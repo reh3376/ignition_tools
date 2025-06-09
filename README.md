@@ -21,9 +21,14 @@ IGN Scripts is designed to streamline the development of Jython scripts for Igni
 
 ## 📋 Features (Planned)
 
+### User Interfaces
+- ✅ Command Line Interface (CLI)
+- ✅ Web-based UI with Streamlit
+- 🔄 Desktop GUI (future consideration)
+
 ### Script Generation
-- ✅ CLI framework
-- 🔄 Vision component event handlers
+- ✅ Template-based script generation
+- ✅ Vision component event handlers
 - 🔄 Perspective component scripts
 - 🔄 Gateway startup/shutdown scripts
 - 🔄 Tag event handlers
@@ -79,6 +84,22 @@ uv pip install -r requirements.txt
 
 ### Basic Usage
 
+#### Web UI (Recommended for beginners)
+
+```bash
+# Launch the web interface
+streamlit run src/ui/streamlit_app.py
+
+# Or use the convenience script
+python3 scripts/run_ui.py
+```
+
+Then open your browser to `http://localhost:8501` for a user-friendly interface.
+
+📚 **For detailed UI usage instructions, see [docs/streamlit_ui_guide.md](docs/streamlit_ui_guide.md)**
+
+#### Command Line Interface
+
 ```bash
 # View available commands
 python -m src.core.cli --help
@@ -87,13 +108,13 @@ python -m src.core.cli --help
 python -m src.core.cli template list
 
 # Generate a basic tag event script
-python -m src.core.cli script generate --type tag-event --output my_script.py
+python -m src.core.cli script generate --template vision/button_click_handler --component-name "MyButton" --output my_script.py
 
-# Validate a Jython script
-python -m src.core.cli script validate my_script.py
+# Generate from configuration file
+python -m src.core.cli script generate --config examples/button_config_example.json --output my_script.py
 
-# Export for Ignition deployment
-python -m src.core.cli export --format ignition-project --output my_project.zip
+# Validate a configuration
+python -m src.core.cli template validate vision/button_click_handler.jinja2 config.json
 ```
 
 ## 📁 Project Structure
@@ -102,6 +123,8 @@ python -m src.core.cli export --format ignition-project --output my_project.zip
 IGN_scripts/
 ├── src/
 │   ├── core/           # Core application logic
+│   ├── ui/             # User interfaces
+│   │   └── streamlit_app.py  # Web UI with Streamlit
 │   ├── ignition/       # Ignition-specific modules
 │   │   ├── templates/  # Jython script templates
 │   │   ├── generators/ # Script generation utilities
@@ -117,6 +140,7 @@ IGN_scripts/
 │   └── alarms/        # Alarm system templates
 ├── tests/             # Test suite
 ├── scripts/           # Standalone utilities
+│   └── run_ui.py      # Launch script for web UI
 ├── examples/          # Example configurations
 ├── docs/              # Documentation
 └── config/            # Configuration files
@@ -178,6 +202,29 @@ This tool supports script generation for various Ignition contexts:
 - Quality change scripts
 - Alarm scripts
 - UDT parameter scripts
+
+## 🌐 Web Interface
+
+IGN Scripts includes a comprehensive web-based interface built with Streamlit, perfect for users who prefer graphical interfaces over command-line tools.
+
+### Features
+- **📝 Script Generator**: Interactive form-based script generation
+- **📋 Template Browser**: Browse and preview available templates
+- **📁 File Upload**: Upload configuration files for batch generation
+- **💾 Download Scripts**: Download generated scripts directly
+- **📚 Built-in Documentation**: Comprehensive help and examples
+- **🎯 Quick Actions**: One-click generation for common scenarios
+
+### Pages Available
+- **Home**: Overview and quick actions
+- **Script Generator**: Full-featured script generation with three modes:
+  - From Template (guided form interface)
+  - From Configuration File (upload JSON configs)
+  - Quick Generate (common scenarios with minimal input)
+- **Templates**: Browse, preview, and download templates
+- **Validation**: Script and configuration validation (coming soon)
+- **Export**: Project export utilities (coming soon)
+- **Documentation**: Complete usage guide and examples
 
 ## 🎓 Examples
 
