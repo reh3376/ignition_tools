@@ -174,6 +174,44 @@ mypy .
 3. **Ignition Compatibility**: All generated code must work within Ignition's scripting environment
 4. **Version Control**: Use git for source control, design for Ignition project versioning
 
+## 🧪 Testing
+
+IGN Scripts includes a comprehensive Docker-based testing environment with real-time monitoring and optimization capabilities.
+
+### Quick Testing
+
+```bash
+# Run all tests
+python3 scripts/run_tests.py --all
+
+# Run specific test types
+python3 scripts/run_tests.py --unit
+python3 scripts/run_tests.py --integration
+python3 scripts/run_tests.py --ui
+python3 scripts/run_tests.py --performance
+
+# Monitor logs in real-time
+python3 scripts/monitor_logs.py --live
+
+# Analyze performance and get optimization recommendations
+python3 scripts/monitor_logs.py --analyze
+```
+
+### Test Categories
+
+- **Unit Tests**: Component-level testing with mocked dependencies
+- **Integration Tests**: End-to-end workflow testing
+- **UI Tests**: Streamlit interface testing with mocked components
+- **Performance Tests**: Benchmarking and profiling with optimization insights
+
+### Coverage & Reports
+
+- **Code Coverage**: 80%+ target with HTML reports
+- **Performance Benchmarks**: JSON reports with timing and memory metrics
+- **Log Analysis**: Automated optimization recommendations
+
+📚 **For detailed testing instructions, see [docs/testing_guide.md](docs/testing_guide.md)**
+
 ## 📚 Ignition Script Contexts
 
 This tool supports script generation for various Ignition contexts:

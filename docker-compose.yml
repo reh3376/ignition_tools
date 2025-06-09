@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  ign-scripts-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ign_scripts_test
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=DEBUG
+      - TESTING_MODE=true
+    volumes:
+      - ./tests:/app/tests
+      - ./src:/app/src
+      - ./templates:/app/templates
+      - ./examples:/app/examples
+      - ./logs:/app/logs
+      - ./test-results:/app/test-results
+      - ./coverage-reports:/app/coverage-reports
+    ports:
+      - "8501:8501"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    command: ["python", "-m", "pytest", "tests/", "-v", "--tb=short", "--log-cli-level=INFO", "--cov=src", "--cov-report=html:/app/coverage-reports/", "--html=/app/test-results/report.html"]
+
+  ign-scripts-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ign_scripts_dev
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+      - TESTING_MODE=false
+    volumes:
+      - ./src:/app/src
+      - ./templates:/app/templates
+      - ./examples:/app/examples
+      - ./logs:/app/logs
+    ports:
+      - "8502:8501"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    command: ["streamlit", "run", "src/ui/streamlit_app.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
+
+  ign-scripts-benchmark:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ign_scripts_benchmark
+    environment:
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./tests:/app/tests
+      - ./src:/app/src
+      - ./logs:/app/logs
+      - ./test-results:/app/test-results
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    command: ["python", "-m", "pytest", "tests/test_performance.py", "-v", "--benchmark-only", "--benchmark-json=/app/test-results/benchmark.json"] 
