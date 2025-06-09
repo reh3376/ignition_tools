@@ -1,0 +1,46 @@
+# Core Dependencies
+uv>=0.4.0
+
+# Script Generation & Templating
+jinja2>=3.1.0
+pydantic>=2.0.0
+jsonschema>=4.19.0
+
+# File Processing
+lxml>=4.9.0
+xmltodict>=0.13.0
+
+# Ignition Resource Processing
+openpyxl>=3.1.0
+zipfile38>=0.3.0
+
+# Development Dependencies
+ruff>=0.1.0
+mypy>=1.7.0
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+black>=23.9.0
+isort>=5.12.0
+
+# Pre-commit
+pre-commit>=3.5.0
+
+# Jupyter (optional)
+jupyter>=1.0.0
+ipykernel>=6.25.0
+
+# Logging
+structlog>=23.1.0
+
+# Configuration
+python-dotenv>=1.0.0
+pyyaml>=6.0.1
+
+# CLI
+click>=8.1.0
+rich>=13.5.0
+
+# Type stubs
+types-requests>=2.31.0
+types-PyYAML>=6.0.12 
