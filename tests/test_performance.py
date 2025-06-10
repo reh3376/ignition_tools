@@ -274,7 +274,7 @@ class TestPerformance:
     def test_cli_performance(self, performance_monitor, temp_dir):
         """Test CLI performance for script generation."""
         from click.testing import CliRunner
-        from src.core.cli import cli
+        from src.core.enhanced_cli import main as cli
         
         runner = CliRunner()
         output_file = temp_dir / "cli_perf_test.py"

@@ -1158,21 +1158,21 @@ def render_docs_page() -> None:
 
         ```bash
         # List available templates
-        python -m src.core.cli template list
+                    python -m src.core.enhanced_cli template list
 
         # Generate script from template
-        python -m src.core.cli script generate \\
+        python -m src.core.enhanced_cli script generate \\
           --template vision/button_click_handler \\
           --component-name "MainButton" \\
           --output my_script.py
 
         # Generate from configuration file
-        python -m src.core.cli script generate \\
+        python -m src.core.enhanced_cli script generate \\
           --config config.json \\
           --output script.py
 
         # Validate configuration
-        python -m src.core.cli template validate \\
+        python -m src.core.enhanced_cli template validate \\
           template_name config.json
         ```
         """

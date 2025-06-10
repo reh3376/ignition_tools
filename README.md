@@ -372,7 +372,7 @@ IGN Scripts includes a comprehensive web-based interface built with Streamlit, p
 ### Generate a Basic Button Click Handler
 
 ```bash
-python -m src.core.cli script generate \
+python -m src.core.enhanced_cli script generate \
   --type vision-button \
   --template basic-navigation \
   --config '{"target_window": "MainMenu", "params": {}}'
@@ -381,7 +381,7 @@ python -m src.core.cli script generate \
 ### Create UDT Definition Scripts
 
 ```bash
-python -m src.core.cli udt generate \
+python -m src.core.enhanced_cli udt generate \
   --name "MotorControl" \
   --type "Industrial" \
   --parameters speed,temperature,status
@@ -390,7 +390,7 @@ python -m src.core.cli udt generate \
 ### Export Project for Gateway
 
 ```bash
-python -m src.core.cli export project \
+python -m src.core.enhanced_cli export project \
   --source ./my_ignition_project \
   --output ./exports/production_v1.2.0.zip \
   --format gateway-import
