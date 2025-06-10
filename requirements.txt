@@ -49,3 +49,11 @@ requests>=2.31.0
 # Type stubs
 types-requests>=2.31.0
 types-PyYAML>=6.0.12
+
+# New dependencies for enhanced CLI
+rich>=13.7.0
+textual>=3.3.0
+
+# Additional visualization
+matplotlib>=3.8.2
+seaborn>=0.13.0

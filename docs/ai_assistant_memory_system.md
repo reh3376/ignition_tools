@@ -5,7 +5,13 @@
 This project includes a **Neo4j graph database** that serves as **persistent long-term memory** for AI assistants working on this codebase. If you are an AI assistant opening this project:
 
 ### **The Graph Database Contains:**
-- **400+ Ignition system functions** with context availability
+- **195/400+ Ignition system functions** (48.8% complete) with context availability
+- **Device Communication Protocols**: OPC, OPC-UA, BACnet, DNP3 (Task 5 ✅)
+- **Tag System Operations**: Complete tag management (Task 1 ✅)
+- **Database Operations**: Enhanced DB functions (Task 2 ✅)
+- **GUI System Functions**: Vision client operations (Task 3 ✅)
+- **Perspective System**: Modern web HMI functions (Task 4 ✅)
+- **Alarm System**: Complete alarm management (Task 7 ✅)
 - **Script templates** and their relationships
 - **Context mappings** (Gateway, Vision, Perspective)
 - **Parameter availability** by script type
@@ -92,6 +98,13 @@ RETURN f2.name, f2.description
 
 ### **Python Integration**
 ```python
+# Recommended: Use the project's IgnitionGraphClient
+from src.ignition.graph.client import IgnitionGraphClient
+
+client = IgnitionGraphClient()
+client.connect()
+
+# Or use Neo4j driver directly
 from neo4j import GraphDatabase
 
 class IgnitionGraphDB:

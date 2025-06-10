@@ -10,28 +10,45 @@ from typing import Any
 
 
 class NodeType(Enum):
-    """Graph node types for Ignition knowledge system."""
-
-    CONTEXT = "Context"
+    """Enumeration of all node types in the graph."""
+    
     FUNCTION = "Function"
+    CONTEXT = "Context"
+    SCOPE = "Scope"
+    PARAMETER = "Parameter"
     TEMPLATE = "Template"
     SCRIPT_TYPE = "ScriptType"
-    PARAMETER = "Parameter"
-    EXAMPLE = "Example"
-    CATEGORY = "Category"
+    PATTERN = "Pattern"
+    TASK = "Task"
+    # Learning System Node Types
+    USAGE_EVENT = "UsageEvent"
+    USER_SESSION = "UserSession"
+    PATTERN_ANALYSIS = "PatternAnalysis"
+    RECOMMENDATION = "Recommendation"
+    PERFORMANCE_METRIC = "PerformanceMetric"
 
 
 class RelationshipType(Enum):
-    """Graph relationship types for Ignition knowledge system."""
-
+    """Enumeration of all relationship types in the graph."""
+    
+    HAS_PARAMETER = "HAS_PARAMETER"
     AVAILABLE_IN = "AVAILABLE_IN"
+    REQUIRES = "REQUIRES"
     USES = "USES"
     PROVIDES = "PROVIDES"
     COMPATIBLE_WITH = "COMPATIBLE_WITH"
     DEPENDS_ON = "DEPENDS_ON"
-    OFTEN_USED_WITH = "OFTEN_USED_WITH"
-    BELONGS_TO = "BELONGS_TO"
-    EXAMPLE_OF = "EXAMPLE_OF"
+    IMPLEMENTS = "IMPLEMENTS"
+    BELONGS_TO_TASK = "BELONGS_TO_TASK"
+    MATCHES_PATTERN = "MATCHES_PATTERN"
+    # Learning System Relationship Types
+    USED_TOGETHER = "USED_TOGETHER"
+    OCCURRED_IN_SESSION = "OCCURRED_IN_SESSION"
+    GENERATED_RECOMMENDATION = "GENERATED_RECOMMENDATION"
+    HAS_PERFORMANCE_DATA = "HAS_PERFORMANCE_DATA"
+    FOLLOWS_PATTERN = "FOLLOWS_PATTERN"
+    PRECEDES = "PRECEDES"
+    CO_OCCURS_WITH = "CO_OCCURS_WITH"
 
 
 @dataclass
@@ -284,3 +301,102 @@ class IgnitionGraphSchema:
         ]
 
         return [GraphNode(NodeType.CATEGORY, category) for category in categories]
+
+    @staticmethod
+    def get_node_schemas() -> dict[str, dict[str, Any]]:
+        """Return schema definitions for all node types."""
+        return {
+            # ... existing schemas ...
+            
+            # Learning System Schemas
+            "UsageEvent": {
+                "description": "Tracks individual usage events for learning patterns",
+                "properties": {
+                    "id": {"type": "string", "required": True, "unique": True},
+                    "event_type": {"type": "string", "required": True},  # "function_query", "template_generation", "parameter_usage"
+                    "timestamp": {"type": "datetime", "required": True},
+                    "user_id": {"type": "string", "required": False},
+                    "session_id": {"type": "string", "required": True},
+                    "context": {"type": "string", "required": False},  # "Gateway", "Vision", "Perspective"
+                    "function_name": {"type": "string", "required": False},
+                    "template_name": {"type": "string", "required": False},
+                    "parameters": {"type": "map", "required": False},
+                    "success": {"type": "boolean", "required": False},
+                    "execution_time": {"type": "float", "required": False},
+                    "error_message": {"type": "string", "required": False}
+                },
+                "indexes": ["timestamp", "event_type", "session_id", "function_name", "template_name"]
+            },
+            
+            "UserSession": {
+                "description": "Represents a user interaction session for pattern analysis",
+                "properties": {
+                    "id": {"type": "string", "required": True, "unique": True},
+                    "user_id": {"type": "string", "required": False},
+                    "start_time": {"type": "datetime", "required": True},
+                    "end_time": {"type": "datetime", "required": False},
+                    "duration": {"type": "integer", "required": False},  # seconds
+                    "event_count": {"type": "integer", "required": False},
+                    "success_rate": {"type": "float", "required": False},
+                    "primary_context": {"type": "string", "required": False},
+                    "unique_functions": {"type": "integer", "required": False},
+                    "unique_templates": {"type": "integer", "required": False},
+                    "session_type": {"type": "string", "required": False}  # "exploration", "development", "debugging"
+                },
+                "indexes": ["start_time", "user_id", "session_type"]
+            },
+            
+            "PatternAnalysis": {
+                "description": "Stores analyzed patterns from usage data",
+                "properties": {
+                    "id": {"type": "string", "required": True, "unique": True},
+                    "pattern_type": {"type": "string", "required": True},  # "co_occurrence", "sequence", "parameter_combo"
+                    "confidence": {"type": "float", "required": True},
+                    "support": {"type": "float", "required": True},  # frequency in dataset
+                    "lift": {"type": "float", "required": False},  # association strength
+                    "pattern_data": {"type": "map", "required": True},
+                    "created_date": {"type": "datetime", "required": True},
+                    "last_updated": {"type": "datetime", "required": True},
+                    "usage_count": {"type": "integer", "required": True},
+                    "success_rate": {"type": "float", "required": False},
+                    "context_specific": {"type": "boolean", "required": False},
+                    "relevance_score": {"type": "float", "required": False}
+                },
+                "indexes": ["pattern_type", "confidence", "created_date", "usage_count"]
+            },
+            
+            "Recommendation": {
+                "description": "Stores generated recommendations for users",
+                "properties": {
+                    "id": {"type": "string", "required": True, "unique": True},
+                    "recommendation_type": {"type": "string", "required": True},  # "function", "template", "parameter"
+                    "source_item": {"type": "string", "required": True},
+                    "recommended_item": {"type": "string", "required": True},
+                    "confidence_score": {"type": "float", "required": True},
+                    "reasoning": {"type": "string", "required": False},
+                    "context": {"type": "string", "required": False},
+                    "created_date": {"type": "datetime", "required": True},
+                    "usage_count": {"type": "integer", "required": False, "default": 0},
+                    "success_count": {"type": "integer", "required": False, "default": 0},
+                    "feedback_score": {"type": "float", "required": False},
+                    "is_active": {"type": "boolean", "required": True, "default": True}
+                },
+                "indexes": ["recommendation_type", "confidence_score", "created_date", "is_active"]
+            },
+            
+            "PerformanceMetric": {
+                "description": "Tracks performance metrics for learning optimization",
+                "properties": {
+                    "id": {"type": "string", "required": True, "unique": True},
+                    "metric_type": {"type": "string", "required": True},  # "generation_time", "success_rate", "error_rate"
+                    "entity_type": {"type": "string", "required": True},  # "function", "template", "combination"
+                    "entity_id": {"type": "string", "required": True},
+                    "metric_value": {"type": "float", "required": True},
+                    "measurement_date": {"type": "datetime", "required": True},
+                    "context": {"type": "string", "required": False},
+                    "sample_size": {"type": "integer", "required": False},
+                    "metadata": {"type": "map", "required": False}
+                },
+                "indexes": ["metric_type", "entity_type", "measurement_date", "entity_id"]
+            }
+        }

@@ -6,11 +6,37 @@ A powerful Python application for generating, validating, and exporting Jython s
 
 **This project includes a Neo4j graph database that serves as persistent long-term memory!**
 
-📋 **Quick AI Assistant Checklist:**
+📋 **Quick AI Assistant Persistent Memory Checklist:**
 - [ ] Check if Neo4j is running: `docker-compose ps neo4j`
 - [ ] Start graph database: `docker-compose up -d neo4j`
-- [ ] Access knowledge: See `docs/ai_assistant_memory_system.md`
-- [ ] Query for context-aware assistance: Contains 400+ Ignition functions, templates, and relationships
+- [ ] **Connection Info**: `bolt://localhost:7687` | Username: `neo4j` | Password: `ignition-graph`
+- [ ] **Web Interface**: http://localhost:7474 (Neo4j Browser)
+- [ ] **Python Access**: `from src.ignition.graph.client import IgnitionGraphClient`
+- [ ] Query for context-aware assistance: Contains 195/400+ Ignition functions (48.8% complete)
+- [ ] **Full Documentation**: See `docs/ai_assistant_memory_system.md`
+
+📊 **Graph Database Status:** Tasks 1-5,7 Complete (195 functions implemented)
+- ✅ Task 1: Tag System (27 functions)
+- ✅ Task 2: Database System (21 functions)
+- ✅ Task 3: GUI System (26 functions)
+- ✅ Task 4: Perspective System (22 functions)
+- ✅ Task 5: Device Communication (37 functions)
+- ✅ Task 7: Alarm System (29 functions)
+- 🎯 Next: Task 6 - Utility System Expansion
+
+🔧 **Quick AI Assistant Commands:**
+```python
+# Connect to knowledge base
+from src.ignition.graph.client import IgnitionGraphClient
+client = IgnitionGraphClient()
+client.connect()
+
+# Query functions by context
+result = client.execute_query("MATCH (f:Function)-[:AVAILABLE_IN]->(s:Scope {name: 'Gateway'}) RETURN f.name, f.description LIMIT 10")
+
+# Get current progress stats
+result = client.execute_query("MATCH (f:Function) RETURN count(f) as total")
+```
 
 **🔗 Full documentation: [AI Assistant Memory System](docs/ai_assistant_memory_system.md)**
 
@@ -48,6 +74,9 @@ IGN Scripts is designed to streamline the development of Jython scripts for Igni
 - 🔄 Alarm pipeline scripts
 
 ### Ignition System Integration
+- ✅ **Gateway Connection System** - HTTP/HTTPS client with authentication
+- ✅ **Multi-Gateway Management** - Connection pooling and health monitoring
+- ✅ **Environment Configuration** - Secure credential management with .env
 - 🔄 `system.tag.*` wrapper functions
 - 🔄 `system.db.*` utilities
 - 🔄 `system.gui.*` helpers
@@ -101,33 +130,70 @@ uv pip install -r requirements.txt
 ```bash
 # Launch the web interface
 streamlit run src/ui/streamlit_app.py
-
-# Or use the convenience script
-python3 scripts/run_ui.py
 ```
 
 Then open your browser to `http://localhost:8501` for a user-friendly interface.
 
-📚 **For detailed UI usage instructions, see [docs/streamlit_ui_guide.md](docs/streamlit_ui_guide.md)**
+📚 **For detailed UI usage instructions, see [ui_readme.md](ui_readme.md)**
 
-#### Command Line Interface
+#### Enhanced CLI with Learning System
 
 ```bash
-# View available commands
-python -m src.core.cli --help
+# View available commands with beautiful terminal UI
+python -m src.core.enhanced_cli --help
 
-# List available script templates
-python -m src.core.cli template list
+# Interactive script generation with recommendations
+python -m src.core.enhanced_cli script generate -i
 
-# Generate a basic tag event script
-python -m src.core.cli script generate --template vision/button_click_handler --component-name "MyButton" --output my_script.py
+# List templates with usage statistics
+python -m src.core.enhanced_cli template list --detailed
 
-# Generate from configuration file
-python -m src.core.cli script generate --config examples/button_config_example.json --output my_script.py
+# Explore usage patterns and analytics
+python -m src.core.enhanced_cli learning patterns
 
-# Validate a configuration
-python -m src.core.cli template validate vision/button_click_handler.jinja2 config.json
+# Launch interactive pattern explorer
+python -m src.core.enhanced_cli learning explore
+
+# Gateway connection management
+python -m src.core.enhanced_cli gateway list
+python -m src.core.enhanced_cli gateway connect --name local_dev
+python -m src.core.enhanced_cli gateway health --all
 ```
+
+📚 **For comprehensive CLI usage instructions, see [cli_readme.md](cli_readme.md)**
+
+### Gateway Configuration
+
+The system supports connecting to multiple Ignition gateways for testing, development, and production use:
+
+```bash
+# Test gateway connection interactively
+python scripts/test_specific_gateway.py
+
+# Discover available endpoints on a gateway
+python scripts/test_ignition_endpoints.py
+
+# Run comprehensive connection tests
+python scripts/test_final_connection.py
+```
+
+Configure gateways using environment variables in a `.env` file:
+
+```bash
+# Copy the template and customize
+cp gateway_config.env .env
+
+# Edit with your gateway details
+IGN_GATEWAYS=local_dev,production
+
+IGN_LOCAL_DEV_HOST=localhost
+IGN_LOCAL_DEV_PORT=8088
+IGN_LOCAL_DEV_HTTPS=false
+IGN_LOCAL_DEV_USERNAME=admin
+IGN_LOCAL_DEV_PASSWORD=password
+```
+
+🔒 **Security Note**: Never commit `.env` files to version control. They contain sensitive credentials.
 
 ## 📁 Project Structure
 
@@ -157,6 +223,30 @@ IGN_scripts/
 ├── docs/              # Documentation
 └── config/            # Configuration files
 ```
+
+## 📚 Documentation
+
+### User Guides
+- **[CLI Usage Guide](cli_readme.md)** - Comprehensive guide to the enhanced CLI with learning system
+- **[Web UI Guide](ui_readme.md)** - Complete instructions for the Streamlit web interface
+- **[Quick Start Tutorial](docs/streamlit_ui_guide.md)** - Getting started with the web interface
+
+### Technical Documentation
+- **[AI Assistant Memory System](docs/ai_assistant_memory_system.md)** - Neo4j graph database integration
+- **[Testing Framework](docs/testing_guide.md)** - Comprehensive testing approach and utilities
+- **[Project Structure](docs/project_structure.md)** - Detailed codebase organization
+- **[Enhanced Graph Functions](docs/enhanced_graph_functions_README.md)** - Ignition function database
+
+### Development Resources
+- **[Testing Summary](docs/TESTING_SUMMARY.md)** - Testing implementation summary
+- **[Learning System Integration](docs/LEARNING_SYSTEM_INTEGRATION_SUMMARY.md)** - Phase 1 learning system details
+- **[Stage 1 Completion](docs/stage1_completion_summary.md)** - Initial development milestone
+- **[Task 5 Summary](docs/TASK_5_COMPLETION_SUMMARY.md)** - Recent development progress
+
+### Configuration Examples
+- **[Templates Directory](templates/)** - Available Jinja2 script templates
+- **[Example Configurations](examples/)** - Sample JSON configuration files
+- **[Docker Configuration](docker-compose.yml)** - Neo4j database setup
 
 ## 🔨 Development
 
