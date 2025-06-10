@@ -6,7 +6,7 @@ import tempfile
 from pathlib import Path
 from click.testing import CliRunner
 
-from src.core.cli import cli
+from src.core.cli import main as cli
 
 
 class TestCLI:
