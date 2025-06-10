@@ -49,7 +49,7 @@ python -m src.core.enhanced_cli learning stats
 #### 📝 Script Generation (`script`)
 Generate Jython scripts from templates with smart recommendations.
 
-#### 📋 Template Management (`template`) 
+#### 📋 Template Management (`template`)
 Browse, list, and get insights about available templates.
 
 #### 🧠 Learning System (`learning`)
@@ -653,4 +653,4 @@ The learning system can be extended with new pattern types and recommendation al
 
 **📞 Support**: For issues and questions, please check the troubleshooting section or create an issue in the repository.
 
-**🔄 Updates**: The CLI automatically tracks usage to improve recommendations. Run `ign learning stats` to see system health and updates. 
+**🔄 Updates**: The CLI automatically tracks usage to improve recommendations. Run `ign learning stats` to see system health and updates.

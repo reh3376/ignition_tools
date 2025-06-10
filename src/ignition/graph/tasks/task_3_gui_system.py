@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Task 3: GUI System Expansion Implementation
+"""Task 3: GUI System Expansion Implementation
 ==========================================
 
 This module implements comprehensive GUI system functions for Ignition Vision Client.
@@ -14,8 +13,8 @@ Functions: 25 comprehensive GUI functions
 Complexity: ⭐⭐⭐ (Medium)
 """
 
-from typing import Dict, List, Any, Optional
 import logging
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -27,12 +26,21 @@ GUI_SYSTEM_FUNCTIONS = [
         "subcategory": "Desktop Operations",
         "description": "Access and manipulate the Vision Client desktop environment",
         "parameters": [
-            {"name": "operation", "type": "String", "description": "Desktop operation to perform"},
-            {"name": "options", "type": "PyDictionary", "description": "Operation-specific options", "optional": True}
+            {
+                "name": "operation",
+                "type": "String",
+                "description": "Desktop operation to perform",
+            },
+            {
+                "name": "options",
+                "type": "PyDictionary",
+                "description": "Operation-specific options",
+                "optional": True,
+            },
         ],
         "returns": {"type": "Object", "description": "Desktop operation result"},
         "scope": ["Vision Client"],
-        "code_example": '''# Get desktop information
+        "code_example": """# Get desktop information
 desktop_info = system.gui.desktop("getInfo")
 print("Desktop size:", desktop_info["size"])
 
@@ -45,13 +53,13 @@ system.gui.desktop("setProperty", {
 # Manage desktop state
 system.gui.desktop("maximize")
 system.gui.desktop("minimize")
-system.gui.desktop("restore")''',
+system.gui.desktop("restore")""",
         "common_patterns": [
             "Desktop state management",
             "Screen configuration",
             "Multi-monitor support",
-            "Desktop customization"
-        ]
+            "Desktop customization",
+        ],
     },
     {
         "name": "system.gui.chooseColor",
@@ -59,12 +67,25 @@ system.gui.desktop("restore")''',
         "subcategory": "Selection Dialogs",
         "description": "Display a color picker dialog for user color selection",
         "parameters": [
-            {"name": "initialColor", "type": "Color", "description": "Initial color selection", "optional": True},
-            {"name": "title", "type": "String", "description": "Dialog title", "optional": True}
+            {
+                "name": "initialColor",
+                "type": "Color",
+                "description": "Initial color selection",
+                "optional": True,
+            },
+            {
+                "name": "title",
+                "type": "String",
+                "description": "Dialog title",
+                "optional": True,
+            },
         ],
-        "returns": {"type": "Color", "description": "Selected color or None if cancelled"},
+        "returns": {
+            "type": "Color",
+            "description": "Selected color or None if cancelled",
+        },
         "scope": ["Vision Client"],
-        "code_example": '''# Basic color picker
+        "code_example": """# Basic color picker
 selected_color = system.gui.chooseColor()
 if selected_color:
     print("Selected color:", selected_color)
@@ -76,13 +97,13 @@ color = system.gui.chooseColor(initial, "Choose Background Color")
 
 # Apply color to component
 if color:
-    event.source.background = color''',
+    event.source.background = color""",
         "common_patterns": [
             "User color selection",
             "Theme customization",
             "Component styling",
-            "Visual configuration"
-        ]
+            "Visual configuration",
+        ],
     },
     {
         "name": "system.gui.warningBox",
@@ -90,13 +111,27 @@ if color:
         "subcategory": "Message Dialogs",
         "description": "Display a warning message dialog to the user",
         "parameters": [
-            {"name": "message", "type": "String", "description": "Warning message to display"},
-            {"name": "title", "type": "String", "description": "Dialog title", "optional": True},
-            {"name": "options", "type": "List", "description": "Custom button options", "optional": True}
+            {
+                "name": "message",
+                "type": "String",
+                "description": "Warning message to display",
+            },
+            {
+                "name": "title",
+                "type": "String",
+                "description": "Dialog title",
+                "optional": True,
+            },
+            {
+                "name": "options",
+                "type": "List",
+                "description": "Custom button options",
+                "optional": True,
+            },
         ],
         "returns": {"type": "String", "description": "User's button selection"},
         "scope": ["Vision Client"],
-        "code_example": '''# Simple warning
+        "code_example": """# Simple warning
 system.gui.warningBox("Temperature exceeded safe limits!")
 
 # Warning with custom title
@@ -117,27 +152,41 @@ if response == "Delete":
     pass
 elif response == "Backup First":
     # Perform backup then delete
-    pass''',
+    pass""",
         "common_patterns": [
             "User warnings",
             "Safety confirmations",
             "Process notifications",
-            "Risk acknowledgments"
-        ]
+            "Risk acknowledgments",
+        ],
     },
     {
         "name": "system.gui.errorBox",
-        "category": "GUI Dialogs", 
+        "category": "GUI Dialogs",
         "subcategory": "Message Dialogs",
         "description": "Display an error message dialog to the user",
         "parameters": [
-            {"name": "message", "type": "String", "description": "Error message to display"},
-            {"name": "title", "type": "String", "description": "Dialog title", "optional": True},
-            {"name": "details", "type": "String", "description": "Detailed error information", "optional": True}
+            {
+                "name": "message",
+                "type": "String",
+                "description": "Error message to display",
+            },
+            {
+                "name": "title",
+                "type": "String",
+                "description": "Dialog title",
+                "optional": True,
+            },
+            {
+                "name": "details",
+                "type": "String",
+                "description": "Detailed error information",
+                "optional": True,
+            },
         ],
         "returns": {"type": "None", "description": "No return value"},
         "scope": ["Vision Client"],
-        "code_example": '''# Simple error message
+        "code_example": """# Simple error message
 system.gui.errorBox("Failed to connect to database")
 
 # Error with custom title
@@ -155,13 +204,13 @@ except Exception as e:
         "Operation failed",
         "System Error",
         str(e)
-    )''',
+    )""",
         "common_patterns": [
             "Error reporting",
             "Exception handling",
             "User notifications",
-            "Troubleshooting aids"
-        ]
+            "Troubleshooting aids",
+        ],
     },
     {
         "name": "system.gui.getRootContainer",
@@ -171,7 +220,7 @@ except Exception as e:
         "parameters": [],
         "returns": {"type": "Container", "description": "Root container object"},
         "scope": ["Vision Client"],
-        "code_example": '''# Get root container
+        "code_example": """# Get root container
 root = system.gui.getRootContainer()
 
 # Access root properties
@@ -185,13 +234,13 @@ root.add(new_label)
 
 # Modify root container
 root.background = java.awt.Color.LIGHT_GRAY
-root.layout = BorderLayout()''',
+root.layout = BorderLayout()""",
         "common_patterns": [
             "Dynamic UI creation",
             "Container manipulation",
             "Layout management",
-            "Component hierarchy access"
-        ]
+            "Component hierarchy access",
+        ],
     },
     {
         "name": "system.gui.getParentWindow",
@@ -199,11 +248,16 @@ root.layout = BorderLayout()''',
         "subcategory": "Window Management",
         "description": "Get reference to the parent window of the current component",
         "parameters": [
-            {"name": "component", "type": "Component", "description": "Component to find parent for", "optional": True}
+            {
+                "name": "component",
+                "type": "Component",
+                "description": "Component to find parent for",
+                "optional": True,
+            }
         ],
         "returns": {"type": "Window", "description": "Parent window object"},
         "scope": ["Vision Client"],
-        "code_example": '''# Get parent window from current context
+        "code_example": """# Get parent window from current context
 parent_window = system.gui.getParentWindow()
 
 # Get parent window of specific component
@@ -216,25 +270,29 @@ parent_window.location = (100, 100)
 
 # Check window state
 if parent_window.visible:
-    print("Window is visible")''',
+    print("Window is visible")""",
         "common_patterns": [
             "Window management",
             "Parent-child relationships",
             "Window property access",
-            "Cross-window communication"
-        ]
+            "Cross-window communication",
+        ],
     },
     {
         "name": "system.gui.getWindow",
         "category": "GUI Management",
-        "subcategory": "Window Management", 
+        "subcategory": "Window Management",
         "description": "Get reference to a specific window by name or path",
         "parameters": [
-            {"name": "windowPath", "type": "String", "description": "Path to the window"}
+            {
+                "name": "windowPath",
+                "type": "String",
+                "description": "Path to the window",
+            }
         ],
         "returns": {"type": "Window", "description": "Window object reference"},
         "scope": ["Vision Client"],
-        "code_example": '''# Get window by path
+        "code_example": """# Get window by path
 main_window = system.gui.getWindow("Main Windows/Overview")
 
 # Check if window exists
@@ -246,18 +304,18 @@ if main_window:
 popup = system.gui.getWindow("Popups/AlarmDetails")
 if popup:
     popup.size = (400, 300)
-    
+
 # Window validation
 try:
     target_window = system.gui.getWindow("NonExistent")
 except:
-    print("Window not found")''',
+    print("Window not found")""",
         "common_patterns": [
             "Window reference management",
             "Cross-window operations",
             "Window existence checking",
-            "Dynamic window access"
-        ]
+            "Dynamic window access",
+        ],
     },
     {
         "name": "system.gui.getWindowNames",
@@ -267,7 +325,7 @@ except:
         "parameters": [],
         "returns": {"type": "List[String]", "description": "List of window names"},
         "scope": ["Vision Client"],
-        "code_example": '''# Get all window names
+        "code_example": """# Get all window names
 window_names = system.gui.getWindowNames()
 print("Available windows:", window_names)
 
@@ -281,13 +339,13 @@ def open_random_window():
     windows = system.gui.getWindowNames()
     if windows:
         random_window = random.choice(windows)
-        system.nav.openWindow(random_window)''',
+        system.nav.openWindow(random_window)""",
         "common_patterns": [
             "Window discovery",
             "Dynamic navigation",
             "Window inventory",
-            "Navigation menu creation"
-        ]
+            "Navigation menu creation",
+        ],
     },
     {
         "name": "system.gui.transform",
@@ -295,19 +353,27 @@ def open_random_window():
         "subcategory": "Coordinate Operations",
         "description": "Transform coordinates between different component coordinate systems",
         "parameters": [
-            {"name": "source", "type": "Component", "description": "Source coordinate system"},
-            {"name": "target", "type": "Component", "description": "Target coordinate system"},
-            {"name": "point", "type": "Point", "description": "Point to transform"}
+            {
+                "name": "source",
+                "type": "Component",
+                "description": "Source coordinate system",
+            },
+            {
+                "name": "target",
+                "type": "Component",
+                "description": "Target coordinate system",
+            },
+            {"name": "point", "type": "Point", "description": "Point to transform"},
         ],
         "returns": {"type": "Point", "description": "Transformed point coordinates"},
         "scope": ["Vision Client"],
-        "code_example": '''# Transform coordinates between components
+        "code_example": """# Transform coordinates between components
 import java.awt.Point as Point
 
 source_point = Point(10, 20)
 transformed = system.gui.transform(
     event.source,      # Source component
-    root_container,    # Target component  
+    root_container,    # Target component
     source_point
 )
 
@@ -319,13 +385,13 @@ def onMouseClick(event):
         system.gui.getRootContainer(),
         Point(event.x, event.y)
     )
-    print("Root coordinates:", root_coords)''',
+    print("Root coordinates:", root_coords)""",
         "common_patterns": [
             "Coordinate system conversion",
             "Mouse event handling",
             "Drag and drop operations",
-            "Component positioning"
-        ]
+            "Component positioning",
+        ],
     },
     {
         "name": "system.gui.openDesktop",
@@ -333,12 +399,24 @@ def onMouseClick(event):
         "subcategory": "Desktop Operations",
         "description": "Open or switch to a specific desktop in the Vision Client",
         "parameters": [
-            {"name": "desktopName", "type": "String", "description": "Name of desktop to open"},
-            {"name": "options", "type": "PyDictionary", "description": "Desktop opening options", "optional": True}
+            {
+                "name": "desktopName",
+                "type": "String",
+                "description": "Name of desktop to open",
+            },
+            {
+                "name": "options",
+                "type": "PyDictionary",
+                "description": "Desktop opening options",
+                "optional": True,
+            },
         ],
-        "returns": {"type": "Boolean", "description": "True if desktop opened successfully"},
+        "returns": {
+            "type": "Boolean",
+            "description": "True if desktop opened successfully",
+        },
         "scope": ["Vision Client"],
-        "code_example": '''# Open specific desktop
+        "code_example": """# Open specific desktop
 success = system.gui.openDesktop("Production Dashboard")
 
 # Open desktop with options
@@ -354,13 +432,13 @@ if current_shift < 8:
 elif current_shift < 16:
     system.gui.openDesktop("Day Shift")
 else:
-    system.gui.openDesktop("Evening Shift")''',
+    system.gui.openDesktop("Evening Shift")""",
         "common_patterns": [
             "Desktop switching",
             "Context-based navigation",
             "Shift-based interfaces",
-            "Role-based desktops"
-        ]
+            "Role-based desktops",
+        ],
     },
     {
         "name": "system.gui.closeDesktop",
@@ -368,12 +446,25 @@ else:
         "subcategory": "Desktop Operations",
         "description": "Close the current or specified desktop",
         "parameters": [
-            {"name": "desktopName", "type": "String", "description": "Name of desktop to close", "optional": True},
-            {"name": "force", "type": "Boolean", "description": "Force close without confirmation", "optional": True}
+            {
+                "name": "desktopName",
+                "type": "String",
+                "description": "Name of desktop to close",
+                "optional": True,
+            },
+            {
+                "name": "force",
+                "type": "Boolean",
+                "description": "Force close without confirmation",
+                "optional": True,
+            },
         ],
-        "returns": {"type": "Boolean", "description": "True if desktop closed successfully"},
+        "returns": {
+            "type": "Boolean",
+            "description": "True if desktop closed successfully",
+        },
         "scope": ["Vision Client"],
-        "code_example": '''# Close current desktop
+        "code_example": """# Close current desktop
 system.gui.closeDesktop()
 
 # Close specific desktop
@@ -384,13 +475,13 @@ system.gui.closeDesktop("Old Interface", True)
 
 # Conditional desktop closure
 if system.security.getUsername() != "admin":
-    system.gui.closeDesktop("Admin Console", True)''',
+    system.gui.closeDesktop("Admin Console", True)""",
         "common_patterns": [
             "Desktop cleanup",
             "Session management",
             "Security-based closure",
-            "Resource management"
-        ]
+            "Resource management",
+        ],
     },
     {
         "name": "system.gui.getClientId",
@@ -400,7 +491,7 @@ if system.security.getUsername() != "admin":
         "parameters": [],
         "returns": {"type": "String", "description": "Unique client identifier"},
         "scope": ["Vision Client"],
-        "code_example": '''# Get client ID
+        "code_example": """# Get client ID
 client_id = system.gui.getClientId()
 print("Client ID:", client_id)
 
@@ -417,13 +508,13 @@ if client_id.startswith("STATION"):
     pass
 elif client_id.startswith("MOBILE"):
     # Mobile client logic
-    pass''',
+    pass""",
         "common_patterns": [
             "Session tracking",
             "Client identification",
             "Multi-client management",
-            "User activity monitoring"
-        ]
+            "User activity monitoring",
+        ],
     },
     {
         "name": "system.gui.getQuality",
@@ -431,12 +522,24 @@ elif client_id.startswith("MOBILE"):
         "subcategory": "Data Quality",
         "description": "Get data quality information for GUI elements",
         "parameters": [
-            {"name": "component", "type": "Component", "description": "Component to check quality for"},
-            {"name": "property", "type": "String", "description": "Property name to check", "optional": True}
+            {
+                "name": "component",
+                "type": "Component",
+                "description": "Component to check quality for",
+            },
+            {
+                "name": "property",
+                "type": "String",
+                "description": "Property name to check",
+                "optional": True,
+            },
         ],
-        "returns": {"type": "Quality", "description": "Quality object with status information"},
+        "returns": {
+            "type": "Quality",
+            "description": "Quality object with status information",
+        },
         "scope": ["Vision Client"],
-        "code_example": '''# Check component quality
+        "code_example": """# Check component quality
 quality = system.gui.getQuality(event.source)
 print("Quality code:", quality.qualityCode)
 
@@ -449,13 +552,13 @@ if quality.isGood():
 elif quality.isBad():
     event.source.background = java.awt.Color.RED
 else:
-    event.source.background = java.awt.Color.YELLOW''',
+    event.source.background = java.awt.Color.YELLOW""",
         "common_patterns": [
             "Data quality visualization",
             "Component validation",
             "Error indication",
-            "Quality-based styling"
-        ]
+            "Quality-based styling",
+        ],
     },
     {
         "name": "system.gui.getScreens",
@@ -463,9 +566,12 @@ else:
         "subcategory": "Screen Management",
         "description": "Get information about available screens/monitors",
         "parameters": [],
-        "returns": {"type": "List[Screen]", "description": "List of screen information objects"},
+        "returns": {
+            "type": "List[Screen]",
+            "description": "List of screen information objects",
+        },
         "scope": ["Vision Client"],
-        "code_example": '''# Get all screens
+        "code_example": """# Get all screens
 screens = system.gui.getScreens()
 for i, screen in enumerate(screens):
     print(f"Screen {i}: {screen.width}x{screen.height}")
@@ -481,13 +587,13 @@ for screen in screens:
 if len(screens) > 1:
     # Place window on second monitor
     second_screen = screens[1]
-    window.location = (second_screen.x, second_screen.y)''',
+    window.location = (second_screen.x, second_screen.y)""",
         "common_patterns": [
             "Multi-monitor support",
             "Screen resolution detection",
             "Window positioning",
-            "Display configuration"
-        ]
+            "Display configuration",
+        ],
     },
     {
         "name": "system.gui.setScreenIndex",
@@ -495,11 +601,18 @@ if len(screens) > 1:
         "subcategory": "Screen Management",
         "description": "Set the active screen index for window operations",
         "parameters": [
-            {"name": "screenIndex", "type": "Integer", "description": "Index of screen to set as active"}
+            {
+                "name": "screenIndex",
+                "type": "Integer",
+                "description": "Index of screen to set as active",
+            }
         ],
-        "returns": {"type": "Boolean", "description": "True if screen index set successfully"},
+        "returns": {
+            "type": "Boolean",
+            "description": "True if screen index set successfully",
+        },
         "scope": ["Vision Client"],
-        "code_example": '''# Set primary screen
+        "code_example": """# Set primary screen
 system.gui.setScreenIndex(0)
 
 # Switch to secondary screen
@@ -512,13 +625,13 @@ def moveToScreen(screen_index):
         # Open new windows on this screen
         system.nav.openWindow("Dashboard")
         return True
-    return False''',
+    return False""",
         "common_patterns": [
             "Screen switching",
             "Multi-monitor workflows",
             "Display management",
-            "Window placement control"
-        ]
+            "Window placement control",
+        ],
     },
     {
         "name": "system.gui.createComponent",
@@ -526,12 +639,21 @@ def moveToScreen(screen_index):
         "subcategory": "Dynamic Creation",
         "description": "Dynamically create GUI components at runtime",
         "parameters": [
-            {"name": "componentType", "type": "String", "description": "Type of component to create"},
-            {"name": "properties", "type": "PyDictionary", "description": "Initial component properties", "optional": True}
+            {
+                "name": "componentType",
+                "type": "String",
+                "description": "Type of component to create",
+            },
+            {
+                "name": "properties",
+                "type": "PyDictionary",
+                "description": "Initial component properties",
+                "optional": True,
+            },
         ],
         "returns": {"type": "Component", "description": "Created component object"},
         "scope": ["Vision Client"],
-        "code_example": '''# Create basic label
+        "code_example": """# Create basic label
 label = system.gui.createComponent("Label", {
     "text": "Dynamic Label",
     "font": "Arial-BOLD-14"
@@ -552,13 +674,13 @@ container.add(button)
 chart = system.gui.createComponent("Chart", {
     "chartType": "line",
     "title": "Trend Data"
-})''',
+})""",
         "common_patterns": [
             "Dynamic UI generation",
             "Runtime component creation",
             "Conditional interfaces",
-            "Data-driven layouts"
-        ]
+            "Data-driven layouts",
+        ],
     },
     {
         "name": "system.gui.removeComponent",
@@ -566,12 +688,24 @@ chart = system.gui.createComponent("Chart", {
         "subcategory": "Dynamic Management",
         "description": "Remove components from their parent containers",
         "parameters": [
-            {"name": "component", "type": "Component", "description": "Component to remove"},
-            {"name": "dispose", "type": "Boolean", "description": "Whether to dispose component resources", "optional": True}
+            {
+                "name": "component",
+                "type": "Component",
+                "description": "Component to remove",
+            },
+            {
+                "name": "dispose",
+                "type": "Boolean",
+                "description": "Whether to dispose component resources",
+                "optional": True,
+            },
         ],
-        "returns": {"type": "Boolean", "description": "True if component removed successfully"},
+        "returns": {
+            "type": "Boolean",
+            "description": "True if component removed successfully",
+        },
         "scope": ["Vision Client"],
-        "code_example": '''# Remove specific component
+        "code_example": """# Remove specific component
 success = system.gui.removeComponent(old_label)
 
 # Remove with resource disposal
@@ -584,13 +718,13 @@ if not component.visible:
 # Clean up dynamic components
 for component in container.components:
     if hasattr(component, 'temporary'):
-        system.gui.removeComponent(component, True)''',
+        system.gui.removeComponent(component, True)""",
         "common_patterns": [
             "Component cleanup",
             "Dynamic UI management",
             "Memory management",
-            "Conditional removal"
-        ]
+            "Conditional removal",
+        ],
     },
     {
         "name": "system.gui.refreshComponent",
@@ -598,12 +732,21 @@ for component in container.components:
         "subcategory": "Component Operations",
         "description": "Refresh component display and data bindings",
         "parameters": [
-            {"name": "component", "type": "Component", "description": "Component to refresh"},
-            {"name": "deep", "type": "Boolean", "description": "Whether to refresh child components", "optional": True}
+            {
+                "name": "component",
+                "type": "Component",
+                "description": "Component to refresh",
+            },
+            {
+                "name": "deep",
+                "type": "Boolean",
+                "description": "Whether to refresh child components",
+                "optional": True,
+            },
         ],
         "returns": {"type": "None", "description": "No return value"},
         "scope": ["Vision Client"],
-        "code_example": '''# Refresh single component
+        "code_example": """# Refresh single component
 system.gui.refreshComponent(data_table)
 
 # Deep refresh including children
@@ -615,13 +758,13 @@ system.gui.refreshComponent(rate_display)
 
 # Periodic refresh
 def refreshDashboard():
-    system.gui.refreshComponent(dashboard_panel, True)''',
+    system.gui.refreshComponent(dashboard_panel, True)""",
         "common_patterns": [
             "Data synchronization",
             "UI updates",
             "Binding refresh",
-            "Display updates"
-        ]
+            "Display updates",
+        ],
     },
     {
         "name": "system.gui.getComponentAt",
@@ -629,17 +772,24 @@ def refreshDashboard():
         "subcategory": "Component Discovery",
         "description": "Get component at specific coordinates within a container",
         "parameters": [
-            {"name": "container", "type": "Container", "description": "Container to search in"},
+            {
+                "name": "container",
+                "type": "Container",
+                "description": "Container to search in",
+            },
             {"name": "x", "type": "Integer", "description": "X coordinate"},
-            {"name": "y", "type": "Integer", "description": "Y coordinate"}
+            {"name": "y", "type": "Integer", "description": "Y coordinate"},
         ],
-        "returns": {"type": "Component", "description": "Component at coordinates or None"},
+        "returns": {
+            "type": "Component",
+            "description": "Component at coordinates or None",
+        },
         "scope": ["Vision Client"],
-        "code_example": '''# Get component at mouse position
+        "code_example": """# Get component at mouse position
 def onMouseClick(event):
     clicked_component = system.gui.getComponentAt(
         event.source.parent,
-        event.x, 
+        event.x,
         event.y
     )
     if clicked_component:
@@ -648,16 +798,16 @@ def onMouseClick(event):
 # Hit testing
 root = system.gui.getRootContainer()
 component_at_center = system.gui.getComponentAt(
-    root, 
-    root.width // 2, 
+    root,
+    root.width // 2,
     root.height // 2
-)''',
+)""",
         "common_patterns": [
             "Hit testing",
             "Mouse interaction",
             "Component discovery",
-            "Coordinate-based selection"
-        ]
+            "Coordinate-based selection",
+        ],
     },
     {
         "name": "system.gui.setClipboard",
@@ -665,11 +815,18 @@ component_at_center = system.gui.getComponentAt(
         "subcategory": "System Integration",
         "description": "Set text content to the system clipboard",
         "parameters": [
-            {"name": "text", "type": "String", "description": "Text to copy to clipboard"}
+            {
+                "name": "text",
+                "type": "String",
+                "description": "Text to copy to clipboard",
+            }
         ],
-        "returns": {"type": "Boolean", "description": "True if clipboard set successfully"},
+        "returns": {
+            "type": "Boolean",
+            "description": "True if clipboard set successfully",
+        },
         "scope": ["Vision Client"],
-        "code_example": '''# Copy text to clipboard
+        "code_example": """# Copy text to clipboard
 system.gui.setClipboard("Copied data value")
 
 # Copy tag value
@@ -681,13 +838,13 @@ data = "Timestamp: %s, Value: %.2f" % (
     system.date.format(system.date.now(), "yyyy-MM-dd HH:mm:ss"),
     production_rate
 )
-system.gui.setClipboard(data)''',
+system.gui.setClipboard(data)""",
         "common_patterns": [
             "Data copying",
             "Export functionality",
             "User assistance",
-            "Data sharing"
-        ]
+            "Data sharing",
+        ],
     },
     {
         "name": "system.gui.getClipboard",
@@ -697,7 +854,7 @@ system.gui.setClipboard(data)''',
         "parameters": [],
         "returns": {"type": "String", "description": "Clipboard text content"},
         "scope": ["Vision Client"],
-        "code_example": '''# Get clipboard content
+        "code_example": """# Get clipboard content
 clipboard_text = system.gui.getClipboard()
 if clipboard_text:
     print("Clipboard contains:", clipboard_text)
@@ -714,13 +871,13 @@ try:
     numeric_value = float(clipboard_data)
     # Use numeric value
 except:
-    print("Clipboard does not contain numeric data")''',
+    print("Clipboard does not contain numeric data")""",
         "common_patterns": [
             "Data pasting",
             "Import functionality",
             "Data validation",
-            "User input assistance"
-        ]
+            "User input assistance",
+        ],
     },
     {
         "name": "system.gui.showKeyboard",
@@ -728,12 +885,24 @@ except:
         "subcategory": "Input Methods",
         "description": "Show or hide the on-screen virtual keyboard",
         "parameters": [
-            {"name": "show", "type": "Boolean", "description": "Whether to show or hide keyboard"},
-            {"name": "keyboardType", "type": "String", "description": "Type of keyboard to display", "optional": True}
+            {
+                "name": "show",
+                "type": "Boolean",
+                "description": "Whether to show or hide keyboard",
+            },
+            {
+                "name": "keyboardType",
+                "type": "String",
+                "description": "Type of keyboard to display",
+                "optional": True,
+            },
         ],
-        "returns": {"type": "Boolean", "description": "True if keyboard state changed successfully"},
+        "returns": {
+            "type": "Boolean",
+            "description": "True if keyboard state changed successfully",
+        },
         "scope": ["Vision Client"],
-        "code_example": '''# Show virtual keyboard
+        "code_example": """# Show virtual keyboard
 system.gui.showKeyboard(True)
 
 # Show numeric keyboard
@@ -749,13 +918,13 @@ def onTextFieldFocus(event):
 
 def onTextFieldBlur(event):
     # Hide keyboard when text field loses focus
-    system.gui.showKeyboard(False)''',
+    system.gui.showKeyboard(False)""",
         "common_patterns": [
             "Touch interface support",
             "Mobile-friendly input",
             "Accessibility features",
-            "Kiosk applications"
-        ]
+            "Kiosk applications",
+        ],
     },
     {
         "name": "system.gui.setCursor",
@@ -763,12 +932,21 @@ def onTextFieldBlur(event):
         "subcategory": "Mouse Operations",
         "description": "Set the mouse cursor type for a component or globally",
         "parameters": [
-            {"name": "cursorType", "type": "String", "description": "Type of cursor to display"},
-            {"name": "component", "type": "Component", "description": "Component to apply cursor to", "optional": True}
+            {
+                "name": "cursorType",
+                "type": "String",
+                "description": "Type of cursor to display",
+            },
+            {
+                "name": "component",
+                "type": "Component",
+                "description": "Component to apply cursor to",
+                "optional": True,
+            },
         ],
         "returns": {"type": "None", "description": "No return value"},
         "scope": ["Vision Client"],
-        "code_example": '''# Set wait cursor globally
+        "code_example": """# Set wait cursor globally
 system.gui.setCursor("wait")
 
 # Set hand cursor for button
@@ -785,13 +963,13 @@ def onMouseEnter(event):
     if event.source.enabled:
         system.gui.setCursor("hand", event.source)
     else:
-        system.gui.setCursor("no", event.source)''',
+        system.gui.setCursor("no", event.source)""",
         "common_patterns": [
             "User feedback",
             "Operation indication",
             "Interactive cues",
-            "State visualization"
-        ]
+            "State visualization",
+        ],
     },
     {
         "name": "system.gui.playSound",
@@ -799,12 +977,24 @@ def onMouseEnter(event):
         "subcategory": "Audio Feedback",
         "description": "Play system sounds or audio files for user feedback",
         "parameters": [
-            {"name": "soundName", "type": "String", "description": "Name of sound to play"},
-            {"name": "volume", "type": "Float", "description": "Volume level (0.0 to 1.0)", "optional": True}
+            {
+                "name": "soundName",
+                "type": "String",
+                "description": "Name of sound to play",
+            },
+            {
+                "name": "volume",
+                "type": "Float",
+                "description": "Volume level (0.0 to 1.0)",
+                "optional": True,
+            },
         ],
-        "returns": {"type": "Boolean", "description": "True if sound played successfully"},
+        "returns": {
+            "type": "Boolean",
+            "description": "True if sound played successfully",
+        },
         "scope": ["Vision Client"],
-        "code_example": '''# Play system beep
+        "code_example": """# Play system beep
 system.gui.playSound("beep")
 
 # Play alarm sound
@@ -821,13 +1011,13 @@ def onButtonClick(event):
         system.gui.playSound("error")
 
 # Volume control
-system.gui.playSound("alert", 0.5)  # 50% volume''',
+system.gui.playSound("alert", 0.5)  # 50% volume""",
         "common_patterns": [
             "Audio feedback",
             "Alarm notifications",
             "User interaction sounds",
-            "System alerts"
-        ]
+            "System alerts",
+        ],
     },
     {
         "name": "system.gui.vibrate",
@@ -835,12 +1025,24 @@ system.gui.playSound("alert", 0.5)  # 50% volume''',
         "subcategory": "Haptic Feedback",
         "description": "Trigger device vibration for haptic feedback",
         "parameters": [
-            {"name": "duration", "type": "Integer", "description": "Vibration duration in milliseconds"},
-            {"name": "intensity", "type": "Float", "description": "Vibration intensity (0.0 to 1.0)", "optional": True}
+            {
+                "name": "duration",
+                "type": "Integer",
+                "description": "Vibration duration in milliseconds",
+            },
+            {
+                "name": "intensity",
+                "type": "Float",
+                "description": "Vibration intensity (0.0 to 1.0)",
+                "optional": True,
+            },
         ],
-        "returns": {"type": "Boolean", "description": "True if vibration triggered successfully"},
+        "returns": {
+            "type": "Boolean",
+            "description": "True if vibration triggered successfully",
+        },
         "scope": ["Vision Client"],
-        "code_example": '''# Short vibration
+        "code_example": """# Short vibration
 system.gui.vibrate(100)
 
 # Long vibration with intensity
@@ -857,13 +1059,13 @@ def vibrateForAlarm(alarm_level):
 
 # Touch feedback
 def onButtonPress(event):
-    system.gui.vibrate(50, 0.4)  # Light haptic feedback''',
+    system.gui.vibrate(50, 0.4)  # Light haptic feedback""",
         "common_patterns": [
             "Haptic feedback",
             "Mobile device interaction",
             "Accessibility support",
-            "Touch confirmation"
-        ]
+            "Touch confirmation",
+        ],
     },
     {
         "name": "system.gui.fullscreen",
@@ -871,12 +1073,24 @@ def onButtonPress(event):
         "subcategory": "Display Control",
         "description": "Enter or exit fullscreen mode for the Vision Client",
         "parameters": [
-            {"name": "enable", "type": "Boolean", "description": "Whether to enable or disable fullscreen"},
-            {"name": "screen", "type": "Integer", "description": "Screen index for fullscreen", "optional": True}
+            {
+                "name": "enable",
+                "type": "Boolean",
+                "description": "Whether to enable or disable fullscreen",
+            },
+            {
+                "name": "screen",
+                "type": "Integer",
+                "description": "Screen index for fullscreen",
+                "optional": True,
+            },
         ],
-        "returns": {"type": "Boolean", "description": "True if fullscreen state changed successfully"},
+        "returns": {
+            "type": "Boolean",
+            "description": "True if fullscreen state changed successfully",
+        },
         "scope": ["Vision Client"],
-        "code_example": '''# Enter fullscreen
+        "code_example": """# Enter fullscreen
 system.gui.fullscreen(True)
 
 # Exit fullscreen
@@ -892,32 +1106,32 @@ system.gui.fullscreen(not current_state)
 # Kiosk mode setup
 def enterKioskMode():
     system.gui.fullscreen(True)
-    system.gui.setCursor("none")  # Hide cursor''',
+    system.gui.setCursor("none")  # Hide cursor""",
         "common_patterns": [
             "Kiosk applications",
             "Presentation mode",
             "Immersive interfaces",
-            "Display optimization"
-        ]
-    }
+            "Display optimization",
+        ],
+    },
 ]
 
-def get_gui_system_functions() -> List[Dict[str, Any]]:
-    """
-    Get all GUI system function definitions.
-    
+
+def get_gui_system_functions() -> list[dict[str, Any]]:
+    """Get all GUI system function definitions.
+
     Returns:
         List[Dict[str, Any]]: List of GUI system function definitions
     """
     return GUI_SYSTEM_FUNCTIONS
 
-def get_function_by_name(function_name: str) -> Optional[Dict[str, Any]]:
-    """
-    Get a specific GUI system function by name.
-    
+
+def get_function_by_name(function_name: str) -> Optional[dict[str, Any]]:
+    """Get a specific GUI system function by name.
+
     Args:
         function_name (str): Name of the function to retrieve
-        
+
     Returns:
         Optional[Dict[str, Any]]: Function definition if found, None otherwise
     """
@@ -926,44 +1140,45 @@ def get_function_by_name(function_name: str) -> Optional[Dict[str, Any]]:
             return func
     return None
 
-def get_functions_by_category(category: str) -> List[Dict[str, Any]]:
-    """
-    Get GUI system functions by category.
-    
+
+def get_functions_by_category(category: str) -> list[dict[str, Any]]:
+    """Get GUI system functions by category.
+
     Args:
         category (str): Category to filter by
-        
+
     Returns:
         List[Dict[str, Any]]: List of functions in the category
     """
     return [func for func in GUI_SYSTEM_FUNCTIONS if func["category"] == category]
 
-def get_functions_by_subcategory(subcategory: str) -> List[Dict[str, Any]]:
-    """
-    Get GUI system functions by subcategory.
-    
+
+def get_functions_by_subcategory(subcategory: str) -> list[dict[str, Any]]:
+    """Get GUI system functions by subcategory.
+
     Args:
         subcategory (str): Subcategory to filter by
-        
+
     Returns:
         List[Dict[str, Any]]: List of functions in the subcategory
     """
     return [func for func in GUI_SYSTEM_FUNCTIONS if func["subcategory"] == subcategory]
+
 
 if __name__ == "__main__":
     # Display function summary
     print("Task 3: GUI System Functions")
     print("=" * 50)
     print(f"Total Functions: {len(GUI_SYSTEM_FUNCTIONS)}")
-    
+
     categories = {}
     for func in GUI_SYSTEM_FUNCTIONS:
         category = func["category"]
         if category not in categories:
             categories[category] = []
         categories[category].append(func["name"])
-    
+
     for category, functions in categories.items():
         print(f"\n{category}:")
         for func_name in functions:
-            print(f"  - {func_name}") 
+            print(f"  - {func_name}")

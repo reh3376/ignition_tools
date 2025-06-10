@@ -5,12 +5,12 @@ Ignition Gateway instances, including authentication, health monitoring,
 and API operations.
 """
 
+from .client import GatewayConnectionPool, IgnitionGatewayClient
 from .config import GatewayConfig, GatewayConfigManager
-from .client import IgnitionGatewayClient, GatewayConnectionPool
 
 __all__ = [
-    "GatewayConfig", 
+    "GatewayConfig",
     "GatewayConfigManager",
     "IgnitionGatewayClient",
-    "GatewayConnectionPool"
-] 
+    "GatewayConnectionPool",
+]

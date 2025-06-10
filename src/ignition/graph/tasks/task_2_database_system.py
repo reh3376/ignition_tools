@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Task 2: Database System Expansion Implementation
+"""Task 2: Database System Expansion Implementation
 ===============================================
 
 This module implements comprehensive database system functions for Ignition SCADA.
@@ -14,8 +13,8 @@ Functions: 17 comprehensive database functions
 Complexity: ⭐⭐⭐⭐ (High)
 """
 
-from typing import Dict, List, Any, Optional
 import logging
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -28,15 +27,31 @@ DATABASE_SYSTEM_FUNCTIONS = [
         "description": "Add a new database datasource connection to the gateway",
         "parameters": [
             {"name": "name", "type": "String", "description": "Name of the datasource"},
-            {"name": "driverClassName", "type": "String", "description": "JDBC driver class name"},
-            {"name": "connectUrl", "type": "String", "description": "Database connection URL"},
+            {
+                "name": "driverClassName",
+                "type": "String",
+                "description": "JDBC driver class name",
+            },
+            {
+                "name": "connectUrl",
+                "type": "String",
+                "description": "Database connection URL",
+            },
             {"name": "username", "type": "String", "description": "Database username"},
             {"name": "password", "type": "String", "description": "Database password"},
-            {"name": "props", "type": "PyDictionary", "description": "Additional connection properties", "optional": True}
+            {
+                "name": "props",
+                "type": "PyDictionary",
+                "description": "Additional connection properties",
+                "optional": True,
+            },
         ],
-        "returns": {"type": "Boolean", "description": "True if datasource was successfully added"},
+        "returns": {
+            "type": "Boolean",
+            "description": "True if datasource was successfully added",
+        },
         "scope": ["Gateway"],
-        "code_example": '''# Add MySQL datasource
+        "code_example": """# Add MySQL datasource
 success = system.db.addDatasource(
     name="ProductionDB",
     driverClassName="com.mysql.cj.jdbc.Driver",
@@ -45,13 +60,13 @@ success = system.db.addDatasource(
     password="secure_password",
     props={"useSSL": "true", "serverTimezone": "UTC"}
 )
-print("Datasource added:", success)''',
+print("Datasource added:", success)""",
         "common_patterns": [
             "Dynamic datasource creation",
             "Runtime database configuration",
             "Multi-environment database setup",
-            "Database failover configuration"
-        ]
+            "Database failover configuration",
+        ],
     },
     {
         "name": "system.db.removeDatasource",
@@ -59,23 +74,30 @@ print("Datasource added:", success)''',
         "subcategory": "Datasource Configuration",
         "description": "Remove an existing database datasource from the gateway",
         "parameters": [
-            {"name": "name", "type": "String", "description": "Name of the datasource to remove"}
+            {
+                "name": "name",
+                "type": "String",
+                "description": "Name of the datasource to remove",
+            }
         ],
-        "returns": {"type": "Boolean", "description": "True if datasource was successfully removed"},
+        "returns": {
+            "type": "Boolean",
+            "description": "True if datasource was successfully removed",
+        },
         "scope": ["Gateway"],
-        "code_example": '''# Remove datasource
+        "code_example": """# Remove datasource
 success = system.db.removeDatasource("OldTestDB")
 print("Datasource removed:", success)
 
 # Conditional removal
 if "TempDB" in system.db.getDatasourceNames():
-    system.db.removeDatasource("TempDB")''',
+    system.db.removeDatasource("TempDB")""",
         "common_patterns": [
             "Cleanup operations",
             "Dynamic configuration management",
             "Database maintenance",
-            "Environment cleanup"
-        ]
+            "Environment cleanup",
+        ],
     },
     {
         "name": "system.db.setDatasourceConnectURL",
@@ -84,11 +106,18 @@ if "TempDB" in system.db.getDatasourceNames():
         "description": "Update the connection URL for an existing datasource",
         "parameters": [
             {"name": "name", "type": "String", "description": "Name of the datasource"},
-            {"name": "connectUrl", "type": "String", "description": "New database connection URL"}
+            {
+                "name": "connectUrl",
+                "type": "String",
+                "description": "New database connection URL",
+            },
         ],
-        "returns": {"type": "Boolean", "description": "True if URL was successfully updated"},
+        "returns": {
+            "type": "Boolean",
+            "description": "True if URL was successfully updated",
+        },
         "scope": ["Gateway"],
-        "code_example": '''# Update connection URL for failover
+        "code_example": """# Update connection URL for failover
 success = system.db.setDatasourceConnectURL(
     "ProductionDB",
     "jdbc:mysql://backup-server:3306/production"
@@ -100,14 +129,14 @@ if env == "production":
     url = "jdbc:mysql://prod-server:3306/main"
 else:
     url = "jdbc:mysql://dev-server:3306/main"
-    
-system.db.setDatasourceConnectURL("MainDB", url)''',
+
+system.db.setDatasourceConnectURL("MainDB", url)""",
         "common_patterns": [
             "Database failover handling",
             "Environment-specific configuration",
             "Dynamic URL updates",
-            "Connection string management"
-        ]
+            "Connection string management",
+        ],
     },
     {
         "name": "system.db.getDatasourceNames",
@@ -117,7 +146,7 @@ system.db.setDatasourceConnectURL("MainDB", url)''',
         "parameters": [],
         "returns": {"type": "List[String]", "description": "List of datasource names"},
         "scope": ["Gateway", "Vision Client", "Perspective Session"],
-        "code_example": '''# Get all datasources
+        "code_example": """# Get all datasources
 datasources = system.db.getDatasourceNames()
 print("Available datasources:", datasources)
 
@@ -133,13 +162,13 @@ for ds_name in datasources:
         system.db.runScalarQuery("SELECT 1", ds_name)
         print(f"Datasource {ds_name} is healthy")
     except:
-        print(f"Datasource {ds_name} has issues")''',
+        print(f"Datasource {ds_name} has issues")""",
         "common_patterns": [
             "Datasource validation",
             "Health checks",
             "Dynamic database selection",
-            "Configuration verification"
-        ]
+            "Configuration verification",
+        ],
     },
     {
         "name": "system.db.createConnection",
@@ -150,12 +179,21 @@ for ds_name in datasources:
             {"name": "jdbcUrl", "type": "String", "description": "JDBC connection URL"},
             {"name": "username", "type": "String", "description": "Database username"},
             {"name": "password", "type": "String", "description": "Database password"},
-            {"name": "driverClassName", "type": "String", "description": "JDBC driver class name"},
-            {"name": "props", "type": "PyDictionary", "description": "Additional connection properties", "optional": True}
+            {
+                "name": "driverClassName",
+                "type": "String",
+                "description": "JDBC driver class name",
+            },
+            {
+                "name": "props",
+                "type": "PyDictionary",
+                "description": "Additional connection properties",
+                "optional": True,
+            },
         ],
         "returns": {"type": "Connection", "description": "Database connection object"},
         "scope": ["Gateway", "Vision Client", "Perspective Session"],
-        "code_example": '''# Create direct connection
+        "code_example": """# Create direct connection
 conn = system.db.createConnection(
     jdbcUrl="jdbc:postgresql://localhost:5432/analytics",
     username="analyst",
@@ -175,13 +213,13 @@ try:
     # Process results
 finally:
     # Always close connection
-    system.db.closeConnection(conn)''',
+    system.db.closeConnection(conn)""",
         "common_patterns": [
             "External database access",
             "Temporary connections",
             "Ad-hoc database queries",
-            "Connection pooling bypass"
-        ]
+            "Connection pooling bypass",
+        ],
     },
     {
         "name": "system.db.closeConnection",
@@ -189,11 +227,15 @@ finally:
         "subcategory": "Connection Management",
         "description": "Close a database connection to free resources",
         "parameters": [
-            {"name": "connection", "type": "Connection", "description": "Database connection to close"}
+            {
+                "name": "connection",
+                "type": "Connection",
+                "description": "Database connection to close",
+            }
         ],
         "returns": {"type": "None", "description": "No return value"},
         "scope": ["Gateway", "Vision Client", "Perspective Session"],
-        "code_example": '''# Proper connection handling
+        "code_example": """# Proper connection handling
 conn = None
 try:
     conn = system.db.createConnection(
@@ -203,7 +245,7 @@ try:
     # Perform database operations
     stmt = conn.createStatement()
     result = stmt.executeQuery("SELECT * FROM temp_data")
-    
+
 finally:
     # Always close in finally block
     if conn is not None:
@@ -219,13 +261,13 @@ def with_connection(jdbc_url, username, password, driver):
             finally:
                 system.db.closeConnection(conn)
         return wrapper
-    return decorator''',
+    return decorator""",
         "common_patterns": [
             "Resource cleanup",
             "Connection lifecycle management",
             "Memory leak prevention",
-            "Exception-safe patterns"
-        ]
+            "Exception-safe patterns",
+        ],
     },
     {
         "name": "system.db.beginNamedQueryTransaction",
@@ -233,13 +275,27 @@ def with_connection(jdbc_url, username, password, driver):
         "subcategory": "Transaction Management",
         "description": "Begin a named query transaction for atomic operations",
         "parameters": [
-            {"name": "datasource", "type": "String", "description": "Name of the datasource"},
-            {"name": "isolationLevel", "type": "Integer", "description": "Transaction isolation level", "optional": True},
-            {"name": "timeout", "type": "Integer", "description": "Transaction timeout in seconds", "optional": True}
+            {
+                "name": "datasource",
+                "type": "String",
+                "description": "Name of the datasource",
+            },
+            {
+                "name": "isolationLevel",
+                "type": "Integer",
+                "description": "Transaction isolation level",
+                "optional": True,
+            },
+            {
+                "name": "timeout",
+                "type": "Integer",
+                "description": "Transaction timeout in seconds",
+                "optional": True,
+            },
         ],
         "returns": {"type": "String", "description": "Transaction identifier"},
         "scope": ["Gateway", "Vision Client", "Perspective Session"],
-        "code_example": '''# Begin transaction for batch operations
+        "code_example": """# Begin transaction for batch operations
 tx_id = system.db.beginNamedQueryTransaction(
     datasource="ProductionDB",
     isolationLevel=2,  # READ_COMMITTED
@@ -251,21 +307,21 @@ try:
     system.db.runNamedQuery("UpdateInventory", {"qty": 100, "item": "A123"}, tx_id)
     system.db.runNamedQuery("LogTransaction", {"action": "inventory_update"}, tx_id)
     system.db.runNamedQuery("UpdateAuditLog", {"user": "system"}, tx_id)
-    
+
     # Commit all changes
     system.db.commitNamedQueryTransaction(tx_id)
     print("Transaction completed successfully")
-    
+
 except Exception as e:
     # Rollback on error
     system.db.rollbackNamedQueryTransaction(tx_id)
-    print("Transaction rolled back:", str(e))''',
+    print("Transaction rolled back:", str(e))""",
         "common_patterns": [
             "Atomic batch operations",
             "Data consistency maintenance",
             "Multi-step workflows",
-            "Error handling with rollback"
-        ]
+            "Error handling with rollback",
+        ],
     },
     {
         "name": "system.db.commitNamedQueryTransaction",
@@ -273,51 +329,58 @@ except Exception as e:
         "subcategory": "Transaction Management",
         "description": "Commit a named query transaction to make changes permanent",
         "parameters": [
-            {"name": "transactionId", "type": "String", "description": "Transaction identifier to commit"}
+            {
+                "name": "transactionId",
+                "type": "String",
+                "description": "Transaction identifier to commit",
+            }
         ],
-        "returns": {"type": "Boolean", "description": "True if transaction was successfully committed"},
+        "returns": {
+            "type": "Boolean",
+            "description": "True if transaction was successfully committed",
+        },
         "scope": ["Gateway", "Vision Client", "Perspective Session"],
-        "code_example": '''# Complete transaction pattern
+        "code_example": """# Complete transaction pattern
 def transfer_inventory(from_location, to_location, item_id, quantity):
     tx_id = system.db.beginNamedQueryTransaction("InventoryDB")
-    
+
     try:
         # Check source availability
         available = system.db.runNamedQuery(
-            "CheckInventory", 
-            {"location": from_location, "item": item_id}, 
+            "CheckInventory",
+            {"location": from_location, "item": item_id},
             tx_id
         )[0]["quantity"]
-        
+
         if available < quantity:
             raise Exception("Insufficient inventory")
-        
+
         # Perform transfer
         system.db.runNamedQuery("DeductInventory", {
-            "location": from_location, 
-            "item": item_id, 
+            "location": from_location,
+            "item": item_id,
             "qty": quantity
         }, tx_id)
-        
+
         system.db.runNamedQuery("AddInventory", {
-            "location": to_location, 
-            "item": item_id, 
+            "location": to_location,
+            "item": item_id,
             "qty": quantity
         }, tx_id)
-        
+
         # Commit transaction
         success = system.db.commitNamedQueryTransaction(tx_id)
         return success
-        
+
     except Exception as e:
         system.db.rollbackNamedQueryTransaction(tx_id)
-        raise e''',
+        raise e""",
         "common_patterns": [
             "Transaction completion",
             "Data integrity assurance",
             "Batch operation finalization",
-            "Consistent state management"
-        ]
+            "Consistent state management",
+        ],
     },
     {
         "name": "system.db.rollbackNamedQueryTransaction",
@@ -325,49 +388,56 @@ def transfer_inventory(from_location, to_location, item_id, quantity):
         "subcategory": "Transaction Management",
         "description": "Rollback a named query transaction to undo changes",
         "parameters": [
-            {"name": "transactionId", "type": "String", "description": "Transaction identifier to rollback"}
+            {
+                "name": "transactionId",
+                "type": "String",
+                "description": "Transaction identifier to rollback",
+            }
         ],
-        "returns": {"type": "Boolean", "description": "True if transaction was successfully rolled back"},
+        "returns": {
+            "type": "Boolean",
+            "description": "True if transaction was successfully rolled back",
+        },
         "scope": ["Gateway", "Vision Client", "Perspective Session"],
-        "code_example": '''# Error handling with rollback
+        "code_example": """# Error handling with rollback
 def process_batch_orders(orders):
     tx_id = system.db.beginNamedQueryTransaction("OrderDB")
     processed_count = 0
-    
+
     try:
         for order in orders:
             # Validate order
             if not validate_order(order):
                 raise Exception(f"Invalid order: {order['id']}")
-            
+
             # Process order
             system.db.runNamedQuery("CreateOrder", order, tx_id)
             system.db.runNamedQuery("UpdateInventory", {
                 "item": order["item_id"],
                 "qty": -order["quantity"]
             }, tx_id)
-            
+
             processed_count += 1
-        
+
         # All orders processed successfully
         system.db.commitNamedQueryTransaction(tx_id)
         return {"success": True, "processed": processed_count}
-        
+
     except Exception as e:
         # Rollback all changes on any error
         rollback_success = system.db.rollbackNamedQueryTransaction(tx_id)
         return {
-            "success": False, 
+            "success": False,
             "processed": 0,
             "error": str(e),
             "rollback_success": rollback_success
-        }''',
+        }""",
         "common_patterns": [
             "Error recovery",
             "Data consistency maintenance",
             "Failed operation cleanup",
-            "Atomic operation guarantee"
-        ]
+            "Atomic operation guarantee",
+        ],
     },
     {
         "name": "system.db.runNamedQuery",
@@ -375,13 +445,27 @@ def process_batch_orders(orders):
         "subcategory": "Query Execution",
         "description": "Execute a named query with parameters and optional transaction context",
         "parameters": [
-            {"name": "queryName", "type": "String", "description": "Name of the configured named query"},
-            {"name": "parameters", "type": "PyDictionary", "description": "Query parameters", "optional": True},
-            {"name": "transactionId", "type": "String", "description": "Transaction identifier", "optional": True}
+            {
+                "name": "queryName",
+                "type": "String",
+                "description": "Name of the configured named query",
+            },
+            {
+                "name": "parameters",
+                "type": "PyDictionary",
+                "description": "Query parameters",
+                "optional": True,
+            },
+            {
+                "name": "transactionId",
+                "type": "String",
+                "description": "Transaction identifier",
+                "optional": True,
+            },
         ],
         "returns": {"type": "PyDataSet", "description": "Query results as dataset"},
         "scope": ["Gateway", "Vision Client", "Perspective Session"],
-        "code_example": '''# Execute named query with parameters
+        "code_example": """# Execute named query with parameters
 results = system.db.runNamedQuery(
     "GetProductsByCategory",
     {"category": "Electronics", "min_price": 100}
@@ -396,11 +480,11 @@ tx_id = system.db.beginNamedQueryTransaction("ProductDB")
 try:
     # Get current inventory
     inventory = system.db.runNamedQuery(
-        "GetInventoryLevels", 
-        {"location": "Warehouse A"}, 
+        "GetInventoryLevels",
+        {"location": "Warehouse A"},
         tx_id
     )
-    
+
     # Update based on results
     for item in inventory:
         if item["quantity"] < item["reorder_point"]:
@@ -408,16 +492,16 @@ try:
                 "item_id": item["id"],
                 "quantity": item["reorder_quantity"]
             }, tx_id)
-    
+
     system.db.commitNamedQueryTransaction(tx_id)
 except:
-    system.db.rollbackNamedQueryTransaction(tx_id)''',
+    system.db.rollbackNamedQueryTransaction(tx_id)""",
         "common_patterns": [
             "Parameterized queries",
             "Reusable query execution",
             "Transaction-aware queries",
-            "Complex data retrieval"
-        ]
+            "Complex data retrieval",
+        ],
     },
     {
         "name": "system.db.runNamedQueryUpdate",
@@ -425,13 +509,27 @@ except:
         "subcategory": "Query Execution",
         "description": "Execute a named update query (INSERT/UPDATE/DELETE) with parameters",
         "parameters": [
-            {"name": "queryName", "type": "String", "description": "Name of the configured named query"},
-            {"name": "parameters", "type": "PyDictionary", "description": "Query parameters", "optional": True},
-            {"name": "transactionId", "type": "String", "description": "Transaction identifier", "optional": True}
+            {
+                "name": "queryName",
+                "type": "String",
+                "description": "Name of the configured named query",
+            },
+            {
+                "name": "parameters",
+                "type": "PyDictionary",
+                "description": "Query parameters",
+                "optional": True,
+            },
+            {
+                "name": "transactionId",
+                "type": "String",
+                "description": "Transaction identifier",
+                "optional": True,
+            },
         ],
         "returns": {"type": "Integer", "description": "Number of affected rows"},
         "scope": ["Gateway", "Vision Client", "Perspective Session"],
-        "code_example": '''# Execute named update query
+        "code_example": """# Execute named update query
 rows_affected = system.db.runNamedQueryUpdate(
     "UpdateProductPrice",
     {"product_id": "PROD-123", "new_price": 149.99}
@@ -442,7 +540,7 @@ print(f"Updated {rows_affected} rows")
 def update_product_prices(price_updates):
     tx_id = system.db.beginNamedQueryTransaction("ProductDB")
     total_updated = 0
-    
+
     try:
         for product_id, new_price in price_updates.items():
             updated = system.db.runNamedQueryUpdate(
@@ -451,38 +549,52 @@ def update_product_prices(price_updates):
                 tx_id
             )
             total_updated += updated
-        
+
         system.db.commitNamedQueryTransaction(tx_id)
         return total_updated
-        
+
     except Exception as e:
         system.db.rollbackNamedQueryTransaction(tx_id)
         raise e
 
 # Usage
 updates = {"PROD-123": 149.99, "PROD-456": 89.99}
-updated_count = update_product_prices(updates)''',
+updated_count = update_product_prices(updates)""",
         "common_patterns": [
             "Data modification operations",
             "Batch updates",
             "Parameterized modifications",
-            "Transaction-safe updates"
-        ]
+            "Transaction-safe updates",
+        ],
     },
     {
         "name": "system.db.runPrepQuery",
-        "category": "Database Operations",  
+        "category": "Database Operations",
         "subcategory": "Prepared Statements",
         "description": "Execute a prepared query with enhanced parameter binding and caching",
         "parameters": [
-            {"name": "query", "type": "String", "description": "SQL query with parameter placeholders"},
+            {
+                "name": "query",
+                "type": "String",
+                "description": "SQL query with parameter placeholders",
+            },
             {"name": "args", "type": "List", "description": "Query parameter values"},
-            {"name": "database", "type": "String", "description": "Database name", "optional": True},
-            {"name": "cacheKey", "type": "String", "description": "Cache key for prepared statement", "optional": True}
+            {
+                "name": "database",
+                "type": "String",
+                "description": "Database name",
+                "optional": True,
+            },
+            {
+                "name": "cacheKey",
+                "type": "String",
+                "description": "Cache key for prepared statement",
+                "optional": True,
+            },
         ],
         "returns": {"type": "PyDataSet", "description": "Query results as dataset"},
         "scope": ["Gateway", "Vision Client", "Perspective Session"],
-        "code_example": '''# Enhanced prepared query with caching
+        "code_example": """# Enhanced prepared query with caching
 results = system.db.runPrepQuery(
     "SELECT * FROM orders WHERE customer_id = ? AND order_date >= ?",
     [customer_id, start_date],
@@ -494,22 +606,22 @@ results = system.db.runPrepQuery(
 def get_filtered_products(filters):
     conditions = []
     params = []
-    
+
     if "category" in filters:
         conditions.append("category = ?")
         params.append(filters["category"])
-    
+
     if "min_price" in filters:
         conditions.append("price >= ?")
         params.append(filters["min_price"])
-    
+
     if "in_stock" in filters and filters["in_stock"]:
         conditions.append("stock_quantity > 0")
-    
+
     query = "SELECT * FROM products"
     if conditions:
         query += " WHERE " + " AND ".join(conditions)
-    
+
     return system.db.runPrepQuery(query, params, "ProductDB")
 
 # Usage
@@ -517,28 +629,45 @@ products = get_filtered_products({
     "category": "Electronics",
     "min_price": 50,
     "in_stock": True
-})''',
+})""",
         "common_patterns": [
             "Dynamic query construction",
             "Performance optimization",
             "SQL injection protection",
-            "Cached prepared statements"
-        ]
+            "Cached prepared statements",
+        ],
     },
     {
         "name": "system.db.runPrepUpdate",
         "category": "Database Operations",
-        "subcategory": "Prepared Statements", 
+        "subcategory": "Prepared Statements",
         "description": "Execute a prepared update statement with enhanced parameter binding",
         "parameters": [
-            {"name": "query", "type": "String", "description": "SQL update query with parameter placeholders"},
+            {
+                "name": "query",
+                "type": "String",
+                "description": "SQL update query with parameter placeholders",
+            },
             {"name": "args", "type": "List", "description": "Query parameter values"},
-            {"name": "database", "type": "String", "description": "Database name", "optional": True},
-            {"name": "getKeys", "type": "Boolean", "description": "Return generated keys", "optional": True}
+            {
+                "name": "database",
+                "type": "String",
+                "description": "Database name",
+                "optional": True,
+            },
+            {
+                "name": "getKeys",
+                "type": "Boolean",
+                "description": "Return generated keys",
+                "optional": True,
+            },
         ],
-        "returns": {"type": "Integer|PyDataSet", "description": "Affected rows count or generated keys"},
+        "returns": {
+            "type": "Integer|PyDataSet",
+            "description": "Affected rows count or generated keys",
+        },
         "scope": ["Gateway", "Vision Client", "Perspective Session"],
-        "code_example": '''# Enhanced prepared update
+        "code_example": """# Enhanced prepared update
 rows_updated = system.db.runPrepUpdate(
     "UPDATE products SET price = ?, last_updated = ? WHERE category = ?",
     [new_price, system.date.now(), "Electronics"],
@@ -558,7 +687,7 @@ new_order_id = new_keys[0]["GENERATED_KEYS"]
 def batch_update_inventory(updates):
     success_count = 0
     errors = []
-    
+
     for item_id, new_quantity in updates:
         try:
             affected = system.db.runPrepUpdate(
@@ -572,14 +701,14 @@ def batch_update_inventory(updates):
                 errors.append(f"Item {item_id} not found")
         except Exception as e:
             errors.append(f"Error updating {item_id}: {str(e)}")
-    
-    return {"success_count": success_count, "errors": errors}''',
+
+    return {"success_count": success_count, "errors": errors}""",
         "common_patterns": [
             "Batch data modifications",
             "Generated key retrieval",
             "Error-resistant updates",
-            "Performance-optimized updates"
-        ]
+            "Performance-optimized updates",
+        ],
     },
     {
         "name": "system.db.runScalarQuery",
@@ -587,12 +716,21 @@ def batch_update_inventory(updates):
         "subcategory": "Scalar Queries",
         "description": "Execute a query that returns a single scalar value",
         "parameters": [
-            {"name": "query", "type": "String", "description": "SQL query returning single value"},
-            {"name": "database", "type": "String", "description": "Database name", "optional": True}
+            {
+                "name": "query",
+                "type": "String",
+                "description": "SQL query returning single value",
+            },
+            {
+                "name": "database",
+                "type": "String",
+                "description": "Database name",
+                "optional": True,
+            },
         ],
         "returns": {"type": "Object", "description": "Single scalar result value"},
         "scope": ["Gateway", "Vision Client", "Perspective Session"],
-        "code_example": '''# Get single values efficiently
+        "code_example": """# Get single values efficiently
 total_orders = system.db.runScalarQuery(
     "SELECT COUNT(*) FROM orders WHERE status = 'active'",
     "OrderDB"
@@ -607,7 +745,7 @@ last_update = system.db.runScalarQuery(
 # Health check queries
 def database_health_check(databases):
     health_status = {}
-    
+
     for db_name in databases:
         try:
             # Simple connectivity test
@@ -616,37 +754,37 @@ def database_health_check(databases):
                 # Get record counts for validation
                 table_counts = {}
                 tables = ["orders", "products", "customers"]
-                
+
                 for table in tables:
                     try:
                         count = system.db.runScalarQuery(
-                            f"SELECT COUNT(*) FROM {table}", 
+                            f"SELECT COUNT(*) FROM {table}",
                             db_name
                         )
                         table_counts[table] = count
                     except:
                         table_counts[table] = "ERROR"
-                
+
                 health_status[db_name] = {
                     "status": "HEALTHY",
                     "table_counts": table_counts
                 }
             else:
                 health_status[db_name] = {"status": "UNHEALTHY"}
-                
+
         except Exception as e:
             health_status[db_name] = {
                 "status": "ERROR",
                 "error": str(e)
             }
-    
-    return health_status''',
+
+    return health_status""",
         "common_patterns": [
             "Aggregate calculations",
             "Existence checks",
             "Health monitoring",
-            "Simple data retrieval"
-        ]
+            "Simple data retrieval",
+        ],
     },
     {
         "name": "system.db.runScalarPrepQuery",
@@ -654,13 +792,22 @@ def database_health_check(databases):
         "subcategory": "Scalar Queries",
         "description": "Execute a prepared query that returns a single scalar value with parameters",
         "parameters": [
-            {"name": "query", "type": "String", "description": "SQL query with parameter placeholders"},
+            {
+                "name": "query",
+                "type": "String",
+                "description": "SQL query with parameter placeholders",
+            },
             {"name": "args", "type": "List", "description": "Query parameter values"},
-            {"name": "database", "type": "String", "description": "Database name", "optional": True}
+            {
+                "name": "database",
+                "type": "String",
+                "description": "Database name",
+                "optional": True,
+            },
         ],
         "returns": {"type": "Object", "description": "Single scalar result value"},
         "scope": ["Gateway", "Vision Client", "Perspective Session"],
-        "code_example": '''# Parameterized scalar queries
+        "code_example": """# Parameterized scalar queries
 customer_order_count = system.db.runScalarPrepQuery(
     "SELECT COUNT(*) FROM orders WHERE customer_id = ? AND order_date >= ?",
     [customer_id, start_date],
@@ -680,7 +827,7 @@ def get_metric(metric_type, filters):
         args = [filters["location"]]
     else:
         return None
-    
+
     return system.db.runScalarPrepQuery(query, args, "MainDB")
 
 # Usage examples
@@ -701,13 +848,13 @@ if stock_level < 10:
         "INSERT INTO purchase_orders (item_id, quantity, status) VALUES (?, ?, ?)",
         ["ITEM-456", 100, "pending"],
         "InventoryDB"
-    )''',
+    )""",
         "common_patterns": [
             "Conditional operations",
             "Metric calculations",
             "Parameterized aggregations",
-            "Decision-making queries"
-        ]
+            "Decision-making queries",
+        ],
     },
     {
         "name": "system.db.refresh",
@@ -715,11 +862,16 @@ if stock_level < 10:
         "subcategory": "Connection Management",
         "description": "Refresh database connections and clear connection pools",
         "parameters": [
-            {"name": "datasource", "type": "String", "description": "Specific datasource to refresh", "optional": True}
+            {
+                "name": "datasource",
+                "type": "String",
+                "description": "Specific datasource to refresh",
+                "optional": True,
+            }
         ],
         "returns": {"type": "Boolean", "description": "True if refresh was successful"},
         "scope": ["Gateway"],
-        "code_example": '''# Refresh all database connections
+        "code_example": """# Refresh all database connections
 success = system.db.refresh()
 print("Database refresh successful:", success)
 
@@ -730,18 +882,18 @@ system.db.refresh("ProductionDB")
 def perform_database_maintenance():
     datasources = system.db.getDatasourceNames()
     maintenance_log = []
-    
+
     for ds_name in datasources:
         try:
             # Test connection before refresh
             pre_test = system.db.runScalarQuery("SELECT 1", ds_name)
-            
+
             # Refresh datasource
             refresh_success = system.db.refresh(ds_name)
-            
+
             # Test connection after refresh
             post_test = system.db.runScalarQuery("SELECT 1", ds_name)
-            
+
             maintenance_log.append({
                 "datasource": ds_name,
                 "pre_test": pre_test == 1,
@@ -749,24 +901,24 @@ def perform_database_maintenance():
                 "post_test": post_test == 1,
                 "status": "SUCCESS" if refresh_success and post_test == 1 else "FAILED"
             })
-            
+
         except Exception as e:
             maintenance_log.append({
                 "datasource": ds_name,
                 "status": "ERROR",
                 "error": str(e)
             })
-    
+
     return maintenance_log
 
 # Scheduled maintenance
-maintenance_results = perform_database_maintenance()''',
+maintenance_results = perform_database_maintenance()""",
         "common_patterns": [
             "Connection pool maintenance",
             "Database health restoration",
             "Scheduled maintenance",
-            "Connection troubleshooting"
-        ]
+            "Connection troubleshooting",
+        ],
     },
     {
         "name": "system.db.execSQLUpdate",
@@ -774,13 +926,27 @@ maintenance_results = perform_database_maintenance()''',
         "subcategory": "Direct SQL Execution",
         "description": "Execute direct SQL update statements with enhanced error handling",
         "parameters": [
-            {"name": "query", "type": "String", "description": "SQL update/insert/delete statement"},
-            {"name": "database", "type": "String", "description": "Database name", "optional": True},
-            {"name": "skipAudit", "type": "Boolean", "description": "Skip audit logging", "optional": True}
+            {
+                "name": "query",
+                "type": "String",
+                "description": "SQL update/insert/delete statement",
+            },
+            {
+                "name": "database",
+                "type": "String",
+                "description": "Database name",
+                "optional": True,
+            },
+            {
+                "name": "skipAudit",
+                "type": "Boolean",
+                "description": "Skip audit logging",
+                "optional": True,
+            },
         ],
         "returns": {"type": "Integer", "description": "Number of affected rows"},
         "scope": ["Gateway", "Vision Client", "Perspective Session"],
-        "code_example": '''# Direct SQL execution
+        "code_example": """# Direct SQL execution
 rows_affected = system.db.execSQLUpdate(
     "UPDATE products SET discontinued = 1 WHERE category = 'Old Electronics'",
     "ProductDB"
@@ -794,7 +960,7 @@ def execute_maintenance_sql(database):
         "UPDATE statistics SET last_calculated = NOW() WHERE stat_type = 'daily'",
         "INSERT INTO audit_log (action, timestamp) VALUES ('maintenance_run', NOW())"
     ]
-    
+
     results = []
     for query in maintenance_queries:
         try:
@@ -810,7 +976,7 @@ def execute_maintenance_sql(database):
                 "error": str(e),
                 "status": "FAILED"
             })
-    
+
     return results
 
 # Usage
@@ -824,39 +990,39 @@ if current_hour == 2:  # 2 AM maintenance window
         "INSERT INTO archive_orders SELECT * FROM orders WHERE order_date < DATE_SUB(NOW(), INTERVAL 1 YEAR)",
         "OrderDB"
     )
-    
+
     # Delete archived records from main table
     deleted = system.db.execSQLUpdate(
         "DELETE FROM orders WHERE order_date < DATE_SUB(NOW(), INTERVAL 1 YEAR)",
         "OrderDB"
     )
-    
-    print(f"Archived {archived} orders, deleted {deleted} from main table")''',
+
+    print(f"Archived {archived} orders, deleted {deleted} from main table")""",
         "common_patterns": [
             "Database maintenance",
             "Bulk data operations",
             "Schema modifications",
-            "Administrative SQL tasks"
-        ]
-    }
+            "Administrative SQL tasks",
+        ],
+    },
 ]
 
-def get_database_system_functions() -> List[Dict[str, Any]]:
-    """
-    Get all database system function definitions.
-    
+
+def get_database_system_functions() -> list[dict[str, Any]]:
+    """Get all database system function definitions.
+
     Returns:
         List[Dict[str, Any]]: List of database system function definitions
     """
     return DATABASE_SYSTEM_FUNCTIONS
 
-def get_function_by_name(function_name: str) -> Optional[Dict[str, Any]]:
-    """
-    Get a specific database system function by name.
-    
+
+def get_function_by_name(function_name: str) -> Optional[dict[str, Any]]:
+    """Get a specific database system function by name.
+
     Args:
         function_name (str): Name of the function to retrieve
-        
+
     Returns:
         Optional[Dict[str, Any]]: Function definition if found, None otherwise
     """
@@ -865,43 +1031,46 @@ def get_function_by_name(function_name: str) -> Optional[Dict[str, Any]]:
             return func
     return None
 
-def get_functions_by_category(category: str) -> List[Dict[str, Any]]:
-    """
-    Get database system functions by category.
-    
+
+def get_functions_by_category(category: str) -> list[dict[str, Any]]:
+    """Get database system functions by category.
+
     Args:
         category (str): Category to filter by
-        
+
     Returns:
         List[Dict[str, Any]]: List of functions in the category
     """
     return [func for func in DATABASE_SYSTEM_FUNCTIONS if func["category"] == category]
 
-def get_functions_by_subcategory(subcategory: str) -> List[Dict[str, Any]]:
-    """
-    Get database system functions by subcategory.
-    
+
+def get_functions_by_subcategory(subcategory: str) -> list[dict[str, Any]]:
+    """Get database system functions by subcategory.
+
     Args:
         subcategory (str): Subcategory to filter by
-        
+
     Returns:
         List[Dict[str, Any]]: List of functions in the subcategory
     """
-    return [func for func in DATABASE_SYSTEM_FUNCTIONS if func["subcategory"] == subcategory]
+    return [
+        func for func in DATABASE_SYSTEM_FUNCTIONS if func["subcategory"] == subcategory
+    ]
+
 
 if __name__ == "__main__":
     # Display function summary
     print("Task 2: Database System Functions")
     print("=" * 50)
     print(f"Total Functions: {len(DATABASE_SYSTEM_FUNCTIONS)}")
-    
+
     categories = {}
     for func in DATABASE_SYSTEM_FUNCTIONS:
         category = func["category"]
         if category not in categories:
             categories[category] = []
         categories[category].append(func["name"])
-    
+
     for category, functions in categories.items():
         print(f"\n{category}:")
         for func_name in functions:

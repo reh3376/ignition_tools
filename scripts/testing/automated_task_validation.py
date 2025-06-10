@@ -312,7 +312,7 @@ class TaskValidator:
             "system.db.runScalarQuery",
             "system.db.runScalarPrepQuery",
             "system.db.refresh",
-            "system.db.execSQLUpdate"
+            "system.db.execSQLUpdate",
         ]
 
         missing_functions = []
@@ -510,7 +510,7 @@ class TaskValidator:
             "system.gui.setCursor",
             "system.gui.playSound",
             "system.gui.vibrate",
-            "system.gui.fullscreen"
+            "system.gui.fullscreen",
         ]
 
         missing_functions = []
@@ -578,12 +578,19 @@ class TaskValidator:
         ORDER BY count DESC
         """
         )
-        
+
         categories = {r["category"]: r["count"] for r in result}
-        expected_categories = ["GUI Management", "GUI Dialogs", "GUI Components", "GUI Operations"]
-        
-        missing_categories = [cat for cat in expected_categories if cat not in categories]
-        
+        expected_categories = [
+            "GUI Management",
+            "GUI Dialogs",
+            "GUI Components",
+            "GUI Operations",
+        ]
+
+        missing_categories = [
+            cat for cat in expected_categories if cat not in categories
+        ]
+
         if len(missing_categories) == 0 and len(categories) >= 4:
             validation_results.append(
                 {
@@ -688,14 +695,14 @@ class TaskValidator:
         # Test 2: Required functions exist
         required_functions = [
             "getSessionInfo",
-            "navigate", 
+            "navigate",
             "sendMessage",
             "alterFilter",
             "requestCamera",
             "openPopup",
             "closePopup",
             "setSessionProps",
-            "getSessionProps"
+            "getSessionProps",
         ]
 
         missing_functions = []
@@ -764,22 +771,22 @@ class TaskValidator:
         ORDER BY f.subcategory
         """
         )
-        
+
         subcategories = {r["subcategory"]: r["count"] for r in result}
         expected_subcategories = {
             "Session Management": 6,
             "Navigation": 4,
             "Messaging": 4,
             "Components": 4,
-            "Device Operations": 4
+            "Device Operations": 4,
         }
-        
+
         distribution_correct = True
         for subcat, expected_count in expected_subcategories.items():
             if subcategories.get(subcat, 0) != expected_count:
                 distribution_correct = False
                 break
-        
+
         if distribution_correct and len(subcategories) == 5:
             validation_results.append(
                 {
@@ -853,185 +860,193 @@ class TaskValidator:
     def _validate_task_5_device_communication(self) -> dict[str, Any]:
         """
         Validate Task 5: Device Communication Expansion implementation.
-        
+
         Validates:
         - Function count and completeness
         - Required device communication functions
         - Protocol-specific patterns
-        - Scope mapping accuracy  
+        - Scope mapping accuracy
         - Task relationships
         """
-        
-        print("\n" + "="*60)
+
+        print("\n" + "=" * 60)
         print("🔧 TASK 5: DEVICE COMMUNICATION EXPANSION VALIDATION")
-        print("="*60)
-        
+        print("=" * 60)
+
         try:
             self.client.connect()
-            
+
             # Test 1: Function Count Validation
             print("\n📊 Test 1: Function Count Validation")
-            
+
             count_query = """
-            MATCH (f:Function) 
-            WHERE f.name STARTS WITH 'system.opc.' OR 
-                  f.name STARTS WITH 'system.opcua.' OR 
-                  f.name STARTS WITH 'system.device.' OR 
-                  f.name STARTS WITH 'system.bacnet.' OR 
+            MATCH (f:Function)
+            WHERE f.name STARTS WITH 'system.opc.' OR
+                  f.name STARTS WITH 'system.opcua.' OR
+                  f.name STARTS WITH 'system.device.' OR
+                  f.name STARTS WITH 'system.bacnet.' OR
                   f.name STARTS WITH 'system.dnp3.'
             RETURN count(f) as function_count
             """
-            
+
             result = self.client.execute_query(count_query)
-            actual_count = result[0]['function_count'] if result else 0
+            actual_count = result[0]["function_count"] if result else 0
             expected_count = 37  # Task 5 target
-            
+
             if actual_count >= expected_count:
-                print(f"   ✅ Function count: {actual_count}/{expected_count} (Expected: ≥{expected_count})")
+                print(
+                    f"   ✅ Function count: {actual_count}/{expected_count} (Expected: ≥{expected_count})"
+                )
                 test_1_passed = True
             else:
-                print(f"   ❌ Function count: {actual_count}/{expected_count} (Expected: ≥{expected_count})")
+                print(
+                    f"   ❌ Function count: {actual_count}/{expected_count} (Expected: ≥{expected_count})"
+                )
                 test_1_passed = False
-            
+
             # Test 2: Required Device Communication Functions
             print("\n🔧 Test 2: Required Device Communication Functions")
-            
+
             required_functions = [
                 # OPC Classic Core
                 "system.opc.readValues",
-                "system.opc.writeValues", 
+                "system.opc.writeValues",
                 "system.opc.browseSimple",
-                
                 # OPC-UA Core
                 "system.opcua.readValues",
                 "system.opcua.writeValues",
                 "system.opcua.browseNodes",
                 "system.opcua.addConnection",
-                
                 # Device Management Core
                 "system.device.addDevice",
                 "system.device.removeDevice",
                 "system.device.getDeviceStatus",
                 "system.device.listDevices",
-                
                 # BACnet Protocol Core
                 "system.bacnet.readProperty",
                 "system.bacnet.writeProperty",
                 "system.bacnet.synchronizeTime",
-                
                 # DNP3 Protocol Core
                 "system.dnp3.request",
                 "system.dnp3.sendDataSet",
-                "system.dnp3.readClass0Data"
+                "system.dnp3.readClass0Data",
             ]
-            
+
             missing_functions = []
             for func_name in required_functions:
                 check_query = "MATCH (f:Function {name: $name}) RETURN f.name"
                 result = self.client.execute_query(check_query, {"name": func_name})
-                
+
                 if result:
                     print(f"   ✅ {func_name}")
                 else:
                     print(f"   ❌ {func_name} - MISSING")
                     missing_functions.append(func_name)
-            
+
             test_2_passed = len(missing_functions) == 0
             if test_2_passed:
                 print(f"   ✅ All {len(required_functions)} required functions present")
             else:
                 print(f"   ❌ {len(missing_functions)} required functions missing")
-            
+
             # Test 3: Device Communication Patterns
             print("\n🔍 Test 3: Device Communication Patterns")
-            
+
             expected_patterns = [
                 "opc_classic_read",
-                "opcua_read_operation", 
+                "opcua_read_operation",
                 "device_configuration",
                 "bacnet_property_read",
                 "dnp3_request",
                 "industrial_communication",
                 "device_monitoring",
-                "protocol_communication"
+                "protocol_communication",
             ]
-            
+
             pattern_results = {}
             for pattern in expected_patterns:
                 pattern_query = """
                 MATCH (f:Function)-[:MATCHES_PATTERN]->(p:Pattern {name: $pattern})
-                WHERE f.name STARTS WITH 'system.opc.' OR 
-                      f.name STARTS WITH 'system.opcua.' OR 
-                      f.name STARTS WITH 'system.device.' OR 
-                      f.name STARTS WITH 'system.bacnet.' OR 
+                WHERE f.name STARTS WITH 'system.opc.' OR
+                      f.name STARTS WITH 'system.opcua.' OR
+                      f.name STARTS WITH 'system.device.' OR
+                      f.name STARTS WITH 'system.bacnet.' OR
                       f.name STARTS WITH 'system.dnp3.'
                 RETURN count(f) as function_count
                 """
-                
+
                 result = self.client.execute_query(pattern_query, {"pattern": pattern})
-                count = result[0]['function_count'] if result else 0
+                count = result[0]["function_count"] if result else 0
                 pattern_results[pattern] = count
-                
+
                 if count > 0:
                     print(f"   ✅ {pattern}: {count} functions")
                 else:
                     print(f"   ⚠️  {pattern}: {count} functions")
-            
+
             # At least 6 patterns should have functions
             active_patterns = sum(1 for count in pattern_results.values() if count > 0)
             test_3_passed = active_patterns >= 6
-            
+
             if test_3_passed:
                 print(f"   ✅ Pattern coverage: {active_patterns}/8 patterns active")
             else:
-                print(f"   ❌ Pattern coverage: {active_patterns}/8 patterns active (Expected: ≥6)")
-            
+                print(
+                    f"   ❌ Pattern coverage: {active_patterns}/8 patterns active (Expected: ≥6)"
+                )
+
             # Test 4: Scope Mapping Validation
             print("\n🎯 Test 4: Scope Mapping Validation")
-            
+
             scope_query = """
             MATCH (f:Function)-[:AVAILABLE_IN]->(s:Scope)
-            WHERE f.name STARTS WITH 'system.opc.' OR 
-                  f.name STARTS WITH 'system.opcua.' OR 
-                  f.name STARTS WITH 'system.device.' OR 
-                  f.name STARTS WITH 'system.bacnet.' OR 
+            WHERE f.name STARTS WITH 'system.opc.' OR
+                  f.name STARTS WITH 'system.opcua.' OR
+                  f.name STARTS WITH 'system.device.' OR
+                  f.name STARTS WITH 'system.bacnet.' OR
                   f.name STARTS WITH 'system.dnp3.'
             RETURN s.name as scope, count(f) as function_count
             ORDER BY function_count DESC
             """
-            
+
             scope_results = self.client.execute_query(scope_query)
             gateway_functions = 0
             client_functions = 0
-            
+
             for result in scope_results:
-                scope_name = result['scope']
-                func_count = result['function_count']
-                
+                scope_name = result["scope"]
+                func_count = result["function_count"]
+
                 if scope_name == "Gateway":
                     gateway_functions = func_count
                 elif scope_name in ["Vision Client", "Perspective Session"]:
                     client_functions += func_count
-                    
+
                 print(f"   📊 {scope_name}: {func_count} functions")
-            
+
             # Most device communication functions should be Gateway scope
-            test_4_passed = gateway_functions >= 30  # Most device operations are gateway-side
-            
+            test_4_passed = (
+                gateway_functions >= 30
+            )  # Most device operations are gateway-side
+
             if test_4_passed:
-                print(f"   ✅ Scope distribution appropriate (Gateway: {gateway_functions}, Client: {client_functions})")
+                print(
+                    f"   ✅ Scope distribution appropriate (Gateway: {gateway_functions}, Client: {client_functions})"
+                )
             else:
-                print(f"   ❌ Scope distribution issues (Gateway: {gateway_functions}, Client: {client_functions})")
-            
+                print(
+                    f"   ❌ Scope distribution issues (Gateway: {gateway_functions}, Client: {client_functions})"
+                )
+
             # Test 5: Task Relationships
             print("\n🔗 Test 5: Task Relationships")
-            
+
             # Check Task 5 node
             task_query = """
             MATCH (t:Task {task_id: 'task_5'})
             RETURN t.name as name, t.priority as priority, t.status as status
             """
-            
+
             task_result = self.client.execute_query(task_query)
             if task_result:
                 task_info = task_result[0]
@@ -1040,27 +1055,33 @@ class TaskValidator:
                 print(f"   🎯 Status: {task_info.get('status', 'IN_PROGRESS')}")
                 test_5_passed = True
             else:
-                print(f"   ❌ Task 5 node not found")
+                print("   ❌ Task 5 node not found")
                 test_5_passed = False
-            
-                        # Overall validation result
-            all_tests = [test_1_passed, test_2_passed, test_3_passed, test_4_passed, test_5_passed]
+
+                # Overall validation result
+            all_tests = [
+                test_1_passed,
+                test_2_passed,
+                test_3_passed,
+                test_4_passed,
+                test_5_passed,
+            ]
             passed_tests = sum(all_tests)
             total_tests = len(all_tests)
-            
-            print(f"\n" + "="*60)
-            print(f"📊 TASK 5 VALIDATION SUMMARY")
-            print(f"="*60)
+
+            print("\n" + "=" * 60)
+            print("📊 TASK 5 VALIDATION SUMMARY")
+            print("=" * 60)
             print(f"✅ Tests Passed: {passed_tests}/{total_tests}")
             print(f"📈 Success Rate: {(passed_tests/total_tests)*100:.1f}%")
-            
+
             if passed_tests == total_tests:
-                print(f"🎉 TASK 5: DEVICE COMMUNICATION EXPANSION - ALL TESTS PASSED!")
+                print("🎉 TASK 5: DEVICE COMMUNICATION EXPANSION - ALL TESTS PASSED!")
                 success = True
             else:
-                print(f"⚠️  TASK 5: Some tests failed - review implementation")
+                print("⚠️  TASK 5: Some tests failed - review implementation")
                 success = False
-            
+
             return {
                 "success": success,
                 "task_id": 5,
@@ -1070,17 +1091,13 @@ class TaskValidator:
                 "missing_functions": missing_functions if not test_2_passed else [],
                 "pattern_coverage": active_patterns,
                 "gateway_functions": gateway_functions,
-                "client_functions": client_functions
+                "client_functions": client_functions,
             }
-                 
+
         except Exception as e:
             print(f"❌ Task 5 validation error: {e}")
-            return {
-                "success": False,
-                "task_id": 5,
-                "error": str(e)
-            }
-            
+            return {"success": False, "task_id": 5, "error": str(e)}
+
         finally:
             self.client.disconnect()
 
@@ -1118,13 +1135,13 @@ class TaskValidator:
         # Test 2: Required utility functions exist
         required_functions = [
             "system.util.translate",
-            "system.util.getLocale", 
+            "system.util.getLocale",
             "system.util.setLocale",
             "system.util.version",
             "system.util.restart",
             "system.util.shutdown",
             "system.util.getMemoryUsage",
-            "system.util.getSystemInfo"
+            "system.util.getSystemInfo",
         ]
 
         missing_functions = []
@@ -1159,11 +1176,11 @@ class TaskValidator:
         # Test 3: Utility function categories
         category_patterns = [
             "General Utilities",
-            "Logging Operations", 
+            "Logging Operations",
             "Project Management",
             "Performance Monitoring",
             "System Configuration",
-            "File Operations"
+            "File Operations",
         ]
 
         active_categories = []
@@ -1226,7 +1243,7 @@ class TaskValidator:
         success = passed_tests == total_tests
 
         # Display results
-        print(f"\n📊 Task 6 Validation Results:")
+        print("\n📊 Task 6 Validation Results:")
         for result in validation_results:
             status = "✅" if result["passed"] else "❌"
             print(f"   {status} {result['test']}: {result['message']}")
@@ -1281,7 +1298,7 @@ class TaskValidator:
         # Test 2: Required core alarm functions exist
         required_functions = [
             "system.alarm.queryJournal",
-            "system.alarm.queryStatus", 
+            "system.alarm.queryStatus",
             "system.alarm.acknowledge",
             "system.alarm.cancel",
             "system.alarm.shelve",
@@ -1289,7 +1306,7 @@ class TaskValidator:
             "system.alarm.clearAlarm",
             "system.alarm.listPipelines",
             "system.alarm.getDisplayPaths",
-            "system.alarm.getRoster"
+            "system.alarm.getRoster",
         ]
 
         missing_functions = []

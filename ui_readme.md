@@ -81,7 +81,7 @@ The main script generation interface with intelligent assistance.
 📋 Available Templates
 ┌─────────────────────────────────────┐
 │ ✅ button_click_handler.jinja2      │ 92% success rate
-│ ✅ window_opener.jinja2             │ 87% success rate  
+│ ✅ window_opener.jinja2             │ 87% success rate
 │ ✅ tag_writer.jinja2                │ 89% success rate
 │ ⚠️  custom_action.jinja2            │ 65% success rate
 └─────────────────────────────────────┘
@@ -104,15 +104,15 @@ Interactive form with smart defaults:
 
 def action_performed(self, event):
     """Handle button click event for NavigateToMainButton"""
-    
+
     try:
         # Navigate to target window
         system.nav.openWindow('MainMenu')
-        
+
         # Log the action
         logger = system.util.getLogger("NavigateToMainButton")
         logger.info("Navigation to MainMenu completed successfully")
-        
+
     except Exception as e:
         # Error handling
         logger.error("Navigation failed: %s" % str(e))
@@ -183,7 +183,7 @@ Explore and manage available script templates.
 
 #### Template Categories:
 - **Vision Components**: Traditional Ignition Vision templates
-- **Perspective Components**: Modern Perspective templates  
+- **Perspective Components**: Modern Perspective templates
 - **Gateway Scripts**: Server-side and startup scripts
 - **Tag Scripts**: Value change and alarm scripts
 - **Custom Templates**: User-created templates
@@ -211,7 +211,7 @@ def action_performed(self, event):
         {% if action_type == 'navigation' %}
         system.nav.openWindow('{{ target_window }}')
         {% endif %}
-        
+
         {% if logging_enabled %}
         logger = system.util.getLogger("{{ component_name }}")
         logger.info("Action performed successfully")
@@ -333,7 +333,7 @@ Detailed Health Checks:
 ✅ Connectivity
    Network connection successful
 
-✅ Authentication  
+✅ Authentication
    Credentials validated
 
 ✅ API Access
@@ -347,7 +347,7 @@ Detailed Health Checks:
 ```
 ✅ Local Development - Healthy
    • Connectivity: healthy
-   • Authentication: healthy  
+   • Authentication: healthy
    • API Access: healthy
    • Response Time: healthy 45ms
 
@@ -371,7 +371,7 @@ Interactive gateway configuration generator and validator.
 Interactive form for creating gateway configurations:
 - **Gateway Details**: Name, host, port, and protocol settings
 - **Authentication**: Username, password, and authentication type
-- **Security Settings**: SSL verification and timeout configuration  
+- **Security Settings**: SSL verification and timeout configuration
 - **Metadata**: Description and organizational tags
 - **Generated Output**: Copy-paste ready environment variables
 
@@ -462,7 +462,7 @@ The interface emphasizes security best practices:
 - **Testing Integration**: Test generated scripts directly on connected gateways
 
 #### For Template Development:
-- **Real Gateway Testing**: Validate templates against actual Ignition environments  
+- **Real Gateway Testing**: Validate templates against actual Ignition environments
 - **API Compatibility**: Ensure generated scripts work with gateway APIs
 - **Performance Optimization**: Optimize scripts based on gateway performance characteristics
 
@@ -706,4 +706,4 @@ Check current version and updates:
 
 **📞 Support**: For issues and questions, check the troubleshooting section or submit feedback through the UI
 
-**🔄 Updates**: The system automatically tracks usage to improve recommendations and user experience 
+**🔄 Updates**: The system automatically tracks usage to improve recommendations and user experience
