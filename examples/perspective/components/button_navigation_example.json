@@ -1,0 +1,23 @@
+{
+  "template": "perspective/components/button_handler",
+  "component_name": "NavigateButton",
+  "description": "Button that navigates to production dashboard with parameters",
+  "function_name": "onActionPerformed",
+  "action_type": "navigation",
+  "target_page": "production/dashboard",
+  "navigation_params": {
+    "department": "manufacturing",
+    "shift": "current",
+    "timestamp": "now"
+  },
+  "logging_enabled": true,
+  "validation_enabled": true,
+  "validation_rules": [
+    "# Check if user has permission to access production dashboard",
+    "user_roles = self.session.props.auth.user.roles",
+    "if 'production_viewer' not in user_roles and 'admin' not in user_roles:",
+    "    raise Exception('Insufficient permissions to access production dashboard')"
+  ],
+  "show_error_popup": true,
+  "confirmation_enabled": false
+} 

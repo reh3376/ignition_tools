@@ -1,0 +1,304 @@
+# {{ component_name }} Button Handler Script
+# Generated: {{ timestamp }}
+# Description: {{ description | default("Perspective button click handler") }}
+
+{% if imports %}
+# Required imports
+{% for import_stmt in imports %}
+{{ import_stmt }}
+{% endfor %}
+{% endif %}
+
+def {{ function_name | default("onActionPerformed") }}(self, event):
+    """
+    Button click handler for {{ component_name }}.
+    
+    Args:
+        self: Reference to the component
+        event: ActionEvent object containing event details
+    
+    {% if action_type == "navigation" %}
+    Action: Navigate to {{ target_page | default("target page") }}
+    {% elif action_type == "popup" %}
+    Action: Open popup window
+    {% elif action_type == "tag_write" %}
+    Action: Write value to tag {{ tag_path | default("[default]Provider/path/to/tag") }}
+    {% elif action_type == "script_execution" %}
+    Action: Execute custom script logic
+    {% elif action_type == "data_operation" %}
+    Action: Perform data operation
+    {% endif %}
+    """
+    
+    {% if logging_enabled | default(true) %}
+    # Logging
+    logger = system.util.getLogger("{{ component_name }}")
+    logger.info("Button clicked: {{ component_name }}")
+    {% endif %}
+    
+    {% if validation_enabled | default(false) %}
+    # Input validation
+    try:
+        {% if validation_rules %}
+        {% for rule in validation_rules %}
+        {{ rule }}
+        {% endfor %}
+        {% else %}
+        # Add your validation logic here
+        if not self.parent.getComponent("{{ component_name }}").props.enabled:
+            logger.warn("Button is disabled")
+            return
+        {% endif %}
+    except Exception as e:
+        logger.error("Validation failed: %s" % str(e))
+        {% if show_error_popup | default(true) %}
+        system.perspective.openPopup("error", "Error", {"message": str(e)})
+        {% endif %}
+        return
+    {% endif %}
+    
+    {% if action_type == "navigation" %}
+    # Navigation Action
+    try:
+        {% if navigation_params %}
+        # Navigation with parameters
+        params = {{ navigation_params | tojson }}
+        system.perspective.navigate(page="{{ target_page }}", params=params)
+        {% else %}
+        # Simple navigation
+        system.perspective.navigate(page="{{ target_page | default('page/path') }}")
+        {% endif %}
+        
+        {% if logging_enabled | default(true) %}
+        logger.info("Navigated to: {{ target_page | default('page/path') }}")
+        {% endif %}
+        
+    except Exception as e:
+        logger.error("Navigation failed: %s" % str(e))
+        {% if show_error_popup | default(true) %}
+        system.perspective.openPopup("error", "Navigation Error", {"message": str(e)})
+        {% endif %}
+    
+    {% elif action_type == "popup" %}
+    # Popup Action
+    try:
+        {% if popup_params %}
+        # Popup with parameters
+        params = {{ popup_params | tojson }}
+        system.perspective.openPopup(
+            id="{{ popup_id | default('popup') }}", 
+            view="{{ popup_view | default('popup/view') }}", 
+            params=params,
+            {% if popup_options %}
+            title="{{ popup_title | default('Popup') }}",
+            position={{ popup_position | tojson | default('{"x": 100, "y": 100}') }},
+            showCloseIcon={{ show_close_icon | default(true) }},
+            draggable={{ draggable | default(true) }},
+            resizable={{ resizable | default(false) }},
+            modal={{ modal | default(true) }}
+            {% endif %}
+        )
+        {% else %}
+        # Simple popup
+        system.perspective.openPopup(
+            id="{{ popup_id | default('popup') }}", 
+            view="{{ popup_view | default('popup/view') }}"
+        )
+        {% endif %}
+        
+        {% if logging_enabled | default(true) %}
+        logger.info("Opened popup: {{ popup_view | default('popup/view') }}")
+        {% endif %}
+        
+    except Exception as e:
+        logger.error("Popup failed: %s" % str(e))
+        {% if show_error_popup | default(true) %}
+        system.perspective.openPopup("error", "Popup Error", {"message": str(e)})
+        {% endif %}
+    
+    {% elif action_type == "tag_write" %}
+    # Tag Write Action
+    try:
+        {% if multiple_tags %}
+        # Multiple tag writes
+        tag_writes = []
+        {% for tag in tag_operations %}
+        tag_writes.append({
+            "path": "{{ tag.path }}",
+            "value": {{ tag.value | tojson }},
+            "quality": "{{ tag.quality | default('Good') }}"
+        })
+        {% endfor %}
+        
+        # Execute batch write
+        paths = [write["path"] for write in tag_writes]
+        values = [write["value"] for write in tag_writes]
+        qualities = [write["quality"] for write in tag_writes]
+        
+        system.tag.writeBlocking(paths, values, qualities)
+        {% else %}
+        # Single tag write
+        tag_path = "{{ tag_path | default('[default]Provider/path/to/tag') }}"
+        {% if dynamic_value %}
+        # Dynamic value from component property
+        tag_value = self.parent.getComponent("{{ value_source_component }}").props.{{ value_source_property }}
+        {% else %}
+        # Static value
+        tag_value = {{ tag_value | tojson }}
+        {% endif %}
+        
+        system.tag.writeBlocking([tag_path], [tag_value])
+        {% endif %}
+        
+        {% if logging_enabled | default(true) %}
+        logger.info("Tag write successful")
+        {% endif %}
+        
+        {% if success_feedback %}
+        {% if success_popup %}
+        system.perspective.openPopup("success", "Success", {"message": "{{ success_message | default('Operation completed successfully') }}"})
+        {% endif %}
+        {% if success_component_update %}
+        # Update success indicator component
+        self.parent.getComponent("{{ success_component }}").props.{{ success_property }} = {{ success_value | tojson }}
+        {% endif %}
+        {% endif %}
+        
+    except Exception as e:
+        logger.error("Tag write failed: %s" % str(e))
+        {% if show_error_popup | default(true) %}
+        system.perspective.openPopup("error", "Tag Write Error", {"message": str(e)})
+        {% endif %}
+    
+    {% elif action_type == "script_execution" %}
+    # Custom Script Execution
+    try:
+        {% if script_module %}
+        # Execute external script module
+        {{ script_module }}.{{ script_function }}({{ script_params | tojson | default('') }})
+        {% else %}
+        # Inline script logic
+        {{ custom_script | default('# Add your custom script logic here\npass') }}
+        {% endif %}
+        
+        {% if logging_enabled | default(true) %}
+        logger.info("Custom script executed successfully")
+        {% endif %}
+        
+    except Exception as e:
+        logger.error("Script execution failed: %s" % str(e))
+        {% if show_error_popup | default(true) %}
+        system.perspective.openPopup("error", "Script Error", {"message": str(e)})
+        {% endif %}
+    
+    {% elif action_type == "data_operation" %}
+    # Data Operation Action
+    try:
+        {% if operation_type == "database" %}
+        # Database operation
+        {% if db_connection %}
+        conn = "{{ db_connection }}"
+        {% else %}
+        conn = ""  # Use default connection
+        {% endif %}
+        
+        {% if operation_subtype == "query" %}
+        # Database query
+        query = """{{ sql_query | default('SELECT * FROM table_name') }}"""
+        {% if query_params %}
+        params = {{ query_params | tojson }}
+        result = system.db.runPrepQuery(query, params, conn)
+        {% else %}
+        result = system.db.runQuery(query, conn)
+        {% endif %}
+        
+        # Process query results
+        {% if result_destination %}
+        {% if result_destination == "component" %}
+        # Update component with results
+        self.parent.getComponent("{{ result_component }}").props.data = system.dataset.toPyDataSet(result)
+        {% elif result_destination == "session" %}
+        # Store in session custom properties
+        self.session.custom.{{ result_property }} = system.dataset.toPyDataSet(result)
+        {% endif %}
+        {% endif %}
+        
+        {% elif operation_subtype == "update" %}
+        # Database update
+        query = """{{ sql_query | default('UPDATE table_name SET column = ? WHERE id = ?') }}"""
+        params = {{ update_params | tojson | default('[]') }}
+        rows_affected = system.db.runPrepUpdate(query, params, conn)
+        
+        logger.info("Database update affected %d rows" % rows_affected)
+        {% endif %}
+        
+        {% elif operation_type == "web_request" %}
+        # Web request operation
+        url = "{{ api_url | default('https://api.example.com/endpoint') }}"
+        method = "{{ http_method | default('GET') }}"
+        
+        {% if request_headers %}
+        headers = {{ request_headers | tojson }}
+        {% else %}
+        headers = {"Content-Type": "application/json"}
+        {% endif %}
+        
+        {% if request_body %}
+        body = {{ request_body | tojson }}
+        response = system.net.httpClient().{{ http_method | lower }}(url, headers=headers, data=body)
+        {% else %}
+        response = system.net.httpClient().{{ http_method | lower }}(url, headers=headers)
+        {% endif %}
+        
+        # Process response
+        if response.good:
+            {% if response_destination %}
+            {% if response_destination == "component" %}
+            # Update component with response
+            self.parent.getComponent("{{ response_component }}").props.text = response.text
+            {% elif response_destination == "session" %}
+            # Store in session custom properties
+            self.session.custom.{{ response_property }} = response.json
+            {% endif %}
+            {% endif %}
+        else:
+            raise Exception("HTTP request failed: %s" % response.statusCode)
+        {% endif %}
+        
+        {% if logging_enabled | default(true) %}
+        logger.info("Data operation completed successfully")
+        {% endif %}
+        
+    except Exception as e:
+        logger.error("Data operation failed: %s" % str(e))
+        {% if show_error_popup | default(true) %}
+        system.perspective.openPopup("error", "Data Operation Error", {"message": str(e)})
+        {% endif %}
+    
+    {% endif %}
+    
+    {% if confirmation_enabled | default(false) %}
+    # Show confirmation dialog
+    try:
+        system.perspective.openPopup(
+            "confirmation", 
+            "{{ confirmation_title | default('Confirm Action') }}", 
+            {"message": "{{ confirmation_message | default('Action completed successfully') }}"}
+        )
+    except Exception as e:
+        logger.error("Confirmation dialog failed: %s" % str(e))
+    {% endif %}
+    
+    {% if final_actions %}
+    # Final actions
+    try:
+        {% for action in final_actions %}
+        {{ action }}
+        {% endfor %}
+    except Exception as e:
+        logger.error("Final actions failed: %s" % str(e))
+    {% endif %}
+    
+    {% if logging_enabled | default(true) %}
+    logger.info("Button handler completed: {{ component_name }}")
+    {% endif %} 

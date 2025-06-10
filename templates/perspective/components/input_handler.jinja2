@@ -1,0 +1,400 @@
+# {{ component_name }} Input Handler Script
+# Generated: {{ timestamp }}
+# Description: {{ description | default("Perspective input component handler") }}
+
+{% if imports %}
+# Required imports
+{% for import_stmt in imports %}
+{{ import_stmt }}
+{% endfor %}
+{% endif %}
+
+{% if event_type == "value_change" or not event_type %}
+def {{ function_name | default("onValueChanged") }}(self, previousValue, currentValue, origin, missedEvents):
+    """
+    Input value change handler for {{ component_name }}.
+    
+    Args:
+        self: Reference to the component
+        previousValue: Previous value before change
+        currentValue: Current value after change
+        origin: Origin of the change (user, script, etc.)
+        missedEvents: Number of missed events
+    
+    Component Type: {{ component_type | default("text_input") }}
+    {% if validation_enabled %}
+    Validation: {{ validation_type | default("basic") }}
+    {% endif %}
+    """
+    
+    {% if logging_enabled | default(true) %}
+    # Logging
+    logger = system.util.getLogger("{{ component_name }}")
+    logger.info("Value changed: %s -> %s (origin: %s)" % (str(previousValue), str(currentValue), str(origin)))
+    {% endif %}
+    
+    {% if origin_filter %}
+    # Filter by origin - only process specific origins
+    allowed_origins = {{ allowed_origins | tojson | default('["user"]') }}
+    if str(origin) not in allowed_origins:
+        logger.debug("Ignoring change from origin: %s" % str(origin))
+        return
+    {% endif %}
+    
+    {% if validation_enabled | default(true) %}
+    # Input validation
+    try:
+        {% if component_type == "text_input" or component_type == "text_area" %}
+        # Text input validation
+        {% if validation_rules %}
+        {% for rule in validation_rules %}
+        {{ rule }}
+        {% endfor %}
+        {% else %}
+        # Basic text validation
+        if currentValue is None:
+            raise ValueError("Value cannot be empty")
+        
+        text_value = str(currentValue).strip()
+        
+        {% if min_length %}
+        if len(text_value) < {{ min_length }}:
+            raise ValueError("Text must be at least {{ min_length }} characters long")
+        {% endif %}
+        
+        {% if max_length %}
+        if len(text_value) > {{ max_length }}:
+            raise ValueError("Text cannot exceed {{ max_length }} characters")
+        {% endif %}
+        
+        {% if pattern %}
+        import re
+        if not re.match(r"{{ pattern }}", text_value):
+            raise ValueError("{{ pattern_error_message | default('Text does not match required pattern') }}")
+        {% endif %}
+        
+        {% if forbidden_values %}
+        forbidden = {{ forbidden_values | tojson }}
+        if text_value.lower() in [val.lower() for val in forbidden]:
+            raise ValueError("This value is not allowed")
+        {% endif %}
+        {% endif %}
+        
+        {% elif component_type == "numeric_input" %}
+        # Numeric input validation
+        {% if validation_rules %}
+        {% for rule in validation_rules %}
+        {{ rule }}
+        {% endfor %}
+        {% else %}
+        # Basic numeric validation
+        if currentValue is None:
+            raise ValueError("Value cannot be empty")
+        
+        try:
+            numeric_value = float(currentValue)
+        except (ValueError, TypeError):
+            raise ValueError("Value must be a valid number")
+        
+        {% if min_value is defined %}
+        if numeric_value < {{ min_value }}:
+            raise ValueError("Value must be at least {{ min_value }}")
+        {% endif %}
+        
+        {% if max_value is defined %}
+        if numeric_value > {{ max_value }}:
+            raise ValueError("Value cannot exceed {{ max_value }}")
+        {% endif %}
+        
+        {% if decimal_places is defined %}
+        # Check decimal places
+        str_value = str(currentValue)
+        if '.' in str_value:
+            decimal_part = str_value.split('.')[1]
+            if len(decimal_part) > {{ decimal_places }}:
+                raise ValueError("Maximum {{ decimal_places }} decimal places allowed")
+        {% endif %}
+        {% endif %}
+        
+        {% elif component_type == "dropdown" %}
+        # Dropdown validation
+        {% if validation_rules %}
+        {% for rule in validation_rules %}
+        {{ rule }}
+        {% endfor %}
+        {% else %}
+        # Basic dropdown validation
+        {% if required | default(true) %}
+        if currentValue is None or currentValue == "":
+            raise ValueError("Please select a value")
+        {% endif %}
+        
+        {% if valid_options %}
+        valid_options = {{ valid_options | tojson }}
+        if currentValue not in valid_options:
+            raise ValueError("Selected value is not valid")
+        {% endif %}
+        {% endif %}
+        
+        {% elif component_type == "datetime_input" %}
+        # DateTime input validation
+        {% if validation_rules %}
+        {% for rule in validation_rules %}
+        {{ rule }}
+        {% endfor %}
+        {% else %}
+        # Basic datetime validation
+        if currentValue is None:
+            raise ValueError("Date/time cannot be empty")
+        
+        from java.util import Date
+        from java.text import SimpleDateFormat
+        
+        {% if min_date %}
+        min_date = Date({{ min_date }})  # Unix timestamp
+        if currentValue < min_date:
+            raise ValueError("Date cannot be before {{ min_date_display | default('minimum allowed date') }}")
+        {% endif %}
+        
+        {% if max_date %}
+        max_date = Date({{ max_date }})  # Unix timestamp  
+        if currentValue > max_date:
+            raise ValueError("Date cannot be after {{ max_date_display | default('maximum allowed date') }}")
+        {% endif %}
+        {% endif %}
+        {% endif %}
+        
+    except Exception as e:
+        logger.warn("Validation failed: %s" % str(e))
+        
+        {% if validation_action == "revert" %}
+        # Revert to previous value
+        self.props.value = previousValue
+        {% elif validation_action == "clear" %}
+        # Clear the input
+        self.props.value = {% if component_type == "numeric_input" %}0{% else %}""{% endif %}
+        {% endif %}
+        
+        {% if show_validation_popup | default(true) %}
+        # Show validation error popup
+        system.perspective.openPopup(
+            "validation_error", 
+            "Input Validation Error", 
+            {"message": str(e), "component": "{{ component_name }}"}
+        )
+        {% endif %}
+        
+        {% if validation_indicator_component %}
+        # Update validation indicator
+        self.parent.getComponent("{{ validation_indicator_component }}").props.{{ validation_indicator_property | default("text") }} = str(e)
+        self.parent.getComponent("{{ validation_indicator_component }}").props.visible = True
+        {% endif %}
+        
+        return  # Stop processing on validation failure
+    {% endif %}
+    
+    {% if auto_format_enabled | default(false) %}
+    # Auto-formatting
+    try:
+        {% if component_type == "text_input" %}
+        {% if format_type == "uppercase" %}
+        formatted_value = str(currentValue).upper()
+        {% elif format_type == "lowercase" %}
+        formatted_value = str(currentValue).lower()
+        {% elif format_type == "title_case" %}
+        formatted_value = str(currentValue).title()
+        {% elif format_type == "phone" %}
+        # Format as phone number (US format)
+        import re
+        digits = re.sub(r'\D', '', str(currentValue))
+        if len(digits) == 10:
+            formatted_value = '(%s) %s-%s' % (digits[:3], digits[3:6], digits[6:])
+        else:
+            formatted_value = str(currentValue)
+        {% elif format_type == "currency" %}
+        # Format as currency
+        try:
+            amount = float(currentValue)
+            formatted_value = "${:,.2f}".format(amount)
+        except:
+            formatted_value = str(currentValue)
+        {% endif %}
+        
+        # Apply formatting if different
+        if formatted_value != str(currentValue):
+            self.props.value = formatted_value
+        {% endif %}
+        
+    except Exception as e:
+        logger.warn("Auto-formatting failed: %s" % str(e))
+    {% endif %}
+    
+    {% if tag_binding_enabled | default(false) %}
+    # Tag binding - write value to tag
+    try:
+        {% if tag_path %}
+        tag_path = "{{ tag_path }}"
+        {% if tag_transform %}
+        # Transform value before writing
+        {% if tag_transform == "scale" %}
+        tag_value = float(currentValue) * {{ scale_factor | default(1.0) }}
+        {% elif tag_transform == "offset" %}
+        tag_value = float(currentValue) + {{ offset_value | default(0.0) }}
+        {% elif tag_transform == "boolean" %}
+        tag_value = bool(currentValue)
+        {% elif tag_transform == "string" %}
+        tag_value = str(currentValue)
+        {% elif tag_transform == "custom" %}
+        # Custom transformation
+        {{ custom_transform | default('tag_value = currentValue') }}
+        {% else %}
+        tag_value = currentValue
+        {% endif %}
+        {% else %}
+        tag_value = currentValue
+        {% endif %}
+        
+        # Write to tag
+        system.tag.writeBlocking([tag_path], [tag_value])
+        
+        {% if logging_enabled | default(true) %}
+        logger.info("Tag write successful: %s = %s" % (tag_path, str(tag_value)))
+        {% endif %}
+        {% endif %}
+        
+    except Exception as e:
+        logger.error("Tag write failed: %s" % str(e))
+        {% if show_error_popup | default(true) %}
+        system.perspective.openPopup("error", "Tag Write Error", {"message": str(e)})
+        {% endif %}
+    {% endif %}
+    
+    {% if dependent_components %}
+    # Update dependent components
+    try:
+        {% for dependency in dependent_components %}
+        {% if dependency.update_type == "enable_disable" %}
+        # Enable/disable dependent component
+        {% if dependency.condition %}
+        condition_met = {{ dependency.condition }}
+        {% else %}
+        condition_met = bool(currentValue)
+        {% endif %}
+        self.parent.getComponent("{{ dependency.component }}").props.enabled = condition_met
+        
+        {% elif dependency.update_type == "visibility" %}
+        # Show/hide dependent component
+        {% if dependency.condition %}
+        condition_met = {{ dependency.condition }}
+        {% else %}
+        condition_met = bool(currentValue)
+        {% endif %}
+        self.parent.getComponent("{{ dependency.component }}").props.visible = condition_met
+        
+        {% elif dependency.update_type == "property" %}
+        # Update component property
+        {% if dependency.transform %}
+        new_value = {{ dependency.transform }}
+        {% else %}
+        new_value = currentValue
+        {% endif %}
+        self.parent.getComponent("{{ dependency.component }}").props.{{ dependency.property }} = new_value
+        
+        {% elif dependency.update_type == "data_source" %}
+        # Update data source based on selection
+        if currentValue:
+            {% if dependency.query_template %}
+            query = "{{ dependency.query_template }}".replace("{{value}}", str(currentValue))
+            {% else %}
+            query = "SELECT * FROM {{ dependency.table }} WHERE {{ dependency.column }} = ?"
+            {% endif %}
+            
+            {% if dependency.params %}
+            params = {{ dependency.params | tojson }}
+            params.append(currentValue)
+            result = system.db.runPrepQuery(query, params)
+            {% else %}
+            result = system.db.runPrepQuery(query, [currentValue])
+            {% endif %}
+            
+            self.parent.getComponent("{{ dependency.component }}").props.data = system.dataset.toPyDataSet(result)
+        {% endif %}
+        {% endfor %}
+        
+    except Exception as e:
+        logger.error("Dependent component update failed: %s" % str(e))
+    {% endif %}
+    
+    {% if custom_actions %}
+    # Custom actions
+    try:
+        {% for action in custom_actions %}
+        {{ action }}
+        {% endfor %}
+        
+    except Exception as e:
+        logger.error("Custom action failed: %s" % str(e))
+    {% endif %}
+    
+    {% if validation_indicator_component and validation_enabled %}
+    # Clear validation indicator on successful processing
+    try:
+        self.parent.getComponent("{{ validation_indicator_component }}").props.visible = False
+    except:
+        pass  # Ignore if component doesn't exist
+    {% endif %}
+    
+    {% if logging_enabled | default(true) %}
+    logger.info("Input handler completed: {{ component_name }}")
+    {% endif %}
+
+{% elif event_type == "focus" %}
+def {{ function_name | default("onFocusGained") }}(self, event):
+    """
+    Focus gained handler for {{ component_name }}.
+    
+    Args:
+        self: Reference to the component
+        event: Focus event
+    """
+    
+    {% if logging_enabled | default(true) %}
+    logger = system.util.getLogger("{{ component_name }}")
+    logger.debug("Component gained focus: {{ component_name }}")
+    {% endif %}
+    
+    {% if focus_actions %}
+    # Focus actions
+    try:
+        {% for action in focus_actions %}
+        {{ action }}
+        {% endfor %}
+    except Exception as e:
+        logger.error("Focus action failed: %s" % str(e))
+    {% endif %}
+
+{% elif event_type == "blur" %}
+def {{ function_name | default("onFocusLost") }}(self, event):
+    """
+    Focus lost handler for {{ component_name }}.
+    
+    Args:
+        self: Reference to the component
+        event: Focus event
+    """
+    
+    {% if logging_enabled | default(true) %}
+    logger = system.util.getLogger("{{ component_name }}")
+    logger.debug("Component lost focus: {{ component_name }}")
+    {% endif %}
+    
+    {% if blur_actions %}
+    # Blur actions
+    try:
+        {% for action in blur_actions %}
+        {{ action }}
+        {% endfor %}
+    except Exception as e:
+        logger.error("Blur action failed: %s" % str(e))
+    {% endif %}
+{% endif %} 

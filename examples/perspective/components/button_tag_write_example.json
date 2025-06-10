@@ -1,0 +1,41 @@
+{
+  "template": "perspective/components/button_handler",
+  "component_name": "StartProcessButton",
+  "description": "Button that starts a manufacturing process by writing to multiple tags",
+  "function_name": "onActionPerformed",
+  "action_type": "tag_write",
+  "multiple_tags": true,
+  "tag_operations": [
+    {
+      "path": "[default]Equipment/Line1/Process/Start",
+      "value": true,
+      "quality": "Good"
+    },
+    {
+      "path": "[default]Equipment/Line1/Process/Mode",
+      "value": "AUTO",
+      "quality": "Good"
+    },
+    {
+      "path": "[default]Equipment/Line1/Process/StartTimestamp",
+      "value": "{{TIMESTAMP}}",
+      "quality": "Good"
+    }
+  ],
+  "logging_enabled": true,
+  "validation_enabled": true,
+  "validation_rules": [
+    "# Check if line is ready for startup",
+    "line_status = system.tag.readBlocking(['[default]Equipment/Line1/Status/Ready'])[0].value",
+    "if not line_status:",
+    "    raise Exception('Line 1 is not ready for startup. Check equipment status.')"
+  ],
+  "success_feedback": true,
+  "success_popup": true,
+  "success_message": "Process started successfully on Line 1",
+  "success_component_update": true,
+  "success_component": "StatusIndicator",
+  "success_property": "text",
+  "success_value": "Process Running",
+  "show_error_popup": true
+} 

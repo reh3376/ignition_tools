@@ -67,11 +67,11 @@ IGN Scripts is designed to streamline the development of Jython scripts for Igni
 ### Script Generation
 - ✅ Template-based script generation
 - ✅ Vision component event handlers
-- 🔄 Perspective component scripts
-- 🔄 Gateway startup/shutdown scripts
-- 🔄 Tag event handlers
-- 🔄 Timer scripts
-- 🔄 Alarm pipeline scripts
+- ✅ **Perspective component scripts** - Button & input handlers with validation
+- 🔄 Gateway startup/shutdown scripts - Enhanced lifecycle management
+- 🔄 Tag event handlers - Advanced event processing
+- 🔄 Timer scripts - Scheduled operations & cron-style timing
+- ✅ **Alarm pipeline scripts** - Email notification system with escalation
 
 ### Ignition System Integration
 - ✅ **Gateway Connection System** - HTTP/HTTPS client with authentication

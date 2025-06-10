@@ -1,0 +1,56 @@
+{
+  "template": "alarms/notification/email_pipeline",
+  "pipeline_name": "CriticalAlarmEmail",
+  "description": "Email notification pipeline for critical priority alarms with escalation",
+  "function_name": "configureSettings",
+  "notification_function": "notifyUsers",
+  "email_profile": "production_smtp",
+  "sender_address": "alarms@company.com",
+  "sender_name": "Ignition Alarm System",
+  "reply_to": "operations@company.com",
+  "email_format": "html",
+  "priority": "high",
+  "logging_enabled": true,
+  
+  "priority_filter": true,
+  "allowed_priorities": [1, 2],
+  
+  "state_filter": true,
+  "allowed_alarm_states": ["Active", "ActiveUnacked"],
+  
+  "source_filter": true,
+  "source_includes": ["Equipment/Critical", "Safety"],
+  "source_excludes": ["Test", "Simulation"],
+  
+  "static_recipients": [
+    "operations@company.com",
+    "maintenance@company.com"
+  ],
+  
+  "dynamic_recipients": true,
+  "recipient_source": "database",
+  "recipient_query": "SELECT email FROM alarm_recipients WHERE department = ? AND shift = ? AND active = 1",
+  "recipient_query_params": ["production", "current"],
+  
+  "escalation_enabled": true,
+  "escalation_delay_minutes": 15,
+  "escalation_recipients": [
+    "supervisor@company.com",
+    "manager@company.com"
+  ],
+  
+  "custom_template": true,
+  "email_subject_template": "[CRITICAL ALARM] {alarm_name} - {priority} Priority",
+  "email_body_html_template": "<html><body><h2 style='color: red;'>CRITICAL ALARM NOTIFICATION</h2><table border='1' style='border-collapse: collapse; padding: 10px;'><tr><td><b>Alarm:</b></td><td>{alarm_name}</td></tr><tr><td><b>State:</b></td><td>{alarm_state}</td></tr><tr><td><b>Priority:</b></td><td>{priority}</td></tr><tr><td><b>Time:</b></td><td>{timestamp}</td></tr><tr><td><b>Location:</b></td><td>{alarm_path}</td></tr></table><p><a href='http://ignition.company.com/main/system/alarms' style='background-color: red; color: white; padding: 10px; text-decoration: none;'>ACKNOWLEDGE ALARM</a></p></body></html>",
+  "timestamp_format": "MMM dd, yyyy HH:mm:ss",
+  
+  "include_acknowledgment_link": true,
+  "ack_link_base": "http://ignition.company.com/main/system/alarms",
+  
+  "send_individual": false,
+  "cc_recipients": ["backup@company.com"],
+  
+  "notification_log": true,
+  "max_send_rate": 30,
+  "timeout": 30000
+} 

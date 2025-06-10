@@ -1,0 +1,37 @@
+{
+  "template": "perspective/components/input_handler",
+  "component_name": "SetpointInput",
+  "description": "Numeric input for setting process temperature setpoint with validation",
+  "function_name": "onValueChanged",
+  "event_type": "value_change",
+  "component_type": "numeric_input",
+  "logging_enabled": true,
+  "origin_filter": true,
+  "allowed_origins": ["user"],
+  "validation_enabled": true,
+  "min_value": 50.0,
+  "max_value": 250.0,
+  "decimal_places": 1,
+  "validation_action": "revert",
+  "show_validation_popup": true,
+  "validation_indicator_component": "ValidationMessage",
+  "validation_indicator_property": "text",
+  "tag_binding_enabled": true,
+  "tag_path": "[default]Process/Temperature/Setpoint",
+  "tag_transform": "scale",
+  "scale_factor": 1.0,
+  "dependent_components": [
+    {
+      "component": "TemperatureChart",
+      "update_type": "property",
+      "property": "yAxisMax",
+      "transform": "currentValue + 50"
+    },
+    {
+      "component": "SetpointIndicator",
+      "update_type": "property", 
+      "property": "text",
+      "transform": "\"Setpoint: \" + str(currentValue) + \"°F\""
+    }
+  ]
+} 

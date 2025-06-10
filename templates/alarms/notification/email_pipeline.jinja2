@@ -1,0 +1,430 @@
+# {{ pipeline_name }} Email Notification Pipeline
+# Generated: {{ timestamp }}
+# Description: {{ description | default("Alarm email notification pipeline") }}
+
+{% if imports %}
+# Required imports
+{% for import_stmt in imports %}
+{{ import_stmt }}
+{% endfor %}
+{% endif %}
+
+def {{ function_name | default("configureSettings") }}(settings):
+    """
+    Configure email notification pipeline settings.
+    
+    Args:
+        settings: Pipeline settings object
+    
+    Pipeline: {{ pipeline_name }}
+    Email Profile: {{ email_profile | default("default") }}
+    """
+    
+    {% if logging_enabled | default(true) %}
+    # Logging setup
+    logger = system.util.getLogger("AlarmPipeline.{{ pipeline_name }}")
+    logger.info("Configuring email notification pipeline: {{ pipeline_name }}")
+    {% endif %}
+    
+    try:
+        # Email configuration
+        settings.setProperty("mail.smtp.profile", "{{ email_profile | default('default') }}")
+        
+        {% if sender_address %}
+        settings.setProperty("mail.from", "{{ sender_address }}")
+        {% endif %}
+        
+        {% if sender_name %}
+        settings.setProperty("mail.from.name", "{{ sender_name }}")
+        {% endif %}
+        
+        {% if reply_to %}
+        settings.setProperty("mail.reply-to", "{{ reply_to }}")
+        {% endif %}
+        
+        # Email format settings
+        settings.setProperty("mail.format", "{{ email_format | default('html') }}")
+        settings.setProperty("mail.charset", "{{ charset | default('UTF-8') }}")
+        
+        {% if priority %}
+        settings.setProperty("mail.priority", "{{ priority }}")  # high, normal, low
+        {% endif %}
+        
+        {% if delivery_receipt %}
+        settings.setProperty("mail.delivery-receipt", {{ delivery_receipt | lower }})
+        {% endif %}
+        
+        {% if read_receipt %}
+        settings.setProperty("mail.read-receipt", {{ read_receipt | lower }})
+        {% endif %}
+        
+        # Advanced settings
+        {% if max_send_rate %}
+        settings.setProperty("mail.max-send-rate", {{ max_send_rate }})  # emails per minute
+        {% endif %}
+        
+        {% if timeout %}
+        settings.setProperty("mail.timeout", {{ timeout }})  # milliseconds
+        {% endif %}
+        
+        {% if logging_enabled | default(true) %}
+        logger.info("Email pipeline configured successfully")
+        {% endif %}
+        
+    except Exception as e:
+        {% if logging_enabled | default(true) %}
+        logger.error("Failed to configure email pipeline: %s" % str(e))
+        {% endif %}
+        raise
+
+def {{ notification_function | default("notifyUsers") }}(wrapper, settings):
+    """
+    Send email notification for alarm event.
+    
+    Args:
+        wrapper: Alarm event wrapper
+        settings: Pipeline settings
+    
+    Email Template: {{ email_template | default("default") }}
+    """
+    
+    {% if logging_enabled | default(true) %}
+    logger = system.util.getLogger("AlarmPipeline.{{ pipeline_name }}")
+    {% endif %}
+    
+    try:
+        # Get alarm information
+        alarm_event = wrapper.getAlarmEvent()
+        alarm_source = alarm_event.getSource()
+        alarm_display_path = alarm_source.getDisplayPath()
+        alarm_name = alarm_source.getName()
+        alarm_state = alarm_event.getState()
+        alarm_priority = alarm_source.getPriority()
+        timestamp = alarm_event.getTimestamp()
+        
+        {% if logging_enabled | default(true) %}
+        logger.info("Processing alarm notification: %s (State: %s, Priority: %s)" % (alarm_display_path, str(alarm_state), str(alarm_priority)))
+        {% endif %}
+        
+        {% if priority_filter %}
+        # Filter by priority
+        allowed_priorities = {{ allowed_priorities | tojson | default('[1, 2, 3, 4]') }}
+        if alarm_priority.getValue() not in allowed_priorities:
+            logger.debug("Alarm priority %d not in allowed list, skipping notification" % alarm_priority.getValue())
+            return
+        {% endif %}
+        
+        {% if state_filter %}
+        # Filter by state
+        from com.inductiveautomation.ignition.common.alarming.evaluation import AlarmState
+        allowed_states = [
+            {% for state in allowed_alarm_states | default(['Active', 'ActiveAcked', 'ActiveUnacked']) %}
+            AlarmState.{{ state }}{{ "," if not loop.last }}
+            {% endfor %}
+        ]
+        if alarm_state not in allowed_states:
+            logger.debug("Alarm state %s not in allowed list, skipping notification" % str(alarm_state))
+            return
+        {% endif %}
+        
+        {% if source_filter %}
+        # Filter by source path
+        {% if source_includes %}
+        include_patterns = {{ source_includes | tojson }}
+        include_match = False
+        for pattern in include_patterns:
+            if pattern in alarm_display_path:
+                include_match = True
+                break
+        if not include_match:
+            logger.debug("Alarm source path does not match include patterns, skipping")
+            return
+        {% endif %}
+        
+        {% if source_excludes %}
+        exclude_patterns = {{ source_excludes | tojson }}
+        for pattern in exclude_patterns:
+            if pattern in alarm_display_path:
+                logger.debug("Alarm source path matches exclude pattern '%s', skipping" % pattern)
+                return
+        {% endif %}
+        {% endif %}
+        
+        # Determine recipients
+        recipients = []
+        
+        {% if static_recipients %}
+        # Static recipient list
+        static_list = {{ static_recipients | tojson }}
+        recipients.extend(static_list)
+        {% endif %}
+        
+        {% if dynamic_recipients %}
+        # Dynamic recipients based on alarm properties
+        try:
+            {% if recipient_source == "tag" %}
+            # Get recipients from tag
+            recipient_tag = "{{ recipient_tag_path }}"
+            tag_value = system.tag.readBlocking([recipient_tag])[0].value
+            if tag_value:
+                if isinstance(tag_value, str):
+                    recipients.extend([email.strip() for email in tag_value.split(',')])
+                else:
+                    recipients.append(str(tag_value))
+            
+            {% elif recipient_source == "database" %}
+            # Get recipients from database
+            query = """{{ recipient_query | default('SELECT email FROM alarm_recipients WHERE active = 1') }}"""
+            {% if recipient_query_params %}
+            params = []
+            {% for param in recipient_query_params %}
+            {% if param == "alarm_name" %}
+            params.append(alarm_name)
+            {% elif param == "alarm_path" %}
+            params.append(alarm_display_path)
+            {% elif param == "alarm_priority" %}
+            params.append(alarm_priority.getValue())
+            {% else %}
+            params.append("{{ param }}")
+            {% endif %}
+            {% endfor %}
+            result = system.db.runPrepQuery(query, params)
+            {% else %}
+            result = system.db.runQuery(query)
+            {% endif %}
+            
+            for row in range(result.getRowCount()):
+                email = result.getValueAt(row, 0)
+                if email:
+                    recipients.append(str(email))
+            
+            {% elif recipient_source == "user_source" %}
+            # Get recipients from user source based on roles/groups
+            {% if recipient_roles %}
+            user_roles = {{ recipient_roles | tojson }}
+            users = system.user.getUsers()
+            for user in users:
+                user_info = system.user.getUser(user.username)
+                if any(role in user_info.roles for role in user_roles):
+                    if user_info.email:
+                        recipients.append(user_info.email)
+            {% endif %}
+            {% endif %}
+            
+        except Exception as e:
+            logger.error("Failed to determine dynamic recipients: %s" % str(e))
+        {% endif %}
+        
+        {% if escalation_enabled %}
+        # Check for escalation
+        try:
+            escalation_delay = {{ escalation_delay_minutes | default(30) }}  # minutes
+            current_time = system.date.now()
+            alarm_age = (current_time.getTime() - timestamp.getTime()) / (1000 * 60)  # minutes
+            
+            if alarm_age >= escalation_delay and alarm_state.isActive() and not alarm_state.isAcked():
+                # Add escalation recipients
+                escalation_recipients = {{ escalation_recipients | tojson | default('[]') }}
+                recipients.extend(escalation_recipients)
+                logger.info("Adding escalation recipients due to alarm age: %.1f minutes" % alarm_age)
+        except Exception as e:
+            logger.error("Escalation logic failed: %s" % str(e))
+        {% endif %}
+        
+        # Remove duplicates and validate email addresses
+        recipients = list(set(recipients))  # Remove duplicates
+        valid_recipients = []
+        
+        import re
+        email_pattern = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+        
+        for recipient in recipients:
+            if email_pattern.match(recipient.strip()):
+                valid_recipients.append(recipient.strip())
+            else:
+                logger.warn("Invalid email address skipped: %s" % recipient)
+        
+        if not valid_recipients:
+            logger.warn("No valid recipients found for alarm notification")
+            return
+        
+        # Build email content
+        {% if custom_template %}
+        # Custom email template
+        subject = """{{ email_subject_template | default('[ALARM] {alarm_name} - {alarm_state}') }}""".format(
+            alarm_name=alarm_name,
+            alarm_state=str(alarm_state),
+            alarm_path=alarm_display_path,
+            priority=alarm_priority.getName(),
+            timestamp=system.date.format(timestamp, "{{ timestamp_format | default('yyyy-MM-dd HH:mm:ss') }}")
+        )
+        
+        {% if email_format == "html" %}
+        body = """{{ email_body_html_template | default('<h2>Alarm Notification</h2><p><strong>Alarm:</strong> {alarm_name}<br/><strong>State:</strong> {alarm_state}<br/><strong>Priority:</strong> {priority}<br/><strong>Time:</strong> {timestamp}<br/><strong>Path:</strong> {alarm_path}</p>') }}""".format(
+            alarm_name=alarm_name,
+            alarm_state=str(alarm_state),
+            alarm_path=alarm_display_path,
+            priority=alarm_priority.getName(),
+            timestamp=system.date.format(timestamp, "{{ timestamp_format | default('yyyy-MM-dd HH:mm:ss') }}")
+        )
+        {% else %}
+        body = """{{ email_body_text_template | default('ALARM NOTIFICATION\n\nAlarm: {alarm_name}\nState: {alarm_state}\nPriority: {priority}\nTime: {timestamp}\nPath: {alarm_path}') }}""".format(
+            alarm_name=alarm_name,
+            alarm_state=str(alarm_state),
+            alarm_path=alarm_display_path,
+            priority=alarm_priority.getName(),
+            timestamp=system.date.format(timestamp, "{{ timestamp_format | default('yyyy-MM-dd HH:mm:ss') }}")
+        )
+        {% endif %}
+        {% else %}
+        # Default email template
+        subject = "[ALARM] %s - %s" % (alarm_name, str(alarm_state))
+        
+        {% if email_format == "html" %}
+        body = """
+        <html>
+        <head><title>Alarm Notification</title></head>
+        <body>
+            <h2 style="color: %s;">Alarm Notification</h2>
+            <table border="1" cellpadding="5" style="border-collapse: collapse;">
+                <tr><td><strong>Alarm Name:</strong></td><td>%s</td></tr>
+                <tr><td><strong>State:</strong></td><td>%s</td></tr>
+                <tr><td><strong>Priority:</strong></td><td>%s</td></tr>
+                <tr><td><strong>Timestamp:</strong></td><td>%s</td></tr>
+                <tr><td><strong>Source Path:</strong></td><td>%s</td></tr>
+            </table>
+            {% if include_acknowledgment_link %}
+            <p><a href="{{ ack_link_base | default('http://localhost:8088/main/system/alarms') }}">Acknowledge Alarm</a></p>
+            {% endif %}
+        </body>
+        </html>
+        """ % (
+            "red" if alarm_state.isActive() else "green",
+            alarm_name,
+            str(alarm_state),
+            alarm_priority.getName(),
+            system.date.format(timestamp, "yyyy-MM-dd HH:mm:ss"),
+            alarm_display_path
+        )
+        {% else %}
+        body = """ALARM NOTIFICATION
+
+Alarm Name: %s
+State: %s
+Priority: %s
+Timestamp: %s
+Source Path: %s
+
+{% if include_acknowledgment_info %}
+To acknowledge this alarm, log into the Ignition system at:
+{{ ack_link_base | default('http://localhost:8088/main/system/alarms') }}
+{% endif %}
+        """ % (
+            alarm_name,
+            str(alarm_state),
+            alarm_priority.getName(),
+            system.date.format(timestamp, "yyyy-MM-dd HH:mm:ss"),
+            alarm_display_path
+        )
+        {% endif %}
+        {% endif %}
+        
+        # Send email
+        {% if send_individual %}
+        # Send individual emails
+        for recipient in valid_recipients:
+            try:
+                {% if attachments %}
+                # Send with attachments
+                attachments_list = {{ attachments | tojson }}
+                system.net.sendEmail(
+                    profile="{{ email_profile | default('default') }}",
+                    to=[recipient],
+                    subject=subject,
+                    body=body,
+                    html={% if email_format == "html" %}True{% else %}False{% endif %},
+                    attachments=attachments_list
+                )
+                {% else %}
+                # Send without attachments
+                system.net.sendEmail(
+                    profile="{{ email_profile | default('default') }}",
+                    to=[recipient],
+                    subject=subject,
+                    body=body,
+                    html={% if email_format == "html" %}True{% else %}False{% endif %}
+                )
+                {% endif %}
+                
+                logger.info("Email sent successfully to: %s" % recipient)
+                
+            except Exception as e:
+                logger.error("Failed to send email to %s: %s" % (recipient, str(e)))
+        {% else %}
+        # Send single email to all recipients
+        try:
+            {% if cc_recipients %}
+            cc_list = {{ cc_recipients | tojson }}
+            {% endif %}
+            
+            {% if bcc_recipients %}
+            bcc_list = {{ bcc_recipients | tojson }}
+            {% endif %}
+            
+            {% if attachments %}
+            # Send with attachments
+            attachments_list = {{ attachments | tojson }}
+            system.net.sendEmail(
+                profile="{{ email_profile | default('default') }}",
+                to=valid_recipients,
+                {% if cc_recipients %}cc=cc_list,{% endif %}
+                {% if bcc_recipients %}bcc=bcc_list,{% endif %}
+                subject=subject,
+                body=body,
+                html={% if email_format == "html" %}True{% else %}False{% endif %},
+                attachments=attachments_list
+            )
+            {% else %}
+            # Send without attachments
+            system.net.sendEmail(
+                profile="{{ email_profile | default('default') }}",
+                to=valid_recipients,
+                {% if cc_recipients %}cc=cc_list,{% endif %}
+                {% if bcc_recipients %}bcc=bcc_list,{% endif %}
+                subject=subject,
+                body=body,
+                html={% if email_format == "html" %}True{% else %}False{% endif %}
+            )
+            {% endif %}
+            
+            logger.info("Email sent successfully to %d recipients" % len(valid_recipients))
+            
+        except Exception as e:
+            logger.error("Failed to send group email: %s" % str(e))
+            raise
+        {% endif %}
+        
+        {% if notification_log %}
+        # Log notification to database
+        try:
+            log_query = """
+            INSERT INTO alarm_notifications (alarm_source, alarm_state, recipients, timestamp, pipeline_name)
+            VALUES (?, ?, ?, ?, ?)
+            """
+            system.db.runPrepUpdate(
+                log_query,
+                [alarm_display_path, str(alarm_state), ','.join(valid_recipients), timestamp, "{{ pipeline_name }}"]
+            )
+        except Exception as e:
+            logger.error("Failed to log notification: %s" % str(e))
+        {% endif %}
+        
+        {% if logging_enabled | default(true) %}
+        logger.info("Email notification completed for alarm: %s" % alarm_display_path)
+        {% endif %}
+        
+    except Exception as e:
+        {% if logging_enabled | default(true) %}
+        logger.error("Email notification failed: %s" % str(e))
+        {% endif %}
+        raise 
