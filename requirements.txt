@@ -42,6 +42,10 @@ click>=8.1.0
 rich>=13.5.0
 streamlit>=1.28.0
 
+# Graph Database - AI Assistant Memory System
+neo4j>=5.15.0
+requests>=2.31.0
+
 # Type stubs
 types-requests>=2.31.0
-types-PyYAML>=6.0.12 
+types-PyYAML>=6.0.12

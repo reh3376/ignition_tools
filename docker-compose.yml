@@ -1,6 +1,52 @@
+# IGN Scripts Docker Testing Environment
+#
+# Three specialized services for comprehensive testing and development:
+# 1. ign-scripts-test: Main testing container with full test suite
+# 2. ign-scripts-dev: Development UI container for interactive testing
+# 3. ign-scripts-benchmark: Performance testing and benchmarking
+#
+# Quick start:
+#   docker-compose up ign-scripts-test     # Run full test suite
+#   docker-compose up ign-scripts-dev      # Launch dev UI on port 8502
+#   docker-compose logs -f <service>       # Monitor logs
+#
+# For automated testing and monitoring:
+#   python3 scripts/run_tests.py --all
+#   python3 scripts/monitor_logs.py --live
+#
 version: '3.8'
 
 services:
+  # Neo4j Graph Database - AI Assistant Persistent Memory
+  neo4j:
+    image: neo4j:5.15-community
+    container_name: ign-scripts-neo4j
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    environment:
+      NEO4J_AUTH: neo4j/ignition-graph
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_apoc_export_file_enabled: 'true'
+      NEO4J_apoc_import_file_enabled: 'true'
+      NEO4J_apoc_import_file_use__neo4j__config: 'true'
+      NEO4J_ACCEPT_LICENSE_AGREEMENT: 'yes'
+    volumes:
+      - ./graph-data/data:/data
+      - ./graph-data/logs:/logs
+      - ./graph-data/import:/var/lib/neo4j/import
+      - ./graph-data/plugins:/plugins
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p ignition-graph 'RETURN 1'"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
   ign-scripts-test:
     build:
       context: .
@@ -71,4 +117,4 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    command: ["python", "-m", "pytest", "tests/test_performance.py", "-v", "--benchmark-only", "--benchmark-json=/app/test-results/benchmark.json"] 
+    command: ["python", "-m", "pytest", "tests/test_performance.py", "-v", "--benchmark-only", "--benchmark-json=/app/test-results/benchmark.json"]

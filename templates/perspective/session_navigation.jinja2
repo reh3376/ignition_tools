@@ -1,0 +1,330 @@
+# Ignition Perspective Component Script - Session Navigation
+# Scope: Perspective Session (executes on Gateway)
+# Trigger: Component event (onActionPerformed, etc.)
+# Use Case: Navigate between Perspective pages with parameters
+
+# Template Configuration:
+# - navigation_type: Type of navigation (page, popup, dock)
+# - target_page: Target page path
+# - page_params: Parameters to pass to the page
+# - validation_checks: Pre-navigation validation
+# - enable_logging: Whether to include session logging
+
+{% if enable_logging -%}
+# Set up logger for Perspective session
+logger = system.util.getLogger("{{ component_name | default('PerspectiveNavigation') }}")
+{% endif -%}
+
+try:
+    {% if validation_checks -%}
+    # Pre-navigation validation
+    validation_passed = True
+
+    {% for check in validation_checks -%}
+    # {{ check.description | default('Validation check') }}
+    try:
+        {% if check.type == 'user_authorization' -%}
+        # Check user authorization
+        user_roles = system.security.getUserRoles()
+        required_roles = {{ check.required_roles | tojson }}
+        has_permission = any(role in user_roles for role in required_roles)
+
+        if not has_permission:
+            validation_passed = False
+            {% if enable_logging -%}
+            logger.warning("User lacks required roles for navigation: " + str(required_roles))
+            {% endif -%}
+            # Show unauthorized message using Perspective messaging
+            system.perspective.sendMessage(
+                "displayNotification",
+                {
+                    "message": "{{ check.error_message | default('Insufficient permissions') }}",
+                    "level": "warn"
+                }
+            )
+
+        {% elif check.type == 'tag_condition' -%}
+        # Check tag condition
+        tag_value = system.tag.readBlocking(["{{ check.tag_path }}"])[0].value
+        condition_met = {{ check.condition }}
+
+        if not condition_met:
+            validation_passed = False
+            {% if enable_logging -%}
+            logger.warning("Navigation blocked by tag condition: {{ check.tag_path }} = " + str(tag_value))
+            {% endif -%}
+            system.perspective.sendMessage(
+                "displayNotification",
+                {
+                    "message": "{{ check.error_message | default('Navigation condition not met') }}",
+                    "level": "warn"
+                }
+            )
+
+        {% elif check.type == 'session_property' -%}
+        # Check session property condition
+        session_info = system.perspective.getSessionInfo()
+        property_value = session_info.get("{{ check.property_name }}")
+        condition_met = {{ check.condition }}
+
+        if not condition_met:
+            validation_passed = False
+            {% if enable_logging -%}
+            logger.warning("Navigation blocked by session property: {{ check.property_name }} = " + str(property_value))
+            {% endif -%}
+            system.perspective.sendMessage(
+                "displayNotification",
+                {
+                    "message": "{{ check.error_message | default('Session condition not met') }}",
+                    "level": "warn"
+                }
+            )
+
+        {% endif -%}
+    except Exception as e:
+        validation_passed = False
+        {% if enable_logging -%}
+        logger.error("Validation check failed: " + str(e))
+        {% endif -%}
+        system.perspective.sendMessage(
+            "displayNotification",
+            {
+                "message": "Validation error: " + str(e),
+                "level": "error"
+            }
+        )
+    {% endfor -%}
+
+    if not validation_passed:
+        {% if enable_logging -%}
+        logger.info("Navigation cancelled due to validation failure")
+        {% endif -%}
+        return
+    {% endif -%}
+
+    # Prepare navigation parameters
+    {% if page_params -%}
+    navigation_params = {
+        {% for param_name, param_value in page_params.items() -%}
+        "{{ param_name }}": {{ param_value | tojson }},
+        {% endfor -%}
+    }
+    {% else -%}
+    navigation_params = {}
+    {% endif -%}
+
+    {% if dynamic_params -%}
+    # Add dynamic parameters
+    {% for param in dynamic_params -%}
+    {% if param.type == 'tag_value' -%}
+    # Get tag value for parameter
+    try:
+        tag_value = system.tag.readBlocking(["{{ param.tag_path }}"])[0].value
+        navigation_params["{{ param.name }}"] = tag_value
+        {% if enable_logging -%}
+        logger.debug("Added tag parameter {{ param.name }}: " + str(tag_value))
+        {% endif -%}
+    except Exception as e:
+        {% if enable_logging -%}
+        logger.error("Failed to read tag {{ param.tag_path }}: " + str(e))
+        {% endif -%}
+        navigation_params["{{ param.name }}"] = {{ param.default_value | default('None') | tojson }}
+
+    {% elif param.type == 'session_property' -%}
+    # Get session property value
+    try:
+        session_info = system.perspective.getSessionInfo()
+        session_value = session_info.get("{{ param.session_property }}", {{ param.default_value | default('None') | tojson }})
+        navigation_params["{{ param.name }}"] = session_value
+        {% if enable_logging -%}
+        logger.debug("Added session parameter {{ param.name }}: " + str(session_value))
+        {% endif -%}
+    except Exception as e:
+        {% if enable_logging -%}
+        logger.error("Failed to get session property {{ param.session_property }}: " + str(e))
+        {% endif -%}
+        navigation_params["{{ param.name }}"] = {{ param.default_value | default('None') | tojson }}
+
+    {% elif param.type == 'component_property' -%}
+    # Get component property value (from session)
+    try:
+        # Note: In Perspective, component access is different from Vision
+        # This would typically be handled via component events
+        calculated_value = {{ param.expression }}
+        navigation_params["{{ param.name }}"] = calculated_value
+        {% if enable_logging -%}
+        logger.debug("Added calculated parameter {{ param.name }}: " + str(calculated_value))
+        {% endif -%}
+    except Exception as e:
+        {% if enable_logging -%}
+        logger.error("Failed to calculate parameter {{ param.name }}: " + str(e))
+        {% endif -%}
+        navigation_params["{{ param.name }}"] = {{ param.default_value | default('None') | tojson }}
+
+    {% endif -%}
+    {% endfor -%}
+    {% endif -%}
+
+    # Perform navigation based on type
+    {% if navigation_type == 'page' -%}
+    # Navigate to a new page
+    target_page = "{{ target_page | default('/path/to/page') }}"
+
+    {% if navigation_params -%}
+    system.perspective.navigate(page=target_page, params=navigation_params)
+    {% else -%}
+    system.perspective.navigate(page=target_page)
+    {% endif -%}
+
+    {% if enable_logging -%}
+    logger.info("Navigated to page: " + target_page + " with params: " + str(navigation_params))
+    {% endif -%}
+
+    {% elif navigation_type == 'popup' -%}
+    # Open popup window
+    popup_id = "{{ popup_id | default('popup') }}"
+    target_view = "{{ target_view | default('/path/to/view') }}"
+
+    popup_config = {
+        "id": popup_id,
+        "view": target_view,
+        {% if popup_position -%}
+        "position": {
+            "x": {{ popup_position.x | default(100) }},
+            "y": {{ popup_position.y | default(100) }}
+        },
+        {% endif -%}
+        {% if popup_size -%}
+        "size": {
+            "width": {{ popup_size.width | default(400) }},
+            "height": {{ popup_size.height | default(300) }}
+        },
+        {% endif -%}
+        {% if popup_modal -%}
+        "modal": {{ popup_modal | tojson }},
+        {% endif -%}
+        {% if navigation_params -%}
+        "params": navigation_params
+        {% endif -%}
+    }
+
+    system.perspective.openPopup(popup_config)
+
+    {% if enable_logging -%}
+    logger.info("Opened popup: " + popup_id + " with view: " + target_view)
+    {% endif -%}
+
+    {% elif navigation_type == 'dock' -%}
+    # Open or manipulate dock
+    dock_id = "{{ dock_id | default('dock') }}"
+
+    {% if dock_action == 'open' -%}
+    system.perspective.openDock(dock_id)
+    {% elif dock_action == 'close' -%}
+    system.perspective.closeDock(dock_id)
+    {% elif dock_action == 'toggle' -%}
+    system.perspective.toggleDock(dock_id)
+    {% endif -%}
+
+    {% if enable_logging -%}
+    logger.info("Dock action '{{ dock_action | default('open') }}' performed on: " + dock_id)
+    {% endif -%}
+
+    {% elif navigation_type == 'back' -%}
+    # Navigate back in history
+    system.perspective.navigateBack()
+
+    {% if enable_logging -%}
+    logger.info("Navigated back in history")
+    {% endif -%}
+
+    {% elif navigation_type == 'forward' -%}
+    # Navigate forward in history
+    system.perspective.navigateForward()
+
+    {% if enable_logging -%}
+    logger.info("Navigated forward in history")
+    {% endif -%}
+
+    {% else -%}
+    # Custom navigation logic
+    {% if custom_navigation_code -%}
+    {{ custom_navigation_code | indent(4) }}
+    {% else -%}
+    # Add your custom navigation logic here
+    # Available functions:
+    # - system.perspective.navigate()
+    # - system.perspective.openPopup()
+    # - system.perspective.closePage()
+    # - system.perspective.openDock()
+    # - system.perspective.closeDock()
+    pass
+    {% endif -%}
+    {% endif -%}
+
+    {% if post_navigation_actions -%}
+    # Post-navigation actions
+    {% for action in post_navigation_actions -%}
+    try:
+        {% if action.type == 'tag_write' -%}
+        # Write to tag after navigation
+        system.tag.writeBlocking(["{{ action.tag_path }}"], [{{ action.value | tojson }}])
+        {% if enable_logging -%}
+        logger.debug("Updated tag {{ action.tag_path }} after navigation")
+        {% endif -%}
+
+        {% elif action.type == 'message_send' -%}
+        # Send message to components
+        system.perspective.sendMessage("{{ action.message_type }}", {{ action.payload | tojson }})
+        {% if enable_logging -%}
+        logger.debug("Sent message {{ action.message_type }} after navigation")
+        {% endif -%}
+
+        {% elif action.type == 'session_update' -%}
+        # Update session properties (if supported)
+        # Note: Direct session property updates may not be available
+        # This is typically handled through other mechanisms
+        {% if enable_logging -%}
+        logger.debug("Session update action triggered")
+        {% endif -%}
+
+        {% elif action.type == 'custom' -%}
+        # Custom post-navigation code
+        {{ action.code | indent(8) }}
+
+        {% endif -%}
+    except Exception as e:
+        {% if enable_logging -%}
+        logger.error("Post-navigation action failed: " + str(e))
+        {% endif -%}
+    {% endfor -%}
+    {% endif -%}
+
+except Exception as e:
+    {% if enable_logging -%}
+    logger.error("Navigation error: " + str(e))
+    {% endif -%}
+
+    # Show error notification
+    try:
+        system.perspective.sendMessage(
+            "displayNotification",
+            {
+                "message": "Navigation failed: " + str(e),
+                "level": "error"
+            }
+        )
+    except Exception as notification_error:
+        {% if enable_logging -%}
+        logger.error("Failed to show error notification: " + str(notification_error))
+        {% endif -%}
+
+    {% if fallback_navigation -%}
+    # Fallback navigation on error
+    try:
+        {{ fallback_navigation | indent(8) }}
+    except Exception as fallback_error:
+        {% if enable_logging -%}
+        logger.error("Fallback navigation failed: " + str(fallback_error))
+        {% endif -%}
+    {% endif %}

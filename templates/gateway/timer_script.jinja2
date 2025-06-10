@@ -1,0 +1,176 @@
+# Ignition Gateway Timer Script
+# Scope: Gateway
+# Trigger: Timer (Fixed Delay or Fixed Rate)
+# Context Variables: None
+
+# Template Configuration:
+# - script_name: Name for logging identification
+# - timer_purpose: Description of what this timer does
+# - enable_logging: Whether to include logging
+# - tag_operations: List of tag read/write operations
+# - database_operations: Database query/update operations
+# - error_handling: How to handle exceptions
+
+{% if enable_logging -%}
+# Set up logger for timer script
+logger = system.util.getLogger("{{ script_name | default('TimerScript') }}")
+{% endif -%}
+
+try:
+    {% if enable_logging -%}
+    logger.debug("Timer script started: {{ timer_purpose | default('Timer execution') }}")
+    {% endif -%}
+
+    {% if tag_operations -%}
+    # Tag Operations
+    {% for operation in tag_operations -%}
+    {% if operation.type == 'read' -%}
+    # Read {{ operation.description | default('tag value') }}
+    try:
+        tag_values = system.tag.readBlocking({{ operation.tag_paths | tojson }})
+        {% if operation.process_code -%}
+        # Process the read values
+        {{ operation.process_code | indent(8) }}
+        {% endif -%}
+        {% if enable_logging -%}
+        logger.debug("Successfully read tags: {{ operation.tag_paths | join(', ') }}")
+        {% endif -%}
+    except Exception as e:
+        {% if enable_logging -%}
+        logger.error("Failed to read tags {{ operation.tag_paths | join(', ') }}: " + str(e))
+        {% endif -%}
+        {% if error_handling == 'continue' -%}
+        pass  # Continue execution despite error
+        {% elif error_handling == 'raise' -%}
+        raise e
+        {% endif -%}
+
+    {% elif operation.type == 'write' -%}
+    # Write {{ operation.description | default('tag values') }}
+    try:
+        tag_paths = {{ operation.tag_paths | tojson }}
+        tag_values = {{ operation.tag_values | tojson }}
+
+        {% if operation.validation_code -%}
+        # Validate values before writing
+        {{ operation.validation_code | indent(8) }}
+        {% endif -%}
+
+        system.tag.writeBlocking(tag_paths, tag_values)
+        {% if enable_logging -%}
+        logger.debug("Successfully wrote tags: {{ operation.tag_paths | join(', ') }}")
+        {% endif -%}
+    except Exception as e:
+        {% if enable_logging -%}
+        logger.error("Failed to write tags {{ operation.tag_paths | join(', ') }}: " + str(e))
+        {% endif -%}
+        {% if error_handling == 'continue' -%}
+        pass  # Continue execution despite error
+        {% elif error_handling == 'raise' -%}
+        raise e
+        {% endif -%}
+
+    {% endif -%}
+    {% endfor -%}
+    {% endif -%}
+
+    {% if database_operations -%}
+    # Database Operations
+    {% for operation in database_operations -%}
+    {% if operation.type == 'query' -%}
+    # {{ operation.description | default('Database query') }}
+    try:
+        {% if operation.parameters -%}
+        # Prepared query with parameters
+        result = system.db.runPrepQuery(
+            "{{ operation.sql }}",
+            {{ operation.parameters | tojson }},
+            "{{ operation.database | default('') }}"
+        )
+        {% else -%}
+        # Standard query
+        result = system.db.runQuery(
+            "{{ operation.sql }}",
+            "{{ operation.database | default('') }}"
+        )
+        {% endif -%}
+
+        {% if operation.process_code -%}
+        # Process query results
+        {{ operation.process_code | indent(8) }}
+        {% endif -%}
+
+        {% if enable_logging -%}
+        logger.debug("Database query executed successfully, {{ '{}' }} rows returned".format(result.rowCount))
+        {% endif -%}
+
+    except Exception as e:
+        {% if enable_logging -%}
+        logger.error("Database query failed: " + str(e))
+        {% endif -%}
+        {% if error_handling == 'continue' -%}
+        pass  # Continue execution despite error
+        {% elif error_handling == 'raise' -%}
+        raise e
+        {% endif -%}
+
+    {% elif operation.type == 'update' -%}
+    # {{ operation.description | default('Database update') }}
+    try:
+        {% if operation.parameters -%}
+        # Prepared update with parameters
+        rows_affected = system.db.runPrepUpdate(
+            "{{ operation.sql }}",
+            {{ operation.parameters | tojson }},
+            "{{ operation.database | default('') }}"
+        )
+        {% else -%}
+        # Standard update
+        rows_affected = system.db.runUpdateQuery(
+            "{{ operation.sql }}",
+            "{{ operation.database | default('') }}"
+        )
+        {% endif -%}
+
+        {% if enable_logging -%}
+        logger.debug("Database update completed, {{ '{}' }} rows affected".format(rows_affected))
+        {% endif -%}
+
+    except Exception as e:
+        {% if enable_logging -%}
+        logger.error("Database update failed: " + str(e))
+        {% endif -%}
+        {% if error_handling == 'continue' -%}
+        pass  # Continue execution despite error
+        {% elif error_handling == 'raise' -%}
+        raise e
+        {% endif -%}
+
+    {% endif -%}
+    {% endfor -%}
+    {% endif -%}
+
+    # Custom timer logic
+    {% if custom_code -%}
+    {{ custom_code | indent(4) }}
+    {% else -%}
+    # Add your custom timer logic here
+    # This script runs every {{ timer_interval | default('X') }} milliseconds
+    {% endif -%}
+
+    {% if enable_logging -%}
+    logger.debug("Timer script completed successfully")
+    {% endif -%}
+
+except Exception as e:
+    {% if enable_logging -%}
+    logger.error("Timer script error: " + str(e))
+    {% endif -%}
+
+    {% if error_handling == 'raise' -%}
+    # Re-raise exception to stop timer execution
+    raise e
+    {% else -%}
+    # Log error but continue timer execution
+    pass
+    {% endif %}

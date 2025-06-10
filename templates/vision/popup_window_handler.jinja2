@@ -1,0 +1,238 @@
+# Ignition Vision Component Script - Popup Window Handler
+# Scope: Vision Client
+# Trigger: Component event (typically actionPerformed)
+# Use Case: Open popup windows with parameters
+
+# Template Configuration:
+# - window_path: Path to the popup window
+# - window_params: Parameters to pass to popup window
+# - popup_mode: Type of popup (modal, non-modal, overlay)
+# - position_config: Window positioning configuration
+# - enable_logging: Whether to include client logging
+
+{% if enable_logging -%}
+# Get logger for client-side logging
+logger = system.util.getLogger("{{ component_name | default('PopupHandler') }}")
+{% endif -%}
+
+try:
+    # Window configuration
+    window_path = "{{ window_path | default('Path/To/PopupWindow') }}"
+
+    {% if window_params -%}
+    # Prepare window parameters
+    window_params = {
+        {% for param_name, param_value in window_params.items() -%}
+        "{{ param_name }}": {{ param_value | tojson }},
+        {% endfor -%}
+    }
+    {% else -%}
+    # No parameters configured - add your own as needed
+    window_params = {
+        # "parameterName": "parameterValue",
+        # "currentUser": system.security.getUsername(),
+        # "timestamp": system.date.now(),
+    }
+    {% endif -%}
+
+    {% if dynamic_params -%}
+    # Add dynamic parameters based on current state
+    {% for param in dynamic_params -%}
+    {% if param.type == 'tag_value' -%}
+    # Get tag value for parameter
+    try:
+        tag_value = system.tag.readBlocking(["{{ param.tag_path }}"])[0].value
+        window_params["{{ param.name }}"] = tag_value
+        {% if enable_logging -%}
+        logger.debug("Added tag parameter {{ param.name }}: " + str(tag_value))
+        {% endif -%}
+    except Exception as e:
+        {% if enable_logging -%}
+        logger.error("Failed to read tag {{ param.tag_path }}: " + str(e))
+        {% endif -%}
+        window_params["{{ param.name }}"] = {{ param.default_value | default('None') | tojson }}
+
+    {% elif param.type == 'component_property' -%}
+    # Get component property value
+    try:
+        {% if param.component_path -%}
+        component = {{ param.component_path }}
+        {% else -%}
+        component = event.source  # Use the component that triggered this event
+        {% endif -%}
+        prop_value = component.{{ param.property_name }}
+        window_params["{{ param.name }}"] = prop_value
+        {% if enable_logging -%}
+        logger.debug("Added component property {{ param.name }}: " + str(prop_value))
+        {% endif -%}
+    except Exception as e:
+        {% if enable_logging -%}
+        logger.error("Failed to get component property {{ param.property_name }}: " + str(e))
+        {% endif -%}
+        window_params["{{ param.name }}"] = {{ param.default_value | default('None') | tojson }}
+
+    {% elif param.type == 'custom_expression' -%}
+    # Custom expression evaluation
+    try:
+        calculated_value = {{ param.expression }}
+        window_params["{{ param.name }}"] = calculated_value
+        {% if enable_logging -%}
+        logger.debug("Added calculated parameter {{ param.name }}: " + str(calculated_value))
+        {% endif -%}
+    except Exception as e:
+        {% if enable_logging -%}
+        logger.error("Failed to calculate parameter {{ param.name }}: " + str(e))
+        {% endif -%}
+        window_params["{{ param.name }}"] = {{ param.default_value | default('None') | tojson }}
+
+    {% endif -%}
+    {% endfor -%}
+    {% endif -%}
+
+    {% if validation_checks -%}
+    # Validation checks before opening window
+    validation_passed = True
+    {% for check in validation_checks -%}
+
+    # {{ check.description | default('Validation check') }}
+    try:
+        {% if check.type == 'user_role' -%}
+        # Check user role
+        user_roles = system.security.getRoles()
+        required_roles = {{ check.required_roles | tojson }}
+        has_required_role = any(role in user_roles for role in required_roles)
+        if not has_required_role:
+            validation_passed = False
+            {% if enable_logging -%}
+            logger.warning("User does not have required roles: " + str(required_roles))
+            {% endif -%}
+            system.gui.warningBox("{{ check.error_message | default('Insufficient permissions to open this window.') }}")
+
+        {% elif check.type == 'tag_condition' -%}
+        # Check tag condition
+        tag_value = system.tag.readBlocking(["{{ check.tag_path }}"])[0].value
+        condition_met = {{ check.condition }}
+        if not condition_met:
+            validation_passed = False
+            {% if enable_logging -%}
+            logger.warning("Tag condition not met for {{ check.tag_path }}: " + str(tag_value))
+            {% endif -%}
+            system.gui.warningBox("{{ check.error_message | default('Condition not met to open window.') }}")
+
+        {% elif check.type == 'custom_condition' -%}
+        # Custom validation condition
+        condition_met = {{ check.condition }}
+        if not condition_met:
+            validation_passed = False
+            {% if enable_logging -%}
+            logger.warning("Custom condition failed: {{ check.description }}")
+            {% endif -%}
+            system.gui.warningBox("{{ check.error_message | default('Validation failed.') }}")
+
+        {% endif -%}
+    except Exception as e:
+        {% if enable_logging -%}
+        logger.error("Validation check failed: " + str(e))
+        {% endif -%}
+        validation_passed = False
+        system.gui.errorBox("Validation error: " + str(e))
+    {% endfor -%}
+
+    if not validation_passed:
+        {% if enable_logging -%}
+        logger.info("Window opening cancelled due to validation failure")
+        {% endif -%}
+        return
+    {% endif -%}
+
+    # Open the popup window
+    {% if popup_mode == 'modal' -%}
+    # Open as modal dialog (blocks interaction with parent)
+    {% if position_config -%}
+    system.nav.openWindow(window_path, window_params)
+    {% if position_config.center -%}
+    system.nav.centerWindow(window_path)
+    {% endif -%}
+    {% else -%}
+    system.nav.openWindow(window_path, window_params)
+    system.nav.centerWindow(window_path)
+    {% endif -%}
+
+    {% elif popup_mode == 'overlay' -%}
+    # Open as overlay window
+    {% if position_config -%}
+    system.nav.openWindow(
+        window_path,
+        window_params,
+        {{ position_config.x | default(0) }},
+        {{ position_config.y | default(0) }},
+        {{ position_config.width | default(800) }},
+        {{ position_config.height | default(600) }}
+    )
+    {% else -%}
+    system.nav.openWindow(window_path, window_params)
+    {% endif -%}
+
+    {% else -%}
+    # Open as standard popup window (non-modal)
+    system.nav.openWindow(window_path, window_params)
+    {% if position_config and position_config.center -%}
+    system.nav.centerWindow(window_path)
+    {% endif -%}
+    {% endif -%}
+
+    {% if enable_logging -%}
+    logger.info("Successfully opened popup window: " + window_path)
+    {% endif -%}
+
+    {% if post_open_actions -%}
+    # Actions to perform after opening window
+    {% for action in post_open_actions -%}
+    {% if action.type == 'tag_write' -%}
+    # Write to tag after opening window
+    try:
+        system.tag.writeBlocking(["{{ action.tag_path }}"], [{{ action.value | tojson }}])
+        {% if enable_logging -%}
+        logger.debug("Updated tag {{ action.tag_path }} to {{ action.value }}")
+        {% endif -%}
+    except Exception as e:
+        {% if enable_logging -%}
+        logger.error("Failed to write tag after window open: " + str(e))
+        {% endif -%}
+
+    {% elif action.type == 'disable_component' -%}
+    # Disable component after opening window
+    try:
+        {% if action.component_path -%}
+        component_to_disable = {{ action.component_path }}
+        {% else -%}
+        component_to_disable = event.source
+        {% endif -%}
+        component_to_disable.enabled = False
+        {% if enable_logging -%}
+        logger.debug("Disabled component after window open")
+        {% endif -%}
+    except Exception as e:
+        {% if enable_logging -%}
+        logger.error("Failed to disable component: " + str(e))
+        {% endif -%}
+
+    {% endif -%}
+    {% endfor -%}
+    {% endif -%}
+
+except Exception as e:
+    {% if enable_logging -%}
+    logger.error("Error opening popup window: " + str(e))
+    {% endif -%}
+    system.gui.errorBox("Failed to open window: " + str(e), "{{ error_title | default('Window Error') }}")
+
+    {% if fallback_action -%}
+    # Fallback action if window opening fails
+    try:
+        {{ fallback_action | indent(8) }}
+    except Exception as fallback_error:
+        {% if enable_logging -%}
+        logger.error("Fallback action also failed: " + str(fallback_error))
+        {% endif -%}
+    {% endif %}

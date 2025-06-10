@@ -204,6 +204,14 @@ temp/
 cache/
 downloads/
 
+# Graph Database - Neo4j Data (AI Assistant Memory)
+graph-data/data/
+graph-data/logs/
+graph-data/plugins/
+# Keep import directory for initial data loading
+!graph-data/import/
+!graph-data/README.md
+
 # Machine Learning
 models/
 *.model
@@ -464,4 +472,4 @@ build/
 # Editor backup files
 *~
 *.bak
-*.orig 
+*.orig

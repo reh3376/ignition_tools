@@ -1,0 +1,318 @@
+# Ignition Vision Component Script - Advanced Tag Write Handler
+# Scope: Vision Client
+# Trigger: Component event (actionPerformed, propertyChange, etc.)
+# Use Case: Complex tag write operations with validation and error handling
+
+# Template Configuration:
+# - tag_operations: List of tag write operations
+# - validation_rules: Validation rules for tag values
+# - confirmation_required: Whether to show confirmation dialog
+# - enable_logging: Whether to include client logging
+# - error_handling: How to handle write failures
+
+{% if enable_logging -%}
+# Get logger for client-side logging
+logger = system.util.getLogger("{{ component_name | default('TagWriteHandler') }}")
+{% endif -%}
+
+try:
+    {% if confirmation_required -%}
+    # Show confirmation dialog before proceeding
+    confirmation_message = "{{ confirmation_message | default('Are you sure you want to perform this operation?') }}"
+    user_confirmed = system.gui.confirm(confirmation_message, "{{ confirmation_title | default('Confirm Action') }}")
+
+    if not user_confirmed:
+        {% if enable_logging -%}
+        logger.info("User cancelled tag write operation")
+        {% endif -%}
+        return
+    {% endif -%}
+
+    {% if validation_rules -%}
+    # Pre-validation checks
+    validation_errors = []
+
+    {% for rule in validation_rules -%}
+    # {{ rule.description | default('Validation rule') }}
+    try:
+        {% if rule.type == 'user_role' -%}
+        # Check user role authorization
+        user_roles = system.security.getRoles()
+        required_roles = {{ rule.required_roles | tojson }}
+        has_permission = any(role in user_roles for role in required_roles)
+        if not has_permission:
+            validation_errors.append("{{ rule.error_message | default('Insufficient permissions for this operation') }}")
+
+        {% elif rule.type == 'tag_condition' -%}
+        # Check tag condition before writing
+        condition_tag_value = system.tag.readBlocking(["{{ rule.tag_path }}"])[0].value
+        condition_met = {{ rule.condition }}
+        if not condition_met:
+            validation_errors.append("{{ rule.error_message | default('Precondition not met') }}")
+
+        {% elif rule.type == 'value_range' -%}
+        # Check if values are within acceptable range
+        {% if rule.tag_path -%}
+        current_value = system.tag.readBlocking(["{{ rule.tag_path }}"])[0].value
+        {% elif rule.component_property -%}
+        current_value = {{ rule.component_property }}
+        {% endif -%}
+
+        if current_value < {{ rule.min_value }} or current_value > {{ rule.max_value }}:
+            validation_errors.append("{{ rule.error_message | default('Value out of acceptable range') }}")
+
+        {% elif rule.type == 'custom_validation' -%}
+        # Custom validation logic
+        validation_result = {{ rule.validation_expression }}
+        if not validation_result:
+            validation_errors.append("{{ rule.error_message | default('Custom validation failed') }}")
+
+        {% endif -%}
+    except Exception as e:
+        validation_errors.append("Validation error: " + str(e))
+        {% if enable_logging -%}
+        logger.error("Validation rule failed: " + str(e))
+        {% endif -%}
+
+    {% endfor -%}
+
+    # Check if validation passed
+    if validation_errors:
+        error_message = "Cannot proceed with tag write:\n" + "\n".join(validation_errors)
+        system.gui.errorBox(error_message, "Validation Failed")
+        {% if enable_logging -%}
+        logger.warning("Tag write blocked by validation: " + str(validation_errors))
+        {% endif -%}
+        return
+    {% endif -%}
+
+    # Prepare tag write operations
+    all_tag_paths = []
+    all_tag_values = []
+    operation_info = []
+
+    {% if tag_operations -%}
+    {% for operation in tag_operations -%}
+    # {{ operation.description | default('Tag write operation') }}
+    try:
+        {% if operation.type == 'static_value' -%}
+        # Static value write
+        tag_paths = {{ operation.tag_paths | tojson }}
+        tag_values = {{ operation.values | tojson }}
+
+        {% elif operation.type == 'component_property' -%}
+        # Write component property value(s) to tag(s)
+        tag_paths = {{ operation.tag_paths | tojson }}
+        tag_values = []
+
+        {% if operation.component_path -%}
+        source_component = {{ operation.component_path }}
+        {% else -%}
+        source_component = event.source
+        {% endif -%}
+
+        {% for property_name in operation.property_names -%}
+        property_value = source_component.{{ property_name }}
+        {% if operation.value_transform -%}
+        # Apply value transformation
+        transformed_value = {{ operation.value_transform }}
+        tag_values.append(transformed_value)
+        {% else -%}
+        tag_values.append(property_value)
+        {% endif -%}
+        {% endfor -%}
+
+        {% elif operation.type == 'calculated_value' -%}
+        # Calculated/expression-based values
+        tag_paths = {{ operation.tag_paths | tojson }}
+        tag_values = []
+
+        {% for expression in operation.value_expressions -%}
+        try:
+            calculated_value = {{ expression }}
+            tag_values.append(calculated_value)
+        except Exception as calc_error:
+            {% if enable_logging -%}
+            logger.error("Value calculation failed: " + str(calc_error))
+            {% endif -%}
+            tag_values.append({{ operation.default_value | default(0) | tojson }})
+        {% endfor -%}
+
+        {% elif operation.type == 'conditional_value' -%}
+        # Conditional value selection
+        tag_paths = {{ operation.tag_paths | tojson }}
+        tag_values = []
+
+        {% for condition in operation.conditions -%}
+        condition_met = {{ condition.expression }}
+        if condition_met:
+            tag_values.extend({{ condition.values | tojson }})
+        {% endfor -%}
+
+        # Use default values if no conditions met
+        if not tag_values:
+            tag_values = {{ operation.default_values | tojson }}
+
+        {% elif operation.type == 'tag_read_write' -%}
+        # Read from one set of tags and write to another
+        source_tag_paths = {{ operation.source_tag_paths | tojson }}
+        target_tag_paths = {{ operation.target_tag_paths | tojson }}
+
+        # Read source values
+        source_values = system.tag.readBlocking(source_tag_paths)
+        tag_paths = target_tag_paths
+        tag_values = []
+
+        for i, qualified_value in enumerate(source_values):
+            source_value = qualified_value.value
+            {% if operation.value_mapping -%}
+            # Apply value mapping/transformation
+            mapped_value = {{ operation.value_mapping }}
+            tag_values.append(mapped_value)
+            {% else -%}
+            tag_values.append(source_value)
+            {% endif -%}
+
+        {% endif -%}
+
+        # Add to master lists
+        all_tag_paths.extend(tag_paths)
+        all_tag_values.extend(tag_values)
+        operation_info.append({
+            'description': "{{ operation.description | default('Tag operation') }}",
+            'paths': tag_paths,
+            'values': tag_values
+        })
+
+        {% if enable_logging -%}
+        logger.debug("Prepared operation: {{ operation.description | default('Tag operation') }}")
+        {% endif -%}
+
+    except Exception as e:
+        {% if enable_logging -%}
+        logger.error("Failed to prepare operation {{ operation.description | default('') }}: " + str(e))
+        {% endif -%}
+        {% if error_handling == 'stop_on_error' -%}
+        system.gui.errorBox("Failed to prepare tag write operation: " + str(e))
+        return
+        {% elif error_handling == 'continue' -%}
+        # Continue with other operations
+        pass
+        {% endif -%}
+    {% endfor -%}
+    {% else -%}
+    # No operations configured - add your own tag write logic here
+    # Example:
+    # all_tag_paths = ["[default]Path/To/Tag1", "[default]Path/To/Tag2"]
+    # all_tag_values = [123, "String Value"]
+    pass
+    {% endif -%}
+
+    # Execute the tag writes
+    if all_tag_paths and all_tag_values:
+        {% if enable_logging -%}
+        logger.info("Writing " + str(len(all_tag_paths)) + " tags")
+        {% endif -%}
+
+        try:
+            # Perform the write operation
+            {% if write_mode == 'async' -%}
+            # Asynchronous write (non-blocking)
+            system.tag.writeAsync(all_tag_paths, all_tag_values)
+            {% if enable_logging -%}
+            logger.info("Asynchronous tag write initiated")
+            {% endif -%}
+
+            {% else -%}
+            # Synchronous write (blocking)
+            write_results = system.tag.writeBlocking(all_tag_paths, all_tag_values)
+
+            # Check write results
+            failed_writes = []
+            for i, result in enumerate(write_results):
+                if not result.quality.isGood():
+                    failed_writes.append({
+                        'path': all_tag_paths[i],
+                        'value': all_tag_values[i],
+                        'quality': str(result.quality)
+                    })
+
+            if failed_writes:
+                {% if enable_logging -%}
+                logger.warning("Some tag writes failed: " + str(failed_writes))
+                {% endif -%}
+                {% if error_handling == 'show_errors' -%}
+                error_details = "\n".join([f"Tag: {fw['path']}, Quality: {fw['quality']}" for fw in failed_writes])
+                system.gui.warningBox("Some tag writes failed:\n" + error_details, "Write Warning")
+                {% endif -%}
+            else:
+                {% if enable_logging -%}
+                logger.info("All tag writes completed successfully")
+                {% endif -%}
+            {% endif -%}
+
+            {% if success_message -%}
+            # Show success message
+            system.gui.messageBox("{{ success_message }}", "{{ success_title | default('Success') }}")
+            {% endif -%}
+
+        except Exception as e:
+            {% if enable_logging -%}
+            logger.error("Tag write operation failed: " + str(e))
+            {% endif -%}
+            system.gui.errorBox("Failed to write tags: " + str(e), "Write Error")
+
+            {% if fallback_action -%}
+            # Execute fallback action
+            try:
+                {{ fallback_action | indent(16) }}
+            except Exception as fallback_error:
+                {% if enable_logging -%}
+                logger.error("Fallback action failed: " + str(fallback_error))
+                {% endif -%}
+            {% endif -%}
+    else:
+        {% if enable_logging -%}
+        logger.warning("No tag operations prepared for execution")
+        {% endif -%}
+
+    {% if post_write_actions -%}
+    # Post-write actions
+    {% for action in post_write_actions -%}
+    try:
+        {% if action.type == 'component_update' -%}
+        # Update component properties
+        {% if action.component_path -%}
+        target_component = {{ action.component_path }}
+        {% else -%}
+        target_component = event.source
+        {% endif -%}
+        target_component.{{ action.property_name }} = {{ action.new_value | tojson }}
+
+        {% elif action.type == 'custom_code' -%}
+        # Custom post-write code
+        {{ action.code | indent(8) }}
+
+        {% endif -%}
+    except Exception as e:
+        {% if enable_logging -%}
+        logger.error("Post-write action failed: " + str(e))
+        {% endif -%}
+    {% endfor -%}
+    {% endif -%}
+
+except Exception as e:
+    {% if enable_logging -%}
+    logger.error("Critical error in tag write handler: " + str(e))
+    {% endif -%}
+    system.gui.errorBox("Unexpected error: " + str(e), "{{ error_title | default('System Error') }}")
+
+    {% if emergency_action -%}
+    # Emergency action in case of critical failure
+    try:
+        {{ emergency_action | indent(8) }}
+    except Exception as emergency_error:
+        {% if enable_logging -%}
+        logger.error("Emergency action failed: " + str(emergency_error))
+        {% endif -%}
+    {% endif %}

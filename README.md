@@ -2,6 +2,18 @@
 
 A powerful Python application for generating, validating, and exporting Jython scripts for Ignition SCADA systems.
 
+## 🤖 **FOR AI ASSISTANTS: PERSISTENT MEMORY AVAILABLE**
+
+**This project includes a Neo4j graph database that serves as persistent long-term memory!**
+
+📋 **Quick AI Assistant Checklist:**
+- [ ] Check if Neo4j is running: `docker-compose ps neo4j`
+- [ ] Start graph database: `docker-compose up -d neo4j`
+- [ ] Access knowledge: See `docs/ai_assistant_memory_system.md`
+- [ ] Query for context-aware assistance: Contains 400+ Ignition functions, templates, and relationships
+
+**🔗 Full documentation: [AI Assistant Memory System](docs/ai_assistant_memory_system.md)**
+
 ## 🎯 Project Overview
 
 IGN Scripts is designed to streamline the development of Jython scripts for Ignition SCADA environments. Instead of manually writing scripts within the Ignition Designer, you can use this tool to:
@@ -211,6 +223,7 @@ python3 scripts/monitor_logs.py --analyze
 - **Log Analysis**: Automated optimization recommendations
 
 📚 **For detailed testing instructions, see [docs/testing_guide.md](docs/testing_guide.md)**
+🚀 **For quick testing reference, see [TESTING.md](TESTING.md)**
 
 ## 📚 Ignition Script Contexts
 
@@ -322,4 +335,4 @@ This is an independent project and is not affiliated with or endorsed by Inducti
 
 - Check the [Issues](https://github.com/your-repo/issues) page for common problems
 - Review the [Wiki](https://github.com/your-repo/wiki) for detailed documentation
-- Join discussions in our [Community Forum](https://github.com/your-repo/discussions) 
+- Join discussions in our [Community Forum](https://github.com/your-repo/discussions)

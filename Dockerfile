@@ -1,4 +1,17 @@
 # IGN Scripts Testing Environment
+#
+# This Docker image provides a comprehensive testing environment for IGN Scripts
+# with Python 3.11, all dependencies, and optimized configuration for:
+# - Unit, integration, UI, and performance testing
+# - Real-time log monitoring and analysis
+# - Coverage reporting and benchmark tracking
+# - Code quality checks and security scanning
+#
+# Usage:
+#   docker build -t ign-scripts-test .
+#   python3 scripts/run_tests.py --all
+#   python3 scripts/monitor_logs.py --live
+#
 FROM python:3.11-slim
 
 # Set working directory
@@ -39,4 +52,4 @@ USER ignuser
 EXPOSE 8501
 
 # Default command runs the test suite
-CMD ["python", "-m", "pytest", "tests/", "-v", "--tb=short", "--log-cli-level=INFO"] 
+CMD ["python", "-m", "pytest", "tests/", "-v", "--tb=short", "--log-cli-level=INFO"]

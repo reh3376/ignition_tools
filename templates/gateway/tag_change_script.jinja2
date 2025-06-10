@@ -1,0 +1,245 @@
+# Ignition Gateway Tag Change Script
+# Scope: Gateway
+# Trigger: Tag value/quality/timestamp changes
+# Context Variables: initialChange, newValue, previousValue, event
+
+# Template Configuration:
+# - script_name: Name for logging identification
+# - handle_initial_change: Whether to process initial subscription events
+# - change_triggers: What changes to respond to (value, quality, timestamp)
+# - enable_logging: Whether to include logging
+# - response_actions: Actions to take when tag changes
+
+{% if enable_logging -%}
+# Set up logger for tag change script
+logger = system.util.getLogger("{{ script_name | default('TagChangeScript') }}")
+{% endif -%}
+
+try:
+    # Get tag information from the event
+    tag_path = str(event.getTagPath())
+    current_value = newValue.getValue()
+    current_quality = newValue.getQuality()
+    current_timestamp = newValue.getTimestamp()
+
+    {% if not handle_initial_change -%}
+    # Skip initial subscription events
+    if initialChange:
+        {% if enable_logging -%}
+        logger.debug("Skipping initial change event for tag: " + tag_path)
+        {% endif -%}
+        return
+    {% endif -%}
+
+    {% if enable_logging -%}
+    logger.debug("Tag change detected: " + tag_path + " = " + str(current_value))
+    {% endif -%}
+
+    # Determine what changed
+    value_changed = False
+    quality_changed = False
+    timestamp_changed = False
+
+    if not initialChange:
+        previous_val = previousValue.getValue()
+        previous_qual = previousValue.getQuality()
+        previous_time = previousValue.getTimestamp()
+
+        value_changed = current_value != previous_val
+        quality_changed = str(current_quality) != str(previous_qual)
+        timestamp_changed = current_timestamp != previous_time
+
+    {% if change_triggers -%}
+    # Filter based on configured change triggers
+    should_process = False
+    {% for trigger in change_triggers -%}
+    {% if trigger == 'value' -%}
+    if value_changed or initialChange:
+        should_process = True
+    {% elif trigger == 'quality' -%}
+    if quality_changed or initialChange:
+        should_process = True
+    {% elif trigger == 'timestamp' -%}
+    if timestamp_changed or initialChange:
+        should_process = True
+    {% endif -%}
+    {% endfor -%}
+
+    if not should_process:
+        {% if enable_logging -%}
+        logger.debug("Change type not configured for processing: " + tag_path)
+        {% endif -%}
+        return
+    {% endif -%}
+
+    {% if response_actions -%}
+    # Process configured response actions
+    {% for action in response_actions -%}
+    {% if action.type == 'tag_write' -%}
+    # {{ action.description | default('Write to tags') }}
+    try:
+        {% if action.condition -%}
+        # Check condition before writing
+        if {{ action.condition }}:
+        {% endif -%}
+            target_paths = {{ action.target_paths | tojson }}
+
+            {% if action.value_expression -%}
+            # Calculate values using expression
+            target_values = []
+            for path in target_paths:
+                # Use current_value, current_quality, tag_path in expressions
+                calculated_value = {{ action.value_expression }}
+                target_values.append(calculated_value)
+            {% else -%}
+            target_values = {{ action.values | tojson }}
+            {% endif -%}
+
+            system.tag.writeBlocking(target_paths, target_values)
+            {% if enable_logging -%}
+            logger.info("Wrote values to tags: " + str(target_paths))
+            {% endif -%}
+        {% if action.condition -%}
+        else:
+            {% if enable_logging -%}
+            logger.debug("Condition not met for tag write action")
+            {% endif -%}
+        {% endif -%}
+    except Exception as e:
+        {% if enable_logging -%}
+        logger.error("Failed to write tags: " + str(e))
+        {% endif -%}
+
+    {% elif action.type == 'database_write' -%}
+    # {{ action.description | default('Database operation') }}
+    try:
+        {% if action.condition -%}
+        # Check condition before database operation
+        if {{ action.condition }}:
+        {% endif -%}
+            {% if action.parameters -%}
+            # Prepared statement with parameters
+            # Parameters can use: current_value, tag_path, current_timestamp
+            params = []
+            {% for param in action.parameters -%}
+            params.append({{ param }})
+            {% endfor -%}
+
+            rows_affected = system.db.runPrepUpdate(
+                "{{ action.sql }}",
+                params,
+                "{{ action.database | default('') }}"
+            )
+            {% else -%}
+            rows_affected = system.db.runUpdateQuery(
+                "{{ action.sql }}",
+                "{{ action.database | default('') }}"
+            )
+            {% endif -%}
+
+            {% if enable_logging -%}
+            logger.info("Database update completed, rows affected: " + str(rows_affected))
+            {% endif -%}
+        {% if action.condition -%}
+        else:
+            {% if enable_logging -%}
+            logger.debug("Condition not met for database action")
+            {% endif -%}
+        {% endif -%}
+    except Exception as e:
+        {% if enable_logging -%}
+        logger.error("Database operation failed: " + str(e))
+        {% endif -%}
+
+    {% elif action.type == 'alarm_action' -%}
+    # {{ action.description | default('Alarm action') }}
+    try:
+        {% if action.condition -%}
+        if {{ action.condition }}:
+        {% endif -%}
+            {% if action.acknowledge -%}
+            # Acknowledge alarms
+            alarm_paths = {{ action.alarm_paths | tojson }}
+            system.alarm.acknowledge(alarm_paths, "{{ action.ack_notes | default('Auto-acknowledged by tag change script') }}")
+            {% if enable_logging -%}
+            logger.info("Acknowledged alarms: " + str(alarm_paths))
+            {% endif -%}
+            {% endif -%}
+
+            {% if action.shelve -%}
+            # Shelve alarms
+            alarm_paths = {{ action.alarm_paths | tojson }}
+            timeout_minutes = {{ action.shelve_timeout | default(60) }}
+            system.alarm.shelve(alarm_paths, timeout_minutes)
+            {% if enable_logging -%}
+            logger.info("Shelved alarms for " + str(timeout_minutes) + " minutes: " + str(alarm_paths))
+            {% endif -%}
+            {% endif -%}
+        {% if action.condition -%}
+        else:
+            {% if enable_logging -%}
+            logger.debug("Condition not met for alarm action")
+            {% endif -%}
+        {% endif -%}
+    except Exception as e:
+        {% if enable_logging -%}
+        logger.error("Alarm action failed: " + str(e))
+        {% endif -%}
+
+    {% elif action.type == 'custom' -%}
+    # {{ action.description | default('Custom action') }}
+    try:
+        {% if action.condition -%}
+        if {{ action.condition }}:
+        {% endif -%}
+            {% if action.code -%}
+            # Custom code execution
+            {{ action.code | indent(12) }}
+            {% else -%}
+            # Add your custom code here
+            # Available variables: current_value, current_quality, current_timestamp
+            # tag_path, newValue, previousValue, event, initialChange
+            pass
+            {% endif -%}
+        {% if action.condition -%}
+        else:
+            {% if enable_logging -%}
+            logger.debug("Condition not met for custom action")
+            {% endif -%}
+        {% endif -%}
+    except Exception as e:
+        {% if enable_logging -%}
+        logger.error("Custom action failed: " + str(e))
+        {% endif -%}
+
+    {% endif -%}
+    {% endfor -%}
+    {% else -%}
+    # Add your tag change response logic here
+    # Available variables:
+    #   - tag_path: String path of the tag that changed
+    #   - current_value: Current tag value
+    #   - current_quality: Current tag quality
+    #   - current_timestamp: Current tag timestamp
+    #   - initialChange: Boolean indicating first subscription
+    #   - newValue: QualifiedValue object with current values
+    #   - previousValue: QualifiedValue object with previous values
+    #   - event: TagChangeEvent object with additional methods
+
+    # Example: Log significant value changes
+    if not initialChange and value_changed:
+        {% if enable_logging -%}
+        logger.info("Tag " + tag_path + " changed from " + str(previousValue.getValue()) + " to " + str(current_value))
+        {% else -%}
+        # Tag value changed - add your logic here
+        pass
+        {% endif -%}
+    {% endif -%}
+
+except Exception as e:
+    {% if enable_logging -%}
+    logger.error("Tag change script error for " + str(event.getTagPath()) + ": " + str(e))
+    {% else -%}
+    # Error in tag change script: " + str(e)
+    pass
+    {% endif -%}

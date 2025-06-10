@@ -1,0 +1,70 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+
+    - name: Install uv
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+    - name: Create virtual environment and install dependencies
+      run: |
+        uv venv
+        source .venv/bin/activate
+        uv pip install -r requirements.txt
+        uv pip install -e ".[dev]"
+
+    - name: Run full test suite
+      run: |
+        source .venv/bin/activate
+        pytest tests/ --cov=src --cov-report=xml -v
+
+    - name: Build Docker image
+      run: |
+        docker build -t ign-scripts:${{ github.ref_name }} .
+        docker build -t ign-scripts:latest .
+
+    - name: Build package
+      run: |
+        source .venv/bin/activate
+        python -m build
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Release ${{ github.ref_name }}
+        body: |
+          Release ${{ github.ref_name }} of IGN Scripts
+
+          ## Changes
+          - See commit history for detailed changes
+
+          ## Docker Image
+          ```bash
+          docker pull ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+          ```
+
+          ## Installation
+          ```bash
+          pip install ign-scripts==${{ github.ref_name }}
+          ```
+        files: dist/*
+        draft: false
+        prerelease: false

@@ -1,0 +1,83 @@
+# Ignition Gateway Startup Script
+# Scope: Gateway
+# Trigger: Gateway/Project startup
+# Context Variables: None
+
+# Template Configuration:
+# - script_name: Name for logging identification
+# - enable_logging: Whether to include logging setup
+# - initialize_tags: Whether to initialize default tag values
+# - database_connection: Database connection to test
+# - startup_tasks: List of custom startup tasks
+
+{% if enable_logging -%}
+# Set up logger for startup activities
+logger = system.util.getLogger("{{ script_name | default('StartupScript') }}")
+logger.info("Starting up {{ script_name | default('project') }}...")
+
+{% endif -%}
+try:
+    {% if database_connection -%}
+    # Test database connectivity
+    logger.info("Testing database connection: {{ database_connection }}")
+    try:
+        # Test query to verify database connectivity
+        test_result = system.db.runScalarQuery("SELECT 1", "{{ database_connection }}")
+        if test_result == 1:
+            logger.info("Database connection successful")
+        else:
+            logger.error("Database connection test failed")
+    except Exception as e:
+        logger.error("Database connection failed: " + str(e))
+
+    {% endif -%}
+    {% if initialize_tags -%}
+    # Initialize default tag values
+    logger.info("Initializing default tag values...")
+    tag_values = [
+        # Add tag paths and default values here
+        # ("[default]System/Status", "Starting"),
+        # ("[default]System/LastStartup", system.date.now()),
+    ]
+
+    if tag_values:
+        for tag_path, default_value in tag_values:
+            try:
+                system.tag.writeBlocking([tag_path], [default_value])
+                logger.info("Initialized tag: " + tag_path)
+            except Exception as e:
+                logger.error("Failed to initialize tag " + tag_path + ": " + str(e))
+
+    {% endif -%}
+    {% if startup_tasks -%}
+    # Custom startup tasks
+    {% for task in startup_tasks -%}
+    logger.info("Executing startup task: {{ task.name }}")
+    try:
+        # {{ task.description }}
+        {{ task.code | indent(8) }}
+        logger.info("Completed startup task: {{ task.name }}")
+    except Exception as e:
+        logger.error("Failed startup task {{ task.name }}: " + str(e))
+
+    {% endfor -%}
+    {% endif -%}
+    {% if enable_logging -%}
+    logger.info("{{ script_name | default('Project') }} startup completed successfully")
+    {% else -%}
+    # Startup completed successfully
+    # Consider enabling logging for better monitoring
+    pass
+    {% endif %}
+
+except Exception as e:
+    {% if enable_logging -%}
+    logger.error("Critical startup error: " + str(e))
+    {% else -%}
+    # Critical startup error occurred
+    # Error: " + str(e)
+    # Consider enabling logging for better error tracking
+    pass
+    {% endif %}
+    # Consider whether to raise the exception or handle gracefully
+    # raise e
