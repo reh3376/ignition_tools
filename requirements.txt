@@ -12,7 +12,6 @@ xmltodict>=0.13.0
 
 # Ignition Resource Processing
 openpyxl>=3.1.0
-zipfile38>=0.3.0
 
 # Development Dependencies
 ruff>=0.1.0
