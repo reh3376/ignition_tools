@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Populate Task 8: Print System Expansion
+"""Populate Task 9: Security System Expansion
 
-This script loads comprehensive print system functions into the Neo4j graph database.
-Task 8 focuses on print operations, document management, and print job handling.
+This script loads comprehensive security system functions into the Neo4j graph database.
+Task 9 focuses on security operations, authentication, user management, and threat monitoring.
 
-Total Functions: 18 functions
-Categories: Print Operations, Print Management, Print Configuration
+Total Functions: 22 functions
+Categories: Security Authentication, Security User Management, Security Monitoring
 Contexts: Gateway, Vision Client, Perspective Session
-Dependencies: Tag System (Task 1), Database System (Task 2), GUI System (Task 3)
+Dependencies: Tag System (Task 1), Database System (Task 2), Alarm System (Task 7)
 """
 
 import sys
@@ -18,19 +18,19 @@ project_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from src.ignition.graph.client import IgnitionGraphClient
-from src.ignition.graph.tasks.task_8_print_system import get_print_system_functions
+from src.ignition.graph.tasks.task_9_security_system import get_security_system_functions
 
 
-def populate_task_8_print_system():
-    """Populate Task 8: Print System Expansion functions into Neo4j database.
+def populate_task_9_security_system():
+    """Populate Task 9: Security System Expansion functions into Neo4j database.
 
     This function:
     1. Connects to Neo4j database
-    2. Loads 18 print system functions
-    3. Creates comprehensive relationships for print operations
+    2. Loads 22 security system functions
+    3. Creates comprehensive relationships for security operations
     4. Validates successful population
     """
-    print("🚀 Starting Task 8: Print System Expansion Population")
+    print("🚀 Starting Task 9: Security System Expansion Population")
     print("=" * 60)
 
     # Initialize client
@@ -42,10 +42,10 @@ def populate_task_8_print_system():
         client.connect()
         print("✅ Connected successfully!")
 
-        # Get print system functions
-        print("\n📚 Loading print system functions...")
-        print_functions = get_print_system_functions()
-        print(f"✅ Loaded {len(print_functions)} print system functions")
+        # Get security system functions
+        print("\n📚 Loading security system functions...")
+        security_functions = get_security_system_functions()
+        print(f"✅ Loaded {len(security_functions)} security system functions")
 
         # Validate function structure
         print("\n🔍 Validating function structure...")
@@ -54,7 +54,7 @@ def populate_task_8_print_system():
         categories = set()
         scopes = set()
 
-        for func in print_functions:
+        for func in security_functions:
             # Validate required fields
             required_fields = [
                 "name",
@@ -84,22 +84,35 @@ def populate_task_8_print_system():
             )
 
         print("\n📊 Function Metrics:")
-        print(f"   • Total Functions: {len(print_functions)}")
+        print(f"   • Total Functions: {len(security_functions)}")
         print(f"   • Total Parameters: {total_parameters}")
         print(f"   • Total Patterns: {total_patterns}")
         print(f"   • Categories: {sorted(categories)}")
         print(f"   • Scopes: {sorted(scopes)}")
 
         # Load functions into database
-        print(f"\n💾 Loading {len(print_functions)} functions into Neo4j...")
+        print(f"\n💾 Loading {len(security_functions)} functions into Neo4j...")
         successful_loads = 0
         failed_loads = 0
 
-        for i, func_data in enumerate(print_functions, 1):
+        for i, func_data in enumerate(security_functions, 1):
             try:
                 print(
-                    f"   [{i:2d}/{len(print_functions)}] Loading {func_data['name']}..."
+                    f"   [{i:2d}/{len(security_functions)}] Loading {func_data['name']}..."
                 )
+
+                # Clean parameters to handle Neo4j constraints
+                cleaned_parameters = []
+                for param in func_data["parameters"]:
+                    cleaned_param = param.copy()
+                    # Convert empty dict defaults to string representation
+                    if "default" in cleaned_param and cleaned_param["default"] == {}:
+                        cleaned_param["default"] = "{}"
+                    elif "default" in cleaned_param and isinstance(
+                        cleaned_param["default"], dict
+                    ):
+                        cleaned_param["default"] = str(cleaned_param["default"])
+                    cleaned_parameters.append(cleaned_param)
 
                 # Create function with relationships using direct query execution
                 query = """
@@ -109,7 +122,7 @@ def populate_task_8_print_system():
                     f.returns_type = $returns_type,
                     f.returns_description = $returns_description,
                     f.category = $category,
-                    f.task = 'Task 8: Print System'
+                    f.task = 'Task 9: Security System'
 
                 // Create parameter relationships
                 WITH f
@@ -138,19 +151,6 @@ def populate_task_8_print_system():
                 RETURN f.name as function_name
                 """
 
-                # Clean parameters to handle Neo4j constraints
-                cleaned_parameters = []
-                for param in func_data["parameters"]:
-                    cleaned_param = param.copy()
-                    # Convert empty dict defaults to string representation
-                    if "default" in cleaned_param and cleaned_param["default"] == {}:
-                        cleaned_param["default"] = "{}"
-                    elif "default" in cleaned_param and isinstance(
-                        cleaned_param["default"], dict
-                    ):
-                        cleaned_param["default"] = str(cleaned_param["default"])
-                    cleaned_parameters.append(cleaned_param)
-
                 params = {
                     "name": func_data["name"],
                     "description": func_data["description"],
@@ -177,7 +177,7 @@ def populate_task_8_print_system():
         print("\n📈 Loading Results:")
         print(f"   • Successful: {successful_loads}")
         print(f"   • Failed: {failed_loads}")
-        print(f"   • Success Rate: {(successful_loads/len(print_functions)*100):.1f}%")
+        print(f"   • Success Rate: {(successful_loads/len(security_functions)*100):.1f}%")
 
         # Validate database state
         print("\n🔍 Validating database state...")
@@ -186,11 +186,11 @@ def populate_task_8_print_system():
         result = client.execute_query("MATCH (f:Function) RETURN count(f) as total")
         total_functions = result[0]["total"] if result else 0
 
-        # Count Task 8 functions
+        # Count Task 9 functions
         result = client.execute_query(
-            "MATCH (f:Function) WHERE f.task = 'Task 8: Print System' RETURN count(f) as task8_count"
+            "MATCH (f:Function) WHERE f.task = 'Task 9: Security System' RETURN count(f) as task9_count"
         )
-        task8_functions = result[0]["task8_count"] if result else 0
+        task9_functions = result[0]["task9_count"] if result else 0
 
         # Count relationships
         result = client.execute_query(
@@ -198,37 +198,37 @@ def populate_task_8_print_system():
         )
         total_relationships = result[0]["total_relationships"] if result else 0
 
-        # Count print-specific relationships
+        # Count security-specific relationships
         result = client.execute_query(
             """
             MATCH (f:Function)-[r]->(n)
-            WHERE f.task = 'Task 8: Print System'
-            RETURN count(r) as task8_relationships
+            WHERE f.task = 'Task 9: Security System'
+            RETURN count(r) as task9_relationships
         """
         )
-        task8_relationships = result[0]["task8_relationships"] if result else 0
+        task9_relationships = result[0]["task9_relationships"] if result else 0
 
         print(f"   • Total Functions in DB: {total_functions}")
-        print(f"   • Task 8 Functions: {task8_functions}")
+        print(f"   • Task 9 Functions: {task9_functions}")
         print(f"   • Total Relationships: {total_relationships}")
-        print(f"   • Task 8 Relationships: {task8_relationships}")
+        print(f"   • Task 9 Relationships: {task9_relationships}")
 
         # Expected relationships calculation
         expected_relationships = (
-            total_parameters + total_patterns + len(scopes) * len(print_functions)
+            total_parameters + total_patterns + len(scopes) * len(security_functions)
         )
-        print(f"   • Expected Task 8 Relationships: ~{expected_relationships}")
+        print(f"   • Expected Task 9 Relationships: ~{expected_relationships}")
 
-        if task8_functions == len(print_functions):
-            print("✅ All print functions loaded successfully!")
+        if task9_functions == len(security_functions):
+            print("✅ All security functions loaded successfully!")
         else:
             print(
-                f"⚠️  Expected {len(print_functions)} functions, found {task8_functions}"
+                f"⚠️  Expected {len(security_functions)} functions, found {task9_functions}"
             )
 
-        print("\n🎉 Task 8: Print System Expansion Population Complete!")
-        print(f"   • Successfully loaded {task8_functions} print functions")
-        print(f"   • Created {task8_relationships} relationships")
+        print("\n🎉 Task 9: Security System Expansion Population Complete!")
+        print(f"   • Successfully loaded {task9_functions} security functions")
+        print(f"   • Created {task9_relationships} relationships")
         print(f"   • Database now contains {total_functions} total functions")
 
         return True
@@ -247,15 +247,15 @@ def populate_task_8_print_system():
 
 
 def main():
-    """Main entry point for Task 8 population."""
-    print("Task 8: Print System Expansion - Neo4j Population")
+    """Main entry point for Task 9 population."""
+    print("Task 9: Security System Expansion - Neo4j Population")
     print("=" * 55)
 
-    success = populate_task_8_print_system()
+    success = populate_task_9_security_system()
 
     if success:
-        print("\n🎯 Ready for Task 8 validation!")
-        print("Run: python scripts/testing/automated_task_validation.py --task 8")
+        print("\n🎯 Ready for Task 9 validation!")
+        print("Run: python scripts/testing/automated_task_validation.py --task 9")
         sys.exit(0)
     else:
         print("\n❌ Population failed. Check errors above.")
@@ -263,4 +263,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main() 
