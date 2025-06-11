@@ -11,6 +11,7 @@ A powerful Python application for generating, validating, and exporting Jython s
 - [ ] Start graph database: `docker-compose up -d neo4j`
 - [ ] **Connection Info**: `bolt://localhost:7687` | Username: `neo4j` | Password: `ignition-graph`
 - [ ] **Web Interface**: http://localhost:7474 (Neo4j Browser)
+- [ ] **Setup Environment**: Copy `docs/env_template.txt` to `.env` with your credentials
 - [ ] **Python Access**: `from src.ignition.graph.client import IgnitionGraphClient`
 - [ ] Query for context-aware assistance: Contains 408/400+ Ignition functions (102.0% complete - MILESTONE EXCEEDED!)
 - [ ] **Full Documentation**: See `docs/ai_assistant_memory_system.md`
@@ -154,8 +155,9 @@ source .venv/bin/activate  # On Unix-like systems
 uv pip install -r requirements.txt
 
 # Create environment configuration (REQUIRED for security)
-cp .env.sample .env
-# Edit .env with your specific configuration
+cp docs/env_template.txt .env
+# The template already includes correct Neo4j credentials:
+# NEO4J_USERNAME=neo4j and NEO4J_PASSWORD=ignition-graph
 ```
 
 ### 🔒 Security Configuration
@@ -164,12 +166,15 @@ cp .env.sample .env
 
 ```bash
 # Required environment variables in .env file
+# Neo4j Graph Database (AI Assistant Memory)
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USERNAME=neo4j
+NEO4J_PASSWORD=ignition-graph
+
+# OPC-UA Configuration
 OPCUA_SERVER_URL=opc.tcp://localhost:4840
 OPCUA_USERNAME=admin
 OPCUA_PASSWORD=your_password
-NEO4J_URI=bolt://localhost:7687
-NEO4J_USERNAME=neo4j
-NEO4J_PASSWORD=your_neo4j_password
 ```
 
 🔐 **Never hardcode sensitive information in scripts - use environment variables with python-dotenv**

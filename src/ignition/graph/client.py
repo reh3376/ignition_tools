@@ -39,7 +39,7 @@ class IgnitionGraphClient:
         """
         self.uri = uri or os.getenv('NEO4J_URI', 'bolt://localhost:7687')
         self.username = username or os.getenv('NEO4J_USERNAME', 'neo4j')
-        self.password = password or os.getenv('NEO4J_PASSWORD', 'neo4j')
+        self.password = password or os.getenv('NEO4J_PASSWORD', 'ignition-graph')
         self.driver = None
         self._connected = False
 

@@ -14,7 +14,7 @@
 
 #### Core SFC Operations
 1. **`sfc.start(chart_path)`** - Start an SFC chart execution
-2. **`sfc.stop(chart_path)`** - Stop an SFC chart execution  
+2. **`sfc.stop(chart_path)`** - Stop an SFC chart execution
 3. **`sfc.pause(chart_path)`** - Pause an SFC chart execution
 4. **`sfc.resume(chart_path)`** - Resume a paused SFC chart
 5. **`sfc.reset(chart_path)`** - Reset an SFC chart to initial state
@@ -80,7 +80,7 @@ src/ignition/graph/tasks/
 ```python
 class SFCChartController:
     """Manages Sequential Function Chart operations."""
-    
+
     def start_chart(self, chart_path: str) -> bool
     def stop_chart(self, chart_path: str) -> bool
     def pause_chart(self, chart_path: str) -> bool
@@ -95,7 +95,7 @@ class SFCChartController:
 ```python
 class RecipeManager:
     """Manages recipe operations and lifecycle."""
-    
+
     def create_recipe(self, name: str, template: dict) -> str
     def load_recipe(self, recipe_name: str) -> dict
     def save_recipe(self, recipe_name: str, data: dict) -> bool
@@ -109,7 +109,7 @@ class RecipeManager:
 ```python
 class SFCRecipeIntegration:
     """Integrates SFC charts with recipe management."""
-    
+
     def bind_recipe_to_chart(self, chart_path: str, recipe_data: dict) -> bool
     def get_chart_recipe_data(self, chart_path: str) -> dict
     def validate_recipe_structure(self, recipe_data: dict) -> dict
@@ -290,4 +290,4 @@ execution_id = recipe.execute("BatchA_001", "Reactor_001")
 2. Set up development environment
 3. Create initial function stubs
 4. Implement core SFC operations
-5. Set up testing framework 
+5. Set up testing framework
