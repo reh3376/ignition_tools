@@ -164,7 +164,9 @@ def populate_task_7_alarm_system():
         print("\n📈 Loading Results:")
         print(f"   • Successful: {successful_loads}")
         print(f"   • Failed: {failed_loads}")
-        print(f"   • Success Rate: {(successful_loads/len(alarm_functions)*100):.1f}%")
+        print(
+            f"   • Success Rate: {(successful_loads / len(alarm_functions) * 100):.1f}%"
+        )
 
         # Validate database state
         print("\n🔍 Validating database state...")

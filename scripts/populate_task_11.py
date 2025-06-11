@@ -158,7 +158,7 @@ def populate_task_11_functions():
         print(f"   • Functions Processed: {len(functions)}")
         print(f"   • Successful Additions: {success_count}")
         print(f"   • Failed Additions: {len(functions) - success_count}")
-        print(f"   • Success Rate: {(success_count/len(functions)*100):.1f}%")
+        print(f"   • Success Rate: {(success_count / len(functions) * 100):.1f}%")
         print(f"   • New Relationships: {relationship_count}")
 
         # Get updated database state
@@ -286,6 +286,6 @@ if __name__ == "__main__":
         print("   ❌ Population: FAILED")
         print("   ⏭️  Validation: SKIPPED")
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("Task 11 execution completed.")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")

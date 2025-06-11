@@ -326,7 +326,10 @@ class IgnitionGraphClient:
 
                 # Test write (create and delete a temporary node)
                 try:
-                    test_query = "CREATE (test:HealthCheck {name: 'test', timestamp: timestamp()}) RETURN test"
+                    test_query = (
+                        "CREATE (test:HealthCheck {name: 'test', timestamp: timestamp()}) "
+                        "RETURN test"
+                    )
                     self.execute_write_query(test_query)
 
                     cleanup_query = (

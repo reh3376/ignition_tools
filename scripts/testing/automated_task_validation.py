@@ -1073,7 +1073,7 @@ class TaskValidator:
             print("📊 TASK 5 VALIDATION SUMMARY")
             print("=" * 60)
             print(f"✅ Tests Passed: {passed_tests}/{total_tests}")
-            print(f"📈 Success Rate: {(passed_tests/total_tests)*100:.1f}%")
+            print(f"📈 Success Rate: {(passed_tests / total_tests) * 100:.1f}%")
 
             if passed_tests == total_tests:
                 print("🎉 TASK 5: DEVICE COMMUNICATION EXPANSION - ALL TESTS PASSED!")

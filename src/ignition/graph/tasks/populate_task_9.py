@@ -180,7 +180,7 @@ def populate_task_9_security_system():
         print(f"   • Successful: {successful_loads}")
         print(f"   • Failed: {failed_loads}")
         print(
-            f"   • Success Rate: {(successful_loads/len(security_functions)*100):.1f}%"
+            f"   • Success Rate: {(successful_loads / len(security_functions) * 100):.1f}%"
         )
 
         # Validate database state

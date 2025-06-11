@@ -31,9 +31,9 @@ def main():
         # Display results
         print("\n=== Task 16: SFC & Recipe Management - Implementation Results ===")
         print(
-            f'Total functions created: {result["task_16_summary"]["total_functions"]}'
+            f"Total functions created: {result['task_16_summary']['total_functions']}"
         )
-        print(f'Target met: {result["task_16_summary"]["target_met"]}')
+        print(f"Target met: {result['task_16_summary']['target_met']}")
         print("\nFunction categories:")
         for category, count in result["task_16_summary"]["categories"].items():
             print(f"  - {category}: {count} functions")
@@ -41,7 +41,7 @@ def main():
         # List created functions
         print("\n📋 Created Functions:")
         for func_key, func_data in result["functions"].items():
-            print(f'  ✓ {func_data.get("name", func_key)}')
+            print(f"  ✓ {func_data.get('name', func_key)}")
 
         print("\n🎉 Task 16 implementation completed successfully!")
         print("📊 Graph database updated with SFC & Recipe Management functions")

@@ -470,8 +470,8 @@ OPCUA_SERVER_CERT_PATH={config.server_cert_path}
 OPCUA_APPLICATION_URI={config.application_uri}
 OPCUA_APPLICATION_NAME={config.application_name}
 OPCUA_ORGANIZATION={config.organization}
-OPCUA_DNS_NAMES={','.join(config.dns_names)}
-OPCUA_IP_ADDRESSES={','.join(config.ip_addresses)}
+OPCUA_DNS_NAMES={",".join(config.dns_names)}
+OPCUA_IP_ADDRESSES={",".join(config.ip_addresses)}
 
 # Connection Settings
 OPCUA_TIMEOUT={config.timeout}

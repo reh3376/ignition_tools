@@ -144,7 +144,7 @@ def populate_task_10_functions():
         print(f"   • Successful: {successful_loads}")
         print(f"   • Failed: {failed_loads}")
         print(
-            f"   • Success Rate: {(successful_loads/len(file_report_functions)*100):.1f}%"
+            f"   • Success Rate: {(successful_loads / len(file_report_functions) * 100):.1f}%"
         )
 
         # Validate database state

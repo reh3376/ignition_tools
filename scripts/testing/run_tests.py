@@ -338,7 +338,7 @@ def run_full_test_suite() -> bool:
     ]
 
     for test_name, test_func in test_functions:
-        print(f"\n{'='*50}")
+        print(f"\n{'=' * 50}")
         print(f"Running {test_name}")
         print("=" * 50)
 
@@ -350,7 +350,7 @@ def run_full_test_suite() -> bool:
             results.append((test_name, False))
 
     # Summary
-    print(f"\n{'='*50}")
+    print(f"\n{'=' * 50}")
     print("TEST SUITE SUMMARY")
     print("=" * 50)
 

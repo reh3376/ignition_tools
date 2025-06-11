@@ -17,13 +17,14 @@ import click
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
-from ignition.opcua import IgnitionOPCUAClient
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.syntax import Syntax
 from rich.table import Table
 from rich.tree import Tree
+
+from ignition.opcua import IgnitionOPCUAClient
 
 console = Console()
 logger = logging.getLogger(__name__)
@@ -701,7 +702,7 @@ async def _monitor_impl(
                 f"[bold]Duration:[/bold] {duration}s\n"
                 f"[bold]Nodes Monitored:[/bold] {len(node_ids)}\n"
                 f"[bold]Data Points Collected:[/bold] {len(monitoring_data)}\n"
-                f"[bold]Average Rate:[/bold] {len(monitoring_data)/max(duration, 1):.2f} points/sec",
+                f"[bold]Average Rate:[/bold] {len(monitoring_data) / max(duration, 1):.2f} points/sec",
                 title="📈 Monitoring Summary",
                 border_style="green",
             )

@@ -221,7 +221,7 @@ def populate_task_5_functions():
     print("📊 TASK 5 POPULATION SUMMARY")
     print("=" * 60)
     print(
-        f"✅ Functions Added: {success_count}/{total_count} ({success_count/total_count*100:.1f}%)"
+        f"✅ Functions Added: {success_count}/{total_count} ({success_count / total_count * 100:.1f}%)"
     )
     print(f"🔗 Relationships Created: {relationships_created}")
     print(f"📁 Categories: {len(categories)}")

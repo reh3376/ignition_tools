@@ -13,18 +13,18 @@ from src.core.enhanced_cli import main as cli
 class TestCLI:
     """Test cases for the CLI functionality."""
 
-    @pytest.fixture()
+    @pytest.fixture
     def runner(self):
         """Fixture providing a CLI runner."""
         return CliRunner()
 
-    @pytest.fixture()
+    @pytest.fixture
     def temp_output_dir(self):
         """Fixture providing a temporary output directory."""
         with tempfile.TemporaryDirectory() as tmp_dir:
             yield Path(tmp_dir)
 
-    @pytest.mark.unit()
+    @pytest.mark.unit
     def test_cli_help(self, runner):
         """Test that CLI help works."""
         result = runner.invoke(cli, ["--help"])
@@ -33,7 +33,7 @@ class TestCLI:
         assert "script" in result.output
         assert "template" in result.output
 
-    @pytest.mark.unit()
+    @pytest.mark.unit
     def test_template_list_command(self, runner):
         """Test the template list command."""
         result = runner.invoke(cli, ["template", "list"])
@@ -44,7 +44,7 @@ class TestCLI:
             or "button_click_handler" in result.output
         )
 
-    @pytest.mark.unit()
+    @pytest.mark.unit
     def test_script_generate_help(self, runner):
         """Test script generate command help."""
         result = runner.invoke(cli, ["script", "generate", "--help"])
@@ -53,7 +53,7 @@ class TestCLI:
         assert "component-name" in result.output
         assert "output" in result.output
 
-    @pytest.mark.integration()
+    @pytest.mark.integration
     def test_script_generate_from_template(self, runner, temp_output_dir):
         """Test generating a script from template via CLI."""
         output_file = temp_output_dir / "test_script.py"
@@ -79,7 +79,7 @@ class TestCLI:
         assert "CLITestButton" in content
         assert "def handle_button_click" in content
 
-    @pytest.mark.integration()
+    @pytest.mark.integration
     def test_script_generate_from_config(self, runner, temp_output_dir):
         """Test generating a script from config file via CLI."""
         # Create test config file
@@ -115,14 +115,14 @@ class TestCLI:
         assert "ConfigTestButton" in content
         assert "TestWindow" in content
 
-    @pytest.mark.unit()
+    @pytest.mark.unit
     def test_script_generate_missing_args(self, runner):
         """Test script generate with missing required arguments."""
         result = runner.invoke(cli, ["script", "generate"])
         assert result.exit_code != 0
         assert "Error" in result.output or "Missing" in result.output
 
-    @pytest.mark.integration()
+    @pytest.mark.integration
     def test_template_validate_command(self, runner, temp_output_dir):
         """Test template validation command."""
         # Create test config
@@ -148,7 +148,7 @@ class TestCLI:
         # Should not error (validation should pass)
         assert result.exit_code == 0
 
-    @pytest.mark.unit()
+    @pytest.mark.unit
     def test_invalid_template_name(self, runner, temp_output_dir):
         """Test handling of invalid template names."""
         output_file = temp_output_dir / "invalid_script.py"
@@ -170,7 +170,7 @@ class TestCLI:
         assert result.exit_code != 0
         assert not output_file.exists()
 
-    @pytest.mark.unit()
+    @pytest.mark.unit
     def test_invalid_config_file(self, runner, temp_output_dir):
         """Test handling of invalid config files."""
         # Create invalid config file
@@ -194,7 +194,7 @@ class TestCLI:
         assert result.exit_code != 0
         assert not output_file.exists()
 
-    @pytest.mark.unit()
+    @pytest.mark.unit
     def test_output_to_stdout(self, runner):
         """Test generating script to stdout."""
         result = runner.invoke(
@@ -213,7 +213,7 @@ class TestCLI:
         assert "StdoutTestButton" in result.output
         assert "def handle_button_click" in result.output
 
-    @pytest.mark.performance()
+    @pytest.mark.performance
     def test_cli_performance(self, runner, temp_output_dir, performance_monitor):
         """Test CLI performance for script generation."""
         performance_monitor.start()
@@ -243,7 +243,7 @@ class TestCLI:
         assert duration is not None
         assert duration < 2.0  # Should complete quickly
 
-    @pytest.mark.integration()
+    @pytest.mark.integration
     def test_cli_with_all_options(self, runner, temp_output_dir):
         """Test CLI with all available options."""
         output_file = temp_output_dir / "full_options_script.py"
@@ -277,7 +277,7 @@ class TestCLI:
         assert "FullOptionsWindow" in content
         assert "FullOptionsLogger" in content
 
-    @pytest.mark.unit()
+    @pytest.mark.unit
     def test_cli_verbose_output(self, runner, temp_output_dir):
         """Test CLI verbose output mode."""
         output_file = temp_output_dir / "verbose_script.py"

@@ -626,9 +626,7 @@ def create_pattern_display(pattern: dict[str, Any]) -> str:
         success = pattern.get("success_rate", 0)
 
         return (
-            f"Template: {template}\n"
-            f"Usage Count: {usage}\n"
-            f"Success Rate: {success:.1%}"
+            f"Template: {template}\nUsage Count: {usage}\nSuccess Rate: {success:.1%}"
         )
 
     elif pattern_type == "parameter_combination":

@@ -246,7 +246,7 @@ def populate_task_6_utility_system():
         print("\n📊 Task 6 Population Results:")
         print(f"   ✅ Successfully added: {success_count} functions")
         print(f"   ❌ Errors: {error_count} functions")
-        print(f"   📈 Success rate: {(success_count/len(functions)*100):.1f}%")
+        print(f"   📈 Success rate: {(success_count / len(functions) * 100):.1f}%")
 
         if success_count == len(functions):
             print("\n🎉 **Task 6 Population COMPLETED Successfully!**")
@@ -264,7 +264,7 @@ def populate_task_6_utility_system():
         print("\n📊 **Updated Database Statistics:**")
         print(f"   📈 Total functions: {total_functions}")
         print(
-            f"   🎯 Completion: {(total_functions/400)*100:.1f}% (target: 400 functions)"
+            f"   🎯 Completion: {(total_functions / 400) * 100:.1f}% (target: 400 functions)"
         )
 
         return success_count == len(functions)

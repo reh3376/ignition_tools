@@ -167,7 +167,7 @@ def populate_task_13():
         f"   ✅ Successfully created: {successful_functions}/{total_functions} functions"
     )
     print(f"   🔗 Total relationships: {total_relationships}")
-    print(f"   📈 Success rate: {(successful_functions/total_functions)*100:.1f}%")
+    print(f"   📈 Success rate: {(successful_functions / total_functions) * 100:.1f}%")
 
     if successful_functions == total_functions:
         print("   🏆 Perfect score! All integration functions loaded successfully!")
