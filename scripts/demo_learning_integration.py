@@ -64,9 +64,7 @@ def demo_cli_integration():
                 table.add_row(
                     rec["command"],
                     f"{rec['confidence']:.1%}",
-                    rec["reasoning"][:50] + "..."
-                    if len(rec["reasoning"]) > 50
-                    else rec["reasoning"],
+                    rec["reasoning"][:50] + "..." if len(rec["reasoning"]) > 50 else rec["reasoning"],
                 )
 
             console.print(table)
@@ -193,9 +191,7 @@ def show_integration_summary():
     print("\n💡 Next Steps:")
     print("  1. Install dependencies: python scripts/test_enhanced_cli.py")
     print("  2. Start Neo4j database for full learning system")
-    print(
-        "  3. Run Phase 1 learning test: python scripts/learning_system/test_complete_phase_1.py"
-    )
+    print("  3. Run Phase 1 learning test: python scripts/learning_system/test_complete_phase_1.py")
     print("  4. Generate some scripts to create usage patterns")
     print("  5. Explore patterns: python -m src.core.enhanced_cli learning explore")
 

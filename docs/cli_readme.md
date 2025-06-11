@@ -58,6 +58,9 @@ Explore usage patterns, get recommendations, and view analytics.
 #### 🔗 Gateway Connections (`gateway`)
 Manage connections to Ignition gateways for testing and deployment.
 
+#### 🗄️ Database Backup (`backup`)
+Manage Neo4j database backups and restore operations.
+
 #### ⚙️ Setup (`setup`)
 Configure the development environment and learning system.
 
@@ -196,6 +199,188 @@ Discover available endpoints on a gateway.
 ```bash
 # Launch endpoint discovery tool
 python -m src.core.enhanced_cli gateway discover
+
+## 🗄️ Database Backup Commands
+
+### `ign backup create`
+Create a full database backup with optional automatic detection.
+
+```bash
+# Create manual backup with reason
+python -m src.core.enhanced_cli backup create --reason "Before major update"
+
+# Create automatic backup only if significant changes detected
+python -m src.core.enhanced_cli backup create --auto
+```
+
+#### Features
+- **Full database export** with all nodes and relationships
+- **Automatic change detection** with configurable thresholds
+- **Timestamped filenames** with metadata tracking
+- **Progress indicators** during backup creation
+
+#### Sample Output
+```
+📦 Creating database backup...
+Creating Neo4j backup: ign_scripts_db_backup_20250128_143022.json
+
+Extracted 1245 nodes and 3487 relationships
+✅ Backup created successfully: neo4j/fullbackup/ign_scripts_db_backup_20250128_143022.json
+```
+
+### `ign backup restore`
+Restore database from backup with confirmation prompts.
+
+```bash
+# Restore from latest backup (interactive)
+python -m src.core.enhanced_cli backup restore
+
+# Restore from specific backup
+python -m src.core.enhanced_cli backup restore --file ign_scripts_db_backup_20250128_143022.json
+
+# Skip confirmation (use with caution)
+python -m src.core.enhanced_cli backup restore --confirm
+```
+
+#### Features
+- **Backup information display** before restoration
+- **Safety confirmation prompts** to prevent accidental data loss
+- **Complete database replacement** with ID remapping
+- **Progress tracking** during restoration
+
+#### Sample Output
+```
+🔄 Restore Information
+┌─────────────────────────────────────────────────────────┐
+│ Backup: ign_scripts_db_backup_20250128_143022.json     │
+│ Created: 2025-01-28 14:30:22                           │
+│ Reason: Before major update                            │
+│ Nodes: 1245                                            │
+│ Relationships: 3487                                    │
+│ Size: 2,345,678 bytes                                  │
+└─────────────────────────────────────────────────────────┘
+
+⚠️  This will DELETE all current data and restore from backup. Continue? [y/N]: y
+
+Restoring database...
+✅ Database restored successfully: Database restored from ign_scripts_db_backup_20250128_143022.json
+```
+
+### `ign backup list`
+List all available database backups with optional details.
+
+```bash
+# Simple backup list
+python -m src.core.enhanced_cli backup list
+
+# Detailed backup information
+python -m src.core.enhanced_cli backup list --detailed
+```
+
+#### Features
+- **Chronological backup listing** (newest first)
+- **Metadata display** including creation time and reason
+- **File size and node/relationship counts** in detailed mode
+- **Summary information** for latest backup
+
+#### Sample Output
+```
+📋 Available Database Backups
+┌──────────────────────────────────────┬─────────────────────┬─────────────────────────┐
+│ Filename                             │ Created             │ Reason                  │
+├──────────────────────────────────────┼─────────────────────┼─────────────────────────┤
+│ ign_scripts_db_backup_20250128_1430 │ 2025-01-28 14:30:22 │ Before major update     │
+└──────────────────────────────────────┴─────────────────────┴─────────────────────────┘
+
+📊 Summary
+┌─────────────────────────────────────────────────────────┐
+│ Latest backup: ign_scripts_db_backup_20250128_143022.j │
+│ Created: 2025-01-28 14:30:22                           │
+│ Data: 1245 nodes, 3487 relationships                  │
+└─────────────────────────────────────────────────────────┘
+```
+
+### `ign backup info`
+Show detailed information about a specific backup file.
+
+```bash
+# Get detailed backup information
+python -m src.core.enhanced_cli backup info ign_scripts_db_backup_20250128_143022.json
+```
+
+#### Sample Output
+```
+📄 Backup Information: ign_scripts_db_backup_20250128_143022.json
+┌─────────────────────────────────────────────────────────┐
+│ Filename: ign_scripts_db_backup_20250128_143022.json   │
+│ Timestamp: 20250128_143022                             │
+│ Datetime: 2025-01-28 14:30:22                          │
+│ Reason: Before major update                            │
+│ Node Count: 1245                                       │
+│ Relationship Count: 3487                               │
+│ Version: 1.0.0                                         │
+│ Backup Type: full                                      │
+│ Source: IGN Scripts Learning System                    │
+│ File Size: 2,345,678 bytes                            │
+│ File Path: neo4j/fullbackup/ign_scripts_db_backup...  │
+└─────────────────────────────────────────────────────────┘
+```
+
+### `ign backup status`
+Show current database backup status and recommendations.
+
+```bash
+# Check backup status and recommendations
+python -m src.core.enhanced_cli backup status
+```
+
+#### Features
+- **Current database statistics** (nodes, relationships)
+- **Last backup comparison** with change detection
+- **Backup recommendations** based on configurable thresholds
+- **Configuration display** for auto-backup settings
+
+#### Sample Output
+```
+📊 Database Backup Status
+┌─────────────────────────────────────────────────────────┐
+│ Current Database:                                       │
+│ • Nodes: 1,295                                         │
+│ • Relationships: 3,587                                 │
+│                                                        │
+│ Last Backup:                                           │
+│ • Nodes: 1,245                                         │
+│ • Relationships: 3,487                                 │
+│                                                        │
+│ Changes Since Last Backup:                             │
+│ • Nodes: +50                                           │
+│ • Relationships: +100                                  │
+│                                                        │
+│ Backup Recommendation: ⚠️ Backup recommended           │
+└─────────────────────────────────────────────────────────┘
+
+⚙️ Configuration
+┌─────────────────────────────────────────────────────────┐
+│ Auto-Backup Thresholds:                                │
+│ • Nodes: 50 new nodes                                  │
+│ • Relationships: 100 new relationships                 │
+│ • Percentage: 10.0% increase                           │
+└─────────────────────────────────────────────────────────┘
+```
+
+### `ign backup init`
+Create initial backup for application distribution.
+
+```bash
+# Create initial distribution backup
+python -m src.core.enhanced_cli backup init
+```
+
+#### Purpose
+- **Application distribution** with pre-populated data
+- **New installation support** with 400+ pre-analyzed functions
+- **Community patterns** and usage recommendations
+- **Faster time-to-value** for new users
 ```
 
 #### Features

@@ -1,0 +1,2 @@
+# This file ensures the neo4j/fullbackup directory exists in git
+# Neo4j database backups are stored in this directory 

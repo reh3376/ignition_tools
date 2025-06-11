@@ -63,6 +63,7 @@ Welcome to the comprehensive documentation for the IGN Scripts project - an inte
 
 ### Recent Achievements
 - ✅ Enhanced CLI with Rich/prompt_toolkit UI and learning system integration
+- ✅ Neo4j database backup and restore system with automatic lifecycle management
 - ✅ Streamlit UI with comprehensive learning analytics and recommendations
 - ✅ Usage tracking and pattern-based intelligence across all interfaces
 - ✅ Interactive TUI for pattern exploration

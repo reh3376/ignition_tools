@@ -22,21 +22,12 @@ from rich.text import Text
 # Optional prompt_toolkit imports for TUI features
 try:
     from prompt_toolkit import Application
-    from prompt_toolkit.application import get_app
-    from prompt_toolkit.formatted_text import HTML
-    from prompt_toolkit.key_binding import KeyBindings
-    from prompt_toolkit.layout import Layout
-    from prompt_toolkit.layout.containers import HSplit, VSplit, Window
-    from prompt_toolkit.layout.controls import FormattedTextControl
     from prompt_toolkit.shortcuts import (
-        button_dialog,
-        checkboxlist_dialog,
         input_dialog,
         message_dialog,
         radiolist_dialog,
     )
     from prompt_toolkit.styles import Style
-    from prompt_toolkit.widgets import Button, Frame, Label, TextArea
 
     PROMPT_TOOLKIT_AVAILABLE = True
 except ImportError:
@@ -93,9 +84,7 @@ class LearningSystemCLI:
                 self.manager = PatternManager(self.client)
                 self.generator = IgnitionScriptGenerator()
             except Exception as e:
-                self.console.print(
-                    f"[yellow]Warning: Learning system not available: {e}[/yellow]"
-                )
+                self.console.print(f"[yellow]Warning: Learning system not available: {e}[/yellow]")
 
     def connect_learning_system(self) -> bool:
         """Connect to the learning system database."""
@@ -151,9 +140,7 @@ class LearningSystemCLI:
 
         try:
             function_name = f"cli.{current_command}"
-            recommendations = self.analyzer.get_recommendations_for_function(
-                function_name
-            )
+            recommendations = self.analyzer.get_recommendations_for_function(function_name)
 
             # Convert to CLI commands
             cli_recommendations = []
@@ -180,11 +167,7 @@ class LearningSystemCLI:
         title.append(__version__, style="bold green")
 
         # Check learning system status
-        ls_status = (
-            "🧠 Connected"
-            if self.client and self.client.is_connected
-            else "⚠️ Disconnected"
-        )
+        ls_status = "🧠 Connected" if self.client and self.client.is_connected else "⚠️ Disconnected"
 
         welcome_panel = Panel.fit(
             f"{title}\n"
@@ -245,12 +228,8 @@ def script(ctx: click.Context) -> None:
 @click.option("--config", "-c", help="Configuration file (JSON)")
 @click.option("--output", "-o", help="Output file path")
 @click.option("--component-name", help="Name of the component")
-@click.option(
-    "--action-type", help="Type of action (navigation, tag_write, popup, etc.)"
-)
-@click.option(
-    "--interactive", "-i", is_flag=True, help="Interactive mode with recommendations"
-)
+@click.option("--action-type", help="Type of action (navigation, tag_write, popup, etc.)")
+@click.option("--interactive", "-i", is_flag=True, help="Interactive mode with recommendations")
 @click.pass_context
 def generate(
     ctx: click.Context,
@@ -280,13 +259,9 @@ def generate(
         with console.status("[bold blue]Generating script..."):
             if config:
                 # Generate from config file
-                script_content = enhanced_cli.generator.generate_from_config(
-                    config, output
-                )
+                script_content = enhanced_cli.generator.generate_from_config(config, output)
                 enhanced_cli.track_cli_usage("script", "generate", params, True)
-                console.print(
-                    f"[green]✓[/green] Generated script from config: {config}"
-                )
+                console.print(f"[green]✓[/green] Generated script from config: {config}")
 
             elif template:
                 # Generate from command line options
@@ -299,18 +274,12 @@ def generate(
                 if not template.endswith(".jinja2"):
                     template += ".jinja2"
 
-                script_content = enhanced_cli.generator.generate_script(
-                    template, context, output
-                )
+                script_content = enhanced_cli.generator.generate_script(template, context, output)
                 enhanced_cli.track_cli_usage("script", "generate", params, True)
-                console.print(
-                    f"[green]✓[/green] Generated script from template: {template}"
-                )
+                console.print(f"[green]✓[/green] Generated script from template: {template}")
 
             else:
-                console.print(
-                    "[red]✗[/red] Either --template or --config must be specified"
-                )
+                console.print("[red]✗[/red] Either --template or --config must be specified")
                 enhanced_cli.track_cli_usage("script", "generate", params, False)
                 return
 
@@ -321,12 +290,8 @@ def generate(
             # Show script with syntax highlighting
             from rich.syntax import Syntax
 
-            syntax = Syntax(
-                script_content, "python", theme="monokai", line_numbers=True
-            )
-            console.print(
-                Panel(syntax, title="📄 Generated Script", border_style="green")
-            )
+            syntax = Syntax(script_content, "python", theme="monokai", line_numbers=True)
+            console.print(Panel(syntax, title="📄 Generated Script", border_style="green"))
 
         # Show follow-up recommendations
         if interactive:
@@ -347,40 +312,28 @@ def show_generation_recommendations(template: str, action_type: str):
     # Get template usage patterns
     try:
         if template:
-            template_patterns = enhanced_cli.manager.get_patterns_by_entity(
-                template, "template"
-            )
+            template_patterns = enhanced_cli.manager.get_patterns_by_entity(template, "template")
             if template_patterns:
-                console.print(
-                    f"[green]💡[/green] Template '{template}' usage insights:"
-                )
+                console.print(f"[green]💡[/green] Template '{template}' usage insights:")
 
                 for pattern in template_patterns[:3]:
                     if pattern.get("pattern_type") == "template_usage":
                         success_rate = pattern.get("success_rate", 0)
                         usage_count = pattern.get("usage_count", 0)
-                        console.print(
-                            f"   • Success rate: {success_rate:.1%} ({usage_count} uses)"
-                        )
+                        console.print(f"   • Success rate: {success_rate:.1%} ({usage_count} uses)")
 
                         common_params = pattern.get("common_parameters", {})
                         if common_params:
                             console.print("   • Common parameters:")
                             for param, info in list(common_params.items())[:3]:
                                 freq = info.get("frequency", 0)
-                                console.print(
-                                    f"     - {param}: used {freq:.1%} of the time"
-                                )
+                                console.print(f"     - {param}: used {freq:.1%} of the time")
 
         # Get action type recommendations
         if action_type:
-            recommendations = enhanced_cli.get_recommendations(
-                f"script.generate.{action_type}"
-            )
+            recommendations = enhanced_cli.get_recommendations(f"script.generate.{action_type}")
             if recommendations:
-                console.print(
-                    f"\n[blue]🎯[/blue] Users who generate {action_type} scripts also use:"
-                )
+                console.print(f"\n[blue]🎯[/blue] Users who generate {action_type} scripts also use:")
                 for rec in recommendations[:3]:
                     cmd = rec["command"].replace("script.generate.", "")
                     console.print(f"   • {cmd} (confidence: {rec['confidence']:.1%})")
@@ -432,9 +385,7 @@ def template() -> None:
 
 
 @template.command()
-@click.option(
-    "--detailed", "-d", is_flag=True, help="Show detailed template information"
-)
+@click.option("--detailed", "-d", is_flag=True, help="Show detailed template information")
 @click.pass_context
 def list(ctx: click.Context, detailed: bool) -> None:
     """📋 List available script templates with usage statistics."""
@@ -448,9 +399,7 @@ def list(ctx: click.Context, detailed: bool) -> None:
             return
 
         # Create a rich table
-        table = Table(
-            title="📋 Available Templates", show_header=True, header_style="bold blue"
-        )
+        table = Table(title="📋 Available Templates", show_header=True, header_style="bold blue")
         table.add_column("Template", style="cyan", no_wrap=True)
         table.add_column("Type", style="green")
 
@@ -474,9 +423,7 @@ def list(ctx: click.Context, detailed: bool) -> None:
             if detailed and enhanced_cli.manager:
                 # Get usage statistics
                 try:
-                    patterns = enhanced_cli.manager.get_patterns_by_entity(
-                        template, "template"
-                    )
+                    patterns = enhanced_cli.manager.get_patterns_by_entity(template, "template")
                     usage_count = 0
                     success_rate = 0
                     last_used = "Never"
@@ -513,9 +460,7 @@ def show_template_recommendations():
     """Show template recommendations based on usage patterns."""
     try:
         top_patterns = enhanced_cli.manager.get_top_patterns_summary(limit=3)
-        template_patterns = top_patterns.get("top_patterns", {}).get(
-            "template_usage", []
-        )
+        template_patterns = top_patterns.get("top_patterns", {}).get("template_usage", [])
 
         if template_patterns:
             console.print("\n[bold green]🌟 Most Popular Templates[/bold green]")
@@ -523,9 +468,7 @@ def show_template_recommendations():
                 template = pattern.get("template", "Unknown")
                 usage = pattern.get("usage_count", 0)
                 success = pattern.get("success_rate", 0)
-                console.print(
-                    f"  {i}. {template} ({usage} uses, {success:.1%} success)"
-                )
+                console.print(f"  {i}. {template} ({usage} uses, {success:.1%} success)")
     except Exception:
         pass
 
@@ -546,16 +489,12 @@ def patterns(ctx: click.Context, days: int, pattern_type: str) -> None:
         console.print("[yellow]Learning system not available[/yellow]")
         return
 
-    enhanced_cli.track_cli_usage(
-        "learning", "patterns", {"days": days, "pattern_type": pattern_type}
-    )
+    enhanced_cli.track_cli_usage("learning", "patterns", {"days": days, "pattern_type": pattern_type})
 
     try:
         with console.status("[bold blue]Analyzing patterns..."):
             if pattern_type:
-                patterns = enhanced_cli.manager.get_patterns_by_type(
-                    pattern_type, limit=10
-                )
+                patterns = enhanced_cli.manager.get_patterns_by_type(pattern_type, limit=10)
                 display_specific_patterns(pattern_type, patterns)
             else:
                 stats = enhanced_cli.manager.get_pattern_statistics()
@@ -591,9 +530,7 @@ def display_pattern_overview(stats: dict[str, Any]):
                 console.print(f"  {level.replace('_', ' ').title()}: {count} {bar}")
 
 
-def display_specific_patterns(
-    pattern_type: str, patterns: builtins.list[dict[str, Any]]
-):
+def display_specific_patterns(pattern_type: str, patterns: builtins.list[dict[str, Any]]):
     """Display specific pattern type details."""
     title = f"📊 {pattern_type.replace('_', ' ').title()} Patterns"
     console.print(f"[bold cyan]{title}[/bold cyan]\n")
@@ -618,20 +555,14 @@ def create_pattern_display(pattern: dict[str, Any]) -> str:
         conf2 = pattern.get("confidence_2_to_1", 0)
         support = pattern.get("support", 0)
 
-        return (
-            f"Functions: {func1} ↔ {func2}\n"
-            f"Confidence: {conf1:.1%} / {conf2:.1%}\n"
-            f"Support: {support:.1%}"
-        )
+        return f"Functions: {func1} ↔ {func2}\n" f"Confidence: {conf1:.1%} / {conf2:.1%}\n" f"Support: {support:.1%}"
 
     elif pattern_type == "template_usage":
         template = pattern.get("template_name", "")
         usage = pattern.get("usage_count", 0)
         success = pattern.get("success_rate", 0)
 
-        return (
-            f"Template: {template}\nUsage Count: {usage}\nSuccess Rate: {success:.1%}"
-        )
+        return f"Template: {template}\nUsage Count: {usage}\nSuccess Rate: {success:.1%}"
 
     elif pattern_type == "parameter_combination":
         entity = pattern.get("entity_name", "")
@@ -640,10 +571,7 @@ def create_pattern_display(pattern: dict[str, Any]) -> str:
         success = pattern.get("success_rate", 0)
 
         return (
-            f"Entity: {entity}\n"
-            f"Parameter: {param}\n"
-            f"Frequency: {frequency:.1%}\n"
-            f"Success Rate: {success:.1%}"
+            f"Entity: {entity}\n" f"Parameter: {param}\n" f"Frequency: {frequency:.1%}\n" f"Success Rate: {success:.1%}"
         )
 
     return str(pattern)
@@ -664,24 +592,18 @@ def recommend(ctx: click.Context, command: str) -> None:
         if command:
             recommendations = enhanced_cli.get_recommendations(command)
             if recommendations:
-                console.print(
-                    f"[bold green]🎯 Recommendations for '{command}'[/bold green]\n"
-                )
+                console.print(f"[bold green]🎯 Recommendations for '{command}'[/bold green]\n")
 
                 for i, rec in enumerate(recommendations, 1):
                     cmd = rec["command"]
                     confidence = rec["confidence"]
                     reasoning = rec["reasoning"]
 
-                    console.print(
-                        f"  {i}. [cyan]{cmd}[/cyan] (confidence: {confidence:.1%})"
-                    )
+                    console.print(f"  {i}. [cyan]{cmd}[/cyan] (confidence: {confidence:.1%})")
                     console.print(f"     {reasoning}")
                     console.print()
             else:
-                console.print(
-                    f"[yellow]No recommendations found for '{command}'[/yellow]"
-                )
+                console.print(f"[yellow]No recommendations found for '{command}'[/yellow]")
         else:
             # Show general recommendations
             console.print("[bold green]🎯 General Recommendations[/bold green]\n")
@@ -723,9 +645,7 @@ def stats(ctx: click.Context) -> None:
         )
 
         # Header
-        header_text = Text(
-            "🧠 Learning System Analytics", style="bold blue", justify="center"
-        )
+        header_text = Text("🧠 Learning System Analytics", style="bold blue", justify="center")
         layout["header"].update(Panel(header_text, border_style="blue"))
 
         # Main content
@@ -795,16 +715,18 @@ if PROMPT_TOOLKIT_AVAILABLE:
             """Initialize the pattern explorer."""
             self.current_patterns = []
             self.current_view = "menu"
-            self.style = Style.from_dict({
-                'dialog': 'bg:#004400',
-                'dialog.body': 'bg:#000044 #ffffff',
-                'dialog.title': 'bg:#004400 #ffffff bold',
-                'button': 'bg:#000044 #ffffff',
-                'button.focused': 'bg:#004400 #ffffff bold',
-                'text': '#ffffff',
-                'header': 'bg:#004400 #ffffff bold',
-                'footer': 'bg:#004400 #ffffff',
-            })
+            self.style = Style.from_dict(
+                {
+                    "dialog": "bg:#004400",
+                    "dialog.body": "bg:#000044 #ffffff",
+                    "dialog.title": "bg:#004400 #ffffff bold",
+                    "button": "bg:#000044 #ffffff",
+                    "button.focused": "bg:#004400 #ffffff bold",
+                    "text": "#ffffff",
+                    "header": "bg:#004400 #ffffff bold",
+                    "footer": "bg:#004400 #ffffff",
+                }
+            )
 
         def run(self):
             """Run the interactive pattern explorer."""
@@ -813,16 +735,12 @@ if PROMPT_TOOLKIT_AVAILABLE:
                     choice = self._show_main_menu()
                     if choice is None or choice == "Exit":
                         break
-                    
+
                     self._handle_menu_choice(choice)
                 except KeyboardInterrupt:
                     break
                 except Exception as e:
-                    message_dialog(
-                        title="Error",
-                        text=f"An error occurred: {e}",
-                        style=self.style
-                    ).run()
+                    message_dialog(title="Error", text=f"An error occurred: {e}", style=self.style).run()
 
         def _show_main_menu(self):
             """Show the main menu with pattern exploration options."""
@@ -861,12 +779,19 @@ if PROMPT_TOOLKIT_AVAILABLE:
 
         def _show_all_patterns(self):
             """Show all patterns in a formatted view."""
-            patterns_text = self._format_patterns_display([
-                {"type": "Co-occurrence", "description": "tag.read + db.query", "confidence": "85%", "support": "23%"},
-                {"type": "Template", "description": "button_handler.jinja2", "confidence": "92%", "support": "15%"},
-                {"type": "Parameter", "description": "timeout=5000", "confidence": "78%", "support": "34%"},
-            ])
-            
+            patterns_text = self._format_patterns_display(
+                [
+                    {
+                        "type": "Co-occurrence",
+                        "description": "tag.read + db.query",
+                        "confidence": "85%",
+                        "support": "23%",
+                    },
+                    {"type": "Template", "description": "button_handler.jinja2", "confidence": "92%", "support": "15%"},
+                    {"type": "Parameter", "description": "timeout=5000", "confidence": "78%", "support": "34%"},
+                ]
+            )
+
             message_dialog(
                 title="📊 All Patterns",
                 text=patterns_text,
@@ -875,23 +800,25 @@ if PROMPT_TOOLKIT_AVAILABLE:
 
         def _show_co_occurrence_patterns(self):
             """Show function co-occurrence patterns."""
-            patterns_text = self._format_co_occurrence_display([
-                {
-                    "function_1": "system.tag.readBlocking",
-                    "function_2": "system.gui.messageBox",
-                    "confidence": "85%",
-                    "support": "23%",
-                    "lift": "2.1"
-                },
-                {
-                    "function_1": "system.db.runPrepQuery",
-                    "function_2": "system.tag.writeBlocking",
-                    "confidence": "78%",
-                    "support": "18%",
-                    "lift": "1.9"
-                },
-            ])
-            
+            patterns_text = self._format_co_occurrence_display(
+                [
+                    {
+                        "function_1": "system.tag.readBlocking",
+                        "function_2": "system.gui.messageBox",
+                        "confidence": "85%",
+                        "support": "23%",
+                        "lift": "2.1",
+                    },
+                    {
+                        "function_1": "system.db.runPrepQuery",
+                        "function_2": "system.tag.writeBlocking",
+                        "confidence": "78%",
+                        "support": "18%",
+                        "lift": "1.9",
+                    },
+                ]
+            )
+
             message_dialog(
                 title="🔗 Function Co-occurrence Patterns",
                 text=patterns_text,
@@ -900,21 +827,23 @@ if PROMPT_TOOLKIT_AVAILABLE:
 
         def _show_template_patterns(self):
             """Show template usage patterns."""
-            patterns_text = self._format_template_display([
-                {
-                    "template": "button_click_handler.jinja2",
-                    "usage_count": "45",
-                    "success_rate": "92%",
-                    "avg_time": "0.3s"
-                },
-                {
-                    "template": "tag_change_script.jinja2",
-                    "usage_count": "38",
-                    "success_rate": "87%",
-                    "avg_time": "0.2s"
-                },
-            ])
-            
+            patterns_text = self._format_template_display(
+                [
+                    {
+                        "template": "button_click_handler.jinja2",
+                        "usage_count": "45",
+                        "success_rate": "92%",
+                        "avg_time": "0.3s",
+                    },
+                    {
+                        "template": "tag_change_script.jinja2",
+                        "usage_count": "38",
+                        "success_rate": "87%",
+                        "avg_time": "0.2s",
+                    },
+                ]
+            )
+
             message_dialog(
                 title="📋 Template Usage Patterns",
                 text=patterns_text,
@@ -923,21 +852,23 @@ if PROMPT_TOOLKIT_AVAILABLE:
 
         def _show_parameter_patterns(self):
             """Show parameter combination patterns."""
-            patterns_text = self._format_parameter_display([
-                {
-                    "entity": "system.tag.readBlocking",
-                    "parameter": "timeout",
-                    "frequency": "78%",
-                    "success_rate": "95%"
-                },
-                {
-                    "entity": "system.db.runPrepQuery",
-                    "parameter": "maxRows",
-                    "frequency": "65%",
-                    "success_rate": "91%"
-                },
-            ])
-            
+            patterns_text = self._format_parameter_display(
+                [
+                    {
+                        "entity": "system.tag.readBlocking",
+                        "parameter": "timeout",
+                        "frequency": "78%",
+                        "success_rate": "95%",
+                    },
+                    {
+                        "entity": "system.db.runPrepQuery",
+                        "parameter": "maxRows",
+                        "frequency": "65%",
+                        "success_rate": "91%",
+                    },
+                ]
+            )
+
             message_dialog(
                 title="⚙️ Parameter Patterns",
                 text=patterns_text,
@@ -963,7 +894,7 @@ Recent Activity:
 ├── Patterns created today: 12
 ├── Patterns updated today: 8
 └── Active users: 3"""
-            
+
             message_dialog(
                 title="📈 System Statistics",
                 text=stats_text,
@@ -977,7 +908,7 @@ Recent Activity:
                 text="Enter search term (function name, template, etc.):",
                 style=self.style,
             ).run()
-            
+
             if search_term:
                 # Simulate search results
                 results = f"""🔍 Search Results for '{search_term}'
@@ -995,7 +926,7 @@ Found 3 matching patterns:
 3. Parameter Pattern
    • {search_term}.timeout parameter
    • Frequency: 78% | Success: 95%"""
-                
+
                 message_dialog(
                     title="🔍 Search Results",
                     text=results,
@@ -1015,7 +946,7 @@ Found 3 matching patterns:
                 ],
                 style=self.style,
             ).run()
-            
+
             if format_choice and format_choice != "cancel":
                 message_dialog(
                     title="💾 Export Complete",
@@ -1036,8 +967,8 @@ Found 3 matching patterns:
             text = "Function 1              | Function 2              | Conf  | Supp | Lift\n"
             text += "─" * 75 + "\n"
             for pattern in patterns:
-                func1 = pattern['function_1'][:22]
-                func2 = pattern['function_2'][:22]
+                func1 = pattern["function_1"][:22]
+                func2 = pattern["function_2"][:22]
                 text += f"{func1:<23} | {func2:<23} | {pattern['confidence']:<5} | {pattern['support']:<4} | {pattern['lift']}\n"
             return text
 
@@ -1046,7 +977,7 @@ Found 3 matching patterns:
             text = "Template                    | Usage | Success | Avg Time\n"
             text += "─" * 55 + "\n"
             for pattern in patterns:
-                template = pattern['template'][:26]
+                template = pattern["template"][:26]
                 text += f"{template:<27} | {pattern['usage_count']:<5} | {pattern['success_rate']:<7} | {pattern['avg_time']}\n"
             return text
 
@@ -1055,7 +986,7 @@ Found 3 matching patterns:
             text = "Entity                      | Parameter | Frequency | Success\n"
             text += "─" * 60 + "\n"
             for pattern in patterns:
-                entity = pattern['entity'][:26]
+                entity = pattern["entity"][:26]
                 text += f"{entity:<27} | {pattern['parameter']:<9} | {pattern['frequency']:<9} | {pattern['success_rate']}\n"
             return text
 
@@ -1066,9 +997,7 @@ else:
             pass
 
         def run(self):
-            console.print(
-                "[yellow]⚠️ TUI not available - prompt_toolkit library not installed[/yellow]"
-            )
+            console.print("[yellow]⚠️ TUI not available - prompt_toolkit library not installed[/yellow]")
 
 
 @learning.command()
@@ -1078,15 +1007,9 @@ def explore(ctx: click.Context) -> None:
     enhanced_cli.track_cli_usage("learning", "explore")
 
     if not PROMPT_TOOLKIT_AVAILABLE:
-        console.print(
-            "[yellow]⚠️ TUI not available - prompt_toolkit library not installed[/yellow]"
-        )
-        console.print(
-            "[yellow]💡[/yellow] Install with: pip install prompt_toolkit"
-        )
-        console.print(
-            "[yellow]💡[/yellow] Try 'ign learning patterns' for command-line exploration"
-        )
+        console.print("[yellow]⚠️ TUI not available - prompt_toolkit library not installed[/yellow]")
+        console.print("[yellow]💡[/yellow] Install with: pip install prompt_toolkit")
+        console.print("[yellow]💡[/yellow] Try 'ign learning patterns' for command-line exploration")
         return
 
     try:
@@ -1095,9 +1018,7 @@ def explore(ctx: click.Context) -> None:
         app.run()
     except Exception as e:
         console.print(f"[red]✗[/red] Error launching explorer: {e}")
-        console.print(
-            "[yellow]💡[/yellow] Try 'ign learning patterns' for command-line exploration"
-        )
+        console.print("[yellow]💡[/yellow] Try 'ign learning patterns' for command-line exploration")
 
 
 # Gateway Management Commands
@@ -1127,9 +1048,7 @@ def list(ctx: click.Context) -> None:
             console.print("3. Run: ign gateway test")
             return
 
-        console.print(
-            f"[bold blue]🔗 Configured Gateways ({len(configs)})[/bold blue]\n"
-        )
+        console.print(f"[bold blue]🔗 Configured Gateways ({len(configs)})[/bold blue]\n")
 
         for name in configs:
             config = manager.get_config(name)
@@ -1222,13 +1141,9 @@ def connect(ctx: click.Context, name: str, test: bool) -> None:
                 )
 
             if not test:
-                console.print(
-                    "\n[green]✓[/green] Gateway connection successful and ready for use"
-                )
+                console.print("\n[green]✓[/green] Gateway connection successful and ready for use")
             else:
-                console.print(
-                    "\n[green]✓[/green] Connection test completed successfully"
-                )
+                console.print("\n[green]✓[/green] Connection test completed successfully")
 
     except Exception as e:
         console.print(f"[red]✗[/red] Connection failed: {e}")
@@ -1259,9 +1174,7 @@ def health(ctx: click.Context, name: str, all: bool) -> None:
                 console.print("[yellow]📭 No gateways configured[/yellow]")
                 return
 
-            console.print(
-                f"[bold blue]🏥 Health Check - All Gateways ({len(configs)})[/bold blue]\n"
-            )
+            console.print(f"[bold blue]🏥 Health Check - All Gateways ({len(configs)})[/bold blue]\n")
 
             pool = GatewayConnectionPool()
             for config_name in configs:
@@ -1283,9 +1196,7 @@ def health(ctx: click.Context, name: str, all: bool) -> None:
                     icon = "❌"
                     color = "red"
 
-                console.print(
-                    f"{icon} [bold]{gateway_name}[/bold] - [{color}]{status}[/{color}]"
-                )
+                console.print(f"{icon} [bold]{gateway_name}[/bold] - [{color}]{status}[/{color}]")
 
                 # Show key health metrics
                 checks = health_data.get("checks", {})
@@ -1296,9 +1207,7 @@ def health(ctx: click.Context, name: str, all: bool) -> None:
                     if check_name == "response_time" and "value_ms" in check_data:
                         details = f"{check_data['value_ms']}ms"
 
-                    console.print(
-                        f"   • {check_name.replace('_', ' ').title()}: {check_status} {details}"
-                    )
+                    console.print(f"   • {check_name.replace('_', ' ').title()}: {check_status} {details}")
 
                 console.print()
 
@@ -1403,9 +1312,7 @@ def test(ctx: click.Context) -> None:
 
         if result.returncode == 0:
             console.print("\n[green]✅ Test completed successfully![/green]")
-            console.print(
-                "Use the generated .env.test as a template for your .env file"
-            )
+            console.print("Use the generated .env.test as a template for your .env file")
         else:
             console.print("\n[yellow]⚠️ Test completed with issues[/yellow]")
             console.print("Check the output above for troubleshooting steps")
@@ -1473,9 +1380,7 @@ def setup(ctx: click.Context) -> None:
         configs = manager.list_configs()
 
         if configs:
-            console.print(
-                f"[green]✓[/green] Gateway system ready ({len(configs)} gateways configured)"
-            )
+            console.print(f"[green]✓[/green] Gateway system ready ({len(configs)} gateways configured)")
         else:
             console.print("[yellow]⚠[/yellow] No gateways configured")
 
@@ -1497,6 +1402,27 @@ def cleanup(ctx: click.Context, result, **kwargs):
     """Clean up and end tracking session."""
     if enhanced_cli.tracker and enhanced_cli.tracker.current_session_id:
         enhanced_cli.tracker.end_session()
+
+
+# Import and register backup commands
+try:
+    from src.core.backup_cli import backup as backup_group
+
+    # Add the backup group to main
+    main.add_command(backup_group, name="backup")
+
+except ImportError:
+    # Create a placeholder group if backup dependencies aren't available
+    @main.group()
+    def backup() -> None:
+        """🗄️ Neo4j database backup and restore operations."""
+        enhanced_cli.track_cli_usage("backup")
+
+    @backup.command()
+    def install():
+        """Install backup dependencies."""
+        console.print("[yellow]⚠️  Backup dependencies not installed[/yellow]")
+        console.print("\n[bold]To enable backup functionality, ensure Neo4j client is available[/bold]")
 
 
 # Import and register OPC-UA commands
