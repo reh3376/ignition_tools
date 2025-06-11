@@ -18,9 +18,35 @@ from rich.panel import Panel
 from rich.prompt import Confirm
 from rich.table import Table
 from rich.text import Text
-from textual.app import App, ComposeResult
-from textual.containers import Horizontal, Vertical
-from textual.widgets import Button, DataTable, Footer, Header, Static
+
+# Optional Textual imports for TUI features
+try:
+    from textual.app import App, ComposeResult
+    from textual.containers import Container, Horizontal, Vertical
+    from textual.widgets import Button, DataTable, Footer, Header, Static
+
+    TEXTUAL_AVAILABLE = True
+except ImportError:
+    # Create dummy classes if Textual not available
+    class DummyButton:
+        class Pressed:
+            def __init__(self):
+                self.button = DummyButton()
+                self.button.id = None
+
+    class DummyApp:
+        def __init__(self):
+            pass
+
+        def run(self):
+            pass
+
+    App = DummyApp
+    ComposeResult = None
+    Container = Horizontal = Vertical = object
+    Button = DummyButton
+    DataTable = Footer = Header = Static = object
+    TEXTUAL_AVAILABLE = False
 
 from src import __version__
 
@@ -754,129 +780,144 @@ def create_stats_display(stats: dict[str, Any]) -> Panel:
 
 
 # Textual TUI for interactive pattern exploration
-class PatternExplorerApp(App):
-    """Interactive TUI for exploring patterns."""
+if TEXTUAL_AVAILABLE:
 
-    CSS = """
-    Screen {
-        background: $surface;
-    }
+    class PatternExplorerApp(App):
+        """Interactive TUI for exploring patterns."""
 
-    Header {
-        background: $primary;
-        color: $text;
-        height: 3;
-    }
+        CSS = """
+        Screen {
+            background: $surface;
+        }
 
-    Footer {
-        background: $primary;
-        color: $text;
-        height: 3;
-    }
+        Header {
+            background: $primary;
+            color: $text;
+            height: 3;
+        }
 
-    DataTable {
-        height: 1fr;
-    }
+        Footer {
+            background: $primary;
+            color: $text;
+            height: 3;
+        }
 
-    #sidebar {
-        width: 30;
-        background: $panel;
-    }
+        DataTable {
+            height: 1fr;
+        }
 
-    #main {
-        width: 1fr;
-    }
-    """
+        #sidebar {
+            width: 30;
+            background: $panel;
+        }
 
-    TITLE = "🧠 IGN Scripts - Pattern Explorer"
+        #main {
+            width: 1fr;
+        }
+        """
 
-    def compose(self) -> ComposeResult:
-        """Compose the TUI layout."""
-        yield Header()
+        TITLE = "🧠 IGN Scripts - Pattern Explorer"
 
-        with Horizontal():
-            with Vertical(id="sidebar"):
-                yield Button("📊 All Patterns", id="all_patterns")
-                yield Button("🔗 Co-occurrence", id="co_occurrence")
-                yield Button("📋 Templates", id="templates")
-                yield Button("⚙️ Parameters", id="parameters")
-                yield Button("📈 Statistics", id="statistics")
+        def compose(self) -> ComposeResult:
+            """Compose the TUI layout."""
+            yield Header()
 
-            with Vertical(id="main"):
-                yield DataTable(id="pattern_table")
-                yield Static("Select a pattern type from the sidebar", id="details")
+            with Horizontal():
+                with Vertical(id="sidebar"):
+                    yield Button("📊 All Patterns", id="all_patterns")
+                    yield Button("🔗 Co-occurrence", id="co_occurrence")
+                    yield Button("📋 Templates", id="templates")
+                    yield Button("⚙️ Parameters", id="parameters")
+                    yield Button("📈 Statistics", id="statistics")
 
-        yield Footer()
+                with Vertical(id="main"):
+                    yield DataTable(id="pattern_table")
+                    yield Static("Select a pattern type from the sidebar", id="details")
 
-    def on_button_pressed(self, event: Button.Pressed) -> None:
-        """Handle button presses."""
-        button_id = event.button.id
+            yield Footer()
 
-        if button_id == "all_patterns":
-            self.show_all_patterns()
-        elif button_id == "co_occurrence":
-            self.show_co_occurrence_patterns()
-        elif button_id == "templates":
-            self.show_template_patterns()
-        elif button_id == "parameters":
-            self.show_parameter_patterns()
-        elif button_id == "statistics":
-            self.show_statistics()
+        def on_button_pressed(self, event: Button.Pressed) -> None:
+            """Handle button presses."""
+            button_id = event.button.id
 
-    def show_all_patterns(self):
-        """Show all patterns in the table."""
-        table = self.query_one("#pattern_table", DataTable)
-        table.clear(columns=True)
-        table.add_columns("Type", "Description", "Confidence", "Support")
+            if button_id == "all_patterns":
+                self.show_all_patterns()
+            elif button_id == "co_occurrence":
+                self.show_co_occurrence_patterns()
+            elif button_id == "templates":
+                self.show_template_patterns()
+            elif button_id == "parameters":
+                self.show_parameter_patterns()
+            elif button_id == "statistics":
+                self.show_statistics()
 
-        # Add sample data (in real implementation, fetch from learning system)
-        table.add_row("Co-occurrence", "tag.read + db.query", "85%", "23%")
-        table.add_row("Template", "button_handler.jinja2", "92%", "15%")
-        table.add_row("Parameter", "timeout=5000", "78%", "34%")
+        def show_all_patterns(self):
+            """Show all patterns in the table."""
+            table = self.query_one("#pattern_table", DataTable)
+            table.clear(columns=True)
+            table.add_columns("Type", "Description", "Confidence", "Support")
 
-    def show_co_occurrence_patterns(self):
-        """Show function co-occurrence patterns."""
-        table = self.query_one("#pattern_table", DataTable)
-        table.clear(columns=True)
-        table.add_columns("Function 1", "Function 2", "Confidence", "Support", "Lift")
+            # Add sample data (in real implementation, fetch from learning system)
+            table.add_row("Co-occurrence", "tag.read + db.query", "85%", "23%")
+            table.add_row("Template", "button_handler.jinja2", "92%", "15%")
+            table.add_row("Parameter", "timeout=5000", "78%", "34%")
 
-        # Add sample data
-        table.add_row(
-            "system.tag.readBlocking", "system.gui.messageBox", "85%", "23%", "2.1"
-        )
+        def show_co_occurrence_patterns(self):
+            """Show function co-occurrence patterns."""
+            table = self.query_one("#pattern_table", DataTable)
+            table.clear(columns=True)
+            table.add_columns(
+                "Function 1", "Function 2", "Confidence", "Support", "Lift"
+            )
 
-    def show_template_patterns(self):
-        """Show template usage patterns."""
-        table = self.query_one("#pattern_table", DataTable)
-        table.clear(columns=True)
-        table.add_columns("Template", "Usage Count", "Success Rate", "Avg Time")
+            # Add sample data
+            table.add_row(
+                "system.tag.readBlocking", "system.gui.messageBox", "85%", "23%", "2.1"
+            )
 
-        # Add sample data
-        table.add_row("button_click_handler.jinja2", "45", "92%", "0.3s")
+        def show_template_patterns(self):
+            """Show template usage patterns."""
+            table = self.query_one("#pattern_table", DataTable)
+            table.clear(columns=True)
+            table.add_columns("Template", "Usage Count", "Success Rate", "Avg Time")
 
-    def show_parameter_patterns(self):
-        """Show parameter combination patterns."""
-        table = self.query_one("#pattern_table", DataTable)
-        table.clear(columns=True)
-        table.add_columns("Entity", "Parameter", "Frequency", "Success Rate")
+            # Add sample data
+            table.add_row("button_click_handler.jinja2", "45", "92%", "0.3s")
 
-        # Add sample data
-        table.add_row("system.tag.readBlocking", "timeout", "78%", "95%")
+        def show_parameter_patterns(self):
+            """Show parameter combination patterns."""
+            table = self.query_one("#pattern_table", DataTable)
+            table.clear(columns=True)
+            table.add_columns("Entity", "Parameter", "Frequency", "Success Rate")
 
-    def show_statistics(self):
-        """Show system statistics."""
-        details = self.query_one("#details", Static)
-        details.update(
-            "📈 Learning System Statistics\n\n"
-            "Total Patterns: 156\n"
-            "High Confidence: 89 (57%)\n"
-            "Medium Confidence: 45 (29%)\n"
-            "Low Confidence: 22 (14%)\n\n"
-            "Pattern Types:\n"
-            "• Co-occurrence: 45\n"
-            "• Template Usage: 67\n"
-            "• Parameter Combos: 44"
-        )
+            # Add sample data
+            table.add_row("system.tag.readBlocking", "timeout", "78%", "95%")
+
+        def show_statistics(self):
+            """Show system statistics."""
+            details = self.query_one("#details", Static)
+            details.update(
+                "📈 Learning System Statistics\n\n"
+                "Total Patterns: 156\n"
+                "High Confidence: 89 (57%)\n"
+                "Medium Confidence: 45 (29%)\n"
+                "Low Confidence: 22 (14%)\n\n"
+                "Pattern Types:\n"
+                "• Co-occurrence: 45\n"
+                "• Template Usage: 67\n"
+                "• Parameter Combos: 44"
+            )
+
+else:
+    # Dummy class when Textual is not available
+    class PatternExplorerApp:
+        def __init__(self):
+            pass
+
+        def run(self):
+            console.print(
+                "[yellow]⚠️ TUI not available - Textual library not installed[/yellow]"
+            )
 
 
 @learning.command()
@@ -884,6 +925,15 @@ class PatternExplorerApp(App):
 def explore(ctx: click.Context) -> None:
     """🔍 Launch interactive pattern explorer (TUI)."""
     enhanced_cli.track_cli_usage("learning", "explore")
+
+    if not TEXTUAL_AVAILABLE:
+        console.print(
+            "[yellow]⚠️ TUI not available - Textual library not installed[/yellow]"
+        )
+        console.print(
+            "[yellow]💡[/yellow] Try 'ign learning patterns' for command-line exploration"
+        )
+        return
 
     try:
         console.print("[bold blue]🚀 Launching Pattern Explorer...[/bold blue]")
