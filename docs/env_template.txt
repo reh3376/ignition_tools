@@ -1,0 +1,84 @@
+# IGN Scripts Environment Configuration Template
+# Copy this file to .env and customize with your specific values
+# NEVER commit .env files to version control - they contain sensitive information
+
+# ================================
+# OPC-UA Configuration
+# ================================
+OPCUA_SERVER_URL=opc.tcp://localhost:4840
+OPCUA_USERNAME=admin
+OPCUA_PASSWORD=your_password
+OPCUA_APPLICATION_NAME=IGN-Scripts
+OPCUA_APPLICATION_URI=urn:IGN-Scripts:Client
+OPCUA_ORGANIZATION_NAME=IGN-Scripts
+OPCUA_ORGANIZATION_URI=urn:IGN-Scripts
+
+# OPC-UA Security Configuration
+OPCUA_SECURITY_POLICY=Basic256Sha256
+OPCUA_SECURITY_MODE=SignAndEncrypt
+OPCUA_CERTIFICATE_PATH=~/.ignition/opcua/certificates/client-certificate.der
+OPCUA_PRIVATE_KEY_PATH=~/.ignition/opcua/certificates/client-private-key.pem
+OPCUA_TRUST_STORE_PATH=~/.ignition/opcua/certificates/trusted
+OPCUA_REJECT_STORE_PATH=~/.ignition/opcua/certificates/rejected
+
+# OPC-UA Connection Options
+OPCUA_SESSION_TIMEOUT=60000
+OPCUA_SECURE_CHANNEL_TIMEOUT=60000
+OPCUA_REQUEST_TIMEOUT=10000
+OPCUA_KEEPALIVE_INTERVAL=30000
+
+# ================================
+# Neo4j Graph Database Configuration
+# ================================
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USERNAME=neo4j
+NEO4J_PASSWORD=ignition-graph
+NEO4J_DATABASE=neo4j
+
+# ================================
+# Ignition Gateway Configuration
+# ================================
+# Define multiple gateways with comma-separated names
+IGN_GATEWAYS=local_dev,staging,production
+
+# Local Development Gateway
+IGN_LOCAL_DEV_HOST=localhost
+IGN_LOCAL_DEV_PORT=8088
+IGN_LOCAL_DEV_HTTPS=false
+IGN_LOCAL_DEV_USERNAME=admin
+IGN_LOCAL_DEV_PASSWORD=password
+IGN_LOCAL_DEV_VERIFY_SSL=false
+
+# Staging Gateway
+IGN_STAGING_HOST=staging.ignition.local
+IGN_STAGING_PORT=8043
+IGN_STAGING_HTTPS=true
+IGN_STAGING_USERNAME=admin
+IGN_STAGING_PASSWORD=staging_password
+IGN_STAGING_VERIFY_SSL=true
+
+# Production Gateway
+IGN_PRODUCTION_HOST=production.ignition.local
+IGN_PRODUCTION_PORT=8043
+IGN_PRODUCTION_HTTPS=true
+IGN_PRODUCTION_USERNAME=admin
+IGN_PRODUCTION_PASSWORD=production_password
+IGN_PRODUCTION_VERIFY_SSL=true
+
+# ================================
+# Application Configuration
+# ================================
+# Logging Configuration
+LOG_LEVEL=INFO
+LOG_FILE_PATH=logs/ignition_scripts.log
+LOG_MAX_SIZE=10MB
+LOG_BACKUP_COUNT=5
+
+# UI Configuration
+UI_PORT=8501
+UI_HOST=localhost
+UI_DEBUG=false
+
+# Development Settings
+DEVELOPMENT_MODE=true
+ENABLE_DEBUG_LOGGING=false

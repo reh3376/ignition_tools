@@ -69,14 +69,15 @@ IGN Scripts is designed to streamline the development of Jython scripts for Igni
 - ✅ **Real-time Monitoring**: Subscribe to data changes and alarm events
 - ✅ **Historical Data**: Access time-series data for analysis and reporting
 
-### **🚀 Task 15 In Planning: Live OPC-UA Client Integration**
+### **✅ Task 15 Phase 2 Complete: Live OPC-UA Client Integration**
 Transform from script generator to full industrial automation platform:
-- **CLI Integration**: `ignition opcua connect/browse/read/write/subscribe`
-- **Live UI Dashboard**: Streamlit-based industrial monitoring with real-time data
-- **FreeOpcUa Libraries**: Integration with `asyncua` and `opcua-client-gui`
-- **Industrial Connectivity**: Direct PLC and SCADA system integration
+- **✅ CLI Integration**: Complete 7-command CLI with `ignition opcua connect/browse/read/monitor/status/info/disconnect`
+- **✅ Live UI Dashboard**: Comprehensive Streamlit-based industrial monitoring with real-time data
+- **✅ Security Framework**: Certificate-based authentication with comprehensive security management
+- **✅ Configuration Management**: Wizard-driven setup with save/load functionality
+- **✅ Industrial Connectivity**: Production-ready OPC-UA client for PLC and SCADA systems
 
-📋 **Detailed Plan**: [Task 15 OPC-UA Integration Plan](docs/TASK_15_OPC_UA_INTEGRATION_PLAN.md)
+📋 **Detailed Documentation**: [Task 15 Phase 2 Summary](docs/TASK_15_PHASE_2_COMPLETION_SUMMARY.md) | [OPC-UA UI Guide](docs/opcua_ui_guide.md)
 
 ## 🔧 Target Environment
 
@@ -149,7 +150,27 @@ source .venv/bin/activate  # On Unix-like systems
 
 # Install dependencies
 uv pip install -r requirements.txt
+
+# Create environment configuration (REQUIRED for security)
+cp .env.sample .env
+# Edit .env with your specific configuration
 ```
+
+### 🔒 Security Configuration
+
+**CRITICAL**: All sensitive information (credentials, IPs, certificates) must be stored in environment variables:
+
+```bash
+# Required environment variables in .env file
+OPCUA_SERVER_URL=opc.tcp://localhost:4840
+OPCUA_USERNAME=admin
+OPCUA_PASSWORD=your_password
+NEO4J_URI=bolt://localhost:7687
+NEO4J_USERNAME=neo4j
+NEO4J_PASSWORD=your_neo4j_password
+```
+
+🔐 **Never hardcode sensitive information in scripts - use environment variables with python-dotenv**
 
 ### Basic Usage
 
@@ -186,6 +207,23 @@ python -m src.core.enhanced_cli learning explore
 python -m src.core.enhanced_cli gateway list
 python -m src.core.enhanced_cli gateway connect --name local_dev
 python -m src.core.enhanced_cli gateway health --all
+```
+
+#### 🏭 OPC-UA Client Commands
+
+```bash
+# Launch OPC-UA web interface
+python scripts/run_opcua_ui.py
+
+# CLI OPC-UA commands
+python -m src.core.opcua_cli connect --wizard  # Interactive setup
+python -m src.core.opcua_cli connect --url opc.tcp://localhost:4840
+python -m src.core.opcua_cli browse --node-id ns=2;s=MyDevice
+python -m src.core.opcua_cli read --node-id ns=2;s=Temperature
+python -m src.core.opcua_cli monitor --node-id ns=2;s=Temperature --interval 1000
+python -m src.core.opcua_cli status  # Connection status
+python -m src.core.opcua_cli info    # Server information
+python -m src.core.opcua_cli disconnect
 ```
 
 📚 **For comprehensive CLI usage instructions, see [docs/cli_readme.md](docs/cli_readme.md)**
@@ -257,7 +295,12 @@ IGN_scripts/
 ### User Guides
 - **[CLI Usage Guide](docs/cli_readme.md)** - Comprehensive guide to the enhanced CLI with learning system
 - **[Web UI Guide](docs/ui_readme.md)** - Complete instructions for the Streamlit web interface
+- **[OPC-UA Web Interface Guide](docs/opcua_ui_guide.md)** - Industrial OPC-UA monitoring and control interface
 - **[Quick Start Tutorial](docs/streamlit_ui_guide.md)** - Getting started with the web interface
+
+### Security & Configuration
+- **[Environment Variables Guide](docs/environment_variables.md)** - Comprehensive security configuration with .env files
+- **[Security Best Practices](docs/environment_variables.md#security-best-practices)** - Production security guidelines
 
 ### Technical Documentation
 - **[AI Assistant Memory System](docs/ai_assistant_memory_system.md)** - Neo4j graph database integration
