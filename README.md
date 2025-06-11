@@ -142,7 +142,7 @@ streamlit run src/ui/streamlit_app.py
 
 Then open your browser to `http://localhost:8501` for a user-friendly interface.
 
-📚 **For detailed UI usage instructions, see [ui_readme.md](ui_readme.md)**
+📚 **For detailed UI usage instructions, see [docs/ui_readme.md](docs/ui_readme.md)**
 
 #### Enhanced CLI with Learning System
 
@@ -168,7 +168,7 @@ python -m src.core.enhanced_cli gateway connect --name local_dev
 python -m src.core.enhanced_cli gateway health --all
 ```
 
-📚 **For comprehensive CLI usage instructions, see [cli_readme.md](cli_readme.md)**
+📚 **For comprehensive CLI usage instructions, see [docs/cli_readme.md](docs/cli_readme.md)**
 
 ### Gateway Configuration
 
@@ -235,8 +235,8 @@ IGN_scripts/
 ## 📚 Documentation
 
 ### User Guides
-- **[CLI Usage Guide](cli_readme.md)** - Comprehensive guide to the enhanced CLI with learning system
-- **[Web UI Guide](ui_readme.md)** - Complete instructions for the Streamlit web interface
+- **[CLI Usage Guide](docs/cli_readme.md)** - Comprehensive guide to the enhanced CLI with learning system
+- **[Web UI Guide](docs/ui_readme.md)** - Complete instructions for the Streamlit web interface
 - **[Quick Start Tutorial](docs/streamlit_ui_guide.md)** - Getting started with the web interface
 
 ### Technical Documentation

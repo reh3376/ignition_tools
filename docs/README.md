@@ -6,8 +6,8 @@ Welcome to the comprehensive documentation for the IGN Scripts project - an inte
 
 ### Getting Started
 - **[Main README](../README.md)** - Project overview, quick start, and basic usage
-- **[CLI Usage Guide](../cli_readme.md)** - Complete guide to the enhanced CLI with learning system
-- **[Web UI Guide](../ui_readme.md)** - Comprehensive instructions for the Streamlit web interface
+- **[CLI Usage Guide](cli_readme.md)** - Complete guide to the enhanced CLI with learning system
+- **[Web UI Guide](ui_readme.md)** - Comprehensive instructions for the Streamlit web interface
 - **[Quick Start Tutorial](streamlit_ui_guide.md)** - Interactive tutorial for the web interface
 
 ### User Interface Guides
@@ -56,7 +56,7 @@ Welcome to the comprehensive documentation for the IGN Scripts project - an inte
 ## 📊 Project Status & Roadmap
 
 ### Current Status
-- **[Roadmap](../roadmap.md)** - Complete project roadmap and progress tracking
+- **[Roadmap](roadmap.md)** - Complete project roadmap and progress tracking
 - **Current Version**: v0.4.1 (Documentation Organization Complete)
 - **Graph Database**: 245/400 Ignition functions implemented (61.3% complete)
 - **Learning System**: Phase 1 complete with 91 patterns discovered
@@ -72,7 +72,7 @@ Welcome to the comprehensive documentation for the IGN Scripts project - an inte
 
 ### For New Users
 1. Start with [Main README](../README.md) for project overview
-2. Choose [CLI Guide](../cli_readme.md) or [Web UI Guide](../ui_readme.md) based on preference
+2. Choose [CLI Guide](cli_readme.md) or [Web UI Guide](ui_readme.md) based on preference
 3. Follow [Quick Start Tutorial](streamlit_ui_guide.md) for hands-on learning
 
 ### For Developers
@@ -88,8 +88,8 @@ Welcome to the comprehensive documentation for the IGN Scripts project - an inte
 ## 🔄 Documentation Maintenance
 
 ### Recent Updates (v0.4.1)
-- Created comprehensive [CLI Usage Guide](../cli_readme.md)
-- Created complete [Web UI Guide](../ui_readme.md)
+- Created comprehensive [CLI Usage Guide](cli_readme.md)
+- Created complete [Web UI Guide](ui_readme.md)
 - Reorganized documentation structure for better navigation
 - Updated main README with documentation references
 - Moved documentation files to docs/ folder for better organization
