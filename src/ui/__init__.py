@@ -1,1 +1,1 @@
-"""User interface modules for IGN Scripts.""" 
+"""User interface modules for IGN Scripts."""

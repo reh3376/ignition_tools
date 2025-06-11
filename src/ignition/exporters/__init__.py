@@ -1,1 +1,1 @@
-"""Ignition gateway resource export utilities.""" 
+"""Ignition gateway resource export utilities."""

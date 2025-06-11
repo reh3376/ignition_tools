@@ -1,4 +1,4 @@
-"""SFC Chart Controller
+"""SFC Chart Controller.
 
 Manages Sequential Function Chart operations including start, stop, pause, resume, and reset.
 Provides comprehensive chart lifecycle management for industrial automation.
@@ -7,7 +7,7 @@ Provides comprehensive chart lifecycle management for industrial automation.
 import logging
 import uuid
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ class SFCChartController:
         self.active_charts: dict[str, dict[str, Any]] = {}
 
     def start_chart(
-        self, chart_path: str, initial_variables: dict[str, Any] = None
+        self, chart_path: str, initial_variables: dict[str, Any] | None = None
     ) -> bool:
         """Start execution of an SFC chart.
 
@@ -203,7 +203,7 @@ class SFCChartController:
             self.logger.error(f"Error resetting SFC chart {chart_path}: {e}")
             return False
 
-    def get_chart_status(self, chart_path: str) -> Optional[dict[str, Any]]:
+    def get_chart_status(self, chart_path: str) -> dict[str, Any] | None:
         """Get current status of an SFC chart.
 
         Args:
@@ -229,7 +229,7 @@ class SFCChartController:
             self.logger.error(f"Error getting chart status {chart_path}: {e}")
             return None
 
-    def get_current_step(self, chart_path: str) -> Optional[str]:
+    def get_current_step(self, chart_path: str) -> str | None:
         """Get the currently active step of an SFC chart.
 
         Args:

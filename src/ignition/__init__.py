@@ -1,1 +1,1 @@
-"""Ignition script generation and management utilities.""" 
+"""Ignition script generation and management utilities."""

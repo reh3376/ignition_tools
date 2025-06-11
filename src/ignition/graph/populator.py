@@ -1,4 +1,4 @@
-"""Ignition Graph Database Populator
+"""Ignition Graph Database Populator.
 
 Loads Ignition system functions, contexts, templates, and relationships
 into the Neo4j graph database from various sources.

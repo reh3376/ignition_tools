@@ -1,4 +1,4 @@
-"""Pattern Analysis Engine for Learning System
+"""Pattern Analysis Engine for Learning System.
 
 This module analyzes usage patterns from tracked events to identify:
 - Function co-occurrence patterns
@@ -434,7 +434,7 @@ class PatternAnalyzer:
         Args:
             analysis_results: Results from pattern analysis
         """
-        for pattern_type, patterns in analysis_results["patterns"].items():
+        for _pattern_type, patterns in analysis_results["patterns"].items():
             for pattern in patterns:
                 try:
                     # Create PatternAnalysis node

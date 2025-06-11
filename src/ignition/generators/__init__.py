@@ -1,1 +1,1 @@
-"""Jython script generation utilities.""" 
+"""Jython script generation utilities."""

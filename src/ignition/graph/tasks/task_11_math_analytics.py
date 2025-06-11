@@ -1,4 +1,4 @@
-"""Task 11: Advanced Math & Analytics Functions
+"""Task 11: Advanced Math & Analytics Functions.
 
 Mathematical operations, statistical analysis, and data analytics functions for Ignition SCADA systems.
 

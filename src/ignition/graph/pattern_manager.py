@@ -1,4 +1,4 @@
-"""Pattern Management System for Learning Enhancement
+"""Pattern Management System for Learning Enhancement.
 
 This module provides enhanced pattern storage, retrieval, and management
 capabilities for the learning system, including pattern aging, relevance
@@ -8,7 +8,7 @@ scoring, cleanup, and maintenance operations.
 import json
 import logging
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 
 from .client import IgnitionGraphClient
 
@@ -213,8 +213,8 @@ class PatternManager:
     def update_pattern_relevance(
         self,
         pattern_id: str,
-        new_usage_count: Optional[int] = None,
-        success_feedback: Optional[bool] = None,
+        new_usage_count: int | None = None,
+        success_feedback: bool | None = None,
     ) -> bool:
         """Update pattern relevance based on usage and feedback.
 
@@ -431,7 +431,7 @@ class PatternManager:
         return summary
 
     def export_patterns(
-        self, pattern_type: Optional[str] = None, file_path: Optional[str] = None
+        self, pattern_type: str | None = None, file_path: str | None = None
     ) -> dict[str, Any]:
         """Export patterns for backup or analysis.
 

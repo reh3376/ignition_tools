@@ -79,7 +79,7 @@ def start_neo4j():
     print("🚀 Starting Neo4j graph database...")
     try:
         # Try new docker compose syntax first
-        result = subprocess.run(
+        subprocess.run(
             ["docker", "compose", "up", "-d", "neo4j"],
             capture_output=True,
             text=True,
@@ -90,7 +90,7 @@ def start_neo4j():
     except subprocess.CalledProcessError:
         # Fall back to legacy docker-compose
         try:
-            result = subprocess.run(
+            subprocess.run(
                 ["docker-compose", "up", "-d", "neo4j"],
                 capture_output=True,
                 text=True,

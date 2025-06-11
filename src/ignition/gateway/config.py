@@ -8,7 +8,7 @@ import logging
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import urlparse
 
 from dotenv import load_dotenv
@@ -24,13 +24,13 @@ class GatewayConfig:
     host: str
     port: int = 8088
     use_https: bool = True
-    username: Optional[str] = None
-    password: Optional[str] = None
+    username: str | None = None
+    password: str | None = None
     auth_type: str = "basic"  # basic, ntlm, sso, token
-    token: Optional[str] = None
+    token: str | None = None
     timeout: int = 30
     verify_ssl: bool = True
-    project_name: Optional[str] = None
+    project_name: str | None = None
     description: str = ""
     tags: list[str] = field(default_factory=list)
 
@@ -78,7 +78,7 @@ class GatewayConfig:
 class GatewayConfigManager:
     """Manages multiple gateway configurations using environment variables."""
 
-    def __init__(self, env_file: Optional[str] = None):
+    def __init__(self, env_file: str | None = None):
         """Initialize the configuration manager.
 
         Args:
@@ -156,7 +156,7 @@ class GatewayConfigManager:
             return []
         return [tag.strip() for tag in tags_str.split(",") if tag.strip()]
 
-    def get_config(self, name: str) -> Optional[GatewayConfig]:
+    def get_config(self, name: str) -> GatewayConfig | None:
         """Get configuration for a specific gateway."""
         return self.configs.get(name)
 
@@ -204,9 +204,8 @@ class GatewayConfigManager:
                         config_errors.append(
                             "Username and password required for basic auth"
                         )
-                elif config.auth_type == "token":
-                    if not config.token:
-                        config_errors.append("Token required for token auth")
+                elif config.auth_type == "token" and not config.token:
+                    config_errors.append("Token required for token auth")
 
                 # Validate port range
                 if not (1 <= config.port <= 65535):

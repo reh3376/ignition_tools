@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Task 3: GUI System Expansion Implementation
+"""Task 3: GUI System Expansion Implementation.
 ==========================================
 
 This module implements comprehensive GUI system functions for Ignition Vision Client.
@@ -14,7 +14,7 @@ Complexity: ⭐⭐⭐ (Medium)
 """
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -1126,7 +1126,7 @@ def get_gui_system_functions() -> list[dict[str, Any]]:
     return GUI_SYSTEM_FUNCTIONS
 
 
-def get_function_by_name(function_name: str) -> Optional[dict[str, Any]]:
+def get_function_by_name(function_name: str) -> dict[str, Any] | None:
     """Get a specific GUI system function by name.
 
     Args:

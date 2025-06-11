@@ -1,4 +1,4 @@
-"""OPC-UA Security Management
+"""OPC-UA Security Management.
 
 Handles certificates, encryption, and security policies for OPC-UA connections.
 """

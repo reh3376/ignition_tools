@@ -1,4 +1,4 @@
-"""Ignition Graph Database Package
+"""Ignition Graph Database Package.
 
 Provides graph database functionality for storing and querying Ignition
 system functions, contexts, templates, and their relationships.
@@ -13,8 +13,8 @@ from .schema import IgnitionGraphSchema
 # from .queries import IgnitionGraphQueries      # Will create next
 
 __all__ = [
-    "IgnitionGraphSchema",
     "IgnitionGraphClient",
     "IgnitionGraphPopulator",
+    "IgnitionGraphSchema",
     # 'IgnitionGraphQueries'
 ]

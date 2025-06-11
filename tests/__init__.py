@@ -1,1 +1,1 @@
-"""Test suite for IGN Scripts.""" 
+"""Test suite for IGN Scripts."""

@@ -7,7 +7,7 @@ including authentication, health checks, and API operations.
 import json
 import logging
 import time
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import urljoin
 
 import requests
@@ -24,7 +24,7 @@ class IgnitionGatewayClient:
     """HTTP client for connecting to Ignition Gateway instances."""
 
     def __init__(
-        self, config: Optional[GatewayConfig] = None, config_name: Optional[str] = None
+        self, config: GatewayConfig | None = None, config_name: str | None = None
     ):
         """Initialize the gateway client.
 
@@ -182,7 +182,7 @@ class IgnitionGatewayClient:
 
     def _make_request(
         self, method: str, endpoint: str, **kwargs
-    ) -> Optional[dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """Make an HTTP request to the gateway.
 
         Args:
@@ -318,7 +318,7 @@ class IgnitionGatewayClient:
         self._last_health_check = health_result
         return health_result
 
-    def get_gateway_info(self) -> Optional[dict[str, Any]]:
+    def get_gateway_info(self) -> dict[str, Any] | None:
         """Get basic gateway information.
 
         Returns:
@@ -379,7 +379,7 @@ class IgnitionGatewayClient:
             logger.error(f"Failed to get gateway info: {e}")
             return None
 
-    def test_tag_read(self, tag_path: str) -> Optional[dict[str, Any]]:
+    def test_tag_read(self, tag_path: str) -> dict[str, Any] | None:
         """Test reading a tag value from the gateway.
 
         Args:
@@ -460,7 +460,7 @@ class GatewayConnectionPool:
             logger.error(f"Failed to add client for {config_name}: {e}")
             return False
 
-    def get_client(self, config_name: str) -> Optional[IgnitionGatewayClient]:
+    def get_client(self, config_name: str) -> IgnitionGatewayClient | None:
         """Get a client from the pool.
 
         Args:

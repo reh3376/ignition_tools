@@ -1,4 +1,4 @@
-"""OPC-UA CLI Module
+"""OPC-UA CLI Module.
 
 Command-line interface components for OPC-UA client operations.
 Provides safe, read-only access to OPC-UA servers through rich CLI commands.

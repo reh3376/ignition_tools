@@ -1,1 +1,1 @@
-"""Core utilities and functionality for IGN Scripts.""" 
+"""Core utilities and functionality for IGN Scripts."""

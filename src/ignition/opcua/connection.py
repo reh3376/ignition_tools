@@ -1,4 +1,4 @@
-"""OPC-UA Connection Management
+"""OPC-UA Connection Management.
 
 Handles connection lifecycle, authentication, and error recovery
 for OPC-UA client connections.

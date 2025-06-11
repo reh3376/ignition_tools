@@ -9,7 +9,7 @@ This module provides a rich, interactive command-line interface with:
 """
 
 from datetime import datetime
-from typing import Any, List
+from typing import Any
 
 import click
 from rich.console import Console
@@ -47,6 +47,8 @@ except ImportError:
     Button = DummyButton
     DataTable = Footer = Header = Static = object
     TEXTUAL_AVAILABLE = False
+
+import builtins
 
 from src import __version__
 
@@ -111,8 +113,8 @@ class LearningSystemCLI:
     def track_cli_usage(
         self,
         command: str,
-        subcommand: str = None,
-        parameters: dict[str, Any] = None,
+        subcommand: str | None = None,
+        parameters: dict[str, Any] | None = None,
         success: bool = True,
     ):
         """Track CLI command usage for learning."""
@@ -271,7 +273,7 @@ def generate(
             show_generation_recommendations(template, action_type)
 
         # Track usage and generate script
-        with console.status("[bold blue]Generating script...") as status:
+        with console.status("[bold blue]Generating script..."):
             if config:
                 # Generate from config file
                 script_content = enhanced_cli.generator.generate_from_config(
@@ -585,7 +587,9 @@ def display_pattern_overview(stats: dict[str, Any]):
                 console.print(f"  {level.replace('_', ' ').title()}: {count} {bar}")
 
 
-def display_specific_patterns(pattern_type: str, patterns: List[dict[str, Any]]):
+def display_specific_patterns(
+    pattern_type: str, patterns: builtins.list[dict[str, Any]]
+):
     """Display specific pattern type details."""
     title = f"📊 {pattern_type.replace('_', ' ').title()} Patterns"
     console.print(f"[bold cyan]{title}[/bold cyan]\n")

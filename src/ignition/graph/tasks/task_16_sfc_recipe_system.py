@@ -1,4 +1,4 @@
-"""Task 16: Sequential Function Charts & Recipe Management System
+"""Task 16: Sequential Function Charts & Recipe Management System.
 
 This module implements comprehensive SFC (Sequential Function Chart) and Recipe Management
 functionality for Ignition automation systems, providing industrial-grade sequence control
@@ -1297,7 +1297,7 @@ else:
         context: list[str],
         category: str,
         code_example: str = "",
-        additional_info: dict[str, Any] = None,
+        additional_info: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Create a function node in the graph database."""
         try:

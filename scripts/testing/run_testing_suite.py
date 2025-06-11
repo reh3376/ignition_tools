@@ -148,7 +148,7 @@ def main():
         ]
 
         passed_tests = 0
-        for test_name, test_function in tests:
+        for _test_name, test_function in tests:
             if test_function():
                 passed_tests += 1
             else:
@@ -165,7 +165,7 @@ def main():
         tests = [("Health Check", health_check), ("Progress Check", progress_check)]
 
         passed_tests = 0
-        for test_name, test_function in tests:
+        for _test_name, test_function in tests:
             if test_function():
                 passed_tests += 1
             else:

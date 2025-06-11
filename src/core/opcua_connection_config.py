@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """OPC-UA Connection Configuration System
-Collect and manage all necessary information for Ignition OPC-UA connections
+Collect and manage all necessary information for Ignition OPC-UA connections.
 """
 
 import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Optional
 
 from rich.console import Console
 from rich.panel import Panel
@@ -513,7 +512,7 @@ class OPCUAConfigManager:
 
         return configs
 
-    def load_configuration(self, name: str) -> Optional[OPCUAConnectionConfig]:
+    def load_configuration(self, name: str) -> OPCUAConnectionConfig | None:
         """Load a specific configuration."""
         config_file = self.config_dir / f"{name}.json"
         if not config_file.exists():
@@ -587,7 +586,7 @@ def list_configs() -> None:
     manager.display_configurations()
 
 
-def load_config(name: str) -> Optional[OPCUAConnectionConfig]:
+def load_config(name: str) -> OPCUAConnectionConfig | None:
     """Load a specific configuration."""
     manager = OPCUAConfigManager()
     return manager.load_configuration(name)

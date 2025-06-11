@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Populate Task 7: Alarm System Expansion
+"""Populate Task 7: Alarm System Expansion.
 
 This script loads comprehensive alarm system functions into the Neo4j graph database.
 Task 7 focuses on alarm management, monitoring, and notification operations.

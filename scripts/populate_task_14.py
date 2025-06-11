@@ -10,7 +10,6 @@ Usage:
 """
 
 import sys
-import os
 from pathlib import Path
 from typing import Any
 
@@ -19,7 +18,12 @@ src_path = Path(__file__).parent.parent / "src"
 sys.path.insert(0, str(src_path))
 
 from ignition.graph.client import IgnitionGraphClient
-from ignition.graph.schema import GraphNode, GraphRelationship, NodeType, RelationshipType
+from ignition.graph.schema import (
+    GraphNode,
+    GraphRelationship,
+    NodeType,
+    RelationshipType,
+)
 from ignition.graph.tasks.task_14_opcua_client import (
     get_opcua_client_functions,
     get_task_14_metadata,
@@ -99,7 +103,7 @@ def populate_task_14():
     functions = get_opcua_client_functions()
     metadata = get_task_14_metadata()
 
-    print(f"📊 Task 14 OPC-UA Overview:")
+    print("📊 Task 14 OPC-UA Overview:")
     print(f"   • Task: {metadata['task_name']}")
     print(f"   • Functions: {len(functions)}")
     print(f"   • Categories: {', '.join(metadata['categories'])}")
@@ -140,7 +144,7 @@ def populate_task_14():
                 print(f"   ❌ Failed to create function: {func_data['name']}")
 
         except Exception as e:
-            print(f"   ❌ Error processing function {func_data['name']}: {str(e)}")
+            print(f"   ❌ Error processing function {func_data['name']}: {e!s}")
             continue
 
     # Create Task 14 summary node
@@ -161,16 +165,18 @@ def populate_task_14():
     )
 
     client.create_node(task_node)
-    print(f"📋 Created Task 14 OPC-UA summary node")
+    print("📋 Created Task 14 OPC-UA summary node")
 
     # Summary
-    print(f"\n🎉 Task 14 OPC-UA Population Complete!")
-    print(f"   ✅ Successfully created: {successful_functions}/{total_functions} functions")
+    print("\n🎉 Task 14 OPC-UA Population Complete!")
+    print(
+        f"   ✅ Successfully created: {successful_functions}/{total_functions} functions"
+    )
     print(f"   🔗 Total relationships: {total_relationships}")
     print(f"   📈 Success rate: {(successful_functions/total_functions)*100:.1f}%")
 
     if successful_functions == total_functions:
-        print(f"   🏆 Perfect score! All OPC-UA functions loaded successfully!")
+        print("   🏆 Perfect score! All OPC-UA functions loaded successfully!")
 
         # Display function distribution
         categories = {}
@@ -180,19 +186,17 @@ def populate_task_14():
                 categories[cat] = 0
             categories[cat] += 1
 
-        print(f"\n📊 OPC-UA Function Distribution by Category:")
+        print("\n📊 OPC-UA Function Distribution by Category:")
         for category, count in categories.items():
             print(f"   • {category}: {count} functions")
 
-        print(f"\n🏭 Industrial OPC-UA Capabilities:")
-        print(
-            f"   • Multi-server connection management with security and certificates"
-        )
-        print(f"   • Complete address space browsing and node hierarchy navigation")
-        print(f"   • Batch read/write operations with quality codes and validation")
-        print(f"   • Real-time subscriptions with deadband filtering and monitoring")
-        print(f"   • Advanced alarm handling and historical data access")
-        print(f"   • Industrial device integration: PLCs, SCADA, MES, DCS systems")
+        print("\n🏭 Industrial OPC-UA Capabilities:")
+        print("   • Multi-server connection management with security and certificates")
+        print("   • Complete address space browsing and node hierarchy navigation")
+        print("   • Batch read/write operations with quality codes and validation")
+        print("   • Real-time subscriptions with deadband filtering and monitoring")
+        print("   • Advanced alarm handling and historical data access")
+        print("   • Industrial device integration: PLCs, SCADA, MES, DCS systems")
 
     return successful_functions == total_functions
 
@@ -258,7 +262,7 @@ def get_database_stats():
     result = client.execute_query(query)
 
     print(f"   📊 Total Functions: {total_functions}")
-    print(f"   🏷️  Functions by Task:")
+    print("   🏷️  Functions by Task:")
 
     for record in result:
         task_num = record["task"] if record["task"] else "Unknown"
@@ -274,7 +278,7 @@ def get_database_stats():
     """
     result = client.execute_query(query)
 
-    print(f"   🏭 Task 14 OPC-UA Functions by Category:")
+    print("   🏭 Task 14 OPC-UA Functions by Category:")
     for record in result:
         category = record["category"]
         count = record["count"]
@@ -290,7 +294,7 @@ def get_database_stats():
     """
     result = client.execute_query(query)
 
-    print(f"   🔧 Top OPC-UA Patterns:")
+    print("   🔧 Top OPC-UA Patterns:")
     for record in result:
         pattern = record["pattern"]
         count = record["count"]
@@ -314,16 +318,18 @@ if __name__ == "__main__":
         # Get updated stats
         total_functions = get_database_stats()
 
-        print(f"\n🎊 Task 14 OPC-UA Successfully Completed!")
-        print(f"   • 12 comprehensive OPC-UA client functions added")
+        print("\n🎊 Task 14 OPC-UA Successfully Completed!")
+        print("   • 12 comprehensive OPC-UA client functions added")
         print(f"   • Database now contains {total_functions} total functions")
-        print(f"   • Industrial connectivity: PLCs, SCADA, MES, DCS systems")
-        print(f"   • Real-time monitoring: Subscriptions, alarms, historical data")
-        print(f"   • 🏭 MILESTONE: Full industrial automation OPC-UA client capabilities!")
+        print("   • Industrial connectivity: PLCs, SCADA, MES, DCS systems")
+        print("   • Real-time monitoring: Subscriptions, alarms, historical data")
+        print(
+            "   • 🏭 MILESTONE: Full industrial automation OPC-UA client capabilities!"
+        )
 
     else:
-        print(f"\n⚠️  Task 14 completed with some issues")
-        print(f"   • Check the error messages above")
-        print(f"   • Some OPC-UA functions may need to be added manually")
+        print("\n⚠️  Task 14 completed with some issues")
+        print("   • Check the error messages above")
+        print("   • Some OPC-UA functions may need to be added manually")
 
-    print("=" * 80) 
+    print("=" * 80)

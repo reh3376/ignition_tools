@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Populate Task 8: Print System Expansion
+"""Populate Task 8: Print System Expansion.
 
 This script loads comprehensive print system functions into the Neo4j graph database.
 Task 8 focuses on print operations, document management, and print job handling.

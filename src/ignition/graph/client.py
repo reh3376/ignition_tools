@@ -1,4 +1,4 @@
-"""Ignition Graph Database Client
+"""Ignition Graph Database Client.
 
 Handles connections to Neo4j and provides methods for querying
 and updating the Ignition knowledge graph.
@@ -26,9 +26,9 @@ class IgnitionGraphClient:
 
     def __init__(
         self,
-        uri: str = None,
-        username: str = None,
-        password: str = None,
+        uri: str | None = None,
+        username: str | None = None,
+        password: str | None = None,
     ):
         """Initialize the graph database client.
 
@@ -37,9 +37,9 @@ class IgnitionGraphClient:
             username: Database username (defaults to NEO4J_USERNAME env var)
             password: Database password (defaults to NEO4J_PASSWORD env var)
         """
-        self.uri = uri or os.getenv('NEO4J_URI', 'bolt://localhost:7687')
-        self.username = username or os.getenv('NEO4J_USERNAME', 'neo4j')
-        self.password = password or os.getenv('NEO4J_PASSWORD', 'ignition-graph')
+        self.uri = uri or os.getenv("NEO4J_URI", "bolt://localhost:7687")
+        self.username = username or os.getenv("NEO4J_USERNAME", "neo4j")
+        self.password = password or os.getenv("NEO4J_PASSWORD", "ignition-graph")
         self.driver = None
         self._connected = False
 
@@ -68,7 +68,7 @@ class IgnitionGraphClient:
             self._connected = False
             return False
 
-    def disconnect(self):
+    def disconnect(self) -> None:
         """Disconnect from the Neo4j database."""
         if self.driver:
             self.driver.close()
@@ -82,9 +82,8 @@ class IgnitionGraphClient:
     @contextmanager
     def session(self):
         """Context manager for database sessions."""
-        if not self.is_connected():
-            if not self.connect():
-                raise RuntimeError("Cannot connect to Neo4j database")
+        if not self.is_connected() and not self.connect():
+            raise RuntimeError("Cannot connect to Neo4j database")
 
         session = self.driver.session()
         try:
@@ -93,7 +92,7 @@ class IgnitionGraphClient:
             session.close()
 
     def execute_query(
-        self, query: str, parameters: dict[str, Any] = None
+        self, query: str, parameters: dict[str, Any] | None = None
     ) -> list[dict[str, Any]]:
         """Execute a Cypher query and return results.
 
@@ -117,7 +116,9 @@ class IgnitionGraphClient:
             logger.error(f"Parameters: {parameters}")
             raise
 
-    def execute_write_query(self, query: str, parameters: dict[str, Any] = None) -> Any:
+    def execute_write_query(
+        self, query: str, parameters: dict[str, Any] | None = None
+    ) -> Any:
         """Execute a write query (CREATE, MERGE, etc.).
 
         Args:
@@ -155,7 +156,8 @@ class IgnitionGraphClient:
             query = node.to_cypher_merge()
             self.execute_write_query(query, node.properties)
             logger.debug(
-                f"Created node: {node.node_type.value} - {node.properties.get('name', 'unknown')}"
+                f"Created node: {node.node_type.value} - "
+                f"{node.properties.get('name', 'unknown')}"
             )
             return True
         except Exception as e:
@@ -182,7 +184,8 @@ class IgnitionGraphClient:
 
             self.execute_write_query(query, params)
             logger.debug(
-                f"Created relationship: {relationship.from_name} -[{relationship.relationship_type.value}]-> {relationship.to_name}"
+                f"Created relationship: {relationship.from_name} "
+                f"-[{relationship.relationship_type.value}]-> {relationship.to_name}"
             )
             return True
         except Exception as e:

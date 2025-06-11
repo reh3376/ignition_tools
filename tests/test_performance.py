@@ -316,7 +316,7 @@ class TestPerformance:
         """Stress test with many script generations."""
         import gc
 
-        initial_memory = script_generator.__class__.__dict__.get("_memory_baseline", 0)
+        script_generator.__class__.__dict__.get("_memory_baseline", 0)
 
         configs = []
         for i in range(500):

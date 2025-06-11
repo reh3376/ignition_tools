@@ -1,4 +1,4 @@
-"""Ignition OPC-UA Client Wrapper
+"""Ignition OPC-UA Client Wrapper.
 
 Enhanced OPC-UA client wrapper built on asyncua for industrial automation.
 Provides high-level interface for connection management, data operations,
@@ -9,7 +9,7 @@ import asyncio
 import logging
 from collections.abc import Callable
 from datetime import datetime
-from typing import Any, Union
+from typing import Any
 
 from asyncua import Client
 
@@ -154,9 +154,7 @@ class IgnitionOPCUAClient:
 
         return await self.browser.browse_tree(node_id, max_depth)
 
-    async def read_values(
-        self, node_ids: Union[str, list[str]]
-    ) -> Union[Any, list[Any]]:
+    async def read_values(self, node_ids: str | list[str]) -> Any | list[Any]:
         """Read values from one or more OPC-UA nodes.
 
         Args:
@@ -253,7 +251,7 @@ class IgnitionOPCUAClient:
         return await self.subscription_manager.remove_subscription(subscription_id)
 
     async def execute_method(
-        self, object_id: str, method_id: str, args: list[Any] = None
+        self, object_id: str, method_id: str, args: list[Any] | None = None
     ) -> Any:
         """Execute OPC-UA method on server.
 

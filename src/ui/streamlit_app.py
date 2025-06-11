@@ -274,27 +274,19 @@ def render_template_generator() -> None:
 
             # Action-specific options
             if action_type == "navigation":
-                target_window = st.text_input(
-                    "Target Window:", placeholder="e.g., MainMenu"
-                )
-                window_params = st.text_area(
+                st.text_input("Target Window:", placeholder="e.g., MainMenu")
+                st.text_area(
                     "Window Parameters (JSON):",
                     placeholder='{"param1": "value1", "param2": "value2"}',
                 )
             elif action_type == "tag_write":
-                target_tag = st.text_input(
-                    "Target Tag:", placeholder="[default]Motor1/Speed"
-                )
-                tag_value = st.text_input("Tag Value:", placeholder="100")
+                st.text_input("Target Tag:", placeholder="[default]Motor1/Speed")
+                st.text_input("Tag Value:", placeholder="100")
             elif action_type == "popup":
-                popup_window = st.text_input(
-                    "Popup Window:", placeholder="e.g., SettingsPopup"
-                )
-                popup_params = st.text_area(
-                    "Popup Parameters (JSON):", placeholder='{"mode": "edit"}'
-                )
+                st.text_input("Popup Window:", placeholder="e.g., SettingsPopup")
+                st.text_area("Popup Parameters (JSON):", placeholder='{"mode": "edit"}')
             elif action_type == "database":
-                sql_query = st.text_area(
+                st.text_area(
                     "SQL Query:",
                     placeholder="INSERT INTO logs (message, timestamp) VALUES (?, ?)",
                 )
@@ -481,28 +473,27 @@ def render_templates_page() -> None:
     # Template grid
     cols = st.columns(2)
     for idx, template in enumerate(templates):
-        with cols[idx % 2]:
-            with st.expander(f"📄 {template}"):
-                template_path = Path("templates") / template
-                if template_path.exists():
-                    with open(template_path) as f:
-                        content = f.read()
+        with cols[idx % 2], st.expander(f"📄 {template}"):
+            template_path = Path("templates") / template
+            if template_path.exists():
+                with open(template_path) as f:
+                    content = f.read()
 
-                    st.markdown(f"**Path:** `{template}`")
-                    st.markdown(f"**Size:** {len(content)} characters")
+                st.markdown(f"**Path:** `{template}`")
+                st.markdown(f"**Size:** {len(content)} characters")
 
-                    # Show preview
-                    preview = content[:300] + "..." if len(content) > 300 else content
-                    st.code(preview, language="python")
+                # Show preview
+                preview = content[:300] + "..." if len(content) > 300 else content
+                st.code(preview, language="python")
 
-                    # Download button
-                    st.download_button(
-                        "💾 Download Template",
-                        data=content,
-                        file_name=template.split("/")[-1],
-                        mime="text/plain",
-                        key=f"download_{idx}",
-                    )
+                # Download button
+                st.download_button(
+                    "💾 Download Template",
+                    data=content,
+                    file_name=template.split("/")[-1],
+                    mime="text/plain",
+                    key=f"download_{idx}",
+                )
 
 
 def render_validation_page() -> None:
@@ -752,7 +743,7 @@ def render_gateways_page() -> None:
                                                 if (
                                                     key != "gateway_info_raw"
                                                     and isinstance(
-                                                        value, (str, int, float, bool)
+                                                        value, str | int | float | bool
                                                     )
                                                 ):
                                                     st.metric(

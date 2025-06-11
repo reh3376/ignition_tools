@@ -1,4 +1,4 @@
-"""OPC-UA CLI Commands
+"""OPC-UA CLI Commands.
 
 Command-line interface for OPC-UA client operations.
 SAFETY: All commands are designed for READ-ONLY operations to protect live systems.
@@ -10,7 +10,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -29,7 +29,7 @@ console = Console()
 logger = logging.getLogger(__name__)
 
 # Global client instance for CLI session
-_current_client: Optional[IgnitionOPCUAClient] = None
+_current_client: IgnitionOPCUAClient | None = None
 _connection_config: dict[str, Any] = {}
 
 
@@ -41,7 +41,7 @@ _connection_config: dict[str, Any] = {}
     help="Set logging level (DEBUG, INFO, WARNING, ERROR)",
 )
 def opcua(verbose: bool, log_level: str):
-    """OPC-UA Client Commands
+    """OPC-UA Client Commands.
 
     🔒 SAFETY: All operations are READ-ONLY to protect live systems.
 
@@ -77,12 +77,12 @@ def opcua(verbose: bool, log_level: str):
 @click.option("--save-config", help="Save connection config to file")
 def connect(
     url: str,
-    username: Optional[str],
-    password: Optional[str],
+    username: str | None,
+    password: str | None,
     security_policy: str,
     security_mode: str,
     timeout: float,
-    save_config: Optional[str],
+    save_config: str | None,
 ):
     """Connect to an OPC-UA server.
 
@@ -107,12 +107,12 @@ def connect(
 
 async def _connect_impl(
     url: str,
-    username: Optional[str],
-    password: Optional[str],
+    username: str | None,
+    password: str | None,
     security_policy: str,
     security_mode: str,
     timeout: float,
-    save_config: Optional[str],
+    save_config: str | None,
 ):
     """Implementation of connect command."""
     global _current_client, _connection_config
@@ -322,7 +322,7 @@ async def _info_impl():
 @click.option("--depth", "-d", default=2, help="Maximum browsing depth")
 @click.option("--filter", "-f", help="Filter nodes by browse name (case-insensitive)")
 @click.option("--variables-only", is_flag=True, help="Show only variable nodes")
-def browse(node: str, depth: int, filter: Optional[str], variables_only: bool):
+def browse(node: str, depth: int, filter: str | None, variables_only: bool):
     """Browse the OPC-UA server address space.
 
     🔒 READ-ONLY: Safely browse server structure without modifications.
@@ -335,9 +335,7 @@ def browse(node: str, depth: int, filter: Optional[str], variables_only: bool):
     asyncio.run(_browse_impl(node, depth, filter, variables_only))
 
 
-async def _browse_impl(
-    node: str, depth: int, filter: Optional[str], variables_only: bool
-):
+async def _browse_impl(node: str, depth: int, filter: str | None, variables_only: bool):
     """Implementation of browse command."""
     if not _current_client or not _current_client.connected:
         console.print("❌ Not connected to any OPC-UA server. Use 'connect' first.")
@@ -372,7 +370,7 @@ async def _browse_impl(
 
 
 def _build_tree_display(
-    tree: Tree, node_data: dict[str, Any], filter: Optional[str], variables_only: bool
+    tree: Tree, node_data: dict[str, Any], filter: str | None, variables_only: bool
 ):
     """Build rich tree display from node data."""
     children = node_data.get("children", [])
@@ -568,7 +566,7 @@ async def _status_impl():
 )
 @click.option("--output", "-o", help="Output file path (default: console)")
 def monitor(
-    node_ids: tuple, interval: int, duration: int, format: str, output: Optional[str]
+    node_ids: tuple, interval: int, duration: int, format: str, output: str | None
 ):
     """Monitor OPC-UA nodes for real-time data changes.
 
@@ -583,7 +581,7 @@ def monitor(
 
 
 async def _monitor_impl(
-    node_ids: list, interval: int, duration: int, format: str, output: Optional[str]
+    node_ids: list, interval: int, duration: int, format: str, output: str | None
 ):
     """Implementation of monitor command."""
     if not _current_client or not _current_client.connected:

@@ -1,4 +1,4 @@
-"""OPC-UA Subscription Management
+"""OPC-UA Subscription Management.
 
 Handles real-time data subscriptions, monitoring, and event handling
 for OPC-UA clients.
@@ -8,7 +8,7 @@ import logging
 import uuid
 from collections.abc import Callable
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from asyncua import Client, Node
 from asyncua.common.subscription import DataChangeNotif
@@ -139,7 +139,7 @@ class SubscriptionManager:
 
     async def get_subscription_info(
         self, subscription_id: str
-    ) -> Optional[dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """Get information about a specific subscription.
 
         Args:

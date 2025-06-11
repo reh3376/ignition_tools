@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Populate Task 6: Utility System Expansion
+"""Populate Task 6: Utility System Expansion.
 
 This script loads comprehensive utility system functions into the Neo4j graph database.
 Task 6 focuses on utility operations, system management, and administrative functions.

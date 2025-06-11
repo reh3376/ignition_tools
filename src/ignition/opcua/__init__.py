@@ -1,4 +1,4 @@
-"""OPC-UA Live Client Integration Module
+"""OPC-UA Live Client Integration Module.
 
 Provides real OPC-UA client functionality for industrial automation,
 integrating with FreeOpcUa libraries for production-grade connectivity.
@@ -14,9 +14,9 @@ __version__ = "0.1.0"
 __author__ = "Ignition Tools Project"
 
 __all__ = [
-    "IgnitionOPCUAClient",
-    "ConnectionManager",
     "AddressSpaceBrowser",
-    "SubscriptionManager",
+    "ConnectionManager",
+    "IgnitionOPCUAClient",
     "SecurityManager",
+    "SubscriptionManager",
 ]

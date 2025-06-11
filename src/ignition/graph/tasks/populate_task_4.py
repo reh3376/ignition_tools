@@ -1,4 +1,4 @@
-"""Population script for Task 4: Perspective System Expansion
+"""Population script for Task 4: Perspective System Expansion.
 
 This script loads Task 4 Perspective system functions into the Neo4j graph database.
 Covers session management, navigation, messaging, components, and device operations.

@@ -9,7 +9,7 @@ import time
 from collections import Counter, defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 
 class LogAnalyzer:
@@ -39,7 +39,7 @@ class LogAnalyzer:
             ],
         }
 
-    def get_container_logs(self, container: str, since: Optional[str] = None) -> str:
+    def get_container_logs(self, container: str, since: str | None = None) -> str:
         """Get logs from a specific container."""
         try:
             cmd = ["docker", "logs", container]
@@ -87,7 +87,7 @@ class LogAnalyzer:
             entry["level"] = level_match.group(1)
 
         # Extract performance metrics
-        for metric_type, patterns in self.log_patterns["performance"]:
+        for _metric_type, patterns in self.log_patterns["performance"]:
             for pattern in patterns:
                 matches = re.finditer(pattern, line, re.IGNORECASE)
                 for match in matches:
@@ -102,9 +102,7 @@ class LogAnalyzer:
 
         return entry
 
-    def analyze_logs(
-        self, container: str, since: Optional[str] = None
-    ) -> dict[str, Any]:
+    def analyze_logs(self, container: str, since: str | None = None) -> dict[str, Any]:
         """Analyze logs from a container and return insights."""
         logs = self.get_container_logs(container, since)
         if not logs:
@@ -451,10 +449,7 @@ def main():
         return
 
     # Determine containers to analyze
-    if args.container:
-        containers = [args.container]
-    else:
-        containers = analyzer.containers
+    containers = [args.container] if args.container else analyzer.containers
 
     # Analyze logs
     analyses = []

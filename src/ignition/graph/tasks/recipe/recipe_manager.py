@@ -1,4 +1,4 @@
-"""Recipe Manager
+"""Recipe Manager.
 
 Handles recipe creation, loading, saving, and management operations for industrial automation.
 Provides comprehensive recipe lifecycle management with validation and versioning.
@@ -7,7 +7,7 @@ Provides comprehensive recipe lifecycle management with validation and versionin
 import logging
 import uuid
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -82,7 +82,7 @@ class RecipeManager:
 
     def load_recipe(
         self, recipe_name: str, version: str = "latest"
-    ) -> Optional[dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """Load an existing recipe.
 
         Args:
@@ -171,7 +171,7 @@ class RecipeManager:
         recipe_name: str,
         equipment_id: str,
         batch_id: str = "",
-        execution_parameters: dict[str, Any] = None,
+        execution_parameters: dict[str, Any] | None = None,
     ) -> str:
         """Execute a recipe on specified equipment.
 
@@ -274,7 +274,7 @@ class RecipeManager:
 
     def get_execution_status(
         self, execution_id: str, include_details: bool = False
-    ) -> Optional[dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """Get execution status of a running recipe.
 
         Args:
@@ -339,7 +339,7 @@ class RecipeManager:
             history = []
 
             # Find executions for this recipe
-            for execution_id, execution_data in self.active_executions.items():
+            for _execution_id, execution_data in self.active_executions.items():
                 if execution_data["recipe_name"] == recipe_name:
                     if include_details:
                         history.append(execution_data.copy())
@@ -379,7 +379,7 @@ class RecipeManager:
         required_fields = ["name", "version", "ingredients", "steps"]
         return all(field in recipe_data for field in required_fields)
 
-    def _find_recipe_by_name(self, recipe_name: str) -> Optional[dict[str, Any]]:
+    def _find_recipe_by_name(self, recipe_name: str) -> dict[str, Any] | None:
         """Find recipe by name."""
         for recipe_data in self.recipes.values():
             if recipe_data["name"] == recipe_name:
@@ -388,7 +388,7 @@ class RecipeManager:
 
     def _estimate_total_execution_time(
         self, execution_data: dict[str, Any]
-    ) -> Optional[datetime]:
+    ) -> datetime | None:
         """Estimate total execution time based on recipe steps."""
         # Placeholder implementation - would use step timing data
         # to estimate total execution time

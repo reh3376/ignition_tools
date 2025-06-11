@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Task 2: Database System Population Script
+"""Task 2: Database System Population Script.
 ========================================
 
 This script populates the Neo4j graph database with Task 2 database system functions.

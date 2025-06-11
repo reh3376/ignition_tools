@@ -1,4 +1,4 @@
-"""Task 4: Perspective System Expansion
+"""Task 4: Perspective System Expansion.
 
 This module contains Ignition Perspective system functions for modern web-based HMI development.
 Covers session management, navigation, messaging, components, and device interaction.
@@ -1055,7 +1055,7 @@ self.getSibling("ActionButton").props.size = button_size""",
 
 
 def get_task_4_metadata() -> dict[str, Any]:
-    """Returns metadata about Task 4"""
+    """Returns metadata about Task 4."""
     return {
         "task_number": 4,
         "task_name": "Perspective System Expansion",

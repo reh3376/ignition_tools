@@ -1,4 +1,4 @@
-"""OPC-UA GUI Components Module
+"""OPC-UA GUI Components Module.
 
 Graphical user interface components for OPC-UA client operations.
 """

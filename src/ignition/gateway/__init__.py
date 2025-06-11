@@ -11,6 +11,6 @@ from .config import GatewayConfig, GatewayConfigManager
 __all__ = [
     "GatewayConfig",
     "GatewayConfigManager",
-    "IgnitionGatewayClient",
     "GatewayConnectionPool",
+    "IgnitionGatewayClient",
 ]

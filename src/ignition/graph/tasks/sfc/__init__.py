@@ -1,4 +1,4 @@
-"""Sequential Function Chart (SFC) Module
+"""Sequential Function Chart (SFC) Module.
 
 This module provides SFC chart control and management functionality for Ignition systems.
 """

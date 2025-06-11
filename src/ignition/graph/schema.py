@@ -1,4 +1,4 @@
-"""Ignition Graph Database Schema
+"""Ignition Graph Database Schema.
 
 Defines the node types, relationships, and constraints for the Ignition
 knowledge graph that serves as AI Assistant persistent memory.
@@ -60,18 +60,18 @@ class GraphNode:
 
     def to_cypher_create(self) -> str:
         """Generate Cypher CREATE statement for this node."""
-        props = ", ".join([f"{k}: ${k}" for k in self.properties.keys()])
+        props = ", ".join([f"{k}: ${k}" for k in self.properties])
         return f"CREATE (n:{self.node_type.value} {{{props}}})"
 
     def to_cypher_merge(self) -> str:
         """Generate Cypher MERGE statement for this node."""
         # Use 'name' as the primary identifier for merging
-        name_prop = self.properties.get("name", "unknown")
+        self.properties.get("name", "unknown")
         other_props = {k: v for k, v in self.properties.items() if k != "name"}
 
         merge_part = f"MERGE (n:{self.node_type.value} {{name: $name}})"
         if other_props:
-            set_props = ", ".join([f"n.{k} = ${k}" for k in other_props.keys()])
+            set_props = ", ".join([f"n.{k} = ${k}" for k in other_props])
             merge_part += f" SET {set_props}"
 
         return merge_part
@@ -95,7 +95,7 @@ class GraphRelationship:
         rel_type = self.relationship_type.value
 
         if self.properties:
-            props = ", ".join([f"{k}: ${k}" for k in self.properties.keys()])
+            props = ", ".join([f"{k}: ${k}" for k in self.properties])
             rel_props = f" {{{props}}}"
         else:
             rel_props = ""

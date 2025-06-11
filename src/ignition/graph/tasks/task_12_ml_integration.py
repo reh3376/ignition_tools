@@ -1,4 +1,4 @@
-"""Task 12: Machine Learning Integration Functions
+"""Task 12: Machine Learning Integration Functions.
 
 Machine learning and AI functions for Ignition SCADA systems.
 This module provides comprehensive ML capabilities for industrial automation including:

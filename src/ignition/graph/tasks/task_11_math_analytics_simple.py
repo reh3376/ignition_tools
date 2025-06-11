@@ -1,4 +1,4 @@
-"""Task 11: Advanced Math & Analytics Functions (Simplified for Neo4j)
+"""Task 11: Advanced Math & Analytics Functions (Simplified for Neo4j).
 
 Mathematical operations, statistical analysis, and data analytics functions for Ignition SCADA systems.
 This is a Neo4j-compatible version with simplified parameter and return structures.

@@ -368,7 +368,7 @@ class GraphDatabaseTester:
         # Test 1: Function query performance
         def test_function_query_performance():
             start_time = time.time()
-            result = self.client.execute_query(
+            self.client.execute_query(
                 """
             MATCH (f:Function)-[:BELONGS_TO]->(c:Category)
             RETURN c.name, count(f)
@@ -392,7 +392,7 @@ class GraphDatabaseTester:
         # Test 2: Context relationship performance
         def test_context_query_performance():
             start_time = time.time()
-            result = self.client.execute_query(
+            self.client.execute_query(
                 """
             MATCH (f:Function)-[:AVAILABLE_IN]->(c:Context)
             WHERE c.name = "Gateway"
@@ -414,7 +414,7 @@ class GraphDatabaseTester:
         # Test 3: Complex relationship traversal
         def test_complex_traversal_performance():
             start_time = time.time()
-            result = self.client.execute_query(
+            self.client.execute_query(
                 """
             MATCH (s:ScriptType)-[:COMPATIBLE_WITH]->(c:Context)<-[:AVAILABLE_IN]-(f:Function)-[:BELONGS_TO]->(cat:Category)
             WHERE s.name = "Timer"

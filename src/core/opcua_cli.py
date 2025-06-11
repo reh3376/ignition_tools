@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """Enhanced OPC-UA CLI Commands with Configuration Management
-Integration with comprehensive connection configuration system
+Integration with comprehensive connection configuration system.
 """
 
 import asyncio
 import json
 from pathlib import Path
-from typing import Optional
 
 import click
 from rich.console import Console
@@ -29,8 +28,8 @@ from .opcua_integration import OPCUAClient
 console = Console()
 
 # Global connection state
-current_connection: Optional[OPCUAClient] = None
-current_config: Optional[OPCUAConnectionConfig] = None
+current_connection: OPCUAClient | None = None
+current_config: OPCUAConnectionConfig | None = None
 
 
 @click.group()
@@ -42,7 +41,7 @@ current_config: Optional[OPCUAConnectionConfig] = None
 )
 @click.pass_context
 def opcua(ctx, verbose, log_level):
-    """OPC-UA Client Commands with Advanced Configuration
+    """OPC-UA Client Commands with Advanced Configuration.
 
     🔒 SAFETY: All operations are READ-ONLY to protect live systems.
 
@@ -88,7 +87,7 @@ def connect(
     key_path,
     server_cert,
 ):
-    """Connect to an OPC-UA server with comprehensive configuration.
+    r"""Connect to an OPC-UA server with comprehensive configuration.
 
     🔒 READ-ONLY: Connection is configured for safe read operations only.
 
@@ -301,7 +300,7 @@ async def _save_current_config(config_name: str):
     current_config.config_name = config_name
     current_config.verified = True
 
-    manager = OPCUAConfigManager()
+    OPCUAConfigManager()
     config_dir = Path("configs/opcua")
     config_dir.mkdir(parents=True, exist_ok=True)
 

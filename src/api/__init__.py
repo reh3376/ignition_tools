@@ -1,1 +1,1 @@
-"""API endpoints and integrations for IGN Scripts.""" 
+"""API endpoints and integrations for IGN Scripts."""

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Task 2: Database System Expansion Implementation
+"""Task 2: Database System Expansion Implementation.
 ===============================================
 
 This module implements comprehensive database system functions for Ignition SCADA.
@@ -14,8 +14,7 @@ Complexity: ⭐⭐⭐⭐ (High)
 """
 
 import logging
-import os
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -1018,7 +1017,7 @@ def get_database_system_functions() -> list[dict[str, Any]]:
     return DATABASE_SYSTEM_FUNCTIONS
 
 
-def get_function_by_name(function_name: str) -> Optional[dict[str, Any]]:
+def get_function_by_name(function_name: str) -> dict[str, Any] | None:
     """Get a specific database system function by name.
 
     Args:

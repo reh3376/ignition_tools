@@ -1,4 +1,4 @@
-"""Usage Tracking System for Learning Enhancement
+"""Usage Tracking System for Learning Enhancement.
 
 This module implements usage pattern tracking for the Ignition Graph Database
 learning system. It collects, stores, and analyzes usage patterns to improve
@@ -9,7 +9,7 @@ import logging
 import uuid
 from contextlib import contextmanager
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from .client import IgnitionGraphClient
 
@@ -26,12 +26,12 @@ class UsageTracker:
             client: IgnitionGraphClient instance for database operations
         """
         self.client = client
-        self.current_session_id: Optional[str] = None
-        self.session_start_time: Optional[datetime] = None
+        self.current_session_id: str | None = None
+        self.session_start_time: datetime | None = None
         self.session_events: list[dict[str, Any]] = []
 
     def start_session(
-        self, user_id: Optional[str] = None, session_type: str = "exploration"
+        self, user_id: str | None = None, session_type: str = "exploration"
     ) -> str:
         """Start a new usage tracking session.
 
@@ -73,7 +73,7 @@ class UsageTracker:
         logger.info(f"Started usage tracking session: {session_id}")
         return session_id
 
-    def end_session(self) -> Optional[dict[str, Any]]:
+    def end_session(self) -> dict[str, Any] | None:
         """End the current usage tracking session.
 
         Returns:
@@ -88,19 +88,19 @@ class UsageTracker:
 
         # Calculate session statistics
         unique_functions = len(
-            set(
+            {
                 event.get("function_name")
                 for event in self.session_events
                 if event.get("function_name")
-            )
+            }
         )
 
         unique_templates = len(
-            set(
+            {
                 event.get("template_name")
                 for event in self.session_events
                 if event.get("template_name")
-            )
+            }
         )
 
         success_events = sum(
@@ -154,7 +154,7 @@ class UsageTracker:
 
     @contextmanager
     def track_session(
-        self, user_id: Optional[str] = None, session_type: str = "exploration"
+        self, user_id: str | None = None, session_type: str = "exploration"
     ):
         """Context manager for automatic session tracking.
 
@@ -174,11 +174,11 @@ class UsageTracker:
     def track_function_query(
         self,
         function_name: str,
-        context: Optional[str] = None,
-        parameters: Optional[dict[str, Any]] = None,
+        context: str | None = None,
+        parameters: dict[str, Any] | None = None,
         success: bool = True,
-        execution_time: Optional[float] = None,
-        error_message: Optional[str] = None,
+        execution_time: float | None = None,
+        error_message: str | None = None,
     ) -> str:
         """Track a function query event.
 
@@ -206,10 +206,10 @@ class UsageTracker:
     def track_template_generation(
         self,
         template_name: str,
-        parameters: Optional[dict[str, Any]] = None,
+        parameters: dict[str, Any] | None = None,
         success: bool = True,
-        execution_time: Optional[float] = None,
-        error_message: Optional[str] = None,
+        execution_time: float | None = None,
+        error_message: str | None = None,
     ) -> str:
         """Track a template generation event.
 
@@ -234,10 +234,10 @@ class UsageTracker:
 
     def track_parameter_usage(
         self,
-        function_name: Optional[str] = None,
-        template_name: Optional[str] = None,
-        parameters: Optional[dict[str, Any]] = None,
-        context: Optional[str] = None,
+        function_name: str | None = None,
+        template_name: str | None = None,
+        parameters: dict[str, Any] | None = None,
+        context: str | None = None,
         success: bool = True,
     ) -> str:
         """Track parameter usage patterns.
@@ -264,14 +264,14 @@ class UsageTracker:
     def _track_event(
         self,
         event_type: str,
-        function_name: Optional[str] = None,
-        template_name: Optional[str] = None,
-        parameters: Optional[dict[str, Any]] = None,
-        context: Optional[str] = None,
+        function_name: str | None = None,
+        template_name: str | None = None,
+        parameters: dict[str, Any] | None = None,
+        context: str | None = None,
         success: bool = True,
-        execution_time: Optional[float] = None,
-        error_message: Optional[str] = None,
-        user_id: Optional[str] = None,
+        execution_time: float | None = None,
+        error_message: str | None = None,
+        user_id: str | None = None,
     ) -> str:
         """Internal method to track usage events.
 
@@ -393,7 +393,7 @@ class UsageTracker:
         except Exception as e:
             logger.debug(f"Could not create event-template relationship: {e}")
 
-    def get_session_stats(self, session_id: Optional[str] = None) -> dict[str, Any]:
+    def get_session_stats(self, session_id: str | None = None) -> dict[str, Any]:
         """Get statistics for a session.
 
         Args:
@@ -435,7 +435,7 @@ class UsageTracker:
         }
 
     def get_recent_events(
-        self, limit: int = 10, event_type: Optional[str] = None
+        self, limit: int = 10, event_type: str | None = None
     ) -> list[dict[str, Any]]:
         """Get recent usage events.
 

@@ -1,4 +1,4 @@
-"""OPC-UA Address Space Browser
+"""OPC-UA Address Space Browser.
 
 Provides functionality for browsing and navigating OPC-UA server
 address spaces with filtering and search capabilities.

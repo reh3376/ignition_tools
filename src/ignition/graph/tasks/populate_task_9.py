@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Populate Task 9: Security System Expansion
+"""Populate Task 9: Security System Expansion.
 
 This script loads comprehensive security system functions into the Neo4j graph database.
 Task 9 focuses on security operations, authentication, user management, and threat monitoring.

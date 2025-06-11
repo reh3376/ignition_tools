@@ -14,6 +14,8 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
+import contextlib
+
 from ignition.graph.client import IgnitionGraphClient
 from ignition.graph.enhanced_populator import EnhancedIgnitionGraphPopulator
 
@@ -97,10 +99,8 @@ def main():
         return False
     finally:
         # Close connection
-        try:
+        with contextlib.suppress(Exception):
             client.close()
-        except:
-            pass
 
 
 if __name__ == "__main__":

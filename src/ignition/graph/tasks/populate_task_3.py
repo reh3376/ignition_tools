@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Task 3: GUI System Population Script
+"""Task 3: GUI System Population Script.
 ===================================
 
 This script populates the Neo4j graph database with Task 3 GUI system functions.

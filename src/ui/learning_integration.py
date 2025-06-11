@@ -72,7 +72,10 @@ class LearningSystemUI:
             yield None
 
     def track_action(
-        self, action_type: str, details: dict[str, Any] = None, success: bool = True
+        self,
+        action_type: str,
+        details: dict[str, Any] | None = None,
+        success: bool = True,
     ):
         """Track user actions in the UI."""
         if not self.tracker:

@@ -1,4 +1,4 @@
-"""Enhanced Ignition Graph Database Populator
+"""Enhanced Ignition Graph Database Populator.
 
 Loads comprehensive Ignition system functions, context variables, best practices,
 and detailed relationships from our documentation into the Neo4j graph database.
