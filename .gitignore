@@ -473,3 +473,8 @@ build/
 *~
 *.bak
 *.orig
+
+# OPC-UA Testing - Protect sensitive credentials
+scripts/opcua_test_config.env
+opcua_test_config.env
+*.opcua.env

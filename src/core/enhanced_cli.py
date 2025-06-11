@@ -899,8 +899,8 @@ def explore(ctx: click.Context) -> None:
 # Gateway Management Commands
 @main.group()
 def gateway() -> None:
-    """🔗 Manage Ignition Gateway connections."""
-    pass
+    """🏭 Gateway connection and management commands."""
+    enhanced_cli.track_cli_usage("gateway")
 
 
 @gateway.command()
@@ -1293,6 +1293,29 @@ def cleanup(ctx: click.Context, result, **kwargs):
     """Clean up and end tracking session."""
     if enhanced_cli.tracker and enhanced_cli.tracker.current_session_id:
         enhanced_cli.tracker.end_session()
+
+
+# Import and register OPC-UA commands
+try:
+    from ignition.opcua.cli.commands import opcua as opcua_group
+
+    # Add the OPC-UA group to main
+    main.add_command(opcua_group, name="opcua")
+
+except ImportError:
+    # Create a placeholder group if OPC-UA dependencies aren't available
+    @main.group()
+    def opcua() -> None:
+        """🔗 OPC-UA client operations for industrial automation."""
+        enhanced_cli.track_cli_usage("opcua")
+
+    @opcua.command()
+    def install():
+        """Install OPC-UA dependencies."""
+        console.print("[yellow]⚠️  OPC-UA dependencies not installed[/yellow]")
+        console.print("\n[bold]To enable OPC-UA functionality, run:[/bold]")
+        console.print("pip install asyncua>=1.1.6 opcua-client>=0.8.4 rich>=13.0.0")
+        console.print("\nThen restart the CLI to access OPC-UA commands.")
 
 
 if __name__ == "__main__":

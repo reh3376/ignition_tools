@@ -58,6 +58,26 @@ IGN Scripts is designed to streamline the development of Jython scripts for Igni
 - Manage version control for Ignition projects
 - Automate deployment to production environments
 
+## 🏭 **NEW: Industrial OPC-UA Integration**
+
+**Task 14 Complete**: Added comprehensive OPC-UA client capabilities for real industrial automation:
+
+### OPC-UA Function Library (14 Functions)
+- ✅ **Connection Management**: Secure OPC-UA server connections with certificate handling
+- ✅ **Address Space Navigation**: Browse server nodes and discover device structures
+- ✅ **Data Operations**: Read/write OPC-UA node values with type validation
+- ✅ **Real-time Monitoring**: Subscribe to data changes and alarm events
+- ✅ **Historical Data**: Access time-series data for analysis and reporting
+
+### **🚀 Task 15 In Planning: Live OPC-UA Client Integration**
+Transform from script generator to full industrial automation platform:
+- **CLI Integration**: `ignition opcua connect/browse/read/write/subscribe`
+- **Live UI Dashboard**: Streamlit-based industrial monitoring with real-time data
+- **FreeOpcUa Libraries**: Integration with `asyncua` and `opcua-client-gui`
+- **Industrial Connectivity**: Direct PLC and SCADA system integration
+
+📋 **Detailed Plan**: [Task 15 OPC-UA Integration Plan](docs/TASK_15_OPC_UA_INTEGRATION_PLAN.md)
+
 ## 🔧 Target Environment
 
 - **Ignition Version**: 8.1+ (primary), 8.0 (secondary)
