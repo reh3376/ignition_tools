@@ -5,6 +5,7 @@ This repository contains tools for generating Jython scripts for Ignition SCADA 
 
 ## Current Status
 - **Project Phase**: Phase 6 Complete (395/400 functions, 98.8% complete - Final Sprint!)
+- **Priority Focus**: OPC-UA Client Integration (Task 14) - Critical for industrial automation
 - **Last Updated**: 2025-01-28
 - **Version**: 0.1.0
 - **Target Ignition Version**: 8.1+
@@ -148,8 +149,15 @@ This repository contains tools for generating Jython scripts for Ignition SCADA 
   - [x] **Task 11**: Advanced Math & Analytics Functions (30+ functions) - Week 12 🟡 MEDIUM ✅ **2025-01-28**
   - [x] **Task 12**: Machine Learning Integration Functions (25 functions) - Week 13 🔴 HIGH ✅ **2025-01-28**
   - [x] **Task 13**: Integration & External Systems Functions (30 functions) - Week 14 ✅ **COMPLETED**
-  - [ ] **Task 14**: Sequential Function Charts & Recipe Management (20+ functions) - Week 15 🟡 MEDIUM
-  - [ ] **Task 15**: System Administration & Project Management (20+ functions) - Week 16 🟡 MEDIUM
+    - [ ] **Task 14**: OPC-UA Client Integration Functions (10+ functions) - Week 15 🔴 HIGH
+      - OPC-UA client connection management
+      - Node browsing and address space navigation  
+      - Read/write operations for OPC-UA nodes
+      - Subscription and data change monitoring
+      - Certificate and security management
+      - Server discovery and endpoint configuration
+    - [ ] **Task 15**: Sequential Function Charts & Recipe Management (15+ functions) - Week 16 🟡 MEDIUM
+    - [ ] **Task 16**: System Administration & Project Management (15+ functions) - Week 17 🟡 MEDIUM
 - [x] Model context availability (Gateway, Vision, Perspective scopes) ✅ **2025-01-28**
 - [x] Create script type nodes (startup, timer, tag change, etc.) ✅ **2025-01-28**
 - [x] Map parameter availability by context and script type ✅ **2025-01-28**
