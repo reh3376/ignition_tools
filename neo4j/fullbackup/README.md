@@ -113,7 +113,7 @@ backups = manager.list_backups()
 The system automatically creates backups when significant changes are detected:
 
 - **Node threshold**: 50+ new nodes
-- **Relationship threshold**: 100+ new relationships  
+- **Relationship threshold**: 100+ new relationships
 - **Percentage threshold**: 10%+ increase in data
 
 ### Retention Policy
@@ -126,7 +126,7 @@ The system automatically creates backups when significant changes are detected:
 
 ### Application Installation/Upgrade
 
-1. **New Installation**: 
+1. **New Installation**:
    - Check for bundled backup in this directory
    - If found, offer to restore initial data
    - Useful for pre-populated function libraries and patterns
@@ -230,4 +230,4 @@ ls -lah neo4j/fullbackup/
 - [Learning System Architecture](../docs/LEARNING_SYSTEM_INTEGRATION_SUMMARY.md)
 - [Neo4j Client Documentation](../src/ignition/graph/client.py)
 - [Database Schema](../src/ignition/graph/schema.py)
-- [Enhanced CLI Guide](../docs/cli_readme.md) 
+- [Enhanced CLI Guide](../docs/cli_readme.md)
