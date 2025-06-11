@@ -163,7 +163,7 @@ def show_integration_summary():
     print("=" * 50)
 
     features = [
-        "✅ Enhanced CLI with Rich formatting and Textual TUI",
+        "✅ Enhanced CLI with Rich formatting and interactive TUI",
         "✅ Automatic usage tracking for CLI commands",
         "✅ Smart recommendations based on usage patterns",
         "✅ Interactive pattern exploration (TUI)",

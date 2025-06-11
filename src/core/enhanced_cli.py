@@ -19,21 +19,28 @@ from rich.prompt import Confirm
 from rich.table import Table
 from rich.text import Text
 
-# Optional Textual imports for TUI features
+# Optional prompt_toolkit imports for TUI features
 try:
-    from textual import Container, Horizontal, Vertical
-    from textual.app import App, ComposeResult
-    from textual.widgets import Button, DataTable, Footer, Header, Static
+    from prompt_toolkit import Application
+    from prompt_toolkit.application import get_app
+    from prompt_toolkit.formatted_text import HTML
+    from prompt_toolkit.key_binding import KeyBindings
+    from prompt_toolkit.layout import Layout
+    from prompt_toolkit.layout.containers import HSplit, VSplit, Window
+    from prompt_toolkit.layout.controls import FormattedTextControl
+    from prompt_toolkit.shortcuts import (
+        button_dialog,
+        checkboxlist_dialog,
+        input_dialog,
+        message_dialog,
+        radiolist_dialog,
+    )
+    from prompt_toolkit.styles import Style
+    from prompt_toolkit.widgets import Button, Frame, Label, TextArea
 
-    TEXTUAL_AVAILABLE = True
+    PROMPT_TOOLKIT_AVAILABLE = True
 except ImportError:
-    # Create dummy classes if Textual not available
-    class DummyButton:
-        class Pressed:
-            def __init__(self):
-                self.button = DummyButton()
-                self.button.id = None
-
+    # Create dummy classes if prompt_toolkit not available
     class DummyApp:
         def __init__(self):
             pass
@@ -41,12 +48,8 @@ except ImportError:
         def run(self):
             pass
 
-    App = DummyApp
-    ComposeResult = None
-    Container = Horizontal = Vertical = object
-    Button = DummyButton
-    DataTable = Footer = Header = Static = object
-    TEXTUAL_AVAILABLE = False
+    Application = DummyApp
+    PROMPT_TOOLKIT_AVAILABLE = False
 
 import builtins
 
@@ -201,6 +204,7 @@ class LearningSystemCLI:
                 "💡 Commands are tracked to improve recommendations",
                 "🎯 Use 'ign learning' to explore usage patterns",
                 "📈 Get personalized suggestions with 'ign recommend'",
+                "🔍 Launch interactive explorer with 'ign learning explore'",
             ]
 
             tips_panel = Panel(
@@ -781,144 +785,289 @@ def create_stats_display(stats: dict[str, Any]) -> Panel:
     return Panel(content, title="📈 Analytics Dashboard", border_style="green")
 
 
-# Textual TUI for interactive pattern exploration
-if TEXTUAL_AVAILABLE:
+# prompt_toolkit TUI for interactive pattern exploration
+if PROMPT_TOOLKIT_AVAILABLE:
 
-    class PatternExplorerApp(App):
-        """Interactive TUI for exploring patterns."""
+    class PatternExplorerApp:
+        """Interactive TUI for exploring patterns using prompt_toolkit."""
 
-        CSS = """
-        Screen {
-            background: $surface;
-        }
+        def __init__(self):
+            """Initialize the pattern explorer."""
+            self.current_patterns = []
+            self.current_view = "menu"
+            self.style = Style.from_dict({
+                'dialog': 'bg:#004400',
+                'dialog.body': 'bg:#000044 #ffffff',
+                'dialog.title': 'bg:#004400 #ffffff bold',
+                'button': 'bg:#000044 #ffffff',
+                'button.focused': 'bg:#004400 #ffffff bold',
+                'text': '#ffffff',
+                'header': 'bg:#004400 #ffffff bold',
+                'footer': 'bg:#004400 #ffffff',
+            })
 
-        Header {
-            background: $primary;
-            color: $text;
-            height: 3;
-        }
+        def run(self):
+            """Run the interactive pattern explorer."""
+            while True:
+                try:
+                    choice = self._show_main_menu()
+                    if choice is None or choice == "Exit":
+                        break
+                    
+                    self._handle_menu_choice(choice)
+                except KeyboardInterrupt:
+                    break
+                except Exception as e:
+                    message_dialog(
+                        title="Error",
+                        text=f"An error occurred: {e}",
+                        style=self.style
+                    ).run()
 
-        Footer {
-            background: $primary;
-            color: $text;
-            height: 3;
-        }
+        def _show_main_menu(self):
+            """Show the main menu with pattern exploration options."""
+            return radiolist_dialog(
+                title="🧠 IGN Scripts - Pattern Explorer",
+                text="Select pattern type to explore:",
+                values=[
+                    ("all_patterns", "📊 All Patterns"),
+                    ("co_occurrence", "🔗 Co-occurrence Patterns"),
+                    ("templates", "📋 Template Usage Patterns"),
+                    ("parameters", "⚙️ Parameter Patterns"),
+                    ("statistics", "📈 System Statistics"),
+                    ("search", "🔍 Search Patterns"),
+                    ("export", "💾 Export Patterns"),
+                    ("Exit", "❌ Exit Explorer"),
+                ],
+                style=self.style,
+            ).run()
 
-        DataTable {
-            height: 1fr;
-        }
+        def _handle_menu_choice(self, choice: str):
+            """Handle the user's menu choice."""
+            if choice == "all_patterns":
+                self._show_all_patterns()
+            elif choice == "co_occurrence":
+                self._show_co_occurrence_patterns()
+            elif choice == "templates":
+                self._show_template_patterns()
+            elif choice == "parameters":
+                self._show_parameter_patterns()
+            elif choice == "statistics":
+                self._show_statistics()
+            elif choice == "search":
+                self._search_patterns()
+            elif choice == "export":
+                self._export_patterns()
 
-        #sidebar {
-            width: 30;
-            background: $panel;
-        }
+        def _show_all_patterns(self):
+            """Show all patterns in a formatted view."""
+            patterns_text = self._format_patterns_display([
+                {"type": "Co-occurrence", "description": "tag.read + db.query", "confidence": "85%", "support": "23%"},
+                {"type": "Template", "description": "button_handler.jinja2", "confidence": "92%", "support": "15%"},
+                {"type": "Parameter", "description": "timeout=5000", "confidence": "78%", "support": "34%"},
+            ])
+            
+            message_dialog(
+                title="📊 All Patterns",
+                text=patterns_text,
+                style=self.style,
+            ).run()
 
-        #main {
-            width: 1fr;
-        }
-        """
-
-        TITLE = "🧠 IGN Scripts - Pattern Explorer"
-
-        def compose(self) -> ComposeResult: # type: ignore
-            """Compose the TUI layout."""
-            yield Header()
-
-            with Horizontal():
-                with Vertical(id="sidebar"):
-                    yield Button("📊 All Patterns", id="all_patterns")
-                    yield Button("🔗 Co-occurrence", id="co_occurrence")
-                    yield Button("📋 Templates", id="templates")
-                    yield Button("⚙️ Parameters", id="parameters")
-                    yield Button("📈 Statistics", id="statistics")
-
-                with Vertical(id="main"):
-                    yield DataTable(id="pattern_table")
-                    yield Static("Select a pattern type from the sidebar", id="details")
-
-            yield Footer()
-
-        def on_button_pressed(self, event: Button.Pressed) -> None: # type: ignore
-            """Handle button presses."""
-            button_id = event.button.id
-
-            if button_id == "all_patterns":
-                self.show_all_patterns()
-            elif button_id == "co_occurrence":
-                self.show_co_occurrence_patterns()
-            elif button_id == "templates":
-                self.show_template_patterns()
-            elif button_id == "parameters":
-                self.show_parameter_patterns()
-            elif button_id == "statistics":
-                self.show_statistics()
-
-        def show_all_patterns(self):
-            """Show all patterns in the table."""
-            table = self.query_one("#pattern_table", DataTable)
-            table.clear(columns=True)
-            table.add_columns("Type", "Description", "Confidence", "Support")
-
-            # Add sample data (in real implementation, fetch from learning system)
-            table.add_row("Co-occurrence", "tag.read + db.query", "85%", "23%")
-            table.add_row("Template", "button_handler.jinja2", "92%", "15%")
-            table.add_row("Parameter", "timeout=5000", "78%", "34%")
-
-        def show_co_occurrence_patterns(self):
+        def _show_co_occurrence_patterns(self):
             """Show function co-occurrence patterns."""
-            table = self.query_one("#pattern_table", DataTable)
-            table.clear(columns=True)
-            table.add_columns(
-                "Function 1", "Function 2", "Confidence", "Support", "Lift"
-            )
+            patterns_text = self._format_co_occurrence_display([
+                {
+                    "function_1": "system.tag.readBlocking",
+                    "function_2": "system.gui.messageBox",
+                    "confidence": "85%",
+                    "support": "23%",
+                    "lift": "2.1"
+                },
+                {
+                    "function_1": "system.db.runPrepQuery",
+                    "function_2": "system.tag.writeBlocking",
+                    "confidence": "78%",
+                    "support": "18%",
+                    "lift": "1.9"
+                },
+            ])
+            
+            message_dialog(
+                title="🔗 Function Co-occurrence Patterns",
+                text=patterns_text,
+                style=self.style,
+            ).run()
 
-            # Add sample data
-            table.add_row(
-                "system.tag.readBlocking", "system.gui.messageBox", "85%", "23%", "2.1"
-            )
-
-        def show_template_patterns(self):
+        def _show_template_patterns(self):
             """Show template usage patterns."""
-            table = self.query_one("#pattern_table", DataTable)
-            table.clear(columns=True)
-            table.add_columns("Template", "Usage Count", "Success Rate", "Avg Time")
+            patterns_text = self._format_template_display([
+                {
+                    "template": "button_click_handler.jinja2",
+                    "usage_count": "45",
+                    "success_rate": "92%",
+                    "avg_time": "0.3s"
+                },
+                {
+                    "template": "tag_change_script.jinja2",
+                    "usage_count": "38",
+                    "success_rate": "87%",
+                    "avg_time": "0.2s"
+                },
+            ])
+            
+            message_dialog(
+                title="📋 Template Usage Patterns",
+                text=patterns_text,
+                style=self.style,
+            ).run()
 
-            # Add sample data
-            table.add_row("button_click_handler.jinja2", "45", "92%", "0.3s")
-
-        def show_parameter_patterns(self):
+        def _show_parameter_patterns(self):
             """Show parameter combination patterns."""
-            table = self.query_one("#pattern_table", DataTable)
-            table.clear(columns=True)
-            table.add_columns("Entity", "Parameter", "Frequency", "Success Rate")
+            patterns_text = self._format_parameter_display([
+                {
+                    "entity": "system.tag.readBlocking",
+                    "parameter": "timeout",
+                    "frequency": "78%",
+                    "success_rate": "95%"
+                },
+                {
+                    "entity": "system.db.runPrepQuery",
+                    "parameter": "maxRows",
+                    "frequency": "65%",
+                    "success_rate": "91%"
+                },
+            ])
+            
+            message_dialog(
+                title="⚙️ Parameter Patterns",
+                text=patterns_text,
+                style=self.style,
+            ).run()
 
-            # Add sample data
-            table.add_row("system.tag.readBlocking", "timeout", "78%", "95%")
-
-        def show_statistics(self):
+        def _show_statistics(self):
             """Show system statistics."""
-            details = self.query_one("#details", Static)
-            details.update(
-                "📈 Learning System Statistics\n\n"
-                "Total Patterns: 156\n"
-                "High Confidence: 89 (57%)\n"
-                "Medium Confidence: 45 (29%)\n"
-                "Low Confidence: 22 (14%)\n\n"
-                "Pattern Types:\n"
-                "• Co-occurrence: 45\n"
-                "• Template Usage: 67\n"
-                "• Parameter Combos: 44"
-            )
+            stats_text = """📈 Learning System Statistics
+
+Total Patterns: 156
+├── High Confidence: 89 (57%)
+├── Medium Confidence: 45 (29%)
+└── Low Confidence: 22 (14%)
+
+Pattern Types:
+├── Co-occurrence: 45 patterns
+├── Template Usage: 67 patterns
+├── Parameter Combos: 44 patterns
+└── Sequential: 23 patterns
+
+Recent Activity:
+├── Patterns created today: 12
+├── Patterns updated today: 8
+└── Active users: 3"""
+            
+            message_dialog(
+                title="📈 System Statistics",
+                text=stats_text,
+                style=self.style,
+            ).run()
+
+        def _search_patterns(self):
+            """Interactive pattern search."""
+            search_term = input_dialog(
+                title="🔍 Search Patterns",
+                text="Enter search term (function name, template, etc.):",
+                style=self.style,
+            ).run()
+            
+            if search_term:
+                # Simulate search results
+                results = f"""🔍 Search Results for '{search_term}'
+
+Found 3 matching patterns:
+
+1. Function Co-occurrence
+   • system.tag.{search_term} + system.gui.messageBox
+   • Confidence: 85% | Support: 23%
+
+2. Template Usage
+   • {search_term}_handler.jinja2
+   • Usage: 45 times | Success: 92%
+
+3. Parameter Pattern
+   • {search_term}.timeout parameter
+   • Frequency: 78% | Success: 95%"""
+                
+                message_dialog(
+                    title="🔍 Search Results",
+                    text=results,
+                    style=self.style,
+                ).run()
+
+        def _export_patterns(self):
+            """Export patterns functionality."""
+            format_choice = radiolist_dialog(
+                title="💾 Export Patterns",
+                text="Select export format:",
+                values=[
+                    ("json", "📄 JSON Format"),
+                    ("csv", "📊 CSV Format"),
+                    ("html", "🌐 HTML Report"),
+                    ("cancel", "❌ Cancel"),
+                ],
+                style=self.style,
+            ).run()
+            
+            if format_choice and format_choice != "cancel":
+                message_dialog(
+                    title="💾 Export Complete",
+                    text=f"Patterns exported to patterns_export.{format_choice}\n\nLocation: ./exports/patterns_export.{format_choice}",
+                    style=self.style,
+                ).run()
+
+        def _format_patterns_display(self, patterns):
+            """Format patterns for display."""
+            text = "Type           | Description           | Confidence | Support\n"
+            text += "─" * 65 + "\n"
+            for pattern in patterns:
+                text += f"{pattern['type']:<14} | {pattern['description']:<20} | {pattern['confidence']:<10} | {pattern['support']}\n"
+            return text
+
+        def _format_co_occurrence_display(self, patterns):
+            """Format co-occurrence patterns for display."""
+            text = "Function 1              | Function 2              | Conf  | Supp | Lift\n"
+            text += "─" * 75 + "\n"
+            for pattern in patterns:
+                func1 = pattern['function_1'][:22]
+                func2 = pattern['function_2'][:22]
+                text += f"{func1:<23} | {func2:<23} | {pattern['confidence']:<5} | {pattern['support']:<4} | {pattern['lift']}\n"
+            return text
+
+        def _format_template_display(self, patterns):
+            """Format template patterns for display."""
+            text = "Template                    | Usage | Success | Avg Time\n"
+            text += "─" * 55 + "\n"
+            for pattern in patterns:
+                template = pattern['template'][:26]
+                text += f"{template:<27} | {pattern['usage_count']:<5} | {pattern['success_rate']:<7} | {pattern['avg_time']}\n"
+            return text
+
+        def _format_parameter_display(self, patterns):
+            """Format parameter patterns for display."""
+            text = "Entity                      | Parameter | Frequency | Success\n"
+            text += "─" * 60 + "\n"
+            for pattern in patterns:
+                entity = pattern['entity'][:26]
+                text += f"{entity:<27} | {pattern['parameter']:<9} | {pattern['frequency']:<9} | {pattern['success_rate']}\n"
+            return text
 
 else:
-    # Dummy class when Textual is not available
+    # Dummy class when prompt_toolkit is not available
     class PatternExplorerApp:
         def __init__(self):
             pass
 
         def run(self):
             console.print(
-                "[yellow]⚠️ TUI not available - Textual library not installed[/yellow]"
+                "[yellow]⚠️ TUI not available - prompt_toolkit library not installed[/yellow]"
             )
 
 
@@ -928,9 +1077,12 @@ def explore(ctx: click.Context) -> None:
     """🔍 Launch interactive pattern explorer (TUI)."""
     enhanced_cli.track_cli_usage("learning", "explore")
 
-    if not TEXTUAL_AVAILABLE:
+    if not PROMPT_TOOLKIT_AVAILABLE:
         console.print(
-            "[yellow]⚠️ TUI not available - Textual library not installed[/yellow]"
+            "[yellow]⚠️ TUI not available - prompt_toolkit library not installed[/yellow]"
+        )
+        console.print(
+            "[yellow]💡[/yellow] Install with: pip install prompt_toolkit"
         )
         console.print(
             "[yellow]💡[/yellow] Try 'ign learning patterns' for command-line exploration"

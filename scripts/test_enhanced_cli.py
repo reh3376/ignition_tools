@@ -8,7 +8,7 @@ from pathlib import Path
 
 def install_dependencies():
     """Install required dependencies for enhanced CLI."""
-    dependencies = ["rich>=13.7.0", "textual>=0.47.0", "click>=8.1.7"]
+    dependencies = ["rich>=13.7.0", "prompt_toolkit>=3.0.0", "click>=8.1.7"]
 
     print("🔧 Installing enhanced CLI dependencies...")
 
@@ -29,7 +29,7 @@ def test_imports():
 
     modules = [
         ("rich", "Rich formatting library"),
-        ("textual", "Textual TUI library"),
+        ("prompt_toolkit", "Interactive prompt toolkit library"),
         ("click", "Click CLI library"),
     ]
 

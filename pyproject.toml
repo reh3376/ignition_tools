@@ -33,7 +33,7 @@ dependencies = [
     "click>=8.1.0",
     "rich>=13.5.0",
     "streamlit>=1.28.0",
-    "textual>=3.3.0",
+    "prompt_toolkit>=3.0.0",
 ]
 
 [project.optional-dependencies]

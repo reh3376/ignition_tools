@@ -4,7 +4,7 @@
 
 ## 🚀 Overview
 
-The IGN Scripts Enhanced CLI provides a beautiful, intelligent command-line interface for generating Jython scripts for Ignition SCADA systems. Powered by Rich and Textual libraries, it features smart recommendations, usage tracking, and interactive pattern exploration.
+The IGN Scripts Enhanced CLI provides a beautiful, intelligent command-line interface for generating Jython scripts for Ignition SCADA systems. Powered by Rich and prompt_toolkit libraries, it features smart recommendations, usage tracking, and interactive pattern exploration.
 
 ## 📦 Installation & Setup
 

@@ -255,7 +255,7 @@ This repository contains tools for generating Jython scripts for Ignition SCADA 
   - [x] Add pattern aging and relevance scoring
 
 #### **Learning System UI Integration** 🎨 ✅ **COMPLETED** (2025-01-28)
-- [x] **Enhanced CLI Interface**: Rich/Textual-powered CLI with learning hooks
+- [x] **Enhanced CLI Interface**: Rich/prompt_toolkit-powered CLI with learning hooks
   - [x] Beautiful terminal UI with smart recommendations
   - [x] Interactive pattern exploration (TUI)
   - [x] Usage tracking for all CLI commands
@@ -267,7 +267,7 @@ This repository contains tools for generating Jython scripts for Ignition SCADA 
   - [x] Learning analytics dashboard page
   - [x] Real-time insights and visualizations
   - [x] Template recommendations with confidence scores
-- [x] **Dependencies & Setup**: Rich, Textual, enhanced requirements
+- [x] **Dependencies & Setup**: Rich, prompt_toolkit, enhanced requirements
   - [x] Test scripts for validation
   - [x] Demo scripts showcasing integration
   - [x] Setup utilities for CLI installation
@@ -550,7 +550,7 @@ services:
   - Task 10: File & Report System Expansion (25 functions) ✅
   - Task 11: Advanced Math & Analytics Functions (30 functions) ✅
 - 2025-01-28 v0.4.0: **Learning System UI Integration Complete**
-  - Enhanced CLI with Rich/Textual UI and learning system integration ✅
+  - Enhanced CLI with Rich/prompt_toolkit UI and learning system integration ✅
   - Streamlit UI with comprehensive learning analytics and recommendations ✅
   - Usage tracking and pattern-based intelligence across all interfaces ✅
   - Interactive TUI for pattern exploration ✅

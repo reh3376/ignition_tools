@@ -62,7 +62,7 @@ Welcome to the comprehensive documentation for the IGN Scripts project - an inte
 - **Learning System**: Phase 1 complete with 91 patterns discovered
 
 ### Recent Achievements
-- ✅ Enhanced CLI with Rich/Textual UI and learning system integration
+- ✅ Enhanced CLI with Rich/prompt_toolkit UI and learning system integration
 - ✅ Streamlit UI with comprehensive learning analytics and recommendations
 - ✅ Usage tracking and pattern-based intelligence across all interfaces
 - ✅ Interactive TUI for pattern exploration

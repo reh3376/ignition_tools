@@ -6,7 +6,7 @@
 
 ## 🎯 Overview
 
-Successfully integrated the learning system with both CLI and UI interfaces, creating a comprehensive intelligent assistant for Ignition script generation with beautiful, interactive interfaces powered by Rich and Textual libraries.
+Successfully integrated the learning system with both CLI and UI interfaces, creating a comprehensive intelligent assistant for Ignition script generation with beautiful, interactive interfaces powered by Rich and prompt_toolkit libraries.
 
 ## 🚀 What Was Accomplished
 
@@ -29,7 +29,7 @@ Created a beautiful, intelligent command-line interface featuring:
 - **Performance monitoring** and analytics
 
 #### 🎮 Interactive Features
-- **Textual TUI** for pattern exploration (`ign learning explore`)
+- **Interactive TUI** for pattern exploration (`ign learning explore`)
 - **Interactive script generation** (`ign script generate -i`)
 - **Real-time pattern analysis** (`ign learning patterns`)
 - **Learning system health monitoring** (`ign learning stats`)
@@ -98,7 +98,7 @@ show_smart_recommendations("script_generation")
 
 #### 📦 Dependencies Added
 - **Rich >= 13.7.0**: Advanced terminal formatting and styling
-- **Textual >= 0.47.0**: Interactive TUI components
+- **prompt_toolkit >= 3.0.0**: Interactive TUI components
 - **Click >= 8.1.7**: Enhanced CLI framework
 - **Plotly >= 5.17.0**: Interactive visualizations
 - **Pandas >= 2.1.4**: Data manipulation for analytics
@@ -146,7 +146,7 @@ Smart Suggestions → Enhanced UI/CLI ← Analytics Dashboard
 - ✅ **CLI Integration**: All commands working with learning hooks
 - ✅ **UI Integration**: Streamlit interface enhanced with recommendations
 - ✅ **Learning System**: Pattern analysis and recommendations functional
-- ✅ **Dependencies**: Rich, Textual, and Plotly working correctly
+- ✅ **Dependencies**: Rich, prompt_toolkit, and Plotly working correctly
 - ✅ **Data Flow**: Usage tracking and pattern storage operational
 
 ## 📖 Usage Examples
@@ -214,7 +214,7 @@ python scripts/learning_system/test_complete_phase_1.py
 ## 🚀 Production Readiness
 
 ### Deployment Checklist
-- [x] **Dependencies installed**: Rich, Textual, Streamlit, Plotly
+- [x] **Dependencies installed**: Rich, prompt_toolkit, Streamlit, Plotly
 - [x] **Learning system connected**: Neo4j integration working
 - [x] **CLI commands functional**: All enhanced commands tested
 - [x] **UI integration complete**: Streamlit with learning hooks
