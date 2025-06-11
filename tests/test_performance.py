@@ -11,7 +11,7 @@ from src.ignition.generators.script_generator import IgnitionScriptGenerator
 class TestPerformance:
     """Performance test cases for IGN Scripts."""
 
-    @pytest.mark.performance()
+    @pytest.mark.performance
     def test_script_generator_initialization_speed(self, benchmark):
         """Benchmark script generator initialization."""
 
@@ -21,7 +21,7 @@ class TestPerformance:
         result = benchmark(create_generator)
         assert result is not None
 
-    @pytest.mark.performance()
+    @pytest.mark.performance
     def test_template_listing_speed(self, script_generator, benchmark):
         """Benchmark template listing performance."""
 
@@ -31,7 +31,7 @@ class TestPerformance:
         templates = benchmark(list_templates)
         assert isinstance(templates, list)
 
-    @pytest.mark.performance()
+    @pytest.mark.performance
     def test_single_script_generation_speed(
         self, script_generator, sample_button_config, benchmark
     ):
@@ -46,7 +46,7 @@ class TestPerformance:
         assert result is not None
         assert len(result) > 0
 
-    @pytest.mark.performance()
+    @pytest.mark.performance
     def test_batch_script_generation(self, script_generator, performance_monitor):
         """Test batch script generation performance."""
         configs = []
@@ -80,7 +80,7 @@ class TestPerformance:
         print(f"Batch generation: {duration:.2f}s for 50 scripts")
         print(f"Memory usage: {memory_usage / 1024 / 1024:.2f} MB")
 
-    @pytest.mark.performance()
+    @pytest.mark.performance
     def test_concurrent_script_generation(self, script_generator, performance_monitor):
         """Test concurrent script generation performance."""
         configs = []
@@ -117,7 +117,7 @@ class TestPerformance:
         print(f"Concurrent generation: {duration:.2f}s for 20 scripts")
         print(f"Memory usage: {memory_usage / 1024 / 1024:.2f} MB")
 
-    @pytest.mark.performance()
+    @pytest.mark.performance
     def test_template_parsing_performance(self, script_generator, benchmark):
         """Benchmark template parsing performance."""
         template_name = "vision/button_click_handler.jinja2"
@@ -133,7 +133,7 @@ class TestPerformance:
         result = benchmark(parse_template)
         assert "PerformanceTest" in result
 
-    @pytest.mark.performance()
+    @pytest.mark.performance
     def test_large_context_handling(self, script_generator, performance_monitor):
         """Test performance with large context objects."""
         # Create a large context with many variables
@@ -172,7 +172,7 @@ class TestPerformance:
         print(f"Large context processing: {duration:.2f}s")
         print(f"Memory usage: {memory_usage / 1024 / 1024:.2f} MB")
 
-    @pytest.mark.performance()
+    @pytest.mark.performance
     def test_memory_usage_stability(self, script_generator, performance_monitor):
         """Test memory usage stability over multiple generations."""
         initial_memory = performance_monitor.process.memory_info().rss
@@ -213,7 +213,7 @@ class TestPerformance:
             f"Memory growth after 100 generations: {memory_growth / 1024 / 1024:.2f} MB"
         )
 
-    @pytest.mark.performance()
+    @pytest.mark.performance
     def test_jinja2_filter_performance(self, script_generator, benchmark):
         """Benchmark custom Jinja2 filter performance."""
         test_data = {
@@ -234,7 +234,7 @@ class TestPerformance:
         assert isinstance(result, str)
         assert "True" in result  # Python True -> Jython True
 
-    @pytest.mark.performance()
+    @pytest.mark.performance
     def test_template_caching_effectiveness(
         self, script_generator, performance_monitor
     ):
@@ -274,7 +274,7 @@ class TestPerformance:
             f"Cache effectiveness: {((cold_duration - avg_warm_duration) / cold_duration * 100):.1f}%"
         )
 
-    @pytest.mark.performance()
+    @pytest.mark.performance
     def test_cli_performance(self, performance_monitor, temp_dir):
         """Test CLI performance for script generation."""
         from click.testing import CliRunner
@@ -310,8 +310,8 @@ class TestPerformance:
 
         print(f"CLI generation time: {duration:.2f}s")
 
-    @pytest.mark.slow()
-    @pytest.mark.performance()
+    @pytest.mark.slow
+    @pytest.mark.performance
     def test_stress_test_script_generation(self, script_generator):
         """Stress test with many script generations."""
         import gc

@@ -22,21 +22,21 @@ def sample_templates_dir():
     return Path(__file__).parent.parent / "templates"
 
 
-@pytest.fixture()
+@pytest.fixture
 def temp_dir():
     """Fixture providing a temporary directory for test files."""
     with tempfile.TemporaryDirectory() as tmp_dir:
         yield Path(tmp_dir)
 
 
-@pytest.fixture()
+@pytest.fixture
 def script_generator():
     """Fixture providing a configured IgnitionScriptGenerator instance."""
     generator = IgnitionScriptGenerator()
     return generator
 
 
-@pytest.fixture()
+@pytest.fixture
 def sample_button_config():
     """Fixture providing a sample button configuration."""
     return {
@@ -53,7 +53,7 @@ def sample_button_config():
     }
 
 
-@pytest.fixture()
+@pytest.fixture
 def sample_tag_write_config():
     """Fixture providing a sample tag write configuration."""
     return {
@@ -68,7 +68,7 @@ def sample_tag_write_config():
     }
 
 
-@pytest.fixture()
+@pytest.fixture
 def sample_custom_config():
     """Fixture providing a sample custom code configuration."""
     return {
@@ -81,7 +81,7 @@ def sample_custom_config():
     }
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_template_files(temp_dir):
     """Fixture creating mock template files for testing."""
     templates_dir = temp_dir / "templates" / "vision"
@@ -111,7 +111,7 @@ def test_function():
     return templates_dir
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_ignition_system():
     """Fixture providing mock Ignition system functions."""
     mock_system = Mock()
@@ -142,7 +142,7 @@ def mock_ignition_system():
     return mock_system
 
 
-@pytest.fixture()
+@pytest.fixture
 def captured_logs():
     """Fixture for capturing log messages during tests."""
 
@@ -179,7 +179,7 @@ def captured_logs():
     return LogCapture()
 
 
-@pytest.fixture()
+@pytest.fixture
 def performance_monitor():
     """Fixture for monitoring performance during tests."""
     import os
@@ -239,7 +239,7 @@ def _setup_test_logging():
         logging.root.removeHandler(handler)
 
 
-@pytest.fixture()
+@pytest.fixture
 def _mock_streamlit():
     """Fixture for mocking Streamlit components in UI tests."""
     with (
@@ -261,7 +261,7 @@ def _mock_streamlit():
         yield
 
 
-@pytest.fixture()
+@pytest.fixture
 def _environment_variables():
     """Fixture for setting test environment variables."""
     import os

@@ -67,10 +67,7 @@ class IgnitionGraphPopulator:
     def _create_context_nodes(self) -> bool:
         """Create Context nodes."""
         try:
-            for node in IgnitionGraphSchema.create_context_nodes():
-                if not self.client.create_node(node):
-                    return False
-            return True
+            return all(self.client.create_node(node) for node in IgnitionGraphSchema.create_context_nodes())
         except Exception as e:
             logger.error(f"Failed to create context nodes: {e}")
             return False
@@ -78,10 +75,7 @@ class IgnitionGraphPopulator:
     def _create_script_type_nodes(self) -> bool:
         """Create ScriptType nodes."""
         try:
-            for node in IgnitionGraphSchema.create_script_type_nodes():
-                if not self.client.create_node(node):
-                    return False
-            return True
+            return all(self.client.create_node(node) for node in IgnitionGraphSchema.create_script_type_nodes())
         except Exception as e:
             logger.error(f"Failed to create script type nodes: {e}")
             return False
@@ -89,10 +83,7 @@ class IgnitionGraphPopulator:
     def _create_category_nodes(self) -> bool:
         """Create Category nodes."""
         try:
-            for node in IgnitionGraphSchema.create_category_nodes():
-                if not self.client.create_node(node):
-                    return False
-            return True
+            return all(self.client.create_node(node) for node in IgnitionGraphSchema.create_category_nodes())
         except Exception as e:
             logger.error(f"Failed to create category nodes: {e}")
             return False

@@ -820,7 +820,7 @@ if TEXTUAL_AVAILABLE:
 
         TITLE = "🧠 IGN Scripts - Pattern Explorer"
 
-        def compose(self) -> ComposeResult:
+        def compose(self) -> ComposeResult: # type: ignore
             """Compose the TUI layout."""
             yield Header()
 
@@ -838,7 +838,7 @@ if TEXTUAL_AVAILABLE:
 
             yield Footer()
 
-        def on_button_pressed(self, event: Button.Pressed) -> None:
+        def on_button_pressed(self, event: Button.Pressed) -> None: # type: ignore
             """Handle button presses."""
             button_id = event.button.id
 

@@ -84,7 +84,7 @@ def connect(
     timeout: float,
     save_config: str | None,
 ):
-    """Connect to an OPC-UA server.
+    r"""Connect to an OPC-UA server.
 
     🔒 READ-ONLY: Connection is configured for safe read operations only.
 
