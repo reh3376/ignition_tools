@@ -300,7 +300,7 @@ class OPCUAWebUI:
 
         with col3:
             st.write("")  # Spacing
-            if st.button("➕ Add Monitor"):
+            if st.button("+ Add Monitor"):
                 self._add_monitor(node_to_monitor, update_interval)
 
         # Active monitors

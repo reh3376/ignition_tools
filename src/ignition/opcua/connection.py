@@ -70,7 +70,7 @@ class ConnectionManager:
 
         except Exception as e:
             logger.error("Connection failed: %s", e)
-            raise ConnectionError(f"Failed to connect: {e}")
+            raise ConnectionError(f"Failed to connect: {e}") from e
 
     async def disconnect(self) -> None:
         """Disconnect from OPC-UA server."""

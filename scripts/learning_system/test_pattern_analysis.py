@@ -193,7 +193,7 @@ def test_pattern_analysis():
                     f"     Support: {pattern['support']:.2%}, Lift: {pattern['lift']:.2f}"
                 )
         else:
-            print("ℹ️ No co-occurrence patterns found (need more diverse data)")
+            print("ℹ No co-occurrence patterns found (need more diverse data)")
 
         # Test 3: Template Usage Patterns
         print("\n🔄 Test 3: Template Usage Patterns")
@@ -208,7 +208,7 @@ def test_pattern_analysis():
                 )
                 print(f"     Avg time: {pattern['avg_execution_time']:.3f}s")
         else:
-            print("ℹ️ No template patterns found")
+            print("ℹ No template patterns found")
 
         # Test 4: Parameter Combination Patterns
         print("\n🔄 Test 4: Parameter Combination Patterns")
@@ -225,7 +225,7 @@ def test_pattern_analysis():
                     f"     Common values: {list(pattern['common_values'].keys())[:3]}"
                 )
         else:
-            print("ℹ️ No parameter patterns found")
+            print("ℹ No parameter patterns found")
 
         # Test 5: Sequential Patterns
         print("\n🔄 Test 5: Sequential Usage Patterns")
@@ -239,7 +239,7 @@ def test_pattern_analysis():
                     f"     Support: {pattern['support']:.2%}, Frequency: {pattern['frequency']}"
                 )
         else:
-            print("ℹ️ No sequential patterns found")
+            print("ℹ No sequential patterns found")
 
         # Test 6: Pattern Retrieval
         print("\n🔄 Test 6: Pattern Retrieval from Database")
@@ -264,7 +264,7 @@ def test_pattern_analysis():
                 )
                 print(f"     {rec['reasoning']}")
         else:
-            print("ℹ️ No recommendations found (need more usage data)")
+            print("ℹ No recommendations found (need more usage data)")
 
         print("\n🎉 Pattern analysis tests completed successfully!")
         return True

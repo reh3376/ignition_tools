@@ -1,4 +1,5 @@
-"""Task 7: Alarm System Expansion
+"""Task 7: Alarm System Expansion.
+
 Enhanced alarm management and monitoring functions for Ignition SCADA systems.
 
 This module provides comprehensive alarm operations including:

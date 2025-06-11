@@ -277,7 +277,7 @@ def test_complete_learning_system():
                         f"   → {rec['recommended_function']} (confidence: {rec['confidence']:.1%})"
                     )
             else:
-                print(f"ℹ️ No recommendations found for '{func}'")
+                print(f"ℹ No recommendations found for '{func}'")
 
         # Test 7: Pattern Export
         print("\n🔄 Test 7: Pattern Export")

@@ -1,4 +1,5 @@
-"""Task 9: Security System Expansion
+"""Task 9: Security System Expansion.
+
 Security operations and access control functions for Ignition SCADA systems.
 
 This module provides comprehensive security operations including:

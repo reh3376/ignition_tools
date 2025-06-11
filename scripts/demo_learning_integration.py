@@ -71,7 +71,7 @@ def demo_cli_integration():
 
             console.print(table)
         else:
-            console.print("ℹ️ No recommendations available yet")
+            console.print("ℹ No recommendations available yet")
 
         # Display welcome message
         console.print("\n[bold blue]4. Enhanced CLI Welcome Experience[/bold blue]")
@@ -146,7 +146,7 @@ def demo_ui_integration():
             for i, rec in enumerate(recommendations[:3], 1):
                 print(f"   {i}. {rec['action']} (confidence: {rec['confidence']:.1%})")
         else:
-            print("ℹ️ No UI recommendations available yet")
+            print("ℹ No UI recommendations available yet")
 
         print("\n✅ UI integration demo complete!")
 

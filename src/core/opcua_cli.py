@@ -325,7 +325,7 @@ def disconnect(force):
     global current_connection, current_config
 
     if not current_connection:
-        console.print("ℹ️ No active connection")
+        console.print("ℹ No active connection")
         return
 
     if not force and not Confirm.ask("🔌 Disconnect from OPC-UA server?"):

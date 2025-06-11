@@ -1,4 +1,5 @@
-"""Task 6: Utility System Expansion
+"""Task 6: Utility System Expansion.
+
 Comprehensive utility functions and system management for Ignition SCADA systems.
 
 This module provides utility operations including:

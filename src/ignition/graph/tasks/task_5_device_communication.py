@@ -1,4 +1,5 @@
-"""Task 5: Device Communication Expansion
+"""Task 5: Device Communication Expansion.
+
 Advanced device communication protocols and management for Ignition SCADA systems.
 
 This module provides comprehensive device communication operations including:

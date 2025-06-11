@@ -1,4 +1,5 @@
-"""Task 8: Print System Expansion
+"""Task 8: Print System Expansion.
+
 Print operations and document management functions for Ignition SCADA systems.
 
 This module provides comprehensive print operations including:

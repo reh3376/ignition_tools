@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Task 3: GUI System Expansion Implementation.
+
 ==========================================
 
 This module implements comprehensive GUI system functions for Ignition Vision Client.

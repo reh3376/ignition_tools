@@ -114,7 +114,7 @@ class IgnitionOPCUAClient:
             except Exception as e:
                 self._connection_stats["error_count"] += 1
                 logger.error("Failed to connect to %s: %s", self.url, e)
-                raise ConnectionError(f"Failed to connect to {self.url}: {e}")
+                raise ConnectionError(f"Failed to connect to {self.url}: {e}") from e
 
     async def disconnect(self) -> None:
         """Disconnect from OPC-UA server."""
@@ -303,7 +303,7 @@ class IgnitionOPCUAClient:
             try:
                 endpoints = await self.client.connect_and_get_server_endpoints()
                 server_info["endpoints"] = [str(ep) for ep in endpoints]
-            except:
+            except Exception:
                 server_info["endpoints"] = []
 
             return server_info
