@@ -14,10 +14,10 @@ jobs:
         python-version: ["3.11", "3.12"]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v4.1.1
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5.0.0
       with:
         python-version: ${{ matrix.python-version }}
 
@@ -53,7 +53,7 @@ jobs:
         pytest tests/ --cov=src --cov-report=xml --cov-report=html -v
 
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4.0.1
       with:
         file: ./coverage.xml
         flags: unittests
@@ -62,7 +62,7 @@ jobs:
   docker-test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v4.1.1
 
     - name: Build Docker test image
       run: docker build -t ign-scripts-test .
@@ -78,10 +78,10 @@ jobs:
   security:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v4.1.1
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5.0.0
       with:
         python-version: "3.11"
 
@@ -96,7 +96,7 @@ jobs:
       run: safety check --json --output safety-report.json || true
 
     - name: Upload security reports
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v4.3.1
       with:
         name: security-reports
         path: |
