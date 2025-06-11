@@ -14,6 +14,7 @@ Complexity: ⭐⭐⭐⭐ (High)
 """
 
 import logging
+import os
 from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
@@ -57,7 +58,7 @@ success = system.db.addDatasource(
     driverClassName="com.mysql.cj.jdbc.Driver",
     connectUrl="jdbc:mysql://localhost:3306/production",
     username="ignition_user",
-    password="secure_password",
+    password=os.getenv("DB_PASSWORD", "your_password_here"),
     props={"useSSL": "true", "serverTimezone": "UTC"}
 )
 print("Datasource added:", success)""",
@@ -197,7 +198,7 @@ for ds_name in datasources:
 conn = system.db.createConnection(
     jdbcUrl="jdbc:postgresql://localhost:5432/analytics",
     username="analyst",
-    password="password123",
+    password=os.getenv("ANALYTICS_DB_PASSWORD", "your_password_here"),
     driverClassName="org.postgresql.Driver",
     props={
         "ssl": "true",

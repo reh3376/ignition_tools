@@ -5,13 +5,18 @@ and updating the Ignition knowledge graph.
 """
 
 import logging
+import os
 from contextlib import contextmanager
 from typing import Any
 
+from dotenv import load_dotenv
 from neo4j import GraphDatabase
 from neo4j.exceptions import AuthError, ServiceUnavailable
 
 from .schema import GraphNode, GraphRelationship, IgnitionGraphSchema
+
+# Load environment variables
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -21,20 +26,20 @@ class IgnitionGraphClient:
 
     def __init__(
         self,
-        uri: str = "bolt://localhost:7687",
-        username: str = "neo4j",
-        password: str = "ignition-graph",
+        uri: str = None,
+        username: str = None,
+        password: str = None,
     ):
         """Initialize the graph database client.
 
         Args:
-            uri: Neo4j connection URI
-            username: Database username
-            password: Database password
+            uri: Neo4j connection URI (defaults to NEO4J_URI env var)
+            username: Database username (defaults to NEO4J_USERNAME env var)
+            password: Database password (defaults to NEO4J_PASSWORD env var)
         """
-        self.uri = uri
-        self.username = username
-        self.password = password
+        self.uri = uri or os.getenv('NEO4J_URI', 'bolt://localhost:7687')
+        self.username = username or os.getenv('NEO4J_USERNAME', 'neo4j')
+        self.password = password or os.getenv('NEO4J_PASSWORD', 'neo4j')
         self.driver = None
         self._connected = False
 

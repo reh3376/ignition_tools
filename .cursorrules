@@ -1,0 +1,50 @@
+# Cursor Rules for IGN_Scripts Project
+
+## Security and Environment Variables
+### CRITICAL SECURITY REQUIREMENT:
+- **NEVER hardcode sensitive information** (credentials, IPs, certificates, API keys, passwords, etc.)
+- **ALWAYS use .env files** for storing sensitive configuration data
+- **ALWAYS use python-dotenv** library to load environment variables
+- **ALWAYS import and use os.getenv()** or python-dotenv's load_dotenv() in scripts
+- Required imports for environment variable usage:
+  ```python
+  import os
+  from dotenv import load_dotenv
+  load_dotenv()  # Load .env file at script start
+  ```
+- Environment variable usage pattern:
+  ```python
+  # Good - using environment variables
+  server_url = os.getenv('OPCUA_SERVER_URL', 'opc.tcp://localhost:4840')
+  username = os.getenv('OPCUA_USERNAME', 'admin')
+  
+  # Bad - hardcoded values
+  server_url = "opc.tcp://10.4.8.15:62541"
+  username = "opcuauser"
+  ```
+- Always provide sensible defaults for non-sensitive configuration
+- Add python-dotenv to requirements.txt if not present
+- Update .env.sample with all required environment variable examples
+
+## Python Development Guidelines
+- Use type hints for all function parameters and return values
+- Follow PEP 8 style guidelines
+- Use descriptive variable and function names
+- Add docstrings to all functions and classes
+- Handle exceptions appropriately with try/except blocks
+- Use logging instead of print statements for debugging
+- Prefer pathlib over os.path for file operations
+
+## OPC-UA Specific Guidelines
+- Always use read-only operations for production safety
+- Implement proper certificate validation
+- Use secure authentication methods
+- Provide comprehensive error handling for connection issues
+- Log all OPC-UA operations for audit trails
+
+## Testing and Quality
+- Write unit tests for all new functionality
+- Use pytest for testing framework
+- Achieve minimum 80% test coverage
+- Run linting tools (ruff, mypy) before committing
+- Follow conventional commit message format 
