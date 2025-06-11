@@ -21,8 +21,8 @@ from rich.text import Text
 
 # Optional Textual imports for TUI features
 try:
-    from textual.app import App, ComposeResult
     from textual import Container, Horizontal, Vertical
+    from textual.app import App, ComposeResult
     from textual.widgets import Button, DataTable, Footer, Header, Static
 
     TEXTUAL_AVAILABLE = True
