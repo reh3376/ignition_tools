@@ -6,13 +6,12 @@ into the Neo4j graph database for the Ignition SCADA system.
 
 Task 10 includes:
 - File System Operations (8 functions)
-- Report Generation & Distribution (9 functions)  
+- Report Generation & Distribution (9 functions)
 - Data Processing & Analysis (8 functions)
 
 Total: 25 functions
 """
 
-import os
 import sys
 from pathlib import Path
 
@@ -28,45 +27,46 @@ from src.ignition.graph.tasks.task_10_file_report_system import (
 
 def populate_task_10_functions():
     """Populate Task 10 file and report system functions in the graph database."""
-    
     print("🚀 Starting Task 10: File & Report System Expansion")
     print("=" * 60)
-    
+
     # Initialize graph client
     client = IgnitionGraphClient()
-    
+
     try:
         # Connect to Neo4j
         print("📡 Connecting to Neo4j database...")
         client.connect()
-        
+
         # Get function definitions
         print("📋 Loading function definitions...")
         file_report_functions = get_file_report_system_functions()
         task_metadata = get_task_10_metadata()
-        
-        print(f"📊 Task 10 Summary:")
+
+        print("📊 Task 10 Summary:")
         print(f"   • Task: {task_metadata['task_name']}")
         print(f"   • Functions: {len(file_report_functions)}")
         print(f"   • Categories: {', '.join(task_metadata['categories'])}")
         print(f"   • Priority: {task_metadata['priority']}")
         print()
-        
+
         # Validate database connection
         print("🔍 Validating database connection...")
-        pre_count_result = client.execute_query("MATCH (f:Function) RETURN count(f) as total")
-        pre_count = pre_count_result[0]['total'] if pre_count_result else 0
+        pre_count_result = client.execute_query(
+            "MATCH (f:Function) RETURN count(f) as total"
+        )
+        pre_count = pre_count_result[0]["total"] if pre_count_result else 0
         print(f"   • Current functions in database: {pre_count}")
-        
+
         # Load functions into database
         print("📤 Loading functions into database...")
         successful_loads = 0
         failed_loads = 0
-        
+
         for i, func_data in enumerate(file_report_functions, 1):
             try:
                 print(f"   📦 Loading function {i:2d}/25: {func_data['name']}")
-                
+
                 # Clean parameters to handle Neo4j constraints
                 cleaned_parameters = []
                 for param in func_data["parameters"]:
@@ -133,11 +133,11 @@ def populate_task_10_functions():
                     successful_loads += 1
                 else:
                     failed_loads += 1
-                    
+
             except Exception as e:
                 print(f"   ❌ Failed to load {func_data['name']}: {e}")
                 failed_loads += 1
-        
+
         print()
         print("📊 Loading Results:")
         print(f"   • Total Functions: {len(file_report_functions)}")
@@ -146,42 +146,44 @@ def populate_task_10_functions():
         print(
             f"   • Success Rate: {(successful_loads/len(file_report_functions)*100):.1f}%"
         )
-        
+
         # Validate database state
         print()
         print("🔍 Validating database state...")
-        post_count_result = client.execute_query("MATCH (f:Function) RETURN count(f) as total")
-        post_count = post_count_result[0]['total'] if post_count_result else 0
+        post_count_result = client.execute_query(
+            "MATCH (f:Function) RETURN count(f) as total"
+        )
+        post_count = post_count_result[0]["total"] if post_count_result else 0
         functions_added = post_count - pre_count
-        
+
         print(f"   • Functions before: {pre_count}")
         print(f"   • Functions after: {post_count}")
         print(f"   • Functions added: {functions_added}")
-        
+
         # Verify specific Task 10 functions
         print()
         print("🔍 Verifying Task 10 functions...")
-        
+
         # Check key functions from each category
         key_functions = [
             "system.file.readFileContent",
-            "system.file.writeFileContent", 
+            "system.file.writeFileContent",
             "system.report.generateDataReport",
             "system.report.scheduleReport",
             "system.file.parseCSVFile",
-            "system.file.parseLogFile"
+            "system.file.parseLogFile",
         ]
-        
+
         for func_name in key_functions:
             result = client.execute_query(
                 "MATCH (f:Function {name: $name}) RETURN f.name as name",
-                {"name": func_name}
+                {"name": func_name},
             )
             if result:
                 print(f"   ✅ {func_name}")
             else:
                 print(f"   ❌ Missing: {func_name}")
-        
+
         # Get category distribution
         print()
         print("📊 Function Category Distribution:")
@@ -191,19 +193,19 @@ def populate_task_10_functions():
         RETURN f.category as category, count(f) as count
         ORDER BY count DESC
         """
-        
+
         category_results = client.execute_query(category_query)
         for result in category_results:
             print(f"   • {result['category']}: {result['count']} functions")
-        
+
         # Get total relationships
         print()
         print("🔗 Relationship Analysis:")
         rel_query = "MATCH ()-[r]->() RETURN count(r) as total_relationships"
         rel_result = client.execute_query(rel_query)
-        total_rels = rel_result[0]['total_relationships'] if rel_result else 0
+        total_rels = rel_result[0]["total_relationships"] if rel_result else 0
         print(f"   • Total relationships: {total_rels}")
-        
+
         # Calculate completion percentage
         target_functions = 400  # Estimated target
         completion_percentage = (post_count / target_functions) * 100
@@ -211,21 +213,28 @@ def populate_task_10_functions():
         print("🎯 Progress Update:")
         print(f"   • Current Progress: {post_count}/{target_functions}+ functions")
         print(f"   • Completion: {completion_percentage:.1f}%")
-        print(f"   • Task 10 Status: ✅ COMPLETE ({successful_loads}/{len(file_report_functions)} functions)")
-        
+        print(
+            f"   • Task 10 Status: ✅ COMPLETE ({successful_loads}/{len(file_report_functions)} functions)"
+        )
+
         if successful_loads == len(file_report_functions):
-            print("\n🎉 Task 10: File & Report System Expansion - COMPLETED SUCCESSFULLY!")
+            print(
+                "\n🎉 Task 10: File & Report System Expansion - COMPLETED SUCCESSFULLY!"
+            )
             print("   All 25 file and report functions loaded successfully.")
-            print("   Database now includes comprehensive file operations and reporting capabilities.")
+            print(
+                "   Database now includes comprehensive file operations and reporting capabilities."
+            )
         else:
             print(f"\n⚠️  Task 10 completed with {failed_loads} failures.")
             print("   Some functions may need manual review.")
-        
+
     except Exception as e:
         print(f"❌ Error during Task 10 population: {e}")
         import traceback
+
         traceback.print_exc()
-        
+
     finally:
         print("\n🔚 Closing database connection...")
         client.disconnect()
@@ -233,4 +242,4 @@ def populate_task_10_functions():
 
 
 if __name__ == "__main__":
-    populate_task_10_functions() 
+    populate_task_10_functions()

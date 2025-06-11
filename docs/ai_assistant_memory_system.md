@@ -5,13 +5,19 @@
 This project includes a **Neo4j graph database** that serves as **persistent long-term memory** for AI assistants working on this codebase. If you are an AI assistant opening this project:
 
 ### **The Graph Database Contains:**
-- **195/400+ Ignition system functions** (48.8% complete) with context availability
+- **365/400+ Ignition system functions** (91.3% complete) with context availability
+- **Machine Learning Integration**: Predictive maintenance, real-time inference, AutoML (Task 12 ✅)
+- **Advanced Math & Analytics**: Statistical analysis, optimization algorithms (Task 11 ✅)
 - **Device Communication Protocols**: OPC, OPC-UA, BACnet, DNP3 (Task 5 ✅)
 - **Tag System Operations**: Complete tag management (Task 1 ✅)
 - **Database Operations**: Enhanced DB functions (Task 2 ✅)
 - **GUI System Functions**: Vision client operations (Task 3 ✅)
 - **Perspective System**: Modern web HMI functions (Task 4 ✅)
 - **Alarm System**: Complete alarm management (Task 7 ✅)
+- **File & Report System**: Document management and reporting (Task 10 ✅)
+- **Security System**: Authentication and authorization (Task 9 ✅)
+- **Print System**: Document printing and management (Task 8 ✅)
+- **Utility System**: Helper functions and utilities (Task 6 ✅)
 - **Script templates** and their relationships
 - **Context mappings** (Gateway, Vision, Perspective)
 - **Parameter availability** by script type
@@ -67,6 +73,16 @@ RETURN f.name, f.category, f.description
 // What parameters are available in tag change scripts?
 MATCH (s:ScriptType {name: "TagChange"})-[:PROVIDES]-(p:Parameter)
 RETURN p.name, p.type, p.description
+
+// Find all ML functions for predictive maintenance
+MATCH (f:Function)
+WHERE f.name STARTS WITH "system.ml." AND f.category CONTAINS "Predictive"
+RETURN f.name, f.description, f.category
+
+// Get AutoML functions for no-code machine learning
+MATCH (f:Function)
+WHERE f.name CONTAINS "AutoML" OR f.category = "AutoML"
+RETURN f.name, f.description, f.parameters
 ```
 
 ### **Validation Queries**

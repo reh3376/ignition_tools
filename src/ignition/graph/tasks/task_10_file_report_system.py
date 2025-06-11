@@ -1351,4 +1351,4 @@ if __name__ == "__main__":
         assert "category" in func
         assert "patterns" in func
 
-    print("✅ All function definitions are valid!") 
+    print("✅ All function definitions are valid!")
