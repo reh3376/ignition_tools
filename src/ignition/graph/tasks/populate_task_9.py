@@ -18,7 +18,9 @@ project_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from src.ignition.graph.client import IgnitionGraphClient
-from src.ignition.graph.tasks.task_9_security_system import get_security_system_functions
+from src.ignition.graph.tasks.task_9_security_system import (
+    get_security_system_functions,
+)
 
 
 def populate_task_9_security_system():
@@ -177,7 +179,9 @@ def populate_task_9_security_system():
         print("\n📈 Loading Results:")
         print(f"   • Successful: {successful_loads}")
         print(f"   • Failed: {failed_loads}")
-        print(f"   • Success Rate: {(successful_loads/len(security_functions)*100):.1f}%")
+        print(
+            f"   • Success Rate: {(successful_loads/len(security_functions)*100):.1f}%"
+        )
 
         # Validate database state
         print("\n🔍 Validating database state...")
@@ -263,4 +267,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main() 
+    main()
