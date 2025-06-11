@@ -177,10 +177,9 @@ class LearningSystemUI:
                     if st.button(f"📋 Browse Templates #{i}", key=f"rec_template_{i}"):
                         st.session_state.page = "templates"
                         st.rerun()
-                elif action == "validation":
-                    if st.button(f"✅ Validate Script #{i}", key=f"rec_validate_{i}"):
-                        st.session_state.page = "validation"
-                        st.rerun()
+                elif action == "validation" and st.button(f"✅ Validate Script #{i}", key=f"rec_validate_{i}"):
+                    st.session_state.page = "validation"
+                    st.rerun()
 
     def display_usage_insights(self):
         """Display usage insights and analytics."""

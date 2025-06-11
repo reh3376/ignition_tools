@@ -13,16 +13,15 @@ from pathlib import Path
 from typing import Any
 
 import click
-
-# Add src to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
-
 from rich.console import Console
 from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.syntax import Syntax
 from rich.table import Table
 from rich.tree import Tree
+
+# Add src to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 from ignition.opcua import IgnitionOPCUAClient
 
@@ -91,7 +90,8 @@ def connect(
 
     Examples:
         ignition opcua connect -u opc.tcp://localhost:4840
-        ignition opcua connect -u opc.tcp://server:4840 --username admin --password secret
+        ignition opcua connect -u opc.tcp://server:4840 --username admin \\
+            --password secret
     """
     asyncio.run(
         _connect_impl(
@@ -208,11 +208,11 @@ async def _connect_impl(
             except Exception as e:
                 progress.update(task, description="❌ Connection failed!")
                 console.print(f"❌ [bold red]Connection failed:[/bold red] {e!s}")
-                raise click.ClickException(f"Failed to connect: {e!s}")
+                raise click.ClickException(f"Failed to connect: {e!s}") from e
 
     except Exception as e:
         console.print(f"❌ [bold red]Error:[/bold red] {e!s}")
-        raise click.ClickException(str(e))
+        raise click.ClickException(str(e)) from e
 
 
 @opcua.command()
@@ -599,7 +599,7 @@ async def _monitor_impl(
         monitoring_data = []
         output_file = None
         if output:
-            output_file = open(output, "w")
+            output_file = open(output, "w")  # noqa: SIM115
             if format == "csv":
                 import csv
 

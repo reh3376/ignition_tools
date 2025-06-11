@@ -20,7 +20,7 @@ from src.ui.streamlit_app import (
 class TestStreamlitUI:
     """Test cases for the Streamlit UI functionality."""
 
-    @pytest.mark.ui
+    @pytest.mark.ui()
     def test_init_session_state(self, mock_streamlit):
         """Test session state initialization."""
         with patch("streamlit.session_state", {}) as mock_session_state:
@@ -31,7 +31,7 @@ class TestStreamlitUI:
                 or "generator" in mock_session_state
             )
 
-    @pytest.mark.ui
+    @pytest.mark.ui()
     def test_render_header(self, mock_streamlit):
         """Test header rendering."""
         with (
@@ -50,7 +50,7 @@ class TestStreamlitUI:
             mock_title.assert_called_once()
             mock_subheader.assert_called_once()
 
-    @pytest.mark.ui
+    @pytest.mark.ui()
     def test_render_sidebar(self, mock_streamlit):
         """Test sidebar rendering."""
         with (
@@ -75,7 +75,7 @@ class TestStreamlitUI:
             mock_sidebar.title.assert_called()
             mock_sidebar.selectbox.assert_called()
 
-    @pytest.mark.ui
+    @pytest.mark.ui()
     def test_render_home_page(self, mock_streamlit):
         """Test home page rendering."""
         with (
@@ -91,7 +91,7 @@ class TestStreamlitUI:
             mock_markdown.assert_called()
             mock_columns.assert_called()
 
-    @pytest.mark.ui
+    @pytest.mark.ui()
     def test_render_generator_page(self, mock_streamlit):
         """Test generator page rendering."""
         with (
@@ -105,7 +105,7 @@ class TestStreamlitUI:
             mock_markdown.assert_called()
             mock_radio.assert_called()
 
-    @pytest.mark.ui
+    @pytest.mark.ui()
     def test_render_templates_page(self, mock_streamlit):
         """Test templates page rendering."""
         with (
@@ -123,7 +123,7 @@ class TestStreamlitUI:
             mock_markdown.assert_called()
             mock_warning.assert_called()
 
-    @pytest.mark.ui
+    @pytest.mark.ui()
     def test_main_function(self, mock_streamlit):
         """Test main function execution."""
         with (
@@ -143,7 +143,7 @@ class TestStreamlitUI:
             mock_sidebar.assert_called_once()
             mock_home.assert_called_once()
 
-    @pytest.mark.ui
+    @pytest.mark.ui()
     def test_template_selection_flow(self, mock_streamlit):
         """Test template selection in generator."""
         with (
@@ -171,7 +171,7 @@ class TestStreamlitUI:
             assert len(templates) > 0
             assert "button_click_handler" in templates[0]
 
-    @pytest.mark.ui
+    @pytest.mark.ui()
     def test_script_generation_error_handling(self, mock_streamlit):
         """Test error handling in script generation."""
         with (
@@ -184,13 +184,10 @@ class TestStreamlitUI:
             mock_session_state.generator = mock_generator
 
             # Simulate error in generation
-            try:
+            with pytest.raises(Exception, match="Test error"):
                 mock_generator.generate_script("template", {})
-            except Exception as e:
-                # This is how the UI would handle the error
-                assert str(e) == "Test error"
 
-    @pytest.mark.ui
+    @pytest.mark.ui()
     def test_file_upload_functionality(self, mock_streamlit):
         """Test file upload functionality."""
         with patch("streamlit.file_uploader") as mock_uploader, patch("streamlit.json"):
@@ -207,7 +204,7 @@ class TestStreamlitUI:
                 config_content = json.loads(uploaded_file.read())
                 assert config_content["component_name"] == "TestButton"
 
-    @pytest.mark.ui
+    @pytest.mark.ui()
     def test_download_button_functionality(self, mock_streamlit):
         """Test download button functionality."""
         with (
@@ -232,7 +229,7 @@ class TestStreamlitUI:
                 )
                 mock_download.assert_called()
 
-    @pytest.mark.ui
+    @pytest.mark.ui()
     def test_session_state_persistence(self, mock_streamlit):
         """Test session state persistence across renders."""
         with patch("streamlit.session_state") as mock_session_state:
@@ -251,7 +248,7 @@ class TestStreamlitUI:
             assert mock_session_state.generated_script == test_script
             assert mock_session_state.last_config == test_config
 
-    @pytest.mark.ui
+    @pytest.mark.ui()
     def test_ui_component_integration(self, mock_streamlit):
         """Test integration between UI components."""
         with (
@@ -276,7 +273,7 @@ class TestStreamlitUI:
             assert action_type == "navigation"
             assert target_window == "TestWindow"
 
-    @pytest.mark.performance
+    @pytest.mark.performance()
     def test_ui_render_performance(self, mock_streamlit, performance_monitor):
         """Test UI rendering performance."""
         with (

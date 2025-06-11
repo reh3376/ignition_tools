@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-"""OPC-UA Connection Configuration System
-Collect and manage all necessary information for Ignition OPC-UA connections.
+"""OPC-UA Connection Configuration Management.
+
+Provides classes and utilities for managing OPC-UA server connections,
+including configuration storage, validation, and connection management.
 """
 
 import json
@@ -351,7 +353,7 @@ class OPCUAConnectionWizard:
 
             parsed = urlparse(config.server_url.replace("opc.tcp://", "http://"))
             default_gateway = f"http://{parsed.hostname}:8088"
-        except:
+        except Exception:
             default_gateway = "http://localhost:8088"
 
         config.ignition_gateway_url = Prompt.ask(

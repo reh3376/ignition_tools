@@ -241,9 +241,9 @@ class IgnitionGatewayClient:
             try:
                 response = self.session.get(self.config.base_url, timeout=10)
                 health_result["checks"]["connectivity"]["status"] = "healthy"
-                health_result["checks"]["connectivity"]["details"] = (
-                    f"HTTP {response.status_code}"
-                )
+                health_result["checks"]["connectivity"][
+                    "details"
+                ] = f"HTTP {response.status_code}"
             except Exception as e:
                 health_result["checks"]["connectivity"]["status"] = "unhealthy"
                 health_result["checks"]["connectivity"]["details"] = str(e)
@@ -254,14 +254,14 @@ class IgnitionGatewayClient:
             logger.debug("Testing authentication...")
             if self._authenticated or self.connect():
                 health_result["checks"]["authentication"]["status"] = "healthy"
-                health_result["checks"]["authentication"]["details"] = (
-                    f"Auth type: {self.config.auth_type}"
-                )
+                health_result["checks"]["authentication"][
+                    "details"
+                ] = f"Auth type: {self.config.auth_type}"
             else:
                 health_result["checks"]["authentication"]["status"] = "unhealthy"
-                health_result["checks"]["authentication"]["details"] = (
-                    "Authentication failed"
-                )
+                health_result["checks"]["authentication"][
+                    "details"
+                ] = "Authentication failed"
                 health_result["overall_status"] = "unhealthy"
                 return health_result
 
@@ -274,19 +274,19 @@ class IgnitionGatewayClient:
                 )
                 if gwinfo_response.status_code == 200:
                     health_result["checks"]["api_access"]["status"] = "healthy"
-                    health_result["checks"]["api_access"]["details"] = (
-                        "Gateway info accessible"
-                    )
+                    health_result["checks"]["api_access"][
+                        "details"
+                    ] = "Gateway info accessible"
                 else:
                     health_result["checks"]["api_access"]["status"] = "warning"
-                    health_result["checks"]["api_access"]["details"] = (
-                        "Limited API access"
-                    )
+                    health_result["checks"]["api_access"][
+                        "details"
+                    ] = "Limited API access"
             except Exception:
                 health_result["checks"]["api_access"]["status"] = "warning"
-                health_result["checks"]["api_access"]["details"] = (
-                    "API access test failed"
-                )
+                health_result["checks"]["api_access"][
+                    "details"
+                ] = "API access test failed"
 
             # Calculate response time
             response_time_ms = (time.time() - start_time) * 1000

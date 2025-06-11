@@ -141,7 +141,7 @@ class AddressSpaceBrowser:
         try:
             node_class = await node.read_node_class()
             return node_class == NodeClass.Variable
-        except:
+        except Exception:
             return False
 
     async def _is_object_node(self, node: Node) -> bool:
@@ -149,7 +149,7 @@ class AddressSpaceBrowser:
         try:
             node_class = await node.read_node_class()
             return node_class == NodeClass.Object
-        except:
+        except Exception:
             return False
 
     async def find_nodes_by_browse_name(

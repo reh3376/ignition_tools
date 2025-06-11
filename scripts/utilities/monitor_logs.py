@@ -179,9 +179,9 @@ class LogAnalyzer:
                             match.group(1)
                         )
                     elif "skipped" in pattern:
-                        analysis["performance_metrics"]["test_results"]["skipped"] = (
-                            int(match.group(1))
-                        )
+                        analysis["performance_metrics"]["test_results"][
+                            "skipped"
+                        ] = int(match.group(1))
 
         # Generate recommendations
         analysis["recommendations"] = self.generate_recommendations(analysis)
