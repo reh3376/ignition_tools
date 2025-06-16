@@ -11,7 +11,7 @@ Add the following to your Cursor settings in the **Indexing & Docs** section:
 
 #### **Project Context Instructions:**
 ```
-This is the IGN Scripts project with a comprehensive Code Intelligence System. 
+This is the IGN Scripts project with a comprehensive Code Intelligence System.
 Phase 8.1 has been completed, providing automated refactoring capabilities.
 
 IMPORTANT: All new agents/chat sessions MUST initialize the knowledge discovery system:
@@ -25,11 +25,11 @@ print(f"✅ Connected to {len(context['knowledge_base_status'])} knowledge bases
 
 Available knowledge bases:
 - Neo4j Graph Database (3,691+ nodes) for code structure analysis
-- Git History Integration (65+ commits) for evolution tracking  
+- Git History Integration (65+ commits) for evolution tracking
 - Refactoring Tracking System for operation documentation
 - Vector Embeddings for semantic code search
 
-Key capabilities: automated refactoring, large file detection, git integration, 
+Key capabilities: automated refactoring, large file detection, git integration,
 architecture diagram generation, comprehensive impact analysis.
 
 CLI commands available with 'refactor' prefix (12 total commands).
@@ -233,4 +233,4 @@ python -c "from ignition.code_intelligence import initialize_agent_knowledge; in
 # Start new chat and check if agent mentions knowledge discovery system
 ```
 
-This setup ensures every new Cursor agent automatically has access to the project's comprehensive knowledge base! 🚀 
+This setup ensures every new Cursor agent automatically has access to the project's comprehensive knowledge base! 🚀

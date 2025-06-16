@@ -49,7 +49,7 @@ Use knowledge discovery system for consistent project understanding.
   # Good - using environment variables
   server_url = os.getenv('OPCUA_SERVER_URL', 'opc.tcp://localhost:4840')
   username = os.getenv('OPCUA_USERNAME', 'admin')
-  
+
   # Bad - hardcoded values
   server_url = "opc.tcp://10.4.8.15:62541"
   username = "opcuauser"
@@ -79,4 +79,4 @@ Use knowledge discovery system for consistent project understanding.
 - Use pytest for testing framework
 - Achieve minimum 80% test coverage
 - Run linting tools (ruff, mypy) before committing
-- Follow conventional commit message format 
+- Follow conventional commit message format

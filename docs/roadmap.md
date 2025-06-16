@@ -175,7 +175,7 @@ This repository contains tools for generating Jython scripts for Ignition SCADA 
 ### Export/Import System 🚧 **IN PROGRESS** - 2025-01-28 ⭐ **MAJOR MILESTONE**
 - [x] **Research Ignition project export formats** ✅ **COMPLETED**
   - [x] Gateway Backup (.gwbk) format analysis ✅ **COMPLETED**
-  - [x] Project Export (.proj) format research ✅ **COMPLETED** 
+  - [x] Project Export (.proj) format research ✅ **COMPLETED**
   - [x] Resource export types and compatibility ✅ **COMPLETED**
   - [x] Version control considerations ✅ **COMPLETED**
 - [x] **Implement gateway resource export utilities** ✅ **COMPLETED** - v1.0.0
@@ -258,7 +258,7 @@ This repository contains tools for generating Jython scripts for Ignition SCADA 
 
 **🎯 IMPLEMENTATION DETAILS (v1.0.0):**
 - **Core Exporter**: `GatewayResourceExporter` class with dependency analysis and multiple format support
-- **Gateway Client**: Mock-ready client interface for connecting to Ignition Gateways  
+- **Gateway Client**: Mock-ready client interface for connecting to Ignition Gateways
 - **Neo4j Schema**: Extended with 6 new node types and 7 new relationship types for export/import intelligence
 - **CLI Commands**: Full CLI integration with 12 new commands across 3 command groups (export, import, deploy)
 - **Streamlit UI**: Comprehensive 5-tab interface with 850+ lines of UI code for complete export/import management
@@ -933,13 +933,13 @@ class CodeIntelligenceManager:
     def __init__(self, graph_client: IgnitionGraphClient):
         self.client = graph_client
         self.embedder = SentenceTransformer('all-MiniLM-L6-v2')
-    
+
     def find_similar_code(self, query: str, context_type: str = None):
         """Find semantically similar code with graph context"""
         query_embedding = self.embedder.encode(query)
-        
+
         cypher = """
-        CALL db.index.vector.queryNodes('code_embeddings', 10, $embedding) 
+        CALL db.index.vector.queryNodes('code_embeddings', 10, $embedding)
         YIELD node, score
         MATCH (node)-[:CONTAINS]->(element)
         OPTIONAL MATCH (node)-[:DEPENDS_ON]->(dep)
@@ -948,9 +948,9 @@ class CodeIntelligenceManager:
                collect(dep.path) as dependencies
         ORDER BY score DESC
         """
-        
+
         return self.client.execute_query(cypher, {"embedding": query_embedding})
-    
+
     def get_file_context(self, file_path: str):
         """Get comprehensive context for a file"""
         cypher = """
@@ -965,7 +965,7 @@ class CodeIntelligenceManager:
                collect(DISTINCT dep.path) as imports,
                collect(DISTINCT dependent.path) as dependents
         """
-        
+
         return self.client.execute_query(cypher, {"path": file_path})
 ```
 

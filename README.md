@@ -41,7 +41,7 @@ IGN_scripts/
    ```bash
    # Install uv if not already installed
    if ! command -v uv &> /dev/null; then pip install uv; fi
-   
+
    # Create and activate virtual environment
    uv venv
    source .venv/bin/activate  # On Unix-like systems
@@ -59,7 +59,7 @@ IGN_scripts/
    # Set required environment variables
    export DOCKER_TOKEN="your_docker_token"
    export CODECOV_TOKEN="your_codecov_token"
-   
+
    # Run the setup script
    ./scripts/setup_github_repo.sh
    ```
