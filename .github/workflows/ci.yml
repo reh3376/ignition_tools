@@ -17,6 +17,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.11", "3.12"]
+        service: [mcp, mcp-tools]
 
     steps:
     - uses: actions/checkout@v4.1.1
@@ -31,86 +32,115 @@ jobs:
         curl -LsSf https://astral.sh/uv/install.sh | sh
         echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
-    - name: Create virtual environment
-      run: uv venv
-
-    - name: Install dependencies
+    - name: Check if service exists
+      id: check-service
       run: |
+        if [ -d "${{ matrix.service }}" ]; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+          echo "Service ${{ matrix.service }} found"
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "Service ${{ matrix.service }} not found, skipping..."
+        fi
+
+    - name: Create virtual environment and install dependencies
+      if: steps.check-service.outputs.exists == 'true'
+      run: |
+        cd ${{ matrix.service }}
+        uv venv
         source .venv/bin/activate
         uv cache clean
-        uv pip install pytest pytest-cov mypy ruff bandit safety codecov
         if [ -f requirements.txt ]; then
           uv pip install -r requirements.txt
+          echo "Installed dependencies from requirements.txt"
+        else
+          echo "No requirements.txt found, installing basic dependencies"
+          uv pip install pytest pytest-cov mypy ruff bandit safety codecov
         fi
 
     - name: Lint with ruff
+      if: steps.check-service.outputs.exists == 'true'
       run: |
+        cd ${{ matrix.service }}
         source .venv/bin/activate
         ruff check . --fix || true
         ruff format . || true
 
     - name: Type check with mypy
+      if: steps.check-service.outputs.exists == 'true'
       run: |
+        cd ${{ matrix.service }}
         source .venv/bin/activate
         if [ -d src ]; then
           mypy src/ --ignore-missing-imports || true
         else
-          echo "No src directory found, skipping mypy"
+          echo "No src directory found in ${{ matrix.service }}, skipping mypy"
         fi
 
     - name: Test with pytest
+      if: steps.check-service.outputs.exists == 'true'
       run: |
+        cd ${{ matrix.service }}
         source .venv/bin/activate
         if [ -d tests ]; then
           pytest tests/ --cov=src --cov-report=xml --cov-report=html -v || true
         else
-          echo "No tests directory found, skipping pytest"
+          echo "No tests directory found in ${{ matrix.service }}, skipping pytest"
         fi
 
     - name: Upload coverage reports to Codecov
-      if: hashFiles('coverage.xml') != ''
+      if: steps.check-service.outputs.exists == 'true' && hashFiles('./${{ matrix.service }}/coverage.xml') != ''
       uses: codecov/codecov-action@v4.0.1
       with:
-        file: ./coverage.xml
-        flags: unittests
-        name: codecov-umbrella
+        file: ./${{ matrix.service }}/coverage.xml
+        flags: unittests-${{ matrix.service }}
+        name: codecov-${{ matrix.service }}
         fail_ci_if_error: false
 
   docker-test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [mcp, mcp-tools]
+
     steps:
     - uses: actions/checkout@v4.1.1
 
-    - name: Check if Dockerfile exists
-      id: check-dockerfile
+    - name: Check if service and Dockerfile exist
+      id: check-service
       run: |
-        if [ -f Dockerfile ]; then
+        if [ -d "${{ matrix.service }}" ] && [ -f "${{ matrix.service }}/Dockerfile" ]; then
           echo "exists=true" >> $GITHUB_OUTPUT
+          echo "Service ${{ matrix.service }} and Dockerfile found"
         else
           echo "exists=false" >> $GITHUB_OUTPUT
-          echo "Dockerfile not found, skipping Docker tests"
+          echo "Service ${{ matrix.service }} or Dockerfile not found, skipping..."
         fi
 
     - name: Build Docker test image
-      if: steps.check-dockerfile.outputs.exists == 'true'
-      run: docker build -t ign-scripts-test .
+      if: steps.check-service.outputs.exists == 'true'
+      run: |
+        cd ${{ matrix.service }}
+        docker build -t ign-scripts-${{ matrix.service }}-test .
 
     - name: Run Docker tests
-      if: steps.check-dockerfile.outputs.exists == 'true'
+      if: steps.check-service.outputs.exists == 'true'
       run: |
+        cd ${{ matrix.service }}
         if [ -d tests ]; then
-          docker run --rm -v $(pwd):/app ign-scripts-test python -m pytest tests/ -v || true
+          docker run --rm -v $(pwd):/app ign-scripts-${{ matrix.service }}-test python -m pytest tests/ -v || true
         else
-          echo "No tests directory found for Docker testing"
+          echo "No tests directory found in ${{ matrix.service }} for Docker testing"
         fi
 
     - name: Run Docker performance tests
-      if: steps.check-dockerfile.outputs.exists == 'true'
+      if: steps.check-service.outputs.exists == 'true'
       run: |
+        cd ${{ matrix.service }}
         if [ -f tests/test_performance.py ]; then
-          docker run --rm -v $(pwd):/app ign-scripts-test python -m pytest tests/test_performance.py -v -m performance || true
+          docker run --rm -v $(pwd):/app ign-scripts-${{ matrix.service }}-test python -m pytest tests/test_performance.py -v -m performance || true
         else
-          echo "No performance tests found, skipping"
+          echo "No performance tests found in ${{ matrix.service }}, skipping"
         fi
 
   security:
@@ -129,25 +159,44 @@ jobs:
 
     - name: Run security check with bandit
       run: |
+        # Check root src directory
         if [ -d src ]; then
-          bandit -r src/ -f json -o bandit-report.json || true
+          bandit -r src/ -f json -o bandit-report-root.json || true
         else
-          echo "No src directory found, creating empty bandit report"
-          echo '{"results": [], "metrics": {}}' > bandit-report.json
+          echo '{"results": [], "metrics": {}}' > bandit-report-root.json
         fi
+        
+        # Check service src directories
+        for service in mcp mcp-tools; do
+          if [ -d "$service/src" ]; then
+            bandit -r "$service/src" -f json -o "bandit-report-$service.json" || true
+          else
+            echo '{"results": [], "metrics": {}}' > "bandit-report-$service.json"
+          fi
+        done
 
     - name: Run safety check
       run: |
+        # Check root requirements
         if [ -f requirements.txt ]; then
-          safety check -r requirements.txt --json --output safety-report.json || true
+          safety check -r requirements.txt --json --output safety-report-root.json || true
         else
-          safety check --json --output safety-report.json || true
+          safety check --json --output safety-report-root.json || true
         fi
+        
+        # Check service requirements
+        for service in mcp mcp-tools; do
+          if [ -f "$service/requirements.txt" ]; then
+            safety check -r "$service/requirements.txt" --json --output "safety-report-$service.json" || true
+          else
+            echo '{"vulnerabilities": []}' > "safety-report-$service.json"
+          fi
+        done
 
     - name: Upload security reports
       uses: actions/upload-artifact@v4.3.1
       with:
         name: security-reports
         path: |
-          bandit-report.json
-          safety-report.json
+          bandit-report-*.json
+          safety-report-*.json
