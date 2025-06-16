@@ -1,0 +1,39 @@
+site_name: MCP Tools Documentation
+site_description: Documentation for the MCP Tools development and testing toolkit
+site_author: IGN Scripts Team
+repo_url: https://github.com/reh3376/mcp-tools
+repo_name: reh3376/mcp-tools
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - search.highlight
+    - search.share
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Configuration: getting-started/configuration.md
+    - Quick Start: getting-started/quickstart.md
+  - Tools:
+    - API Testing: tools/api-testing.md
+    - Performance Monitoring: tools/performance.md
+    - Debugging: tools/debugging.md
+  - Development:
+    - Contributing: development/contributing.md
+    - Testing: development/testing.md
+    - Docker: development/docker.md
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed
+  - admonition
+  - footnotes
+  - toc:
+      permalink: true 
