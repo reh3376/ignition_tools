@@ -20,6 +20,7 @@ class NodeType(Enum):
     SCRIPT_TYPE = "ScriptType"
     PATTERN = "Pattern"
     TASK = "Task"
+    CATEGORY = "Category"
     # Learning System Node Types
     USAGE_EVENT = "UsageEvent"
     USER_SESSION = "UserSession"
@@ -52,6 +53,7 @@ class RelationshipType(Enum):
     COMPATIBLE_WITH = "COMPATIBLE_WITH"
     DEPENDS_ON = "DEPENDS_ON"
     IMPLEMENTS = "IMPLEMENTS"
+    BELONGS_TO = "BELONGS_TO"
     BELONGS_TO_TASK = "BELONGS_TO_TASK"
     MATCHES_PATTERN = "MATCHES_PATTERN"
     # Learning System Relationship Types
@@ -478,7 +480,7 @@ class IgnitionGraphSchema:
                     "name": {"type": "string", "required": True},
                     "description": {"type": "string", "required": False},
                     "export_type": {
-                        "type": "string", 
+                        "type": "string",
                         "required": True,
                     },  # "gateway_backup", "project_export", "resource_export", "custom"
                     "format": {
@@ -528,7 +530,11 @@ class IgnitionGraphSchema:
                     "resources_imported": {"type": "integer", "required": False},
                     "conflicts_resolved": {"type": "integer", "required": False},
                     "configuration": {"type": "map", "required": False},
-                    "rollback_available": {"type": "boolean", "required": True, "default": False},
+                    "rollback_available": {
+                        "type": "boolean",
+                        "required": True,
+                        "default": False,
+                    },
                     "rollback_id": {"type": "string", "required": False},
                 },
                 "indexes": [
@@ -594,8 +600,16 @@ class IgnitionGraphSchema:
                     "configuration": {"type": "map", "required": False},
                     "created_date": {"type": "datetime", "required": True},
                     "last_used": {"type": "datetime", "required": False},
-                    "success_count": {"type": "integer", "required": True, "default": 0},
-                    "failure_count": {"type": "integer", "required": True, "default": 0},
+                    "success_count": {
+                        "type": "integer",
+                        "required": True,
+                        "default": 0,
+                    },
+                    "failure_count": {
+                        "type": "integer",
+                        "required": True,
+                        "default": 0,
+                    },
                     "is_active": {"type": "boolean", "required": True, "default": True},
                 },
                 "indexes": [
@@ -616,14 +630,22 @@ class IgnitionGraphSchema:
                     "created_date": {"type": "datetime", "required": True},
                     "author": {"type": "string", "required": False},
                     "release_notes": {"type": "string", "required": False},
-                    "is_release": {"type": "boolean", "required": True, "default": False},
-                    "is_prerelease": {"type": "boolean", "required": True, "default": False},
+                    "is_release": {
+                        "type": "boolean",
+                        "required": True,
+                        "default": False,
+                    },
+                    "is_prerelease": {
+                        "type": "boolean",
+                        "required": True,
+                        "default": False,
+                    },
                     "compatibility_info": {"type": "map", "required": False},
                     "file_checksums": {"type": "map", "required": False},
                 },
                 "indexes": [
                     "version",
-                    "tag_name", 
+                    "tag_name",
                     "created_date",
                     "is_release",
                 ],
@@ -644,7 +666,11 @@ class IgnitionGraphSchema:
                     "size": {"type": "integer", "required": False},
                     "created_date": {"type": "datetime", "required": True},
                     "modified_date": {"type": "datetime", "required": False},
-                    "exported_count": {"type": "integer", "required": True, "default": 0},
+                    "exported_count": {
+                        "type": "integer",
+                        "required": True,
+                        "default": 0,
+                    },
                     "last_exported": {"type": "datetime", "required": False},
                     "status": {
                         "type": "string",
@@ -670,8 +696,14 @@ class IgnitionGraphSchema:
                         "type": "string",
                         "required": True,
                     },  # "successful_config", "environment_specific", "resource_combination", "timing_pattern"
-                    "environment_types": {"type": "list", "required": True},  # ["development", "staging", "production"]
-                    "resource_types": {"type": "list", "required": True},  # ["project", "tag_provider", "database"]
+                    "environment_types": {
+                        "type": "list",
+                        "required": True,
+                    },  # ["development", "staging", "production"]
+                    "resource_types": {
+                        "type": "list",
+                        "required": True,
+                    },  # ["project", "tag_provider", "database"]
                     "deployment_strategy": {"type": "string", "required": True},
                     "success_criteria": {"type": "map", "required": True},
                     "configuration_template": {"type": "map", "required": True},
@@ -679,11 +711,30 @@ class IgnitionGraphSchema:
                     "post_conditions": {"type": "list", "required": False},
                     "discovered_date": {"type": "datetime", "required": True},
                     "last_applied": {"type": "datetime", "required": False},
-                    "success_count": {"type": "integer", "required": True, "default": 0},
-                    "failure_count": {"type": "integer", "required": True, "default": 0},
-                    "confidence_score": {"type": "float", "required": True, "default": 0.0},
-                    "applicability_score": {"type": "float", "required": True, "default": 0.0},
-                    "pattern_data": {"type": "string", "required": True},  # JSON serialized pattern details
+                    "success_count": {
+                        "type": "integer",
+                        "required": True,
+                        "default": 0,
+                    },
+                    "failure_count": {
+                        "type": "integer",
+                        "required": True,
+                        "default": 0,
+                    },
+                    "confidence_score": {
+                        "type": "float",
+                        "required": True,
+                        "default": 0.0,
+                    },
+                    "applicability_score": {
+                        "type": "float",
+                        "required": True,
+                        "default": 0.0,
+                    },
+                    "pattern_data": {
+                        "type": "string",
+                        "required": True,
+                    },  # JSON serialized pattern details
                     "tags": {"type": "list", "required": False},
                     "is_active": {"type": "boolean", "required": True, "default": True},
                 },
@@ -720,10 +771,18 @@ class IgnitionGraphSchema:
                     },  # "pending", "running", "completed", "failed", "rolled_back", "partially_completed"
                     "success_metrics": {"type": "map", "required": False},
                     "failure_reasons": {"type": "list", "required": False},
-                    "rollback_triggered": {"type": "boolean", "required": True, "default": False},
+                    "rollback_triggered": {
+                        "type": "boolean",
+                        "required": True,
+                        "default": False,
+                    },
                     "rollback_successful": {"type": "boolean", "required": False},
                     "user_id": {"type": "string", "required": False},
-                    "automation_triggered": {"type": "boolean", "required": True, "default": False},
+                    "automation_triggered": {
+                        "type": "boolean",
+                        "required": True,
+                        "default": False,
+                    },
                     "execution_log": {"type": "string", "required": False},
                     "performance_data": {"type": "map", "required": False},
                     "lessons_learned": {"type": "string", "required": False},
@@ -756,7 +815,11 @@ class IgnitionGraphSchema:
                     "validation_criteria": {"type": "list", "required": False},
                     "discovered_date": {"type": "datetime", "required": True},
                     "last_applied": {"type": "datetime", "required": False},
-                    "application_count": {"type": "integer", "required": True, "default": 0},
+                    "application_count": {
+                        "type": "integer",
+                        "required": True,
+                        "default": 0,
+                    },
                     "success_rate": {"type": "float", "required": True, "default": 0.0},
                     "impact_assessment": {"type": "map", "required": False},
                     "automation_level": {
@@ -764,7 +827,11 @@ class IgnitionGraphSchema:
                         "required": True,
                         "default": "manual",
                     },  # "manual", "semi_automated", "fully_automated"
-                    "confidence_level": {"type": "float", "required": True, "default": 0.0},
+                    "confidence_level": {
+                        "type": "float",
+                        "required": True,
+                        "default": 0.0,
+                    },
                     "is_active": {"type": "boolean", "required": True, "default": True},
                 },
                 "indexes": [
@@ -789,18 +856,36 @@ class IgnitionGraphSchema:
                     "failure_patterns": {"type": "list", "required": True},
                     "rollback_strategy": {"type": "string", "required": True},
                     "rollback_steps": {"type": "list", "required": True},
-                    "recovery_time_target": {"type": "integer", "required": False},  # seconds
-                    "data_loss_acceptable": {"type": "boolean", "required": True, "default": False},
+                    "recovery_time_target": {
+                        "type": "integer",
+                        "required": False,
+                    },  # seconds
+                    "data_loss_acceptable": {
+                        "type": "boolean",
+                        "required": True,
+                        "default": False,
+                    },
                     "environment": {"type": "string", "required": True},
                     "resource_types_affected": {"type": "list", "required": True},
                     "validation_steps": {"type": "list", "required": False},
-                    "notification_required": {"type": "boolean", "required": True, "default": True},
+                    "notification_required": {
+                        "type": "boolean",
+                        "required": True,
+                        "default": True,
+                    },
                     "escalation_criteria": {"type": "list", "required": False},
                     "discovered_date": {"type": "datetime", "required": True},
                     "last_executed": {"type": "datetime", "required": False},
-                    "execution_count": {"type": "integer", "required": True, "default": 0},
+                    "execution_count": {
+                        "type": "integer",
+                        "required": True,
+                        "default": 0,
+                    },
                     "success_rate": {"type": "float", "required": True, "default": 0.0},
-                    "average_recovery_time": {"type": "integer", "required": False},  # seconds
+                    "average_recovery_time": {
+                        "type": "integer",
+                        "required": False,
+                    },  # seconds
                     "lessons_learned": {"type": "string", "required": False},
                     "automation_level": {
                         "type": "string",
@@ -834,7 +919,10 @@ class IgnitionGraphSchema:
                     "deployment_strategy": {"type": "string", "required": False},
                     "resource_type": {"type": "string", "required": False},
                     "metric_value": {"type": "float", "required": True},
-                    "unit": {"type": "string", "required": True},  # "seconds", "percentage", "count", "bytes"
+                    "unit": {
+                        "type": "string",
+                        "required": True,
+                    },  # "seconds", "percentage", "count", "bytes"
                     "measurement_date": {"type": "datetime", "required": True},
                     "baseline_value": {"type": "float", "required": False},
                     "target_value": {"type": "float", "required": False},

@@ -62,7 +62,9 @@ class Neo4jBackupManager:
                 "datetime": datetime.now().isoformat(),
                 "reason": reason,
                 "node_count": backup_data.get("statistics", {}).get("node_count", 0),
-                "relationship_count": backup_data.get("statistics", {}).get("relationship_count", 0),
+                "relationship_count": backup_data.get("statistics", {}).get(
+                    "relationship_count", 0
+                ),
                 "version": "1.0.0",
                 "backup_type": "full",
                 "source": "IGN Scripts Learning System",
@@ -118,7 +120,9 @@ class Neo4jBackupManager:
             data = backup_content.get("data", {})
 
             print(f"Backup info: {metadata.get('datetime')} - {metadata.get('reason')}")
-            print(f"Data: {metadata.get('node_count', 0)} nodes, {metadata.get('relationship_count', 0)} relationships")
+            print(
+                f"Data: {metadata.get('node_count', 0)} nodes, {metadata.get('relationship_count', 0)} relationships"
+            )
 
             # Connect to database
             if not self.client.is_connected:
@@ -157,7 +161,9 @@ class Neo4jBackupManager:
 
             # Determine if backup is needed
             if self._should_create_backup(current_stats, last_backup_stats):
-                success, _ = self.create_full_backup("Automatic backup - significant changes detected")
+                success, _ = self.create_full_backup(
+                    "Automatic backup - significant changes detected"
+                )
                 return success
 
             return False
@@ -272,7 +278,9 @@ class Neo4jBackupManager:
             # Get statistics
             data["statistics"] = self._get_database_statistics()
 
-            print(f"Extracted {len(data['nodes'])} nodes and {len(data['relationships'])} relationships")
+            print(
+                f"Extracted {len(data['nodes'])} nodes and {len(data['relationships'])} relationships"
+            )
 
         except Exception as e:
             print(f"❌ Failed to extract database data: {e}")
@@ -294,7 +302,9 @@ class Neo4jBackupManager:
 
                 # Create node with labels
                 labels_str = ":".join(labels) if labels else "Node"
-                create_query = f"CREATE (n:{labels_str} $props) RETURN elementId(n) as new_id"
+                create_query = (
+                    f"CREATE (n:{labels_str} $props) RETURN elementId(n) as new_id"
+                )
 
                 result = self.client.execute_query(create_query, {"props": node_data})
                 if result:
@@ -324,7 +334,12 @@ class Neo4jBackupManager:
                     """
 
                     self.client.execute_query(
-                        create_rel_query, {"start_id": new_start_id, "end_id": new_end_id, "props": rel_data}
+                        create_rel_query,
+                        {
+                            "start_id": new_start_id,
+                            "end_id": new_end_id,
+                            "props": rel_data,
+                        },
                     )
 
             print("✅ Database data restored successfully")
@@ -350,11 +365,15 @@ class Neo4jBackupManager:
             stats = {}
 
             # Node count
-            node_result = self.client.execute_query("MATCH (n) RETURN count(n) as count")
+            node_result = self.client.execute_query(
+                "MATCH (n) RETURN count(n) as count"
+            )
             stats["node_count"] = node_result[0]["count"] if node_result else 0
 
             # Relationship count
-            rel_result = self.client.execute_query("MATCH ()-[r]->() RETURN count(r) as count")
+            rel_result = self.client.execute_query(
+                "MATCH ()-[r]->() RETURN count(r) as count"
+            )
             stats["relationship_count"] = rel_result[0]["count"] if rel_result else 0
 
             # Label counts
@@ -368,7 +387,9 @@ class Neo4jBackupManager:
             )
 
             if label_result:
-                stats["label_counts"] = {record["label"]: record["count"] for record in label_result}
+                stats["label_counts"] = {
+                    record["label"]: record["count"] for record in label_result
+                }
 
             return stats
 
@@ -392,7 +413,9 @@ class Neo4jBackupManager:
         except Exception:
             return {}
 
-    def _should_create_backup(self, current_stats: dict[str, Any], last_backup_stats: dict[str, Any]) -> bool:
+    def _should_create_backup(
+        self, current_stats: dict[str, Any], last_backup_stats: dict[str, Any]
+    ) -> bool:
         """Determine if a backup should be created based on changes."""
         if not last_backup_stats:
             return True  # No previous backup
@@ -454,9 +477,9 @@ class Neo4jBackupManager:
         all_metadata["backups"].append(backup_info)
 
         # Keep only the most recent backup metadata
-        all_metadata["backups"] = sorted(all_metadata["backups"], key=lambda x: x.get("timestamp", ""), reverse=True)[
-            : self.max_backups
-        ]
+        all_metadata["backups"] = sorted(
+            all_metadata["backups"], key=lambda x: x.get("timestamp", ""), reverse=True
+        )[: self.max_backups]
 
         # Save updated metadata
         with open(metadata_file, "w", encoding="utf-8") as f:
@@ -465,7 +488,9 @@ class Neo4jBackupManager:
     def _cleanup_old_backups(self) -> None:
         """Remove old backup files, keeping only the most recent."""
         backups = sorted(
-            self.backup_dir.glob("ign_scripts_db_backup_*.json"), key=lambda x: x.stat().st_mtime, reverse=True
+            self.backup_dir.glob("ign_scripts_db_backup_*.json"),
+            key=lambda x: x.stat().st_mtime,
+            reverse=True,
         )
 
         # Keep only the most recent backup
@@ -476,17 +501,199 @@ class Neo4jBackupManager:
             except Exception as e:
                 print(f"❌ Failed to remove old backup {backup_file.name}: {e}")
 
+    def selective_restore_from_backup(
+        self, backup_file: str | None = None, preserve_labels: list[str] = None
+    ) -> tuple[bool, str]:
+        """Restore database from backup while preserving specified node types.
+
+        Args:
+            backup_file: Specific backup file to restore from. If None, uses most recent.
+            preserve_labels: List of node labels to preserve (not overwrite)
+
+        Returns:
+            Tuple of (success, message)
+        """
+        try:
+            if preserve_labels is None:
+                preserve_labels = []
+
+            # Determine backup file to use
+            if backup_file is None:
+                backup_file = self._get_latest_backup()
+                if not backup_file:
+                    return False, "No backup files found"
+
+            backup_path = self.backup_dir / backup_file
+            if not backup_path.exists():
+                return False, f"Backup file not found: {backup_file}"
+
+            print(f"Selective restore from backup: {backup_file}")
+            print(f"Preserving existing data for labels: {preserve_labels}")
+
+            # Load backup data
+            with open(backup_path, encoding="utf-8") as f:
+                backup_content = json.load(f)
+
+            metadata = backup_content.get("metadata", {})
+            data = backup_content.get("data", {})
+
+            print(f"Backup info: {metadata.get('datetime')} - {metadata.get('reason')}")
+            print(
+                f"Data: {metadata.get('node_count', 0)} nodes, {metadata.get('relationship_count', 0)} relationships"
+            )
+
+            # Connect to database
+            if not self.client.is_connected:
+                if not self.client.connect():
+                    return False, "Failed to connect to Neo4j database"
+
+            # Get current statistics before restore
+            current_stats = self._get_database_statistics()
+            print(
+                f"Current database: {current_stats.get('node_count', 0)} nodes, {current_stats.get('relationship_count', 0)} relationships"
+            )
+
+            # Restore data selectively
+            success = self._selective_restore_database_data(data, preserve_labels)
+
+            if success:
+                # Get final statistics
+                final_stats = self._get_database_statistics()
+                print("✅ Selective restore completed successfully")
+                print(
+                    f"Final database: {final_stats.get('node_count', 0)} nodes, {final_stats.get('relationship_count', 0)} relationships"
+                )
+                return True, f"Database selectively restored from {backup_file}"
+            else:
+                return False, "Failed to restore database data"
+
+        except Exception as e:
+            error_msg = f"Failed to selective restore backup: {e}"
+            print(f"❌ {error_msg}")
+            return False, error_msg
+
+    def _selective_restore_database_data(
+        self, data: dict[str, Any], preserve_labels: list[str]
+    ) -> bool:
+        """Restore data to the Neo4j database while preserving specified node types."""
+        try:
+            nodes = data.get("nodes", [])
+            relationships = data.get("relationships", [])
+
+            # Filter nodes to restore (exclude preserved labels)
+            nodes_to_restore = []
+            preserved_node_count = 0
+
+            for node_data in nodes:
+                node_labels = node_data.get("_labels", [])
+                # Check if any of the node's labels should be preserved
+                should_preserve = any(label in preserve_labels for label in node_labels)
+
+                if not should_preserve:
+                    nodes_to_restore.append(node_data)
+                else:
+                    preserved_node_count += 1
+
+            print(
+                f"Restoring {len(nodes_to_restore)} nodes (preserving {preserved_node_count} existing nodes)..."
+            )
+
+            # Create nodes with MERGE to avoid duplicates
+            node_id_mapping = {}
+
+            for node_data in nodes_to_restore:
+                old_id = node_data.pop("_id", None)
+                labels = node_data.pop("_labels", [])
+
+                if not labels:
+                    continue
+
+                # Use MERGE with name as unique identifier if available
+                name = node_data.get("name")
+                if name:
+                    # Create node with labels using MERGE
+                    labels_str = ":".join(labels)
+                    merge_query = f"""
+                    MERGE (n:{labels_str} {{name: $name}})
+                    SET n = $props
+                    RETURN elementId(n) as new_id
+                    """
+
+                    result = self.client.execute_query(
+                        merge_query, {"name": name, "props": node_data}
+                    )
+                else:
+                    # Create node without name constraint
+                    labels_str = ":".join(labels)
+                    create_query = (
+                        f"CREATE (n:{labels_str} $props) RETURN elementId(n) as new_id"
+                    )
+
+                    result = self.client.execute_query(
+                        create_query, {"props": node_data}
+                    )
+
+                if result:
+                    new_id = result[0]["new_id"]
+                    node_id_mapping[old_id] = new_id
+
+            # Create relationships for restored nodes
+            print("Restoring relationships...")
+            relationships_restored = 0
+
+            for rel_data in relationships:
+                old_start_id = rel_data.pop("_start_id", None)
+                old_end_id = rel_data.pop("_end_id", None)
+                rel_type = rel_data.pop("_type", "RELATED")
+                rel_data.pop("_id", None)
+
+                # Only restore relationships where both nodes were restored
+                new_start_id = node_id_mapping.get(old_start_id)
+                new_end_id = node_id_mapping.get(old_end_id)
+
+                if new_start_id is not None and new_end_id is not None:
+                    # Use MERGE to avoid duplicate relationships
+                    merge_rel_query = f"""
+                    MATCH (a), (b)
+                    WHERE elementId(a) = $start_id AND elementId(b) = $end_id
+                    MERGE (a)-[r:{rel_type}]->(b)
+                    SET r = $props
+                    """
+
+                    self.client.execute_query(
+                        merge_rel_query,
+                        {
+                            "start_id": new_start_id,
+                            "end_id": new_end_id,
+                            "props": rel_data,
+                        },
+                    )
+                    relationships_restored += 1
+
+            print(
+                f"✅ Selective restore completed: {len(nodes_to_restore)} nodes, {relationships_restored} relationships"
+            )
+            return True
+
+        except Exception as e:
+            print(f"❌ Failed to selectively restore database data: {e}")
+            return False
+
 
 def create_initial_backup() -> None:
     """Create an initial backup for distribution with the application."""
     print("🚀 Creating initial backup for application distribution...")
 
     manager = Neo4jBackupManager()
-    success, result = manager.create_full_backup("Initial backup for application distribution")
+    success, result = manager.create_full_backup(
+        "Initial backup for application distribution"
+    )
 
     if success:
         print(f"✅ Initial backup created: {result}")
-        print("This backup will be included with the application for new installations.")
+        print(
+            "This backup will be included with the application for new installations."
+        )
     else:
         print(f"❌ Failed to create initial backup: {result}")
 
@@ -497,10 +704,14 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Neo4j Backup Manager for IGN Scripts")
     parser.add_argument(
-        "action", choices=["backup", "restore", "list", "info", "auto", "init"], help="Action to perform"
+        "action",
+        choices=["backup", "restore", "list", "info", "auto", "init"],
+        help="Action to perform",
     )
     parser.add_argument("--file", "-f", help="Backup file name (for restore/info)")
-    parser.add_argument("--reason", "-r", default="Manual backup", help="Reason for backup")
+    parser.add_argument(
+        "--reason", "-r", default="Manual backup", help="Reason for backup"
+    )
 
     args = parser.parse_args()
 
@@ -508,11 +719,19 @@ if __name__ == "__main__":
 
     if args.action == "backup":
         success, result = manager.create_full_backup(args.reason)
-        print("✅ Backup completed successfully" if success else f"❌ Backup failed: {result}")
+        print(
+            "✅ Backup completed successfully"
+            if success
+            else f"❌ Backup failed: {result}"
+        )
 
     elif args.action == "restore":
         success, result = manager.restore_from_backup(args.file)
-        print("✅ Restore completed successfully" if success else f"❌ Restore failed: {result}")
+        print(
+            "✅ Restore completed successfully"
+            if success
+            else f"❌ Restore failed: {result}"
+        )
 
     elif args.action == "list":
         backups = manager.list_backups()

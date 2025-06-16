@@ -1,9 +1,8 @@
 name: Update Dependencies
-
 on:
   schedule:
-    - cron: '0 0 * * 0'  # Run weekly on Sunday
-  workflow_dispatch:  # Allow manual triggering
+    - cron: "0 0 * * 0" # Run weekly on Sunday
+  workflow_dispatch: # Allow manual triggering
 
 jobs:
   update-deps:
@@ -14,60 +13,60 @@ jobs:
         service: [mcp, mcp-tools]
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
 
-    - name: Install uv
-      run: |
-        curl -LsSf https://astral.sh/uv/install.sh | sh
-        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
-    - name: Create virtual environment
-      run: |
-        cd ${{ matrix.service }}
-        uv venv
-        source .venv/bin/activate
-        if [ -f requirements.txt ]; then
-          uv pip install -r requirements.txt
-        fi
-
-    - name: Check for updates
-      id: check-updates
-      run: |
-        cd ${{ matrix.service }}
-        if [ -f requirements.txt ]; then
+      - name: Create virtual environment
+        run: |
+          cd ${{ matrix.service }}
+          uv venv
           source .venv/bin/activate
-          uv pip compile requirements.txt -o requirements.txt.new
-          if ! cmp -s requirements.txt requirements.txt.new; then
-            mv requirements.txt.new requirements.txt
-            echo "Dependencies updated for ${{ matrix.service }}"
-            echo "updated=true" >> $GITHUB_OUTPUT
+          if [ -f requirements.txt ]; then
+            uv pip install -r requirements.txt
+          fi
+
+      - name: Check for updates
+        id: check-updates
+        run: |
+          cd ${{ matrix.service }}
+          if [ -f requirements.txt ]; then
+            source .venv/bin/activate
+            uv pip compile requirements.txt -o requirements.txt.new
+            if ! cmp -s requirements.txt requirements.txt.new; then
+              mv requirements.txt.new requirements.txt
+              echo "Dependencies updated for ${{ matrix.service }}"
+              echo "updated=true" >> $GITHUB_OUTPUT
+            else
+              rm requirements.txt.new
+              echo "No dependency updates needed for ${{ matrix.service }}"
+              echo "updated=false" >> $GITHUB_OUTPUT
+            fi
           else
-            rm requirements.txt.new
-            echo "No dependency updates needed for ${{ matrix.service }}"
+            echo "No requirements.txt found for ${{ matrix.service }}"
             echo "updated=false" >> $GITHUB_OUTPUT
           fi
-        else
-          echo "No requirements.txt found for ${{ matrix.service }}"
-          echo "updated=false" >> $GITHUB_OUTPUT
-        fi
 
-    - name: Create Pull Request
-      if: steps.check-updates.outputs.updated == 'true'
-      uses: peter-evans/create-pull-request@v6
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        commit-message: "Update dependencies for ${{ matrix.service }}"
-        title: "Update dependencies for ${{ matrix.service }}"
-        body: |
-          Automated dependency updates for ${{ matrix.service }}.
-          
-          This PR was created by the dependency update workflow.
-        branch: update-deps-${{ matrix.service }}
-        base: main
-        add-paths: |
-          ${{ matrix.service }}/requirements.txt 
+      - name: Create Pull Request
+        if: steps.check-updates.outputs.updated == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Update dependencies for ${{ matrix.service }}"
+          title: "Update dependencies for ${{ matrix.service }}"
+          body: |
+            Automated dependency updates for ${{ matrix.service }}.
+
+            This PR was created by the dependency update workflow.
+          branch: update-deps-${{ matrix.service }}
+          base: main
+          add-paths: |
+            ${{ matrix.service }}/requirements.txt
