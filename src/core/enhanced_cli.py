@@ -2114,5 +2114,182 @@ def validate_import(file_path: str, type: str, detailed: bool):
         console.print(f"[red]✗[/red] Validation failed: {e}")
 
 
+# Version Control Intelligence Commands
+@main.group()
+def version():
+    """🔄 Version Control Intelligence commands."""
+    pass
+
+
+@version.command()
+@click.option("--repository", "-r", help="Repository path (default: current directory)")
+@click.option("--detailed", "-d", is_flag=True, help="Show detailed status information")
+def status(repository: str | None, detailed: bool):
+    """📊 Show version control intelligence status."""
+    try:
+        from pathlib import Path
+
+        from src.ignition.version_control.manager import (
+            VersionControlConfig,
+            VersionControlManager,
+        )
+
+        # Determine repository path
+        repo_path = Path(repository) if repository else Path.cwd()
+        if not repo_path.exists():
+            console.print(f"[red]✗[/red] Repository path does not exist: {repo_path}")
+            return
+
+        # Create configuration
+        config = VersionControlConfig(repository_path=repo_path)
+
+        # Initialize manager
+        manager = VersionControlManager(config=config)
+
+        with console.status("[bold blue]Checking version control status..."):
+            if not manager.initialize():
+                console.print(
+                    "[red]✗[/red] Failed to initialize version control manager"
+                )
+                return
+
+            status_info = manager.get_repository_status()
+
+        # Display status
+        console.print("\n[bold blue]🔄 Version Control Intelligence Status[/bold blue]")
+        console.print(f"Repository: {status_info['repository_path']}")
+        console.print(f"Initialized: {'✓' if status_info['initialized'] else '✗'}")
+        console.print(f"Git Enabled: {'✓' if status_info['git_enabled'] else '✗'}")
+
+        # Show capabilities
+        capabilities = status_info["capabilities"]
+        console.print("\n[bold]Capabilities:[/bold]")
+        console.print(
+            f"  Impact Analysis: {'✓' if capabilities['impact_analysis'] else '✗'}"
+        )
+        console.print(
+            f"  Conflict Prediction: {'✓' if capabilities['conflict_prediction'] else '✗'}"
+        )
+        console.print(
+            f"  Release Planning: {'✓' if capabilities['release_planning'] else '✗'}"
+        )
+        console.print(
+            f"  Auto Tracking: {'✓' if capabilities['auto_tracking'] else '✗'}"
+        )
+
+        # Show connections
+        connections = status_info["connections"]
+        console.print("\n[bold]Connections:[/bold]")
+        console.print(
+            f"  Graph Database: {'✓' if connections['graph_database'] else '✗'}"
+        )
+        console.print(f"  Gateway: {'✓' if connections['gateway'] else '✗'}")
+
+        # Show git status if available
+        if "git" in status_info:
+            git_info = status_info["git"]
+            console.print("\n[bold]Git Status:[/bold]")
+            console.print(f"  Current Branch: {git_info['current_branch']}")
+            console.print(f"  Clean: {'✓' if git_info['clean'] else '✗'}")
+
+            if not git_info["clean"] and detailed:
+                console.print(f"  Changes: {len(git_info['changes'])}")
+                for change in git_info["changes"][:5]:  # Show first 5 changes
+                    console.print(f"    {change['status']} {change['file']}")
+                if len(git_info["changes"]) > 5:
+                    console.print(f"    ... and {len(git_info['changes']) - 5} more")
+
+        console.print("\n[green]✓[/green] Version control intelligence is operational")
+
+    except ImportError as e:
+        console.print(f"[red]✗[/red] Version control intelligence not available: {e}")
+    except Exception as e:
+        console.print(f"[red]✗[/red] Failed to get status: {e}")
+
+
+@version.command()
+@click.option("--commit-hash", "-c", help="Specific commit hash to analyze")
+@click.option("--files", "-f", help="Comma-separated list of files to analyze")
+@click.option("--detailed", "-d", is_flag=True, help="Show detailed impact analysis")
+@click.option("--repository", "-r", help="Repository path (default: current directory)")
+def analyze_commit(
+    commit_hash: str | None, files: str | None, detailed: bool, repository: str | None
+):
+    """🔍 Analyze the impact of a commit or changes."""
+    console.print("\n[bold blue]📊 Commit Impact Analysis[/bold blue]")
+
+    if commit_hash:
+        console.print(f"Commit: {commit_hash}")
+    else:
+        console.print("Analyzing current changes")
+
+    # This will be implemented when the impact analyzer is complete
+    console.print("[yellow]💡[/yellow] Impact analysis implementation in progress")
+    console.print("Features coming soon:")
+    console.print("  • Resource impact assessment")
+    console.print("  • Dependency chain analysis")
+    console.print("  • Risk scoring")
+    console.print("  • Performance impact prediction")
+
+
+@version.command()
+@click.option(
+    "--source-branch", "-s", required=True, help="Source branch to merge from"
+)
+@click.option("--target-branch", "-t", default="main", help="Target branch to merge to")
+@click.option(
+    "--detailed", "-d", is_flag=True, help="Show detailed conflict predictions"
+)
+@click.option("--repository", "-r", help="Repository path (default: current directory)")
+def predict_conflicts(
+    source_branch: str, target_branch: str, detailed: bool, repository: str | None
+):
+    """🔮 Predict merge conflicts between branches."""
+    console.print("\n[bold blue]🔮 Merge Conflict Prediction[/bold blue]")
+    console.print(f"Source: {source_branch} → Target: {target_branch}")
+
+    # This will be implemented when the conflict predictor is complete
+    console.print("[yellow]💡[/yellow] Conflict prediction implementation in progress")
+    console.print("Features coming soon:")
+    console.print("  • Resource overlap detection")
+    console.print("  • Semantic conflict analysis")
+    console.print("  • Configuration conflict prediction")
+    console.print("  • Resolution suggestions")
+
+
+@version.command()
+@click.option("--version", "-v", required=True, help="Release version identifier")
+@click.option(
+    "--strategy",
+    "-s",
+    default="incremental",
+    type=click.Choice(
+        ["incremental", "big_bang", "feature_flag", "blue_green", "canary"]
+    ),
+    help="Release strategy",
+)
+@click.option("--include", "-i", help="Comma-separated list of changes to include")
+@click.option("--exclude", "-e", help="Comma-separated list of changes to exclude")
+@click.option("--repository", "-r", help="Repository path (default: current directory)")
+def plan_release(
+    version: str,
+    strategy: str,
+    include: str | None,
+    exclude: str | None,
+    repository: str | None,
+):
+    """📋 Plan a release with intelligent recommendations."""
+    console.print(f"\n[bold blue]📋 Release Plan: {version}[/bold blue]")
+    console.print(f"Strategy: {strategy}")
+
+    # This will be implemented when the release planner is complete
+    console.print("[yellow]💡[/yellow] Release planning implementation in progress")
+    console.print("Features coming soon:")
+    console.print("  • Feature grouping")
+    console.print("  • Risk-based scheduling")
+    console.print("  • Dependency-aware planning")
+    console.print("  • Rollback strategy planning")
+
+
 if __name__ == "__main__":
     main()
