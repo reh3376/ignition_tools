@@ -26,6 +26,13 @@ class NodeType(Enum):
     PATTERN_ANALYSIS = "PatternAnalysis"
     RECOMMENDATION = "Recommendation"
     PERFORMANCE_METRIC = "PerformanceMetric"
+    # Export/Import Intelligence Node Types
+    EXPORT_PROFILE = "ExportProfile"
+    IMPORT_JOB = "ImportJob"
+    RESOURCE_DEPENDENCY = "ResourceDependency"
+    DEPLOYMENT_CONFIG = "DeploymentConfig"
+    VERSION_TAG = "VersionTag"
+    GATEWAY_RESOURCE = "GatewayResource"
 
 
 class RelationshipType(Enum):
@@ -49,6 +56,14 @@ class RelationshipType(Enum):
     FOLLOWS_PATTERN = "FOLLOWS_PATTERN"
     PRECEDES = "PRECEDES"
     CO_OCCURS_WITH = "CO_OCCURS_WITH"
+    # Export/Import Intelligence Relationship Types
+    EXPORTS_TO = "EXPORTS_TO"
+    IMPORTS_FROM = "IMPORTS_FROM"
+    DEPLOYED_AS = "DEPLOYED_AS"
+    REPLACES = "REPLACES"
+    REFERENCES = "REFERENCES"
+    CONFLICTS_WITH = "CONFLICTS_WITH"
+    VERSIONED_AS = "VERSIONED_AS"
 
 
 @dataclass
@@ -421,29 +436,213 @@ class IgnitionGraphSchema:
                 ],
             },
             "PerformanceMetric": {
-                "description": "Tracks performance metrics for learning optimization",
+                "description": "Stores performance metrics for templates and functions",
                 "properties": {
                     "id": {"type": "string", "required": True, "unique": True},
                     "metric_type": {
                         "type": "string",
                         "required": True,
-                    },  # "generation_time", "success_rate", "error_rate"
-                    "entity_type": {
-                        "type": "string",
-                        "required": True,
-                    },  # "function", "template", "combination"
-                    "entity_id": {"type": "string", "required": True},
-                    "metric_value": {"type": "float", "required": True},
-                    "measurement_date": {"type": "datetime", "required": True},
+                    },  # "generation_time", "success_rate", "usage_frequency"
+                    "value": {"type": "float", "required": True},
                     "context": {"type": "string", "required": False},
+                    "created_date": {"type": "datetime", "required": True},
+                    "time_period": {"type": "string", "required": False},
                     "sample_size": {"type": "integer", "required": False},
-                    "metadata": {"type": "map", "required": False},
                 },
                 "indexes": [
                     "metric_type",
-                    "entity_type",
-                    "measurement_date",
-                    "entity_id",
+                    "created_date",
+                    "value",
+                ],
+            },
+            # Export/Import Intelligence Node Definitions
+            "ExportProfile": {
+                "description": "Stores export configuration profiles and patterns",
+                "properties": {
+                    "id": {"type": "string", "required": True, "unique": True},
+                    "name": {"type": "string", "required": True},
+                    "description": {"type": "string", "required": False},
+                    "export_type": {
+                        "type": "string", 
+                        "required": True,
+                    },  # "gateway_backup", "project_export", "resource_export", "custom"
+                    "format": {
+                        "type": "string",
+                        "required": True,
+                    },  # "gwbk", "proj", "json", "xml", "zip"
+                    "include_patterns": {"type": "list", "required": False},
+                    "exclude_patterns": {"type": "list", "required": False},
+                    "configuration": {"type": "map", "required": False},
+                    "created_date": {"type": "datetime", "required": True},
+                    "last_used": {"type": "datetime", "required": False},
+                    "usage_count": {"type": "integer", "required": True, "default": 0},
+                    "success_rate": {"type": "float", "required": False},
+                    "average_size": {"type": "integer", "required": False},
+                    "compression_ratio": {"type": "float", "required": False},
+                },
+                "indexes": [
+                    "export_type",
+                    "format",
+                    "created_date",
+                    "usage_count",
+                ],
+            },
+            "ImportJob": {
+                "description": "Tracks import/deployment jobs and their outcomes",
+                "properties": {
+                    "id": {"type": "string", "required": True, "unique": True},
+                    "name": {"type": "string", "required": True},
+                    "import_type": {
+                        "type": "string",
+                        "required": True,
+                    },  # "project_import", "resource_merge", "full_restore", "selective_import"
+                    "source_format": {"type": "string", "required": True},
+                    "target_gateway": {"type": "string", "required": True},
+                    "import_mode": {
+                        "type": "string",
+                        "required": True,
+                    },  # "merge", "overwrite", "skip_conflicts", "selective"
+                    "status": {
+                        "type": "string",
+                        "required": True,
+                    },  # "pending", "running", "completed", "failed", "rolled_back"
+                    "started_at": {"type": "datetime", "required": True},
+                    "completed_at": {"type": "datetime", "required": False},
+                    "duration": {"type": "integer", "required": False},
+                    "error_message": {"type": "string", "required": False},
+                    "resources_imported": {"type": "integer", "required": False},
+                    "conflicts_resolved": {"type": "integer", "required": False},
+                    "configuration": {"type": "map", "required": False},
+                    "rollback_available": {"type": "boolean", "required": True, "default": False},
+                    "rollback_id": {"type": "string", "required": False},
+                },
+                "indexes": [
+                    "import_type",
+                    "target_gateway",
+                    "status",
+                    "started_at",
+                ],
+            },
+            "ResourceDependency": {
+                "description": "Models dependencies between Ignition resources",
+                "properties": {
+                    "id": {"type": "string", "required": True, "unique": True},
+                    "source_resource": {"type": "string", "required": True},
+                    "target_resource": {"type": "string", "required": True},
+                    "dependency_type": {
+                        "type": "string",
+                        "required": True,
+                    },  # "requires", "references", "optional", "conflict"
+                    "resource_type": {
+                        "type": "string",
+                        "required": True,
+                    },  # "tag_provider", "database", "security_zone", "device", "project"
+                    "strength": {
+                        "type": "string",
+                        "required": True,
+                    },  # "strong", "weak", "optional"
+                    "validation_rule": {"type": "string", "required": False},
+                    "error_impact": {
+                        "type": "string",
+                        "required": False,
+                    },  # "critical", "warning", "info"
+                    "discovered_date": {"type": "datetime", "required": True},
+                    "last_validated": {"type": "datetime", "required": False},
+                    "is_active": {"type": "boolean", "required": True, "default": True},
+                },
+                "indexes": [
+                    "source_resource",
+                    "target_resource",
+                    "dependency_type",
+                    "resource_type",
+                ],
+            },
+            "DeploymentConfig": {
+                "description": "Stores deployment configuration patterns and environments",
+                "properties": {
+                    "id": {"type": "string", "required": True, "unique": True},
+                    "name": {"type": "string", "required": True},
+                    "environment": {
+                        "type": "string",
+                        "required": True,
+                    },  # "development", "staging", "production", "test"
+                    "gateway_host": {"type": "string", "required": True},
+                    "deployment_strategy": {
+                        "type": "string",
+                        "required": True,
+                    },  # "blue_green", "rolling", "direct", "canary"
+                    "pre_deployment_checks": {"type": "list", "required": False},
+                    "post_deployment_tests": {"type": "list", "required": False},
+                    "rollback_strategy": {"type": "string", "required": False},
+                    "notification_settings": {"type": "map", "required": False},
+                    "maintenance_window": {"type": "map", "required": False},
+                    "configuration": {"type": "map", "required": False},
+                    "created_date": {"type": "datetime", "required": True},
+                    "last_used": {"type": "datetime", "required": False},
+                    "success_count": {"type": "integer", "required": True, "default": 0},
+                    "failure_count": {"type": "integer", "required": True, "default": 0},
+                    "is_active": {"type": "boolean", "required": True, "default": True},
+                },
+                "indexes": [
+                    "environment",
+                    "gateway_host",
+                    "deployment_strategy",
+                    "created_date",
+                ],
+            },
+            "VersionTag": {
+                "description": "Tracks version information for exported resources",
+                "properties": {
+                    "id": {"type": "string", "required": True, "unique": True},
+                    "version": {"type": "string", "required": True},
+                    "tag_name": {"type": "string", "required": True},
+                    "commit_hash": {"type": "string", "required": False},
+                    "branch_name": {"type": "string", "required": False},
+                    "created_date": {"type": "datetime", "required": True},
+                    "author": {"type": "string", "required": False},
+                    "release_notes": {"type": "string", "required": False},
+                    "is_release": {"type": "boolean", "required": True, "default": False},
+                    "is_prerelease": {"type": "boolean", "required": True, "default": False},
+                    "compatibility_info": {"type": "map", "required": False},
+                    "file_checksums": {"type": "map", "required": False},
+                },
+                "indexes": [
+                    "version",
+                    "tag_name", 
+                    "created_date",
+                    "is_release",
+                ],
+            },
+            "GatewayResource": {
+                "description": "Represents individual Ignition gateway resources",
+                "properties": {
+                    "id": {"type": "string", "required": True, "unique": True},
+                    "name": {"type": "string", "required": True},
+                    "resource_type": {
+                        "type": "string",
+                        "required": True,
+                    },  # "project", "tag_provider", "database", "device", "security", "script"
+                    "resource_path": {"type": "string", "required": True},
+                    "gateway_host": {"type": "string", "required": True},
+                    "configuration": {"type": "map", "required": False},
+                    "checksum": {"type": "string", "required": False},
+                    "size": {"type": "integer", "required": False},
+                    "created_date": {"type": "datetime", "required": True},
+                    "modified_date": {"type": "datetime", "required": False},
+                    "exported_count": {"type": "integer", "required": True, "default": 0},
+                    "last_exported": {"type": "datetime", "required": False},
+                    "status": {
+                        "type": "string",
+                        "required": True,
+                        "default": "active",
+                    },  # "active", "disabled", "error", "removed"
+                    "metadata": {"type": "map", "required": False},
+                },
+                "indexes": [
+                    "resource_type",
+                    "gateway_host",
+                    "resource_path",
+                    "status",
                 ],
             },
         }

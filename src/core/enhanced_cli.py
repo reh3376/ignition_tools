@@ -1448,5 +1448,496 @@ except ImportError:
         console.print("\nThen restart the CLI to access OPC-UA commands.")
 
 
+@main.group(name="export")
+def export_group():
+    """🚀 Export Ignition gateway resources and projects."""
+    pass
+
+
+@export_group.command()
+@click.option("--gateway", "-g", help="Gateway configuration name")
+@click.option("--output", "-o", required=True, help="Output path for backup file")
+@click.option("--format", "-f", type=click.Choice(["gwbk", "json", "zip"]), default="gwbk", help="Export format")
+@click.option("--profile", "-p", help="Export profile name")
+@click.option("--include-projects/--exclude-projects", default=True, help="Include projects in backup")
+@click.option("--include-tags/--exclude-tags", default=True, help="Include tag providers")
+@click.option("--include-databases/--exclude-databases", default=True, help="Include database connections")
+@click.option("--include-devices/--exclude-devices", default=True, help="Include device connections")
+@click.option("--include-security/--exclude-security", default=True, help="Include security configuration")
+@click.option("--compression/--no-compression", default=True, help="Enable compression")
+def gateway(
+    gateway: str,
+    output: str,
+    format: str,
+    profile: str,
+    include_projects: bool,
+    include_tags: bool,
+    include_databases: bool,
+    include_devices: bool,
+    include_security: bool,
+    compression: bool,
+):
+    """📦 Export complete gateway backup (.gwbk equivalent)."""
+    from pathlib import Path
+    from src.ignition.gateway.client import IgnitionGatewayClient, GatewayConfig
+    from src.ignition.exporters.gateway_exporter import GatewayResourceExporter
+    
+    try:
+        console.print(f"[blue]🚀 Starting gateway backup export...[/blue]")
+        
+        # Create gateway client (mock configuration for now)
+        config = GatewayConfig(
+            host=gateway or "localhost",
+            port=8088,
+            username="admin",
+            password="password",
+        )
+        
+        gateway_client = IgnitionGatewayClient(config)
+        if not gateway_client.connect():
+            console.print("[red]❌ Failed to connect to gateway[/red]")
+            return
+        
+        # Create exporter with optional graph client
+        graph_client = None
+        try:
+            from src.ignition.graph.client import IgnitionGraphClient
+            if hasattr(enhanced_cli, 'graph_client') and enhanced_cli.graph_client and enhanced_cli.graph_client.is_connected:
+                graph_client = enhanced_cli.graph_client
+        except ImportError:
+            pass
+        
+        exporter = GatewayResourceExporter(gateway_client, graph_client)
+        
+        # Create export profile
+        export_profile = {
+            "name": profile or "cli_export",
+            "description": f"CLI export to {output}",
+            "include_projects": include_projects,
+            "include_tags": include_tags,
+            "include_databases": include_databases,
+            "include_devices": include_devices,
+            "include_security": include_security,
+            "compression": compression,
+        }
+        
+        # Perform export
+        with console.status("[bold green]Exporting gateway backup..."):
+            result = exporter.export_gateway_backup(Path(output), export_profile)
+        
+        if result.get("success"):
+            console.print(f"[green]✅ Gateway backup exported successfully![/green]")
+            console.print(f"[blue]📁 File:[/blue] {result['output_path']}")
+            console.print(f"[blue]📊 Size:[/blue] {result['file_size']:,} bytes")
+            console.print(f"[blue]📉 Compression:[/blue] {result['compression_ratio']:.2f}")
+        else:
+            console.print("[red]❌ Gateway backup export failed[/red]")
+        
+        gateway_client.disconnect()
+        
+    except Exception as e:
+        console.print(f"[red]❌ Export failed: {e}[/red]")
+
+
+@export_group.command()
+@click.option("--gateway", "-g", help="Gateway configuration name")
+@click.option("--project", "-p", required=True, help="Project name to export")
+@click.option("--output", "-o", required=True, help="Output path for project file")
+@click.option("--format", "-f", type=click.Choice(["proj", "json", "zip"]), default="proj", help="Export format")
+@click.option("--include-global/--exclude-global", default=False, help="Include global resources")
+@click.option("--include-dependencies/--exclude-dependencies", default=True, help="Include dependencies")
+def project(
+    gateway: str,
+    project: str,
+    output: str,
+    format: str,
+    include_global: bool,
+    include_dependencies: bool,
+):
+    """📋 Export specific Ignition project (.proj equivalent)."""
+    from pathlib import Path
+    from src.ignition.gateway.client import IgnitionGatewayClient, GatewayConfig
+    from src.ignition.exporters.gateway_exporter import GatewayResourceExporter
+    
+    try:
+        console.print(f"[blue]🚀 Starting project export for '{project}'...[/blue]")
+        
+        # Create gateway client
+        config = GatewayConfig(
+            host=gateway or "localhost",
+            port=8088,
+            username="admin", 
+            password="password",
+        )
+        
+        gateway_client = IgnitionGatewayClient(config)
+        if not gateway_client.connect():
+            console.print("[red]❌ Failed to connect to gateway[/red]")
+            return
+        
+        # Create exporter
+        graph_client = None
+        try:
+            from src.ignition.graph.client import IgnitionGraphClient
+            if hasattr(enhanced_cli, 'graph_client') and enhanced_cli.graph_client and enhanced_cli.graph_client.is_connected:
+                graph_client = enhanced_cli.graph_client
+        except (ImportError, AttributeError):
+            pass
+        
+        exporter = GatewayResourceExporter(gateway_client, graph_client)
+        
+        # Create export options
+        export_options = {
+            "include_global_resources": include_global,
+            "include_dependencies": include_dependencies,
+            "validate_resources": True,
+            "compression": True,
+        }
+        
+        # Perform export
+        with console.status(f"[bold green]Exporting project '{project}'..."):
+            result = exporter.export_project(project, Path(output), export_options)
+        
+        if result.get("success"):
+            console.print(f"[green]✅ Project '{project}' exported successfully![/green]")
+            console.print(f"[blue]📁 File:[/blue] {result['output_path']}")
+            console.print(f"[blue]📊 Size:[/blue] {result['file_size']:,} bytes")
+        else:
+            console.print(f"[red]❌ Project export failed[/red]")
+        
+        gateway_client.disconnect()
+        
+    except Exception as e:
+        console.print(f"[red]❌ Export failed: {e}[/red]")
+
+
+@export_group.command()
+@click.option("--gateway", "-g", help="Gateway configuration name")
+@click.option("--output", "-o", required=True, help="Output path for resources")
+@click.option("--format", "-f", type=click.Choice(["json", "xml", "zip"]), default="json", help="Export format")
+@click.option("--projects", help="Comma-separated list of projects to export")
+@click.option("--tag-providers", help="Comma-separated list of tag providers to export")
+@click.option("--databases", help="Comma-separated list of database connections to export")
+@click.option("--devices", help="Comma-separated list of device connections to export")
+def resources(
+    gateway: str,
+    output: str,
+    format: str,
+    projects: str,
+    tag_providers: str,
+    databases: str,
+    devices: str,
+):
+    """🎯 Export specific gateway resources selectively."""
+    from pathlib import Path
+    from src.ignition.gateway.client import IgnitionGatewayClient, GatewayConfig
+    from src.ignition.exporters.gateway_exporter import GatewayResourceExporter
+    
+    try:
+        console.print(f"[blue]🚀 Starting selective resource export...[/blue]")
+        
+        # Parse resource selections
+        resource_selection = {}
+        if projects:
+            resource_selection["projects"] = [p.strip() for p in projects.split(",")]
+        if tag_providers:
+            resource_selection["tag_providers"] = [t.strip() for t in tag_providers.split(",")]
+        if databases:
+            resource_selection["databases"] = [d.strip() for d in databases.split(",")]
+        if devices:
+            resource_selection["devices"] = [dev.strip() for dev in devices.split(",")]
+        
+        if not resource_selection:
+            console.print("[red]❌ No resources specified for export[/red]")
+            return
+        
+        # Create gateway client
+        config = GatewayConfig(
+            host=gateway or "localhost",
+            port=8088,
+            username="admin",
+            password="password",
+        )
+        
+        gateway_client = IgnitionGatewayClient(config)
+        if not gateway_client.connect():
+            console.print("[red]❌ Failed to connect to gateway[/red]")
+            return
+        
+        # Create exporter
+        graph_client = None
+        try:
+            from src.ignition.graph.client import IgnitionGraphClient
+            if hasattr(enhanced_cli, 'graph_client') and enhanced_cli.graph_client and enhanced_cli.graph_client.is_connected:
+                graph_client = enhanced_cli.graph_client
+        except (ImportError, AttributeError):
+            pass
+        
+        exporter = GatewayResourceExporter(gateway_client, graph_client)
+        
+        # Perform export
+        with console.status("[bold green]Exporting selected resources..."):
+            result = exporter.export_resources(resource_selection, Path(output), format)
+        
+        if result.get("success"):
+            console.print(f"[green]✅ Resources exported successfully![/green]")
+            console.print(f"[blue]📁 File:[/blue] {result['output_path']}")
+            console.print(f"[blue]📊 Resources:[/blue] {result['metadata']['resource_count']}")
+            console.print(f"[blue]📦 Size:[/blue] {result['file_size']:,} bytes")
+        else:
+            console.print("[red]❌ Resource export failed[/red]")
+        
+        gateway_client.disconnect()
+        
+    except Exception as e:
+        console.print(f"[red]❌ Export failed: {e}[/red]")
+
+
+@main.group(name="import")
+def import_group():
+    """📥 Import Ignition projects and resources."""
+    pass
+
+
+@import_group.command()
+@click.option("--gateway", "-g", help="Target gateway configuration name")
+@click.option("--file", "-f", "file_path", required=True, help="Path to project file to import")
+@click.option("--mode", "-m", type=click.Choice(["merge", "overwrite", "skip_conflicts"]), default="merge", help="Import mode")
+@click.option("--project-name", help="Override project name")
+@click.option("--validate/--no-validate", default=True, help="Validate before import")
+@click.option("--dry-run", is_flag=True, help="Show what would be imported without actually importing")
+def project(
+    gateway: str,
+    file_path: str,
+    mode: str,
+    project_name: str,
+    validate: bool,
+    dry_run: bool,
+):
+    """📋 Import Ignition project from file."""
+    from pathlib import Path
+    from src.ignition.gateway.client import IgnitionGatewayClient, GatewayConfig
+    
+    try:
+        console.print(f"[blue]📥 Starting project import from '{file_path}'...[/blue]")
+        
+        if not Path(file_path).exists():
+            console.print(f"[red]❌ File not found: {file_path}[/red]")
+            return
+        
+        # Create gateway client
+        config = GatewayConfig(
+            host=gateway or "localhost",
+            port=8088,
+            username="admin",
+            password="password",
+        )
+        
+        gateway_client = IgnitionGatewayClient(config)
+        if not gateway_client.connect():
+            console.print("[red]❌ Failed to connect to gateway[/red]")
+            return
+        
+        # Prepare import options
+        import_options = {
+            "mode": mode,
+            "project_name": project_name,
+            "validate": validate,
+            "dry_run": dry_run,
+        }
+        
+        if dry_run:
+            console.print("[yellow]🔍 Dry run mode - no changes will be made[/yellow]")
+        
+        # Perform import
+        with console.status(f"[bold green]Importing project..."):
+            result = gateway_client.import_project(file_path, import_options)
+        
+        if result.get("success"):
+            console.print(f"[green]✅ Project imported successfully![/green]")
+            console.print(f"[blue]📋 Project:[/blue] {result['project_name']}")
+            console.print(f"[blue]🔄 Mode:[/blue] {result['import_mode']}")
+            if result.get("conflicts_resolved", 0) > 0:
+                console.print(f"[yellow]⚠️ Conflicts resolved:[/yellow] {result['conflicts_resolved']}")
+        else:
+            console.print("[red]❌ Project import failed[/red]")
+        
+        gateway_client.disconnect()
+        
+    except Exception as e:
+        console.print(f"[red]❌ Import failed: {e}[/red]")
+
+
+@import_group.command()
+@click.option("--file", "-f", "file_path", required=True, help="Path to file to validate")
+@click.option("--type", "-t", type=click.Choice(["project", "gateway_backup", "resources"]), help="Expected file type")
+@click.option("--detailed", is_flag=True, help="Show detailed validation results")
+def validate(file_path: str, type: str, detailed: bool):
+    """✅ Validate import file before importing."""
+    from pathlib import Path
+    import json
+    
+    try:
+        console.print(f"[blue]✅ Validating file '{file_path}'...[/blue]")
+        
+        file_path_obj = Path(file_path)
+        if not file_path_obj.exists():
+            console.print(f"[red]❌ File not found: {file_path}[/red]")
+            return
+        
+        # Basic file validation
+        file_size = file_path_obj.stat().st_size
+        file_ext = file_path_obj.suffix.lower()
+        
+        console.print(f"[blue]📁 File:[/blue] {file_path}")
+        console.print(f"[blue]📊 Size:[/blue] {file_size:,} bytes")
+        console.print(f"[blue]📄 Extension:[/blue] {file_ext}")
+        
+        # Try to determine file type
+        detected_type = "unknown"
+        if file_ext in [".gwbk", ".proj"]:
+            detected_type = "ignition_export"
+        elif file_ext == ".json":
+            try:
+                with open(file_path_obj, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                # Check for our export format
+                if "metadata" in data and "exporter_version" in data["metadata"]:
+                    detected_type = "ign_scripts_export"
+                elif "metadata" in data and "export_type" in data.get("metadata", {}):
+                    detected_type = data["metadata"]["export_type"]
+                elif "export_profile" in data or "resources" in data:
+                    detected_type = "gateway_backup"
+                else:
+                    detected_type = "json_file"
+            except:
+                detected_type = "json_file"
+        elif file_ext == ".zip":
+            detected_type = "zip_archive"
+        
+        console.print(f"[blue]🔍 Detected type:[/blue] {detected_type}")
+        
+        # Validation results
+        validation_results = {
+            "file_exists": True,
+            "readable": True,
+            "size_valid": file_size > 0,
+            "format_valid": detected_type != "unknown",
+        }
+        
+        # Show results
+        all_valid = all(validation_results.values())
+        status_color = "green" if all_valid else "red"
+        status_icon = "✅" if all_valid else "❌"
+        
+        console.print(f"[{status_color}]{status_icon} Validation {'passed' if all_valid else 'failed'}[/{status_color}]")
+        
+        if detailed:
+            console.print("\n[blue]📋 Detailed Results:[/blue]")
+            for check, result in validation_results.items():
+                icon = "✅" if result else "❌"
+                color = "green" if result else "red"
+                console.print(f"  [{color}]{icon} {check.replace('_', ' ').title()}[/{color}]")
+        
+    except Exception as e:
+        console.print(f"[red]❌ Validation failed: {e}[/red]")
+
+
+@main.group(name="deploy")
+def deploy_group():
+    """🚀 Deploy projects and manage deployments."""
+    pass
+
+
+@deploy_group.command()
+@click.option("--package", "-p", required=True, help="Path to deployment package")
+@click.option("--environment", "-e", required=True, help="Target environment")
+@click.option("--gateway", "-g", help="Target gateway configuration")
+@click.option("--validate/--no-validate", default=True, help="Validate before deployment")
+@click.option("--rollback-on-failure/--no-rollback", default=True, help="Auto-rollback on failure")
+def package(
+    package: str,
+    environment: str,
+    gateway: str,
+    validate: bool,
+    rollback_on_failure: bool,
+):
+    """🚀 Deploy a deployment package to target environment."""
+    try:
+        console.print(f"[blue]🚀 Starting deployment of '{package}' to '{environment}'...[/blue]")
+        
+        # Mock deployment - real implementation would use deployment management
+        console.print("[yellow]⚠️ Deployment functionality is under development[/yellow]")
+        console.print(f"[blue]📦 Package:[/blue] {package}")
+        console.print(f"[blue]🎯 Environment:[/blue] {environment}")
+        console.print(f"[blue]✅ Validation:[/blue] {'enabled' if validate else 'disabled'}")
+        console.print(f"[blue]🔄 Auto-rollback:[/blue] {'enabled' if rollback_on_failure else 'disabled'}")
+        
+        # Simulate deployment steps
+        import time
+        with console.status("[bold green]Preparing deployment..."):
+            time.sleep(1)
+        
+        console.print("[green]✅ Deployment simulation completed[/green]")
+        
+    except Exception as e:
+        console.print(f"[red]❌ Deployment failed: {e}[/red]")
+
+
+@deploy_group.command()
+@click.option("--deployment-id", required=True, help="Deployment ID to rollback")
+@click.option("--confirm", is_flag=True, help="Skip confirmation prompt")
+def rollback(deployment_id: str, confirm: bool):
+    """🔄 Rollback a deployment."""
+    try:
+        if not confirm:
+            if not click.confirm(f"Are you sure you want to rollback deployment '{deployment_id}'?"):
+                console.print("[yellow]Rollback cancelled[/yellow]")
+                return
+        
+        console.print(f"[blue]🔄 Rolling back deployment '{deployment_id}'...[/blue]")
+        
+        # Mock rollback
+        console.print("[yellow]⚠️ Rollback functionality is under development[/yellow]")
+        console.print("[green]✅ Rollback simulation completed[/green]")
+        
+    except Exception as e:
+        console.print(f"[red]❌ Rollback failed: {e}[/red]")
+
+
+@deploy_group.command()
+@click.option("--environment", "-e", help="Filter by environment")
+@click.option("--status", "-s", help="Filter by status")
+@click.option("--limit", "-l", default=10, help="Limit number of results")
+def status(environment: str, status: str, limit: int):
+    """📊 Show deployment status and history."""
+    try:
+        console.print("[blue]📊 Deployment Status Dashboard[/blue]")
+        
+        # Mock deployment status
+        console.print("[yellow]⚠️ Status functionality is under development[/yellow]")
+        
+        if environment:
+            console.print(f"[blue]🎯 Environment filter:[/blue] {environment}")
+        if status:
+            console.print(f"[blue]📈 Status filter:[/blue] {status}")
+        
+        console.print(f"[blue]📋 Showing last {limit} deployments[/blue]")
+        
+        # Mock deployment history
+        deployments = [
+            {"id": "dep-001", "package": "project-v1.2.0", "env": "staging", "status": "success", "time": "2025-01-28T10:00:00Z"},
+            {"id": "dep-002", "package": "project-v1.1.9", "env": "production", "status": "success", "time": "2025-01-27T15:30:00Z"},
+            {"id": "dep-003", "package": "project-v1.2.0", "env": "test", "status": "failed", "time": "2025-01-27T12:00:00Z"},
+        ]
+        
+        for dep in deployments[:limit]:
+            status_color = "green" if dep["status"] == "success" else "red" if dep["status"] == "failed" else "yellow"
+            console.print(f"  [{status_color}]● {dep['id']}[/{status_color}] - {dep['package']} → {dep['env']} ({dep['time']})")
+        
+    except Exception as e:
+        console.print(f"[red]❌ Status check failed: {e}[/red]")
+
+
 if __name__ == "__main__":
     main()

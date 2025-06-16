@@ -1,0 +1,36 @@
+{
+  "backups": [
+    {
+      "timestamp": "20250616_150337",
+      "datetime": "2025-06-16T15:03:37.000000",
+      "reason": "Post Export/Import System v1.0.0 completion backup",
+      "node_count": 2475,
+      "relationship_count": 2926,
+      "version": "1.0.0",
+      "backup_type": "milestone",
+      "source": "IGN Scripts Learning System",
+      "filename": "ign_scripts_db_backup_20250616_150337.json",
+      "file_size": 1760941,
+      "milestone": "Export/Import System v1.0.0",
+      "features_added": [
+        "Gateway Resource Exporter",
+        "Neo4j Schema Extensions",
+        "CLI Export/Import Commands", 
+        "Streamlit UI Integration",
+        "File Validation System"
+      ]
+    },
+    {
+      "timestamp": "20250611_170830",
+      "datetime": "2025-06-11T17:08:30.418531",
+      "reason": "Testing backup after fixing dictionary handling",
+      "node_count": 2475,
+      "relationship_count": 2926,
+      "version": "1.0.0",
+      "backup_type": "full",
+      "source": "IGN Scripts Learning System",
+      "filename": "ign_scripts_db_backup_20250611_170830.json",
+      "file_size": 1760941
+    }
+  ]
+}

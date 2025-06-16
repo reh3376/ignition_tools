@@ -94,7 +94,7 @@ def render_sidebar() -> str:
         "📝 Script Generator": "generator",
         "📋 Templates": "templates",
         "✅ Validation": "validation",
-        "📦 Export": "export",
+        "📦 Export/Import": "export",
         "🔗 Gateway Connections": "gateways",
         "🧠 Learning Analytics": "learning",
         "📚 Documentation": "docs",
@@ -518,21 +518,26 @@ def render_validation_page() -> None:
 
 def render_export_page() -> None:
     """Render the export page."""
-    st.markdown("## 📦 Project Export")
+    try:
+        from src.ui.pages.export_import import show_export_import_page
+        show_export_import_page()
+    except ImportError as e:
+        st.error(f"❌ Export/Import System not available: {e}")
+        st.markdown("## 📦 Project Export")
+        st.info("🚧 Export/Import System is being developed!")
+        
+        st.markdown(
+            """
+        ### Available Export Features:
 
-    st.info("🚧 Project export features are coming soon!")
-
-    st.markdown(
+        - **Gateway Backup Format** - Export as .gwbk files
+        - **Project Archive** - Create Ignition project zips  
+        - **Resource Export** - Export individual resources
+        - **Version Control Preparation** - Structure for git integration
+        - **Deployment Packages** - Ready-to-deploy script packages
+        - **CLI Integration** - Full CLI support for exports and imports
         """
-    ### Planned Export Features:
-
-    - **Gateway Backup Format** - Export as .gwbk files
-    - **Project Archive** - Create Ignition project zips
-    - **Resource Export** - Export individual resources
-    - **Version Control Preparation** - Structure for git integration
-    - **Deployment Packages** - Ready-to-deploy script packages
-    """
-    )
+        )
 
 
 def render_gateways_page() -> None:
