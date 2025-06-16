@@ -1,5 +1,5 @@
-import pytest
 from fastapi.testclient import TestClient
+
 from src.main import app
 
 client = TestClient(app)
@@ -34,4 +34,4 @@ def test_health_check_mcp_connection():
     data = response.json()
     assert "mcp_status" in data
     assert "connection_time" in data
-    assert isinstance(data["connection_time"], float) 
+    assert isinstance(data["connection_time"], float)

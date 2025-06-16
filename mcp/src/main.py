@@ -5,10 +5,10 @@ including health checks, authentication, and core functionality.
 """
 
 import os
-from typing import Any, Dict
+from typing import Any
 
 import structlog
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -36,12 +36,12 @@ class HealthResponse(BaseModel):
     """Health check response model."""
     status: str
     version: str
-    details: Dict[str, Any]
+    details: dict[str, Any]
 
 @app.get("/health", response_model=HealthResponse)
 async def health_check() -> HealthResponse:
     """Health check endpoint.
-    
+
     Returns:
         HealthResponse: Health status information
     """
@@ -55,11 +55,11 @@ async def health_check() -> HealthResponse:
     )
 
 @app.get("/")
-async def root() -> Dict[str, str]:
+async def root() -> dict[str, str]:
     """Root endpoint.
-    
+
     Returns:
-        Dict[str, str]: Welcome message
+        dict[str, str]: Welcome message
     """
     return {"message": "Welcome to MCP Service"}
 
@@ -70,4 +70,4 @@ if __name__ == "__main__":
         host="0.0.0.0",
         port=8080,
         reload=True
-    ) 
+    )

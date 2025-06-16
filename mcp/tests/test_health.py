@@ -1,5 +1,5 @@
-import pytest
 from fastapi.testclient import TestClient
+
 from src.main import app
 
 client = TestClient(app)
@@ -25,4 +25,4 @@ def test_health_check_structure():
     data = response.json()
     assert isinstance(data["status"], str)
     assert isinstance(data["version"], str)
-    assert isinstance(data["timestamp"], str) 
+    assert isinstance(data["timestamp"], str)

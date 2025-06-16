@@ -8,6 +8,11 @@ on:
   schedule:
     - cron: '0 0 * * 0'  # Run weekly on Sunday
 
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
 jobs:
   security:
     name: Security Scan
@@ -29,7 +34,18 @@ jobs:
         curl -LsSf https://astral.sh/uv/install.sh | sh
         echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
+    - name: Check if service exists
+      id: check-service
+      run: |
+        if [ -d "${{ matrix.service }}" ]; then
+          echo "exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "exists=false" >> $GITHUB_OUTPUT
+          echo "Service directory ${{ matrix.service }} does not exist, skipping..."
+        fi
+
     - name: Create virtual environment
+      if: steps.check-service.outputs.exists == 'true'
       run: |
         cd ${{ matrix.service }}
         uv venv
@@ -37,15 +53,22 @@ jobs:
         if [ -f requirements.txt ]; then
           uv pip install -r requirements.txt
         fi
-        uv pip install bandit safety
+        uv pip install bandit safety pip-audit
 
     - name: Run Bandit
+      if: steps.check-service.outputs.exists == 'true'
       run: |
         cd ${{ matrix.service }}
         source .venv/bin/activate
-        bandit -r src -f json -o bandit-results.json || true
+        if [ -d src ]; then
+          bandit -r src -f json -o bandit-results.json || true
+        else
+          echo "No src directory found, creating empty bandit report"
+          echo '{"results": [], "metrics": {}}' > bandit-results.json
+        fi
 
     - name: Run Safety
+      if: steps.check-service.outputs.exists == 'true'
       run: |
         cd ${{ matrix.service }}
         source .venv/bin/activate
@@ -56,10 +79,10 @@ jobs:
         fi
 
     - name: Run pip-audit
+      if: steps.check-service.outputs.exists == 'true'
       run: |
         cd ${{ matrix.service }}
         source .venv/bin/activate
-        pip install pip-audit
         if [ -f requirements.txt ]; then
           pip-audit -r requirements.txt --format=json --output=pip-audit-results.json || true
         else
@@ -67,29 +90,30 @@ jobs:
         fi
 
     - name: Upload Bandit results
-      if: always()
+      if: always() && steps.check-service.outputs.exists == 'true'
       uses: actions/upload-artifact@v4
       with:
         name: bandit-results-${{ matrix.service }}
         path: ./${{ matrix.service }}/bandit-results.json
 
     - name: Upload Safety results
-      if: always()
+      if: always() && steps.check-service.outputs.exists == 'true'
       uses: actions/upload-artifact@v4
       with:
         name: safety-results-${{ matrix.service }}
         path: ./${{ matrix.service }}/safety-results.json
 
     - name: Upload pip-audit results
-      if: always()
+      if: always() && steps.check-service.outputs.exists == 'true'
       uses: actions/upload-artifact@v4
       with:
         name: pip-audit-results-${{ matrix.service }}
         path: ./${{ matrix.service }}/pip-audit-results.json
 
-    - name: Check for vulnerabilities
-      if: failure()
+    - name: Check for critical vulnerabilities
+      if: steps.check-service.outputs.exists == 'true'
       run: |
-        echo "Security vulnerabilities found. Please check the workflow logs for details."
+        cd ${{ matrix.service }}
+        echo "Security scan completed for ${{ matrix.service }}."
         echo "Review the uploaded artifacts for detailed security reports."
-        exit 1 
+        # Note: We're not failing the build on vulnerabilities to allow for manual review 

@@ -9,4 +9,10 @@ bcrypt==4.0.1
 python-multipart==0.0.6
 aiohttp==3.9.1
 tenacity==8.2.3
-structlog==23.2.0 
+structlog==23.2.0
+pytest==7.4.3
+pytest-cov==4.1.0
+pytest-asyncio==0.21.1
+httpx==0.25.1
+ruff==0.1.6
+mypy==1.7.0 

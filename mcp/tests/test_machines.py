@@ -1,5 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
+
 from src.main import app
 
 client = TestClient(app)
@@ -21,7 +22,7 @@ def test_get_machine_status(sample_machine_data):
     """Test getting machine status."""
     # First create a machine status
     client.post(f"/machines/{sample_machine_data['machine_id']}/status", json=sample_machine_data)
-    
+
     # Then get the status
     response = client.get(f"/machines/{sample_machine_data['machine_id']}/status")
     assert response.status_code == 200
@@ -70,7 +71,7 @@ def test_list_machines(sample_machine_data):
     """Test listing machines."""
     # Create a machine first
     client.post(f"/machines/{sample_machine_data['machine_id']}/status", json=sample_machine_data)
-    
+
     # Then list machines
     response = client.get("/machines")
     assert response.status_code == 200
@@ -86,7 +87,7 @@ def test_list_machines_with_filters(sample_machine_data):
     """Test listing machines with filters."""
     # Create a machine first
     client.post(f"/machines/{sample_machine_data['machine_id']}/status", json=sample_machine_data)
-    
+
     # List machines with status filter
     response = client.get("/machines?status=running")
     assert response.status_code == 200
@@ -97,7 +98,7 @@ def test_get_machine_metrics(sample_machine_data):
     """Test getting machine metrics."""
     # Create a machine first
     client.post(f"/machines/{sample_machine_data['machine_id']}/status", json=sample_machine_data)
-    
+
     # Get metrics
     response = client.get(f"/machines/{sample_machine_data['machine_id']}/metrics")
     assert response.status_code == 200
@@ -108,4 +109,4 @@ def test_get_machine_metrics(sample_machine_data):
     assert "timestamp" in data["metrics"][0]
     assert "temperature" in data["metrics"][0]
     assert "pressure" in data["metrics"][0]
-    assert "speed" in data["metrics"][0] 
+    assert "speed" in data["metrics"][0]

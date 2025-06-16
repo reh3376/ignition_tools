@@ -1,10 +1,12 @@
 import os
+
 import pytest
 from fastapi.testclient import TestClient
-from src.main import app
-from src.database import get_db, Base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+from src.database import Base, get_db
+from src.main import app
 
 # Test database URL
 TEST_DATABASE_URL = "sqlite:///./test.db"
@@ -19,7 +21,7 @@ def test_db_engine():
     if os.path.exists("./test.db"):
         os.remove("./test.db")
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def test_db(test_db_engine):
     """Create a test database session."""
     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=test_db_engine)
@@ -29,7 +31,7 @@ def test_db(test_db_engine):
     finally:
         db.close()
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def client(test_db):
     """Create a test client with a test database session."""
     def override_get_db():
@@ -37,13 +39,13 @@ def client(test_db):
             yield test_db
         finally:
             test_db.close()
-    
+
     app.dependency_overrides[get_db] = override_get_db
     with TestClient(app) as test_client:
         yield test_client
     app.dependency_overrides.clear()
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def mock_mcp_service():
     """Mock MCP service responses."""
     return {
@@ -64,7 +66,7 @@ def mock_mcp_service():
         }
     }
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def sample_test_data():
     """Provide sample test data for testing."""
     return {
@@ -76,4 +78,4 @@ def sample_test_data():
             "load_level": "high",
             "metrics": ["temperature", "pressure", "speed"]
         }
-    } 
+    }

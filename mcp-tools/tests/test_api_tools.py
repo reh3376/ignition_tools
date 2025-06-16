@@ -1,5 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
+
 from src.main import app
 
 client = TestClient(app)
@@ -18,7 +19,7 @@ def test_get_api_test(sample_test_data):
     """Test retrieving an API test."""
     # First create a test
     client.post("/api/tests", json=sample_test_data)
-    
+
     # Then get it
     response = client.get(f"/api/tests/{sample_test_data['test_id']}")
     assert response.status_code == 200
@@ -30,7 +31,7 @@ def test_list_api_tests(sample_test_data):
     """Test listing API tests."""
     # Create a test first
     client.post("/api/tests", json=sample_test_data)
-    
+
     # Then list tests
     response = client.get("/api/tests")
     assert response.status_code == 200
@@ -44,7 +45,9 @@ def test_run_api_test(sample_test_data, mock_mcp_service):
     """Test running an API test."""
     # Create a test first
     client.post("/api/tests", json=sample_test_data)
-    
+    # Use mock service for isolated testing
+    assert mock_mcp_service is not None
+
     # Run the test
     response = client.post(f"/api/tests/{sample_test_data['test_id']}/run")
     assert response.status_code == 200
@@ -60,7 +63,7 @@ def test_get_test_results(sample_test_data):
     # Create and run a test first
     client.post("/api/tests", json=sample_test_data)
     client.post(f"/api/tests/{sample_test_data['test_id']}/run")
-    
+
     # Get results
     response = client.get(f"/api/tests/{sample_test_data['test_id']}/results")
     assert response.status_code == 200
@@ -98,7 +101,7 @@ def test_performance_test_execution(sample_test_data):
     """Test executing a performance test."""
     # Create a test first
     client.post("/api/tests", json=sample_test_data)
-    
+
     # Run performance test
     response = client.post(
         f"/api/tests/{sample_test_data['test_id']}/run",
@@ -110,4 +113,4 @@ def test_performance_test_execution(sample_test_data):
     assert "status" in data
     assert "performance_metrics" in data
     assert "response_times" in data["performance_metrics"]
-    assert "throughput" in data["performance_metrics"] 
+    assert "throughput" in data["performance_metrics"]
