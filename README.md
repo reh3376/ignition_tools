@@ -428,11 +428,13 @@ IGN_scripts/
 
 ### Technical Documentation
 - **[AI Assistant Memory System](docs/ai_assistant_memory_system.md)** - Neo4j graph database integration
+- **[Deployment Pattern Learning](docs/deployment/pattern-learning.md)** - ✅ AI-powered deployment intelligence system
 - **[Testing Framework](docs/testing_guide.md)** - Comprehensive testing approach and utilities
 - **[Project Structure](docs/project_structure.md)** - Detailed codebase organization
 - **[Enhanced Graph Functions](docs/enhanced_graph_functions_README.md)** - Ignition function database
 
 ### Development Resources
+- **[Deployment Pattern Learning Completion](docs/DEPLOYMENT_PATTERN_LEARNING_COMPLETION.md)** - ✅ Latest major feature completion
 - **[Testing Summary](docs/TESTING_SUMMARY.md)** - Testing implementation summary
 - **[Learning System Integration](docs/LEARNING_SYSTEM_INTEGRATION_SUMMARY.md)** - Phase 1 learning system details
 - **[Stage 1 Completion](docs/stage1_completion_summary.md)** - Initial development milestone
@@ -589,6 +591,22 @@ python -m src.core.enhanced_cli export project \
   --source ./my_ignition_project \
   --output ./exports/production_v1.2.0.zip \
   --format gateway-import
+```
+
+### AI-Powered Deployment Intelligence
+
+```bash
+# Get deployment recommendations based on learned patterns
+python -m src.core.enhanced_cli deploy recommendations -e production
+
+# Get environment-specific adaptations
+python -m src.core.enhanced_cli deploy adaptations -s staging -t production
+
+# Get rollback scenarios for emergency situations
+python -m src.core.enhanced_cli deploy rollback-scenarios -e production
+
+# Analyze deployment performance and trends
+python -m src.core.enhanced_cli deploy analytics -e production -d 30
 ```
 
 ## 🤝 Contributing

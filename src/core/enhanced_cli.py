@@ -1939,5 +1939,300 @@ def status(environment: str, status: str, limit: int):
         console.print(f"[red]❌ Status check failed: {e}[/red]")
 
 
+@deploy_group.command()
+@click.option("--environment", "-e", required=True, help="Target environment")
+@click.option("--resource-types", "-r", multiple=True, help="Resource types to deploy")
+@click.option("--strategy", "-s", help="Deployment strategy")
+@click.option("--gateway", "-g", help="Target gateway host")
+@click.option("--limit", "-l", default=5, help="Number of recommendations")
+def recommendations(environment: str, resource_types: tuple, strategy: str, gateway: str, limit: int):
+    """🧠 Get AI-powered deployment recommendations based on learned patterns."""
+    try:
+        from ..ignition.graph.client import IgnitionGraphClient
+        from ..ignition.graph.deployment_pattern_learner import DeploymentPatternLearner
+        
+        console.print("[blue]🧠 Analyzing deployment patterns for recommendations...[/blue]")
+        
+        # Initialize components
+        client = IgnitionGraphClient()
+        if not client.connect():
+            console.print("[red]❌ Failed to connect to knowledge graph[/red]")
+            return
+        
+        learner = DeploymentPatternLearner(client)
+        
+        # Get recommendations
+        recommendations = learner.get_deployment_recommendations(
+            target_environment=environment,
+            resource_types=list(resource_types) if resource_types else ["project"],
+            deployment_strategy=strategy,
+            gateway_host=gateway,
+            limit=limit
+        )
+        
+        if not recommendations:
+            console.print("[yellow]⚠️ No deployment patterns found for the specified criteria[/yellow]")
+            console.print("[blue]💡 Consider starting with a basic deployment to build pattern history[/blue]")
+            return
+        
+        console.print(f"[green]✅ Found {len(recommendations)} deployment recommendations:[/green]")
+        console.print()
+        
+        for i, rec in enumerate(recommendations, 1):
+            confidence_color = "green" if rec["confidence_score"] >= 0.8 else "yellow" if rec["confidence_score"] >= 0.6 else "red"
+            
+            console.print(f"[bold blue]{i}. {rec['pattern_name']}[/bold blue]")
+            console.print(f"   [blue]Strategy:[/blue] {rec['deployment_strategy']}")
+            console.print(f"   [{confidence_color}]Confidence:[/{confidence_color}] {rec['confidence_score']:.1%}")
+            console.print(f"   [blue]Success Rate:[/blue] {rec['success_rate']:.1%} ({rec['success_count']} successes)")
+            console.print(f"   [blue]Usage Count:[/blue] {rec['usage_count']} times")
+            
+            if rec.get("applicability_reasons"):
+                console.print("   [blue]Why this pattern applies:[/blue]")
+                for reason in rec["applicability_reasons"]:
+                    console.print(f"     • {reason}")
+            
+            if rec.get("pre_conditions"):
+                console.print("   [blue]Pre-conditions:[/blue]")
+                for condition in rec["pre_conditions"]:
+                    console.print(f"     • {condition}")
+            
+            console.print()
+        
+        console.print("[blue]💡 Use these patterns as templates for your deployment configuration[/blue]")
+        
+    except ImportError:
+        console.print("[red]❌ Deployment pattern learning system not available[/red]")
+    except Exception as e:
+        console.print(f"[red]❌ Failed to get recommendations: {e}[/red]")
+
+
+@deploy_group.command()
+@click.option("--source-env", "-s", required=True, help="Source environment")
+@click.option("--target-env", "-t", required=True, help="Target environment")
+@click.option("--resource-type", "-r", help="Specific resource type")
+@click.option("--adaptation-type", "-a", help="Specific adaptation type")
+@click.option("--limit", "-l", default=10, help="Number of adaptations to show")
+def adaptations(source_env: str, target_env: str, resource_type: str, adaptation_type: str, limit: int):
+    """🔄 Get environment-specific adaptations for cross-environment deployments."""
+    try:
+        from ..ignition.graph.client import IgnitionGraphClient
+        from ..ignition.graph.deployment_pattern_learner import DeploymentPatternLearner
+        
+        console.print(f"[blue]🔄 Finding adaptations from {source_env} → {target_env}...[/blue]")
+        
+        # Initialize components
+        client = IgnitionGraphClient()
+        if not client.connect():
+            console.print("[red]❌ Failed to connect to knowledge graph[/red]")
+            return
+        
+        learner = DeploymentPatternLearner(client)
+        
+        # Get adaptations
+        adaptations = learner.get_environment_adaptations(
+            source_environment=source_env,
+            target_environment=target_env,
+            resource_type=resource_type,
+            adaptation_type=adaptation_type,
+            limit=limit
+        )
+        
+        if not adaptations:
+            console.print("[yellow]⚠️ No environment adaptations found for the specified criteria[/yellow]")
+            console.print("[blue]💡 Consider recording adaptations as you discover them[/blue]")
+            return
+        
+        console.print(f"[green]✅ Found {len(adaptations)} environment adaptations:[/green]")
+        console.print()
+        
+        for i, adaptation in enumerate(adaptations, 1):
+            success_color = "green" if adaptation["success_rate"] >= 0.8 else "yellow" if adaptation["success_rate"] >= 0.6 else "red"
+            
+            console.print(f"[bold blue]{i}. {adaptation['adaptation_name']}[/bold blue]")
+            console.print(f"   [blue]Type:[/blue] {adaptation['adaptation_type']}")
+            console.print(f"   [blue]Resource:[/blue] {adaptation['resource_type']}")
+            console.print(f"   [{success_color}]Success Rate:[/{success_color}] {adaptation['success_rate']:.1%}")
+            console.print(f"   [blue]Applications:[/blue] {adaptation['application_count']} times")
+            console.print(f"   [blue]Automation:[/blue] {adaptation['automation_level']}")
+            
+            if adaptation.get("adaptation_rules"):
+                console.print("   [blue]Adaptation Rules:[/blue]")
+                for rule in adaptation["adaptation_rules"][:3]:  # Show first 3 rules
+                    console.print(f"     • {rule}")
+            
+            if adaptation.get("trigger_conditions"):
+                console.print("   [blue]Trigger Conditions:[/blue]")
+                for condition in adaptation["trigger_conditions"][:3]:  # Show first 3 conditions
+                    console.print(f"     • {condition}")
+            
+            console.print()
+        
+    except ImportError:
+        console.print("[red]❌ Deployment pattern learning system not available[/red]")
+    except Exception as e:
+        console.print(f"[red]❌ Failed to get adaptations: {e}[/red]")
+
+
+@deploy_group.command()
+@click.option("--environment", "-e", required=True, help="Target environment")
+@click.option("--resource-types", "-r", multiple=True, help="Resource types that might need rollback")
+@click.option("--rollback-type", "-t", help="Specific rollback type")
+@click.option("--limit", "-l", default=10, help="Number of scenarios to show")
+def rollback_scenarios(environment: str, resource_types: tuple, rollback_type: str, limit: int):
+    """🚨 Get rollback scenarios and recovery patterns for emergency situations."""
+    try:
+        from ..ignition.graph.client import IgnitionGraphClient
+        from ..ignition.graph.deployment_pattern_learner import DeploymentPatternLearner
+        
+        console.print(f"[blue]🚨 Finding rollback scenarios for {environment} environment...[/blue]")
+        
+        # Initialize components
+        client = IgnitionGraphClient()
+        if not client.connect():
+            console.print("[red]❌ Failed to connect to knowledge graph[/red]")
+            return
+        
+        learner = DeploymentPatternLearner(client)
+        
+        # Get rollback scenarios
+        scenarios = learner.get_rollback_scenarios(
+            environment=environment,
+            resource_types=list(resource_types) if resource_types else None,
+            rollback_type=rollback_type,
+            limit=limit
+        )
+        
+        if not scenarios:
+            console.print("[yellow]⚠️ No rollback scenarios found for the specified criteria[/yellow]")
+            console.print("[blue]💡 Consider documenting rollback procedures as you develop them[/blue]")
+            return
+        
+        console.print(f"[green]✅ Found {len(scenarios)} rollback scenarios:[/green]")
+        console.print()
+        
+        for i, scenario in enumerate(scenarios, 1):
+            success_color = "green" if scenario["success_rate"] >= 0.8 else "yellow" if scenario["success_rate"] >= 0.6 else "red"
+            
+            console.print(f"[bold blue]{i}. {scenario['scenario_name']}[/bold blue]")
+            console.print(f"   [blue]Type:[/blue] {scenario['rollback_type']}")
+            console.print(f"   [{success_color}]Success Rate:[/{success_color}] {scenario['success_rate']:.1%}")
+            console.print(f"   [blue]Executions:[/blue] {scenario['execution_count']} times")
+            console.print(f"   [blue]Automation:[/blue] {scenario['automation_level']}")
+            
+            if scenario.get("recovery_time_target"):
+                console.print(f"   [blue]Recovery Target:[/blue] {scenario['recovery_time_target']} seconds")
+            
+            if scenario.get("average_recovery_time"):
+                console.print(f"   [blue]Avg Recovery Time:[/blue] {scenario['average_recovery_time']} seconds")
+            
+            console.print(f"   [blue]Data Loss Acceptable:[/blue] {'Yes' if scenario['data_loss_acceptable'] else 'No'}")
+            
+            if scenario.get("trigger_conditions"):
+                console.print("   [blue]Trigger Conditions:[/blue]")
+                for condition in scenario["trigger_conditions"][:3]:  # Show first 3 conditions
+                    console.print(f"     • {condition}")
+            
+            if scenario.get("rollback_steps"):
+                console.print("   [blue]Rollback Steps:[/blue]")
+                for step in scenario["rollback_steps"][:3]:  # Show first 3 steps
+                    console.print(f"     • {step}")
+            
+            if scenario.get("lessons_learned"):
+                console.print(f"   [blue]Lessons Learned:[/blue] {scenario['lessons_learned'][:100]}...")
+            
+            console.print()
+        
+    except ImportError:
+        console.print("[red]❌ Deployment pattern learning system not available[/red]")
+    except Exception as e:
+        console.print(f"[red]❌ Failed to get rollback scenarios: {e}[/red]")
+
+
+@deploy_group.command()
+@click.option("--environment", "-e", help="Filter by environment")
+@click.option("--days", "-d", default=30, help="Days to look back")
+@click.option("--metrics", "-m", multiple=True, help="Specific metric types to include")
+def analytics(environment: str, days: int, metrics: tuple):
+    """📈 Get deployment analytics and performance trends."""
+    try:
+        from ..ignition.graph.client import IgnitionGraphClient
+        from ..ignition.graph.deployment_pattern_learner import DeploymentPatternLearner
+        
+        console.print(f"[blue]📈 Analyzing deployment performance over last {days} days...[/blue]")
+        
+        # Initialize components
+        client = IgnitionGraphClient()
+        if not client.connect():
+            console.print("[red]❌ Failed to connect to knowledge graph[/red]")
+            return
+        
+        learner = DeploymentPatternLearner(client)
+        
+        # Get analytics
+        analytics_data = learner.get_deployment_analytics(
+            environment=environment,
+            days_back=days,
+            metric_types=list(metrics) if metrics else None
+        )
+        
+        console.print("[green]✅ Deployment Analytics Report[/green]")
+        console.print()
+        
+        # Period information
+        period = analytics_data.get("period", {})
+        console.print(f"[blue]📅 Analysis Period:[/blue] {period.get('start_date', 'N/A')} to {period.get('end_date', 'N/A')}")
+        console.print()
+        
+        # Deployment statistics
+        stats = analytics_data.get("deployment_statistics", {})
+        if stats:
+            console.print("[blue]📊 Deployment Statistics:[/blue]")
+            console.print(f"   Total Deployments: {stats.get('total_deployments', 0)}")
+            console.print(f"   Successful: {stats.get('successful_deployments', 0)}")
+            console.print(f"   Failed: {stats.get('failed_deployments', 0)}")
+            console.print(f"   Rollbacks Triggered: {stats.get('rollbacks_triggered', 0)}")
+            
+            if stats.get('avg_duration'):
+                avg_duration_min = stats['avg_duration'] / 60
+                console.print(f"   Average Duration: {avg_duration_min:.1f} minutes")
+            
+            success_rate = analytics_data.get("success_rate", 0)
+            rollback_rate = analytics_data.get("rollback_rate", 0)
+            
+            success_color = "green" if success_rate >= 0.9 else "yellow" if success_rate >= 0.8 else "red"
+            rollback_color = "green" if rollback_rate <= 0.05 else "yellow" if rollback_rate <= 0.1 else "red"
+            
+            console.print(f"   [{success_color}]Success Rate: {success_rate:.1%}[/{success_color}]")
+            console.print(f"   [{rollback_color}]Rollback Rate: {rollback_rate:.1%}[/{rollback_color}]")
+            console.print()
+        
+        # Metric trends
+        trends = analytics_data.get("metric_trends", {})
+        if trends:
+            console.print("[blue]📈 Metric Trends:[/blue]")
+            for metric_type, trend_data in trends.items():
+                console.print(f"   {metric_type}:")
+                console.print(f"     Average: {trend_data.get('avg_value', 0):.2f} {trend_data.get('unit', '')}")
+                console.print(f"     Range: {trend_data.get('min_value', 0):.2f} - {trend_data.get('max_value', 0):.2f}")
+                console.print(f"     Measurements: {trend_data.get('measurement_count', 0)}")
+            console.print()
+        
+        # Insights
+        insights = analytics_data.get("insights", [])
+        if insights:
+            console.print("[blue]💡 Insights & Recommendations:[/blue]")
+            for insight in insights:
+                console.print(f"   • {insight}")
+            console.print()
+        else:
+            console.print("[green]✅ No issues detected - deployment performance looks good![/green]")
+        
+    except ImportError:
+        console.print("[red]❌ Deployment pattern learning system not available[/red]")
+    except Exception as e:
+        console.print(f"[red]❌ Failed to get analytics: {e}[/red]")
+
+
 if __name__ == "__main__":
     main()

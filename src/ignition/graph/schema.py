@@ -33,6 +33,12 @@ class NodeType(Enum):
     DEPLOYMENT_CONFIG = "DeploymentConfig"
     VERSION_TAG = "VersionTag"
     GATEWAY_RESOURCE = "GatewayResource"
+    # Deployment Pattern Learning Node Types
+    DEPLOYMENT_PATTERN = "DeploymentPattern"
+    DEPLOYMENT_EXECUTION = "DeploymentExecution"
+    ENVIRONMENT_ADAPTATION = "EnvironmentAdaptation"
+    ROLLBACK_SCENARIO = "RollbackScenario"
+    DEPLOYMENT_METRIC = "DeploymentMetric"
 
 
 class RelationshipType(Enum):
@@ -64,6 +70,15 @@ class RelationshipType(Enum):
     REFERENCES = "REFERENCES"
     CONFLICTS_WITH = "CONFLICTS_WITH"
     VERSIONED_AS = "VERSIONED_AS"
+    # Deployment Pattern Learning Relationship Types
+    FOLLOWS_DEPLOYMENT_PATTERN = "FOLLOWS_DEPLOYMENT_PATTERN"
+    ADAPTS_TO_ENVIRONMENT = "ADAPTS_TO_ENVIRONMENT"
+    TRIGGERS_ROLLBACK = "TRIGGERS_ROLLBACK"
+    MEASURES_DEPLOYMENT = "MEASURES_DEPLOYMENT"
+    LEARNS_FROM_EXECUTION = "LEARNS_FROM_EXECUTION"
+    SIMILAR_TO_PATTERN = "SIMILAR_TO_PATTERN"
+    CAUSED_BY_ISSUE = "CAUSED_BY_ISSUE"
+    RESOLVED_BY_ADAPTATION = "RESOLVED_BY_ADAPTATION"
 
 
 @dataclass
@@ -643,6 +658,201 @@ class IgnitionGraphSchema:
                     "gateway_host",
                     "resource_path",
                     "status",
+                ],
+            },
+            # Deployment Pattern Learning Node Definitions
+            "DeploymentPattern": {
+                "description": "Captures successful deployment configuration patterns",
+                "properties": {
+                    "id": {"type": "string", "required": True, "unique": True},
+                    "name": {"type": "string", "required": True},
+                    "pattern_type": {
+                        "type": "string",
+                        "required": True,
+                    },  # "successful_config", "environment_specific", "resource_combination", "timing_pattern"
+                    "environment_types": {"type": "list", "required": True},  # ["development", "staging", "production"]
+                    "resource_types": {"type": "list", "required": True},  # ["project", "tag_provider", "database"]
+                    "deployment_strategy": {"type": "string", "required": True},
+                    "success_criteria": {"type": "map", "required": True},
+                    "configuration_template": {"type": "map", "required": True},
+                    "pre_conditions": {"type": "list", "required": False},
+                    "post_conditions": {"type": "list", "required": False},
+                    "discovered_date": {"type": "datetime", "required": True},
+                    "last_applied": {"type": "datetime", "required": False},
+                    "success_count": {"type": "integer", "required": True, "default": 0},
+                    "failure_count": {"type": "integer", "required": True, "default": 0},
+                    "confidence_score": {"type": "float", "required": True, "default": 0.0},
+                    "applicability_score": {"type": "float", "required": True, "default": 0.0},
+                    "pattern_data": {"type": "string", "required": True},  # JSON serialized pattern details
+                    "tags": {"type": "list", "required": False},
+                    "is_active": {"type": "boolean", "required": True, "default": True},
+                },
+                "indexes": [
+                    "pattern_type",
+                    "environment_types",
+                    "deployment_strategy",
+                    "confidence_score",
+                    "success_count",
+                    "discovered_date",
+                ],
+            },
+            "DeploymentExecution": {
+                "description": "Records individual deployment execution instances",
+                "properties": {
+                    "id": {"type": "string", "required": True, "unique": True},
+                    "execution_name": {"type": "string", "required": True},
+                    "deployment_type": {
+                        "type": "string",
+                        "required": True,
+                    },  # "initial", "update", "rollback", "hotfix", "migration"
+                    "source_environment": {"type": "string", "required": False},
+                    "target_environment": {"type": "string", "required": True},
+                    "gateway_host": {"type": "string", "required": True},
+                    "deployment_strategy": {"type": "string", "required": True},
+                    "resources_deployed": {"type": "list", "required": True},
+                    "configuration_used": {"type": "map", "required": True},
+                    "started_at": {"type": "datetime", "required": True},
+                    "completed_at": {"type": "datetime", "required": False},
+                    "duration_seconds": {"type": "integer", "required": False},
+                    "status": {
+                        "type": "string",
+                        "required": True,
+                    },  # "pending", "running", "completed", "failed", "rolled_back", "partially_completed"
+                    "success_metrics": {"type": "map", "required": False},
+                    "failure_reasons": {"type": "list", "required": False},
+                    "rollback_triggered": {"type": "boolean", "required": True, "default": False},
+                    "rollback_successful": {"type": "boolean", "required": False},
+                    "user_id": {"type": "string", "required": False},
+                    "automation_triggered": {"type": "boolean", "required": True, "default": False},
+                    "execution_log": {"type": "string", "required": False},
+                    "performance_data": {"type": "map", "required": False},
+                    "lessons_learned": {"type": "string", "required": False},
+                },
+                "indexes": [
+                    "deployment_type",
+                    "target_environment",
+                    "gateway_host",
+                    "status",
+                    "started_at",
+                    "duration_seconds",
+                ],
+            },
+            "EnvironmentAdaptation": {
+                "description": "Captures environment-specific adaptations and configurations",
+                "properties": {
+                    "id": {"type": "string", "required": True, "unique": True},
+                    "adaptation_name": {"type": "string", "required": True},
+                    "source_environment": {"type": "string", "required": True},
+                    "target_environment": {"type": "string", "required": True},
+                    "adaptation_type": {
+                        "type": "string",
+                        "required": True,
+                    },  # "configuration_change", "resource_mapping", "security_adjustment", "performance_tuning"
+                    "resource_type": {"type": "string", "required": True},
+                    "original_configuration": {"type": "map", "required": True},
+                    "adapted_configuration": {"type": "map", "required": True},
+                    "adaptation_rules": {"type": "list", "required": True},
+                    "trigger_conditions": {"type": "list", "required": True},
+                    "validation_criteria": {"type": "list", "required": False},
+                    "discovered_date": {"type": "datetime", "required": True},
+                    "last_applied": {"type": "datetime", "required": False},
+                    "application_count": {"type": "integer", "required": True, "default": 0},
+                    "success_rate": {"type": "float", "required": True, "default": 0.0},
+                    "impact_assessment": {"type": "map", "required": False},
+                    "automation_level": {
+                        "type": "string",
+                        "required": True,
+                        "default": "manual",
+                    },  # "manual", "semi_automated", "fully_automated"
+                    "confidence_level": {"type": "float", "required": True, "default": 0.0},
+                    "is_active": {"type": "boolean", "required": True, "default": True},
+                },
+                "indexes": [
+                    "source_environment",
+                    "target_environment",
+                    "adaptation_type",
+                    "resource_type",
+                    "success_rate",
+                    "discovered_date",
+                ],
+            },
+            "RollbackScenario": {
+                "description": "Documents rollback scenarios and recovery patterns",
+                "properties": {
+                    "id": {"type": "string", "required": True, "unique": True},
+                    "scenario_name": {"type": "string", "required": True},
+                    "rollback_type": {
+                        "type": "string",
+                        "required": True,
+                    },  # "automatic", "manual", "partial", "full", "emergency"
+                    "trigger_conditions": {"type": "list", "required": True},
+                    "failure_patterns": {"type": "list", "required": True},
+                    "rollback_strategy": {"type": "string", "required": True},
+                    "rollback_steps": {"type": "list", "required": True},
+                    "recovery_time_target": {"type": "integer", "required": False},  # seconds
+                    "data_loss_acceptable": {"type": "boolean", "required": True, "default": False},
+                    "environment": {"type": "string", "required": True},
+                    "resource_types_affected": {"type": "list", "required": True},
+                    "validation_steps": {"type": "list", "required": False},
+                    "notification_required": {"type": "boolean", "required": True, "default": True},
+                    "escalation_criteria": {"type": "list", "required": False},
+                    "discovered_date": {"type": "datetime", "required": True},
+                    "last_executed": {"type": "datetime", "required": False},
+                    "execution_count": {"type": "integer", "required": True, "default": 0},
+                    "success_rate": {"type": "float", "required": True, "default": 0.0},
+                    "average_recovery_time": {"type": "integer", "required": False},  # seconds
+                    "lessons_learned": {"type": "string", "required": False},
+                    "automation_level": {
+                        "type": "string",
+                        "required": True,
+                        "default": "manual",
+                    },  # "manual", "semi_automated", "fully_automated"
+                    "is_active": {"type": "boolean", "required": True, "default": True},
+                },
+                "indexes": [
+                    "rollback_type",
+                    "environment",
+                    "success_rate",
+                    "execution_count",
+                    "discovered_date",
+                ],
+            },
+            "DeploymentMetric": {
+                "description": "Stores deployment performance and success metrics",
+                "properties": {
+                    "id": {"type": "string", "required": True, "unique": True},
+                    "metric_name": {"type": "string", "required": True},
+                    "metric_type": {
+                        "type": "string",
+                        "required": True,
+                    },  # "duration", "success_rate", "resource_count", "error_rate", "rollback_rate"
+                    "metric_category": {
+                        "type": "string",
+                        "required": True,
+                    },  # "performance", "reliability", "quality", "efficiency"
+                    "environment": {"type": "string", "required": True},
+                    "deployment_strategy": {"type": "string", "required": False},
+                    "resource_type": {"type": "string", "required": False},
+                    "metric_value": {"type": "float", "required": True},
+                    "unit": {"type": "string", "required": True},  # "seconds", "percentage", "count", "bytes"
+                    "measurement_date": {"type": "datetime", "required": True},
+                    "baseline_value": {"type": "float", "required": False},
+                    "target_value": {"type": "float", "required": False},
+                    "threshold_warning": {"type": "float", "required": False},
+                    "threshold_critical": {"type": "float", "required": False},
+                    "trend_direction": {
+                        "type": "string",
+                        "required": False,
+                    },  # "improving", "degrading", "stable", "unknown"
+                    "context_data": {"type": "map", "required": False},
+                    "tags": {"type": "list", "required": False},
+                },
+                "indexes": [
+                    "metric_type",
+                    "metric_category",
+                    "environment",
+                    "measurement_date",
+                    "metric_value",
                 ],
             },
         }
