@@ -1,3 +1,120 @@
+# IGN Scripts
+
+This repository contains the IGN Scripts project, which consists of two main services:
+
+1. MCP (Machine Control Protocol) - A service for managing and monitoring machine status and metrics
+2. MCP Tools - A service providing testing and analysis tools for the MCP service
+
+## Project Structure
+
+```
+IGN_scripts/
+├── mcp/                 # MCP service
+│   ├── src/            # Source code
+│   ├── tests/          # Test files
+│   ├── docs/           # Documentation
+│   └── Dockerfile      # Docker configuration
+├── mcp-tools/          # MCP Tools service
+│   ├── src/            # Source code
+│   ├── tests/          # Test files
+│   ├── docs/           # Documentation
+│   └── Dockerfile      # Docker configuration
+└── scripts/            # Utility scripts
+```
+
+## Prerequisites
+
+- Python 3.11 or higher
+- Docker
+- GitHub CLI (gh)
+- uv (Python package manager)
+
+## Setup Instructions
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/reh3376/IGN_scripts.git
+   cd IGN_scripts
+   ```
+
+2. Set up the Python environment:
+   ```bash
+   # Install uv if not already installed
+   if ! command -v uv &> /dev/null; then pip install uv; fi
+   
+   # Create and activate virtual environment
+   uv venv
+   source .venv/bin/activate  # On Unix-like systems
+   # or
+   .venv\Scripts\activate     # On Windows
+   ```
+
+3. Install dependencies:
+   ```bash
+   uv pip install -r requirements.txt
+   ```
+
+4. Set up GitHub repositories:
+   ```bash
+   # Set required environment variables
+   export DOCKER_TOKEN="your_docker_token"
+   export CODECOV_TOKEN="your_codecov_token"
+   
+   # Run the setup script
+   ./scripts/setup_github_repo.sh
+   ```
+
+## Development
+
+### Running Tests
+
+```bash
+# Run all tests
+pytest
+
+# Run specific test categories
+pytest -m unit
+pytest -m integration
+pytest -m e2e
+```
+
+### Building Docker Images
+
+```bash
+# Build MCP service
+cd mcp
+docker build -t ghcr.io/reh3376/mcp:latest .
+
+# Build MCP Tools service
+cd ../mcp-tools
+docker build -t ghcr.io/reh3376/mcp-tools:latest .
+```
+
+### Documentation
+
+Documentation for each service is available in their respective `docs` directories and is also published to GitHub Pages:
+
+- MCP Documentation: https://reh3376.github.io/mcp/
+- MCP Tools Documentation: https://reh3376.github.io/mcp-tools/
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and ensure they pass
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Contact
+
+For questions or support, please open an issue in the respective repository:
+- [MCP Issues](https://github.com/reh3376/mcp/issues)
+- [MCP Tools Issues](https://github.com/reh3376/mcp-tools/issues)
+
 # IGN Scripts - Ignition Jython Script Generator
 
 A powerful Python application for generating, validating, and exporting Jython scripts for Ignition SCADA systems.
