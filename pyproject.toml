@@ -34,6 +34,7 @@ dependencies = [
     "rich>=13.5.0",
     "streamlit>=1.28.0",
     "prompt-toolkit>=3.0.0",
+    "ruff>=0.11.13",
 ]
 
 [project.optional-dependencies]
