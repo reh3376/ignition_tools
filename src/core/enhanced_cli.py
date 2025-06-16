@@ -115,20 +115,22 @@ class LearningSystemCLI:
 
         try:
             # Create a session if none exists
-            if not self.tracker.current_session_id:
-                self.tracker.start_session(user_id="cli_user", session_type="cli_usage")
+            if hasattr(self.tracker, 'current_session_id') and not self.tracker.current_session_id:
+                if hasattr(self.tracker, 'start_session'):
+                    self.tracker.start_session(user_id="cli_user", session_type="cli_usage")
 
             # Track the command usage
             function_name = f"cli.{command}"
             if subcommand:
                 function_name += f".{subcommand}"
 
-            self.tracker.track_function_query(
-                function_name=function_name,
-                context="CLI",
-                parameters=parameters,
-                success=success,
-            )
+            if hasattr(self.tracker, 'track_function_query'):
+                self.tracker.track_function_query(
+                    function_name=function_name,
+                    context="CLI",
+                    parameters=parameters,
+                    success=success,
+                )
         except Exception:
             # Silently fail for usage tracking
             pass
@@ -259,9 +261,14 @@ def generate(
         with console.status("[bold blue]Generating script..."):
             if config:
                 # Generate from config file
-                script_content = enhanced_cli.generator.generate_from_config(config, output)
-                enhanced_cli.track_cli_usage("script", "generate", params, True)
-                console.print(f"[green]✓[/green] Generated script from config: {config}")
+                if enhanced_cli.generator:
+                    script_content = enhanced_cli.generator.generate_from_config(config, output)
+                    enhanced_cli.track_cli_usage("script", "generate", params, True)
+                    console.print(f"[green]✓[/green] Generated script from config: {config}")
+                else:
+                    console.print("[red]✗[/red] Script generator not available")
+                    enhanced_cli.track_cli_usage("script", "generate", params, False)
+                    return
 
             elif template:
                 # Generate from command line options
@@ -274,9 +281,14 @@ def generate(
                 if not template.endswith(".jinja2"):
                     template += ".jinja2"
 
-                script_content = enhanced_cli.generator.generate_script(template, context, output)
-                enhanced_cli.track_cli_usage("script", "generate", params, True)
-                console.print(f"[green]✓[/green] Generated script from template: {template}")
+                if enhanced_cli.generator:
+                    script_content = enhanced_cli.generator.generate_script(template, context, output)
+                    enhanced_cli.track_cli_usage("script", "generate", params, True)
+                    console.print(f"[green]✓[/green] Generated script from template: {template}")
+                else:
+                    console.print("[red]✗[/red] Script generator not available")
+                    enhanced_cli.track_cli_usage("script", "generate", params, False)
+                    return
 
             else:
                 console.print("[red]✗[/red] Either --template or --config must be specified")
@@ -392,7 +404,11 @@ def list(ctx: click.Context, detailed: bool) -> None:
     enhanced_cli.track_cli_usage("template", "list", {"detailed": detailed})
 
     try:
-        templates = enhanced_cli.generator.list_templates()
+        if enhanced_cli.generator:
+            templates = enhanced_cli.generator.list_templates()
+        else:
+            console.print("[red]✗[/red] Script generator not available")
+            return
 
         if not templates:
             console.print("[yellow]No templates found[/yellow]")
@@ -458,6 +474,9 @@ def list(ctx: click.Context, detailed: bool) -> None:
 
 def show_template_recommendations():
     """Show template recommendations based on usage patterns."""
+    if not enhanced_cli.manager:
+        return
+        
     try:
         top_patterns = enhanced_cli.manager.get_top_patterns_summary(limit=3)
         template_patterns = top_patterns.get("top_patterns", {}).get("template_usage", [])
