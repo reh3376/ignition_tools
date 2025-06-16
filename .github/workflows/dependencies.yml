@@ -1,0 +1,64 @@
+name: Update Dependencies
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sunday
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  update-deps:
+    name: Update Dependencies
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [mcp, mcp-tools]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install uv
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+    - name: Create virtual environment
+      run: |
+        cd ${{ matrix.service }}
+        uv venv
+        source .venv/bin/activate
+        uv pip install -r requirements.txt
+
+    - name: Check for updates
+      run: |
+        cd ${{ matrix.service }}
+        source .venv/bin/activate
+        uv pip compile requirements.txt -o requirements.txt.new
+        if ! cmp -s requirements.txt requirements.txt.new; then
+          mv requirements.txt.new requirements.txt
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          git add requirements.txt
+          git commit -m "Update dependencies for ${{ matrix.service }}"
+          git push
+        else
+          rm requirements.txt.new
+        fi
+
+    - name: Create Pull Request
+      if: success()
+      uses: peter-evans/create-pull-request@v6
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: "Update dependencies for ${{ matrix.service }}"
+        title: "Update dependencies for ${{ matrix.service }}"
+        body: |
+          Automated dependency updates for ${{ matrix.service }}.
+          
+          This PR was created by the dependency update workflow.
+        branch: update-deps-${{ matrix.service }}
+        base: main 

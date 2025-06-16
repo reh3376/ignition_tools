@@ -1,0 +1,74 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sunday
+
+jobs:
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [mcp, mcp-tools]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install uv
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+    - name: Create virtual environment
+      run: |
+        cd ${{ matrix.service }}
+        uv venv
+        source .venv/bin/activate
+        uv pip install -r requirements.txt
+
+    - name: Run Bandit
+      run: |
+        cd ${{ matrix.service }}
+        source .venv/bin/activate
+        bandit -r src -f json -o bandit-results.json
+
+    - name: Run Safety
+      run: |
+        cd ${{ matrix.service }}
+        source .venv/bin/activate
+        safety check -r requirements.txt --json > safety-results.json
+
+    - name: Run Snyk
+      uses: snyk/actions/python@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=high
+
+    - name: Upload Bandit results
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ./${{ matrix.service }}/bandit-results.json
+        category: bandit
+
+    - name: Upload Safety results
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: ./${{ matrix.service }}/safety-results.json
+        category: safety
+
+    - name: Check for vulnerabilities
+      if: failure()
+      run: |
+        echo "Security vulnerabilities found. Please check the workflow logs for details."
+        exit 1 

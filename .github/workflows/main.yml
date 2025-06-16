@@ -1,0 +1,163 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.11]
+        service: [mcp, mcp-tools]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install uv
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+    - name: Create virtual environment
+      run: |
+        cd ${{ matrix.service }}
+        uv venv
+        source .venv/bin/activate
+        uv pip install -r requirements.txt
+
+    - name: Run tests
+      run: |
+        cd ${{ matrix.service }}
+        source .venv/bin/activate
+        pytest --cov=src --cov-report=xml
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./${{ matrix.service }}/coverage.xml
+        fail_ci_if_error: true
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.11]
+        service: [mcp, mcp-tools]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install uv
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+    - name: Create virtual environment
+      run: |
+        cd ${{ matrix.service }}
+        uv venv
+        source .venv/bin/activate
+        uv pip install -r requirements.txt
+
+    - name: Run ruff
+      run: |
+        cd ${{ matrix.service }}
+        source .venv/bin/activate
+        ruff check .
+        ruff format --check .
+
+    - name: Run mypy
+      run: |
+        cd ${{ matrix.service }}
+        source .venv/bin/activate
+        mypy src tests
+
+  build-docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [mcp, mcp-tools]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install uv
+      run: |
+        curl -LsSf https://astral.sh/uv/install.sh | sh
+        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+    - name: Create virtual environment
+      run: |
+        cd ${{ matrix.service }}
+        uv venv
+        source .venv/bin/activate
+        uv pip install -r requirements.txt
+
+    - name: Build documentation
+      run: |
+        cd ${{ matrix.service }}
+        source .venv/bin/activate
+        mkdocs build
+
+    - name: Deploy to GitHub Pages
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./${{ matrix.service }}/site
+        publish_branch: gh-pages
+
+  build-docker:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    needs: [test, lint]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and push MCP
+      uses: docker/build-push-action@v5
+      with:
+        context: ./mcp
+        push: true
+        tags: ghcr.io/reh3376/mcp:latest
+
+    - name: Build and push MCP Tools
+      uses: docker/build-push-action@v5
+      with:
+        context: ./mcp-tools
+        push: true
+        tags: ghcr.io/reh3376/mcp-tools:latest 
