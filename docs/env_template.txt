@@ -35,7 +35,22 @@ OPCUA_SECURE_CHANNEL_TIMEOUT=60000
 OPCUA_REQUEST_TIMEOUT=10000
 OPCUA_KEEPALIVE_INTERVAL=30000
 
+# ================================
+# MCP Configuration
+# ================================
+# MCP API Configuration
+MCP_API_URL=http://localhost:8080
+MCP_API_KEY=your_mcp_api_key
+MCP_ADMIN_USER=admin
+MCP_ADMIN_PASSWORD=your_mcp_admin_password
 
+# MCP Tools API Configuration
+MCP_TOOLS_API_URL=http://localhost:8082
+MCP_TOOLS_API_KEY=your_mcp_tools_api_key
+
+# MCP Logging Configuration
+MCP_LOG_LEVEL=INFO
+MCP_TOOLS_LOG_LEVEL=INFO
 
 # ================================
 # Ignition Gateway Configuration

@@ -47,6 +47,60 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+
+  # MCP Docker Service
+  mcp:
+    image: ghcr.io/github-tools/mcp:latest
+    container_name: ign-scripts-mcp
+    ports:
+      - "8080:8080"  # MCP API
+      - "8081:8081"  # MCP Web UI
+    environment:
+      MCP_API_KEY: ${MCP_API_KEY:-default_key}
+      MCP_ADMIN_USER: ${MCP_ADMIN_USER:-admin}
+      MCP_ADMIN_PASSWORD: ${MCP_ADMIN_PASSWORD:-admin}
+      MCP_LOG_LEVEL: INFO
+    volumes:
+      - ./mcp-data:/data
+      - ./mcp-logs:/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # MCP Development Tools
+  mcp-tools:
+    image: ghcr.io/github-tools/mcp-tools:latest
+    container_name: ign-scripts-mcp-tools
+    ports:
+      - "8082:8082"  # MCP Tools API
+    environment:
+      MCP_TOOLS_API_KEY: ${MCP_TOOLS_API_KEY:-default_tools_key}
+      MCP_TOOLS_LOG_LEVEL: INFO
+    volumes:
+      - ./mcp-tools-data:/data
+      - ./mcp-tools-logs:/logs
+    depends_on:
+      - mcp
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   ign-scripts-test:
     build:
       context: .
