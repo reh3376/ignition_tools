@@ -232,11 +232,13 @@ jobs:
         context: ./mcp
         push: true
         tags: |
-          ghcr.io/${{ github.repository_owner }}/mcp:latest
-          ghcr.io/${{ github.repository_owner }}/mcp:${{ github.sha }}
+          ghcr.io/${{ github.repository_owner }}/ignition_tools-mcp:latest
+          ghcr.io/${{ github.repository_owner }}/ignition_tools-mcp:${{ github.sha }}
         labels: |
           org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
           org.opencontainers.image.revision=${{ github.sha }}
+          org.opencontainers.image.title=IGN Scripts MCP Service
+          org.opencontainers.image.description=Machine Control Program service for IGN Scripts
 
     - name: Build and push MCP Tools
       if: hashFiles('./mcp-tools/Dockerfile') != ''
@@ -245,8 +247,10 @@ jobs:
         context: ./mcp-tools
         push: true
         tags: |
-          ghcr.io/${{ github.repository_owner }}/mcp-tools:latest
-          ghcr.io/${{ github.repository_owner }}/mcp-tools:${{ github.sha }}
+          ghcr.io/${{ github.repository_owner }}/ignition_tools-mcp-tools:latest
+          ghcr.io/${{ github.repository_owner }}/ignition_tools-mcp-tools:${{ github.sha }}
         labels: |
           org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
-          org.opencontainers.image.revision=${{ github.sha }} 
+          org.opencontainers.image.revision=${{ github.sha }}
+          org.opencontainers.image.title=IGN Scripts MCP Tools
+          org.opencontainers.image.description=Development and testing toolkit for IGN Scripts MCP service 
