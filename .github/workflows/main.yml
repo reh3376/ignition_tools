@@ -140,9 +140,8 @@ jobs:
   build-docs:
     name: Build Documentation
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        service: [mcp, mcp-tools]
+    needs: [test, lint]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
     - uses: actions/checkout@v4
@@ -157,46 +156,53 @@ jobs:
         curl -LsSf https://astral.sh/uv/install.sh | sh
         echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
-    - name: Check if service exists
-      id: check-service
+    - name: Build combined documentation
       run: |
-        if [ -d "${{ matrix.service }}" ] && [ -f "${{ matrix.service }}/mkdocs.yml" ]; then
-          echo "exists=true" >> $GITHUB_OUTPUT
-        else
-          echo "exists=false" >> $GITHUB_OUTPUT
-          echo "Service directory or mkdocs.yml not found for ${{ matrix.service }}, skipping..."
+        mkdir -p combined-docs
+        echo "# IGN Scripts Documentation" > combined-docs/index.md
+        echo "" >> combined-docs/index.md
+        echo "## Services" >> combined-docs/index.md
+        echo "" >> combined-docs/index.md
+        
+        # Check and build MCP docs
+        if [ -d "mcp" ] && [ -f "mcp/mkdocs.yml" ]; then
+          echo "- [MCP Service](./mcp/)" >> combined-docs/index.md
+          cd mcp
+          uv venv
+          source .venv/bin/activate
+          if [ -f requirements.txt ]; then
+            uv pip install -r requirements.txt
+          fi
+          uv pip install mkdocs mkdocs-material
+          mkdocs build
+          cp -r site ../combined-docs/mcp
+          cd ..
         fi
-
-    - name: Create virtual environment
-      if: steps.check-service.outputs.exists == 'true'
-      run: |
-        cd ${{ matrix.service }}
-        uv venv
-        source .venv/bin/activate
-        if [ -f requirements.txt ]; then
-          uv pip install -r requirements.txt
+        
+        # Check and build MCP Tools docs
+        if [ -d "mcp-tools" ] && [ -f "mcp-tools/mkdocs.yml" ]; then
+          echo "- [MCP Tools Service](./mcp-tools/)" >> combined-docs/index.md
+          cd mcp-tools
+          uv venv
+          source .venv/bin/activate
+          if [ -f requirements.txt ]; then
+            uv pip install -r requirements.txt
+          fi
+          uv pip install mkdocs mkdocs-material
+          mkdocs build
+          cp -r site ../combined-docs/mcp-tools
+          cd ..
         fi
-        uv pip install mkdocs mkdocs-material
-
-    - name: Build documentation
-      if: steps.check-service.outputs.exists == 'true'
-      run: |
-        cd ${{ matrix.service }}
-        source .venv/bin/activate
-        mkdocs build
 
     - name: Setup Pages
-      if: steps.check-service.outputs.exists == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
       uses: actions/configure-pages@v4
 
     - name: Upload to GitHub Pages
-      if: steps.check-service.outputs.exists == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
       uses: actions/upload-pages-artifact@v3
       with:
-        path: ./${{ matrix.service }}/site
+        path: ./combined-docs
 
     - name: Deploy to GitHub Pages
-      if: steps.check-service.outputs.exists == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
       id: deployment
       uses: actions/deploy-pages@v4
 
@@ -225,7 +231,12 @@ jobs:
       with:
         context: ./mcp
         push: true
-        tags: ghcr.io/${{ github.repository_owner }}/mcp:latest
+        tags: |
+          ghcr.io/${{ github.repository_owner }}/mcp:latest
+          ghcr.io/${{ github.repository_owner }}/mcp:${{ github.sha }}
+        labels: |
+          org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+          org.opencontainers.image.revision=${{ github.sha }}
 
     - name: Build and push MCP Tools
       if: hashFiles('./mcp-tools/Dockerfile') != ''
@@ -233,4 +244,9 @@ jobs:
       with:
         context: ./mcp-tools
         push: true
-        tags: ghcr.io/${{ github.repository_owner }}/mcp-tools:latest 
+        tags: |
+          ghcr.io/${{ github.repository_owner }}/mcp-tools:latest
+          ghcr.io/${{ github.repository_owner }}/mcp-tools:${{ github.sha }}
+        labels: |
+          org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+          org.opencontainers.image.revision=${{ github.sha }} 
