@@ -104,7 +104,7 @@ ENABLE_DEBUG_LOGGING=false
 IGNITION_DEV_MODE=true
 IGNITION_DEBUG_LOGGING=true
 
-# Neo4j Configuration
+# Neo4j Configuration (used by MCPs and core system)
 NEO4J_URL=bolt://host.docker.internal:7687
 NEO4J_USERNAME=neo4j
 NEO4J_PASSWORD=your_neo4j_password_here
@@ -121,3 +121,8 @@ OPCUA_SECURITY_MODE=SignAndEncrypt
 OPCUA_CERTIFICATE_PATH=certs/client-cert.der
 OPCUA_PRIVATE_KEY_PATH=certs/client-key.pem
 OPCUA_CA_CERTIFICATE_PATH=certs/ca-cert.der
+
+# Notes:
+# - NEO4J_URL, NEO4J_USERNAME, and NEO4J_PASSWORD are required for all Neo4j MCPs (neo4j-memory, neo4j-cypher)
+# - GITHUB_PERSONAL_ACCESS_TOKEN is required for github-official MCP
+# - Never commit this file with real secrets to version control

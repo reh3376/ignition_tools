@@ -504,3 +504,31 @@ This is an independent project and is not affiliated with or endorsed by Inducti
 - Check the [Issues](https://github.com/your-repo/issues) page for common problems
 - Review the [Wiki](https://github.com/your-repo/wiki) for detailed documentation
 - Join discussions in our [Community Forum](https://github.com/your-repo/discussions)
+
+## Neo4j MCP Integration
+
+This project now includes robust support for Neo4j-backed Machine Control Programs (MCPs) for persistent memory and Cypher query assistance.
+
+### Key MCP Services
+- **neo4j-memory**: Provides persistent memory storage and retrieval using Neo4j.
+- **neo4j-cypher**: Assists with Cypher query formatting, validation, and execution.
+
+### Setup & Testing
+
+1. **Setup**
+   - Run the setup script to check Docker, Neo4j, environment variables, and install dependencies:
+     ```bash
+     python scripts/setup_neo4j_mcp.py
+     ```
+2. **Test**
+   - Run the test script to verify Neo4j and MCP service connectivity:
+     ```bash
+     python scripts/test_neo4j_mcp_setup.py
+     ```
+
+### MCP Server Management
+For details on starting, stopping, and configuring MCP servers, see [.cursor/README.md](.cursor/README.md).
+
+### Security
+- All sensitive credentials are managed via environment variables in your `.env` file (see `docs/env_template.txt`).
+- Never commit `.env` to version control.
