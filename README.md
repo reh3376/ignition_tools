@@ -241,6 +241,41 @@ python -m src.core.enhanced_cli version plan-release --version="v1.1.0" --strate
 
 📋 **Detailed Documentation**: [Version Control Intelligence Plan](docs/VERSION_CONTROL_INTELLIGENCE_PLAN.md) | [Implementation Summary](docs/VERSION_CONTROL_INTELLIGENCE_SUMMARY.md)
 
+## 🧠 **NEW: Code Intelligence System**
+
+**✅ Phase 8.1 Complete**: Advanced code intelligence system using Neo4j for structural relationships and vector embeddings for semantic search. Addresses growing codebase complexity (2,300+ line files) with persistent, context-aware memory for AI assistants.
+
+### Code Intelligence Features
+- ✅ **AST-based Analysis**: Python file parsing with complexity metrics and maintainability index
+- ✅ **Graph Database Schema**: 4 node types (CodeFile, Class, Method, Import) with comprehensive relationships
+- ✅ **Vector Support**: 3 vector indexes for 384-dimensional embeddings with cosine similarity
+- ✅ **Context Retrieval**: Intelligent file context, cross-file relationships, and impact analysis
+- ✅ **CLI Integration**: Rich terminal UI with progress indicators and detailed analysis
+
+### Database Statistics
+- **Live Data**: 4 files analyzed, 8 classes, 36 imports stored in Neo4j
+- **Schema**: 11 constraints, 25 indexes including 3 vector indexes
+- **Relationships**: CONTAINS, HAS_METHOD, IMPORTS for code structure mapping
+
+### CLI Commands
+```bash
+# Check code intelligence system status
+python -m src.core.enhanced_cli code-status --detailed
+
+# Analyze specific files with complexity metrics
+python -m src.core.enhanced_cli analyze-file src/ignition/code_intelligence/analyzer.py --detailed
+
+# Search code elements by name or content
+python -m src.core.enhanced_cli search-code "CodeAnalyzer" --type class --limit 5
+```
+
+### Implementation Files
+- `src/ignition/code_intelligence/schema.py` - Neo4j schema management and vector indexes
+- `src/ignition/code_intelligence/analyzer.py` - AST-based Python code analysis engine
+- `src/ignition/code_intelligence/manager.py` - Central coordinator for code intelligence operations
+
+📋 **Detailed Documentation**: [Code Intelligence Phase 8.1 Summary](docs/CODE_INTELLIGENCE_PHASE_8_1_SUMMARY.md)
+
 ## 🔧 Target Environment
 
 - **Ignition Version**: 8.1+ (primary), 8.0 (secondary)
@@ -379,6 +414,11 @@ python -m src.core.enhanced_cli version status --detailed
 python -m src.core.enhanced_cli version analyze-commit --files="src/core/enhanced_cli.py"
 python -m src.core.enhanced_cli version predict-conflicts --source-branch="feature/new-feature"
 python -m src.core.enhanced_cli version plan-release --version="v1.1.0" --strategy="incremental"
+
+# Code Intelligence System
+python -m src.core.enhanced_cli code-status --detailed
+python -m src.core.enhanced_cli analyze-file src/ignition/code_intelligence/analyzer.py --detailed
+python -m src.core.enhanced_cli search-code "CodeAnalyzer" --type class --limit 5
 ```
 
 #### 🏭 OPC-UA Client Commands

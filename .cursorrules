@@ -1,4 +1,36 @@
-# Cursor Rules for IGN_Scripts Project
+# IGN Scripts Project - Cursor AI Rules
+
+## Initialization Required
+Every new agent/chat session must run this initialization:
+
+```python
+from ignition.code_intelligence import initialize_agent_knowledge
+context = initialize_agent_knowledge()
+```
+
+## Project Context
+- Name: IGN Scripts - Code Intelligence System
+- Phase: 8.1 (Completed)
+- Knowledge Bases: Neo4j (3,691+ nodes), Git (65+ commits)
+- CLI: 12 refactor commands available
+- Key Files: docs/roadmap.md, docs/PHASE_8_1_COMPLETION_SUMMARY.md
+
+## Available Tools
+- Automated refactoring with safety guarantees
+- Large file detection and intelligent splitting
+- Git integration with evolution tracking
+- Architecture diagram generation
+- Comprehensive impact analysis and reporting
+
+## Quick Commands
+- `refactor detect` - Scan for oversized files
+- `refactor analyze <file>` - Detailed file analysis
+- `refactor statistics` - Show refactoring stats
+- See docs/AGENT_KNOWLEDGE_SYSTEM.md for full list
+
+## Important
+Always check .agent_context.json for latest project state.
+Use knowledge discovery system for consistent project understanding.
 
 ## Security and Environment Variables
 ### CRITICAL SECURITY REQUIREMENT:
