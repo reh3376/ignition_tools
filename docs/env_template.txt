@@ -99,3 +99,25 @@ UI_DEBUG=false
 # Development Settings
 DEVELOPMENT_MODE=true
 ENABLE_DEBUG_LOGGING=false
+
+# Development Mode
+IGNITION_DEV_MODE=true
+IGNITION_DEBUG_LOGGING=true
+
+# Neo4j Configuration
+NEO4J_URL=bolt://host.docker.internal:7687
+NEO4J_USERNAME=neo4j
+NEO4J_PASSWORD=your_neo4j_password_here
+
+# GitHub MCP Configuration
+GITHUB_PERSONAL_ACCESS_TOKEN=your_github_token_here
+
+# OPC-UA Configuration
+OPCUA_SERVER_URL=opc.tcp://localhost:4840
+OPCUA_USERNAME=admin
+OPCUA_PASSWORD=password
+OPCUA_SECURITY_POLICY=Basic256Sha256
+OPCUA_SECURITY_MODE=SignAndEncrypt
+OPCUA_CERTIFICATE_PATH=certs/client-cert.der
+OPCUA_PRIVATE_KEY_PATH=certs/client-key.pem
+OPCUA_CA_CERTIFICATE_PATH=certs/ca-cert.der

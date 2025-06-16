@@ -3,7 +3,7 @@ uv>=0.4.0
 
 # Script Generation & Templating
 jinja2>=3.1.0
-pydantic>=2.0.0
+pydantic>=2.5.0
 jsonschema>=4.19.0
 
 # File Processing
@@ -35,7 +35,7 @@ jupyter>=1.0.0
 ipykernel>=6.25.0
 
 # Logging
-structlog>=23.1.0
+structlog>=23.2.0
 
 # Configuration
 python-dotenv>=1.0.0
@@ -43,22 +43,24 @@ pyyaml>=6.0.1
 
 # CLI & UI
 click>=8.0.0
-rich>=13.0.0
+rich>=13.7.0
 colorama>=0.4.6
 streamlit>=1.28.0
 
 # Graph Database - AI Assistant Memory System
-neo4j>=5.15.0
-requests>=2.31.0
+neo4j>=5.14.0
+py2neo>=2021.2.4
 
 # Type stubs
 types-requests>=2.31.0
 types-PyYAML>=6.0.12
 
 # New dependencies for enhanced CLI
-rich>=13.7.0
 prompt_toolkit>=3.0.0
 
 # Additional visualization
 matplotlib>=3.8.2
 seaborn>=0.13.0
+
+# MCP dependencies
+docker>=7.0.0
