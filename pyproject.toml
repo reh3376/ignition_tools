@@ -54,7 +54,8 @@ jupyter = [
 ]
 
 [project.scripts]
-ign-scripts = "src.core.enhanced_cli:main"
+ign-scripts = "src.main:main"
+ign-scripts-ui = "src.ui.app:main"
 
 [tool.ruff]
 target-version = "py311"
