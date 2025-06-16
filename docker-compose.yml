@@ -50,7 +50,7 @@ services:
 
   # MCP Docker Service
   mcp:
-    image: ghcr.io/github-tools/mcp:latest
+    image: ghcr.io/reh3376/mcp:latest
     container_name: ign-scripts-mcp
     ports:
       - "8080:8080"  # MCP API
@@ -77,7 +77,7 @@ services:
 
   # MCP Development Tools
   mcp-tools:
-    image: ghcr.io/github-tools/mcp-tools:latest
+    image: ghcr.io/reh3376/mcp-tools:latest
     container_name: ign-scripts-mcp-tools
     ports:
       - "8082:8082"  # MCP Tools API

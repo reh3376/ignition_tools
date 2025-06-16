@@ -33,8 +33,10 @@ jobs:
       run: |
         source .venv/bin/activate
         uv cache clean
-        uv pip install -r requirements.txt
-        uv pip install -e ".[dev]"
+        uv pip install pytest pytest-cov mypy ruff bandit safety codecov
+        if [ -f requirements.txt ]; then
+          uv pip install -r requirements.txt
+        fi
 
     - name: Lint with ruff
       run: |

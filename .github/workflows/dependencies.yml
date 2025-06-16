@@ -31,26 +31,33 @@ jobs:
         cd ${{ matrix.service }}
         uv venv
         source .venv/bin/activate
-        uv pip install -r requirements.txt
+        if [ -f requirements.txt ]; then
+          uv pip install -r requirements.txt
+        fi
 
     - name: Check for updates
+      id: check-updates
       run: |
         cd ${{ matrix.service }}
-        source .venv/bin/activate
-        uv pip compile requirements.txt -o requirements.txt.new
-        if ! cmp -s requirements.txt requirements.txt.new; then
-          mv requirements.txt.new requirements.txt
-          git config --global user.name 'GitHub Actions'
-          git config --global user.email 'actions@github.com'
-          git add requirements.txt
-          git commit -m "Update dependencies for ${{ matrix.service }}"
-          git push
+        if [ -f requirements.txt ]; then
+          source .venv/bin/activate
+          uv pip compile requirements.txt -o requirements.txt.new
+          if ! cmp -s requirements.txt requirements.txt.new; then
+            mv requirements.txt.new requirements.txt
+            echo "Dependencies updated for ${{ matrix.service }}"
+            echo "updated=true" >> $GITHUB_OUTPUT
+          else
+            rm requirements.txt.new
+            echo "No dependency updates needed for ${{ matrix.service }}"
+            echo "updated=false" >> $GITHUB_OUTPUT
+          fi
         else
-          rm requirements.txt.new
+          echo "No requirements.txt found for ${{ matrix.service }}"
+          echo "updated=false" >> $GITHUB_OUTPUT
         fi
 
     - name: Create Pull Request
-      if: success()
+      if: steps.check-updates.outputs.updated == 'true'
       uses: peter-evans/create-pull-request@v6
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -61,4 +68,6 @@ jobs:
           
           This PR was created by the dependency update workflow.
         branch: update-deps-${{ matrix.service }}
-        base: main 
+        base: main
+        add-paths: |
+          ${{ matrix.service }}/requirements.txt 
