@@ -285,7 +285,7 @@ class VersionControlManager:
                     "graph_database": (
                         self.graph_client is not None
                         and hasattr(self.graph_client, "is_connected")
-                        and self.graph_client.is_connected
+                        and self.graph_client.is_connected()
                         if self.graph_client
                         else False
                     ),

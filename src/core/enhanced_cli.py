@@ -10,6 +10,7 @@ This module provides a rich, interactive command-line interface with:
 
 from datetime import datetime
 from typing import Any
+import logging
 
 import click
 from rich.console import Console
@@ -61,6 +62,8 @@ except ImportError as e:
     PatternManager = None
 
 console = Console()
+
+logger = logging.getLogger(__name__)
 
 
 class LearningSystemCLI:
@@ -2143,8 +2146,18 @@ def status(repository: str | None, detailed: bool):
         # Create configuration
         config = VersionControlConfig(repository_path=repo_path)
 
+        # Initialize graph client
+        graph_client = None
+        try:
+            from src.ignition.graph.client import IgnitionGraphClient
+            graph_client = IgnitionGraphClient()
+            if graph_client.connect():
+                logger.debug("Graph client connected for version control")
+        except Exception as e:
+            logger.debug(f"Graph client not available: {e}")
+
         # Initialize manager
-        manager = VersionControlManager(config=config)
+        manager = VersionControlManager(config=config, graph_client=graph_client)
 
         with console.status("[bold blue]Checking version control status..."):
             if not manager.initialize():
