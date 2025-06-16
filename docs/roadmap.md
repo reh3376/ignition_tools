@@ -694,151 +694,247 @@ services:
 
 ---
 
-## Phase 8: Advanced Features
-### Template & Component Libraries
-- [ ] Create reusable component templates
-- [ ] Build custom property binding generators
-- [ ] Implement animation script templates
-- [ ] Create popup window utilities
+## Phase 8: Neo4j Code Memory & Vector Intelligence System 🧠 **PLANNED**
 
-### Historical Data & Reporting
-- [ ] Generate historical data collection scripts
-- [ ] Create automated report generation
-- [ ] Implement data export utilities
-- [ ] Build dashboard automation tools
+### **Overview**
+Implement a comprehensive code intelligence system using Neo4j for structural relationships and vector embeddings for semantic search. This addresses the growing codebase complexity (2,300+ line files) and provides AI assistants with persistent, context-aware memory.
 
-### Integration APIs
-- [ ] Create REST API integration utilities
-- [ ] Build email/SMS notification scripts
-- [ ] Implement file system integration
-- [ ] Create external database sync tools
+### **Phase 8.1: Neo4j Code Memory Foundation** 🗄️ **Week 1-2**
+
+#### **Code Structure Schema Extension**
+- [ ] **Extend graph schema with code structure nodes**
+  - [ ] Create CodeFile, Class, Method, Function, Import node types
+  - [ ] Add Module, Package, Dependency, and CodeBlock nodes
+  - [ ] Design relationships: CONTAINS, IMPORTS, CALLS, INHERITS, IMPLEMENTS
+  - [ ] Add temporal tracking: MODIFIED_AT, CREATED_AT relationships
+- [ ] **Implement code analysis pipeline**
+  - [ ] Create AST (Abstract Syntax Tree) parser for Python files
+  - [ ] Build dependency analyzer for import relationships
+  - [ ] Implement complexity metrics calculator (cyclomatic, cognitive)
+  - [ ] Add code quality metrics (maintainability index, technical debt)
+- [ ] **Create code change tracking integration**
+  - [ ] Integrate with Version Control Intelligence system
+  - [ ] Track code evolution over time in graph
+  - [ ] Link code changes to git commits and branches
+  - [ ] Monitor file size growth and complexity trends
+
+#### **Context Retrieval System**
+- [ ] **Build intelligent context queries**
+  - [ ] Create file context retrieval (classes, methods, dependencies)
+  - [ ] Implement cross-file relationship discovery
+  - [ ] Build impact analysis queries (what depends on this code?)
+  - [ ] Add code similarity detection through graph patterns
+- [ ] **AI Assistant integration**
+  - [ ] Create context-aware prompts using graph data
+  - [ ] Build intelligent code suggestions based on patterns
+  - [ ] Implement change impact warnings for AI assistants
+  - [ ] Add code quality insights for development guidance
+
+### **Phase 8.2: Vector Embeddings Integration** 🔍 **Week 3-4**
+
+#### **Neo4j Vector Index Implementation**
+- [ ] **Set up vector indexes in existing Neo4j instance**
+  - [ ] Create vector indexes for code files (384-dimensional embeddings)
+  - [ ] Add function-level vector indexes for semantic search
+  - [ ] Implement docstring and comment embeddings
+  - [ ] Create class and module-level semantic indexes
+- [ ] **Embedding generation pipeline**
+  - [ ] Integrate sentence-transformers for code embeddings
+  - [ ] Create code preprocessing for optimal embeddings
+  - [ ] Implement incremental embedding updates on file changes
+  - [ ] Add embedding versioning and cache management
+
+#### **Semantic Search System**
+- [ ] **Hybrid graph + vector queries**
+  - [ ] Combine structural relationships with semantic similarity
+  - [ ] Create "find similar code that also depends on X" queries
+  - [ ] Implement context-aware code recommendations
+  - [ ] Build semantic duplicate detection across codebase
+- [ ] **Intelligent code discovery**
+  - [ ] Create natural language code search interface
+  - [ ] Implement "show me all error handling patterns" queries
+  - [ ] Build code pattern discovery through semantic clustering
+  - [ ] Add cross-file functionality discovery
+
+### **Phase 8.3: AI Assistant Enhancement** 🤖 **Week 5-6**
+
+#### **Context-Aware Development**
+- [ ] **Smart context loading for AI assistants**
+  - [ ] Replace large file reading with targeted context queries
+  - [ ] Provide relevant code snippets instead of entire files
+  - [ ] Add dependency context for better understanding
+  - [ ] Include recent changes and evolution history
+- [ ] **Intelligent code suggestions**
+  - [ ] Use graph patterns to suggest similar implementations
+  - [ ] Provide refactoring recommendations based on code structure
+  - [ ] Suggest optimal file organization and module structure
+  - [ ] Recommend code reuse opportunities
+
+#### **Change Impact Intelligence**
+- [ ] **Predictive impact analysis**
+  - [ ] Analyze potential effects of code changes using graph relationships
+  - [ ] Predict breaking changes through dependency analysis
+  - [ ] Suggest test coverage improvements based on change impact
+  - [ ] Provide rollback recommendations for risky changes
+- [ ] **Code evolution insights**
+  - [ ] Track code complexity growth over time
+  - [ ] Identify technical debt accumulation patterns
+  - [ ] Suggest refactoring opportunities based on evolution trends
+  - [ ] Monitor code quality degradation and improvement
+
+### **Phase 8.4: Advanced Analytics & Optimization** 📊 **Week 7-8**
+
+#### **Code Intelligence Dashboard**
+- [ ] **Comprehensive code analytics**
+  - [ ] Create codebase health metrics and visualizations
+  - [ ] Build dependency graph visualizations
+  - [ ] Implement code complexity trend analysis
+  - [ ] Add technical debt tracking and prioritization
+- [ ] **Performance optimization insights**
+  - [ ] Identify performance bottlenecks through code analysis
+  - [ ] Suggest optimization opportunities based on patterns
+  - [ ] Track performance impact of code changes
+  - [ ] Provide architecture improvement recommendations
+
+#### **Documentation Synchronization**
+- [ ] **Automated documentation updates**
+  - [ ] Sync code changes with documentation embeddings
+  - [ ] Update API documentation based on code structure changes
+  - [ ] Maintain consistency between code and documentation
+  - [ ] Generate documentation suggestions for undocumented code
+- [ ] **Knowledge base maintenance**
+  - [ ] Automatically update code examples in documentation
+  - [ ] Sync function signatures and parameter descriptions
+  - [ ] Maintain cross-references between code and docs
+  - [ ] Generate changelog entries from code analysis
+
+### **Phase 8.5: Integration & Production Deployment** 🚀 **Week 9-10**
+
+#### **CLI Integration**
+- [ ] **Enhanced CLI with code intelligence**
+  - [ ] Add `ign code search "semantic query"` command
+  - [ ] Implement `ign code analyze <file>` for context analysis
+  - [ ] Create `ign code similar <file>` for finding related code
+  - [ ] Add `ign code impact <file>` for change impact analysis
+- [ ] **Development workflow integration**
+  - [ ] Integrate with git hooks for automatic code analysis
+  - [ ] Add pre-commit code intelligence checks
+  - [ ] Create code review assistance tools
+  - [ ] Implement automated code quality gates
+
+#### **Performance & Scalability**
+- [ ] **System optimization**
+  - [ ] Optimize graph queries for large codebases
+  - [ ] Implement efficient embedding update strategies
+  - [ ] Add caching layers for frequent queries
+  - [ ] Monitor and optimize memory usage
+- [ ] **Monitoring & maintenance**
+  - [ ] Create health checks for code intelligence system
+  - [ ] Implement automated backup strategies for code data
+  - [ ] Add performance monitoring and alerting
+  - [ ] Create maintenance scripts for data cleanup
+
+### **Technical Architecture**
+
+#### **Database Schema Extensions**
+```cypher
+// New node types for code structure
+CREATE (f:CodeFile {
+  path: "src/core/enhanced_cli.py",
+  lines: 2296,
+  complexity: 85.2,
+  maintainability_index: 42.1,
+  last_modified: "2025-01-28T10:30:00Z",
+  content_hash: "sha256:abc123...",
+  embedding: [0.1, 0.2, ...] // 384-dimensional vector
+})
+
+CREATE (c:Class {
+  name: "LearningSystemCLI",
+  file: "enhanced_cli.py",
+  start_line: 66,
+  end_line: 220,
+  methods_count: 8,
+  complexity: 15.3
+})
+
+CREATE (m:Method {
+  name: "track_cli_usage",
+  class: "LearningSystemCLI",
+  start_line: 107,
+  end_line: 143,
+  parameters: ["command", "subcommand", "parameters", "success"],
+  complexity: 3.2,
+  embedding: [0.3, 0.1, ...] // Function-level embedding
+})
+
+// Relationships for code structure
+CREATE (f)-[:CONTAINS]->(c)
+CREATE (c)-[:HAS_METHOD]->(m)
+CREATE (f)-[:IMPORTS]->(dep:CodeFile)
+CREATE (m)-[:CALLS]->(other:Method)
+```
+
+#### **Vector Search Integration**
+```python
+class CodeIntelligenceManager:
+    def __init__(self, graph_client: IgnitionGraphClient):
+        self.client = graph_client
+        self.embedder = SentenceTransformer('all-MiniLM-L6-v2')
+    
+    def find_similar_code(self, query: str, context_type: str = None):
+        """Find semantically similar code with graph context"""
+        query_embedding = self.embedder.encode(query)
+        
+        cypher = """
+        CALL db.index.vector.queryNodes('code_embeddings', 10, $embedding) 
+        YIELD node, score
+        MATCH (node)-[:CONTAINS]->(element)
+        OPTIONAL MATCH (node)-[:DEPENDS_ON]->(dep)
+        RETURN node.path, node.complexity, score,
+               collect(element.name) as components,
+               collect(dep.path) as dependencies
+        ORDER BY score DESC
+        """
+        
+        return self.client.execute_query(cypher, {"embedding": query_embedding})
+    
+    def get_file_context(self, file_path: str):
+        """Get comprehensive context for a file"""
+        cypher = """
+        MATCH (f:CodeFile {path: $path})
+        OPTIONAL MATCH (f)-[:CONTAINS]->(c:Class)
+        OPTIONAL MATCH (c)-[:HAS_METHOD]->(m:Method)
+        OPTIONAL MATCH (f)-[:IMPORTS]->(dep:CodeFile)
+        OPTIONAL MATCH (f)<-[:DEPENDS_ON]-(dependent:CodeFile)
+        RETURN f,
+               collect(DISTINCT c) as classes,
+               collect(DISTINCT m) as methods,
+               collect(DISTINCT dep.path) as imports,
+               collect(DISTINCT dependent.path) as dependents
+        """
+        
+        return self.client.execute_query(cypher, {"path": file_path})
+```
+
+### **Success Metrics**
+- **Context Efficiency**: Reduce AI context loading time by 80%
+- **Code Discovery**: Enable natural language code search with 90%+ relevance
+- **Change Safety**: Predict 95% of breaking changes before implementation
+- **Development Speed**: Increase development velocity by 40% through better context
+- **Code Quality**: Reduce technical debt accumulation by 60%
+
+### **Dependencies**
+- **Existing Infrastructure**: Neo4j 5.15 with vector support ✅
+- **Version Control Intelligence**: Integration with existing change tracking ✅
+- **Enhanced CLI**: Extension of current CLI framework ✅
+- **Graph Client**: Leverage existing IgnitionGraphClient ✅
+
+### **Estimated Timeline**: 10 weeks
+**Team Size**: 1-2 developers
+**Risk Level**: Medium (leverages existing infrastructure)
+**Priority**: High (addresses critical scalability issue)
 
 ---
 
-## Maintenance & Future Enhancements
-### Regular Maintenance
-- [ ] Update for new Ignition versions
-- [ ] Maintain Jython compatibility
-- [ ] Update security best practices
-- [ ] Refresh documentation
-
-### Future Features
-- [ ] AI-assisted script generation
-- [ ] Visual script builder interface
-- [ ] Advanced error handling patterns
-- [ ] Cloud deployment integration
-
----
-
-## Technical Debt & Improvements
-- [ ] Jython-to-Python3 migration planning
-- [ ] Performance optimizations for large projects
-- [ ] Enhanced error messages and debugging
-- [ ] Improved user interface design
-
----
-
-## Ignition-Specific Considerations
-### Supported Ignition Versions
-- Primary: Ignition 8.1+
-- Secondary: Ignition 8.0 (limited support)
-- Legacy: Ignition 7.9 (documentation only)
-
-### Script Contexts Supported
-- Gateway scripts (startup, shutdown, message handlers)
-- Vision client scripts (component events, window events)
-- Perspective session scripts (view scripts, session events)
-- Tag event scripts (value change, quality change)
-- Timer scripts (fixed delay, fixed rate)
-
-### Export/Import Formats
-- Native Ignition project files (.proj)
-- Gateway backup files (.gwbk)
-- Resource exports (JSON, XML)
-- Custom structured formats for version control
-
----
-
-## Notes Section
-### Completed Tasks
-- 2025-01-27 v0.1.0: Initial repository structure created
-- 2025-01-27 v0.1.0: Basic CLI framework implemented
-- 2025-01-27 v0.1.0: Project configuration files added
-- 2025-01-27 v0.1.0: Jython script generation engine with templates
-- 2025-01-27 v0.1.0: Streamlit web UI with full script generation capabilities
-- 2025-01-27 v0.1.0: Template browser and configuration upload features
-- 2025-01-27 v0.1.0: Docker-based testing environment with comprehensive test suite
-- 2025-01-27 v0.1.0: Real-time log monitoring and performance analysis system
-- 2025-01-27 v0.1.0: Automated testing scripts and optimization recommendations
-- 2025-01-27 v0.1.0: Complete development environment setup with uv, pre-commit hooks, and GitHub Actions workflows
-- 2025-01-28 v0.1.1: Enhanced Graph Database Testing Framework with comprehensive validation, health checks, and automated task validation
-- 2025-01-28 v0.3.1: **Graph Database Knowledge System - Phase 6 Complete** (340/400 functions, 85.0% complete)
-  - Task 1: Tag System Expansion (27 functions) ✅
-  - Task 2: Database System Expansion (21 functions) ✅
-  - Task 3: GUI System Expansion (26 functions) ✅
-  - Task 4: Perspective System Expansion (22 functions) ✅
-  - Task 5: Device Communication Expansion (37 functions) ✅
-  - Task 6: Utility System Expansion (50 functions) ✅
-  - Task 7: Alarm System Expansion (29 functions) ✅
-  - Task 8: Print System Expansion (18 functions) ✅
-  - Task 9: Security System Expansion (22 functions) ✅
-  - Task 10: File & Report System Expansion (25 functions) ✅
-  - Task 11: Advanced Math & Analytics Functions (30 functions) ✅
-- 2025-01-28 v0.4.0: **Learning System UI Integration Complete**
-  - Enhanced CLI with Rich/prompt_toolkit UI and learning system integration ✅
-  - Streamlit UI with comprehensive learning analytics and recommendations ✅
-  - Usage tracking and pattern-based intelligence across all interfaces ✅
-  - Interactive TUI for pattern exploration ✅
-- 2025-01-28 v0.4.1: **Documentation Organization & Cleanup Complete**
-  - Comprehensive CLI Usage Guide (cli_readme.md) ✅
-  - Complete Web UI Guide (ui_readme.md) ✅
-  - Documentation restructuring and organization ✅
-  - Updated main README with documentation references ✅
-- 2025-01-28 v0.5.0: **Ignition Gateway Connection System - Planning Phase**
-  - Added comprehensive gateway connection roadmap to Phase 4 ✅
-  - Identified requirements for HTTP/HTTPS client, authentication, and .env configuration ✅
-  - Confirmed no existing functionality conflicts ✅
-  - Prioritized as immediate implementation target ✅
-- 2025-01-28 v0.5.1: **Ignition Gateway Connection System - Implementation Complete**
-  - Full IgnitionGatewayClient with HTTP/HTTPS support ✅
-  - Multi-authentication support (basic, NTLM, SSO, token) ✅
-  - Complete .env configuration system with python-dotenv ✅
-  - Multi-gateway connection pooling and management ✅
-  - Comprehensive health monitoring and diagnostics ✅
-  - Interactive CLI testing tools and endpoint discovery ✅
-  - Successfully tested with real Ignition gateway environments ✅
-  - Working configuration files generated for immediate use ✅
-- 2025-01-28 v0.6.0: **Task 16: Sequential Function Charts & Recipe Management - Implementation Complete**
-  - 16 functions implemented (107% of 15+ target) ✅
-  - SFC Control Functions: 8 functions for chart lifecycle management ✅
-  - Recipe Management Functions: 5 functions for recipe CRUD and execution ✅
-  - Integration & Validation Functions: 3 functions for SFC-Recipe integration ✅
-  - Modular architecture with SFCChartController and RecipeManager classes ✅
-  - Industrial-grade batch processing and sequential control capabilities ✅
-  - ISA-88 compliant implementation with safety features ✅
-  - Comprehensive Jython code examples and documentation ✅
-  - Ready for Neo4j database population (pending Docker environment) ✅
-- 2025-01-28 v0.6.1: **Documentation Framework Complete**
-  - Documentation framework setup with comprehensive index page ✅
-  - Contributing guidelines with detailed code standards and PR process ✅
-  - Jython/Ignition coding standards with comprehensive examples ✅
-  - Getting started guide with installation and first script tutorials ✅
-  - Professional documentation structure for all user types ✅
-  - Phase 1 Documentation tasks officially completed ✅
-- 2025-01-28 v0.6.2: **Documentation Compliance Phase 1 Complete**
-  - Created `src/main.py` entry point resolving critical documentation misalignment ✅
-  - Created `src/ui/app.py` entry point standardizing UI launch commands ✅
-  - Updated `pyproject.toml` with proper CLI and UI script entry points ✅
-  - Verified all major documented commands work correctly ✅
-  - Critical user-blocking documentation issues resolved ✅
-  - New users can now successfully execute documented commands ✅
-
-### Known Issues
-- Need to determine optimal Jython testing strategy
-- Gateway resource export formats need research
-- Version control integration complexity
-
-### Decision Log
-- 2025-01-27: Chose to focus on Ignition 8.1+ for primary support
-- 2025-01-27: Decided to use Python for development, generate Jython for output
-- 2025-01-27: Selected CLI-first approach with future GUI considerations
+## Phase 9: Ignition Module Development & SDK Integration 🛠️ **PLANNED**

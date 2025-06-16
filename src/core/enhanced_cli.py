@@ -2304,5 +2304,143 @@ def plan_release(
     console.print("  • Rollback strategy planning")
 
 
+# Code Intelligence Commands
+@main.group()
+def code():
+    """🧠 Code Intelligence commands for analyzing and searching code."""
+    pass
+
+
+@code.command()
+@click.option('--detailed', is_flag=True, help='Show detailed information')
+def code_status(detailed: bool):
+    """Show code intelligence system status."""
+    try:
+        from src.ignition.graph.client import IgnitionGraphClient
+        from src.ignition.code_intelligence import CodeIntelligenceManager
+        
+        with console.status("[bold blue]Checking code intelligence status..."):
+            # Connect to database
+            client = IgnitionGraphClient()
+            if not client.connect():
+                console.print("❌ Failed to connect to Neo4j database", style="red")
+                return
+            
+            manager = CodeIntelligenceManager(client)
+            stats = manager.get_code_statistics()
+            schema_info = manager.schema.get_schema_info()
+        
+        # Display status
+        console.print("\n🧠 Code Intelligence System Status", style="bold blue")
+        console.print("=" * 50)
+        
+        # Basic statistics
+        console.print(f"📊 Code Statistics:")
+        console.print(f"  Files: {stats.get('files', 0)}")
+        console.print(f"  Classes: {stats.get('classes', 0)}")
+        console.print(f"  Methods: {stats.get('methods', 0)}")
+        console.print(f"  Imports: {stats.get('imports', 0)}")
+        
+        if detailed:
+            # Schema information
+            console.print(f"\n🗄️ Database Schema:")
+            console.print(f"  Constraints: {len(schema_info.get('constraints', []))}")
+            console.print(f"  Indexes: {len(schema_info.get('indexes', []))}")
+            console.print(f"  Schema Version: {schema_info.get('schema_version', 'Unknown')}")
+        
+        console.print("\n✅ Code Intelligence System is operational", style="green")
+        
+    except Exception as e:
+        console.print(f"❌ Error: {e}", style="red")
+
+
+@code.command()
+@click.argument('file_path', type=click.Path(exists=True))
+@click.option('--detailed', is_flag=True, help='Show detailed analysis')
+def analyze_file(file_path: str, detailed: bool):
+    """Analyze a specific file and store results."""
+    try:
+        from src.ignition.graph.client import IgnitionGraphClient
+        from src.ignition.code_intelligence import CodeIntelligenceManager
+        from pathlib import Path
+        
+        file_path_obj = Path(file_path).absolute()
+        
+        with console.status(f"[bold blue]Analyzing {file_path}..."):
+            client = IgnitionGraphClient()
+            if not client.connect():
+                console.print("❌ Failed to connect to Neo4j database", style="red")
+                return
+            
+            manager = CodeIntelligenceManager(client)
+            success = manager.analyze_and_store_file(file_path_obj)
+        
+        if success:
+            console.print(f"✅ Successfully analyzed: {file_path}", style="green")
+            
+            if detailed:
+                # Get file context
+                relative_path = str(file_path_obj.relative_to(Path.cwd()))
+                context = manager.get_file_context(relative_path)
+                
+                if context:
+                    console.print(f"\n📁 File Analysis: {relative_path}", style="bold")
+                    
+                    file_info = context.get('file', {})
+                    console.print(f"  Lines: {file_info.get('lines', 'N/A')}")
+                    console.print(f"  Complexity: {file_info.get('complexity', 'N/A')}")
+                    console.print(f"  Maintainability: {file_info.get('maintainability_index', 'N/A'):.1f}")
+                    
+                    classes = context.get('classes', [])
+                    methods = context.get('class_methods', []) + context.get('file_methods', [])
+                    imports = context.get('imports', [])
+                    
+                    console.print(f"  Classes: {len(classes)}")
+                    console.print(f"  Methods: {len(methods)}")
+                    console.print(f"  Imports: {len(imports)}")
+        else:
+            console.print(f"❌ Failed to analyze: {file_path}", style="red")
+            
+    except Exception as e:
+        console.print(f"❌ Error: {e}", style="red")
+
+
+@code.command()
+@click.argument('query')
+@click.option('--type', 'search_type', type=click.Choice(['all', 'files', 'classes', 'methods']), 
+              default='all', help='Type of code elements to search')
+@click.option('--limit', default=10, help='Maximum number of results')
+def search_code(query: str, search_type: str, limit: int):
+    """Search for code elements by name or content."""
+    try:
+        from src.ignition.graph.client import IgnitionGraphClient
+        from src.ignition.code_intelligence import CodeIntelligenceManager
+        
+        with console.status("[bold blue]Searching..."):
+            client = IgnitionGraphClient()
+            if not client.connect():
+                console.print("❌ Failed to connect to Neo4j database", style="red")
+                return
+            
+            manager = CodeIntelligenceManager(client)
+            results = manager.search_code(query, search_type)
+        
+        if not results:
+            console.print(f"No results found for '{query}'", style="yellow")
+            return
+        
+        console.print(f"\n🔍 Search Results for '{query}' ({search_type})", style="bold blue")
+        console.print(f"Found {len(results)} results (showing first {min(limit, len(results))})")
+        
+        for i, result in enumerate(results[:limit], 1):
+            console.print(f"{i}. {result.get('type', 'N/A')}: {result.get('name', 'N/A')}")
+            console.print(f"   File: {result.get('file_path', 'N/A')}")
+            console.print(f"   Complexity: {result.get('complexity', 'N/A')}")
+            console.print()
+        
+    except Exception as e:
+        console.print(f"❌ Error: {e}", style="red")
+
+
 if __name__ == "__main__":
     main()
