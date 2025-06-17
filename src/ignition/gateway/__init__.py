@@ -1,5 +1,5 @@
 """Gateway client utilities for connecting to Ignition Gateways."""
 
-from .client import IgnitionGatewayClient, GatewayConfig
+from .client import GatewayConfig, IgnitionGatewayClient
 
-__all__ = ["IgnitionGatewayClient", "GatewayConfig"]
+__all__ = ["GatewayConfig", "IgnitionGatewayClient"]

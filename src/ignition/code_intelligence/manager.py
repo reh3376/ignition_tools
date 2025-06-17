@@ -2,16 +2,14 @@
 
 import logging
 from pathlib import Path
-from typing import Any, Dict, List, Optional
-from dataclasses import asdict
-from datetime import datetime
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
 class CodeIntelligenceManager:
     """Main manager for code intelligence system."""
-    
+
     def __init__(self, graph_client, embedder=None):
         """Initialize the code intelligence manager.
         
@@ -21,17 +19,17 @@ class CodeIntelligenceManager:
         """
         self.client = graph_client
         self.embedder = embedder
-        
+
         # Import here to avoid circular imports
-        from .schema import CodeSchema
         from .analyzer import CodeAnalyzer
-        
+        from .schema import CodeSchema
+
         self.schema = CodeSchema(graph_client)
         self.analyzer = CodeAnalyzer()
-        
+
         # Initialize schema
         self._initialize_schema()
-        
+
     def _initialize_schema(self):
         """Initialize the Neo4j schema for code intelligence."""
         try:
@@ -39,7 +37,7 @@ class CodeIntelligenceManager:
             logger.info("Code intelligence schema initialized")
         except Exception as e:
             logger.error(f"Failed to initialize schema: {e}")
-    
+
     def analyze_and_store_file(self, file_path: Path) -> bool:
         """Analyze a file and store results in Neo4j."""
         try:
@@ -47,15 +45,15 @@ class CodeIntelligenceManager:
             analysis = self.analyzer.analyze_file(file_path)
             if not analysis:
                 return False
-            
+
             # Store in Neo4j
             return self._store_analysis(analysis)
-            
+
         except Exception as e:
             logger.error(f"Failed to analyze and store file {file_path}: {e}")
             return False
-    
-    def analyze_and_store_directory(self, directory_path: Path, recursive: bool = True) -> Dict[str, Any]:
+
+    def analyze_and_store_directory(self, directory_path: Path, recursive: bool = True) -> dict[str, Any]:
         """Analyze all files in a directory and store results."""
         results = {
             "files_processed": 0,
@@ -63,12 +61,12 @@ class CodeIntelligenceManager:
             "files_failed": 0,
             "errors": []
         }
-        
+
         try:
             # Analyze directory
             analyses = self.analyzer.analyze_directory(directory_path, recursive)
             results["files_processed"] = len(analyses)
-            
+
             # Store each analysis
             for analysis in analyses:
                 try:
@@ -79,45 +77,45 @@ class CodeIntelligenceManager:
                 except Exception as e:
                     results["files_failed"] += 1
                     results["errors"].append(str(e))
-            
+
             logger.info(f"Processed {results['files_processed']} files, "
                        f"{results['files_successful']} successful, "
                        f"{results['files_failed']} failed")
-            
+
         except Exception as e:
             logger.error(f"Failed to analyze directory {directory_path}: {e}")
             results["errors"].append(str(e))
-        
+
         return results
-    
-    def _store_analysis(self, analysis: Dict[str, Any]) -> bool:
+
+    def _store_analysis(self, analysis: dict[str, Any]) -> bool:
         """Store analysis results in Neo4j."""
         try:
             # Store file node
-            file_info = analysis['file']
+            file_info = analysis["file"]
             self._store_file_node(file_info)
-            
+
             # Store classes
-            for class_info in analysis['classes']:
+            for class_info in analysis["classes"]:
                 self._store_class_node(class_info)
-            
+
             # Store methods
-            for method_info in analysis['methods']:
+            for method_info in analysis["methods"]:
                 self._store_method_node(method_info)
-            
+
             # Store imports
-            for import_info in analysis['imports']:
+            for import_info in analysis["imports"]:
                 self._store_import_node(import_info)
-            
+
             # Create relationships
             self._create_relationships(analysis)
-            
+
             return True
-            
+
         except Exception as e:
             logger.error(f"Failed to store analysis: {e}")
             return False
-    
+
     def _store_file_node(self, file_info):
         """Store a file node in Neo4j."""
         cypher = """
@@ -131,7 +129,7 @@ class CodeIntelligenceManager:
             f.size_bytes = $size_bytes,
             f.updated_at = datetime()
         """
-        
+
         params = {
             "path": file_info.path,
             "lines": file_info.lines,
@@ -142,9 +140,9 @@ class CodeIntelligenceManager:
             "language": file_info.language,
             "size_bytes": file_info.size_bytes
         }
-        
+
         self.client.execute_query(cypher, params)
-    
+
     def _store_class_node(self, class_info):
         """Store a class node in Neo4j."""
         cypher = """
@@ -157,7 +155,7 @@ class CodeIntelligenceManager:
             c.inheritance = $inheritance,
             c.updated_at = datetime()
         """
-        
+
         params = {
             "name": class_info.name,
             "file_path": class_info.file_path,
@@ -168,9 +166,9 @@ class CodeIntelligenceManager:
             "docstring": class_info.docstring,
             "inheritance": class_info.inheritance
         }
-        
+
         self.client.execute_query(cypher, params)
-    
+
     def _store_method_node(self, method_info):
         """Store a method node in Neo4j."""
         cypher = """
@@ -184,7 +182,7 @@ class CodeIntelligenceManager:
             m.is_async = $is_async,
             m.updated_at = datetime()
         """
-        
+
         params = {
             "name": method_info.name,
             "class_name": method_info.class_name,
@@ -197,9 +195,9 @@ class CodeIntelligenceManager:
             "docstring": method_info.docstring,
             "is_async": method_info.is_async
         }
-        
+
         self.client.execute_query(cypher, params)
-    
+
     def _store_import_node(self, import_info):
         """Store an import node in Neo4j."""
         cypher = """
@@ -209,7 +207,7 @@ class CodeIntelligenceManager:
             i.is_local = $is_local,
             i.updated_at = datetime()
         """
-        
+
         params = {
             "module": import_info.module,
             "alias": import_info.alias,
@@ -218,15 +216,15 @@ class CodeIntelligenceManager:
             "line_number": import_info.line_number,
             "is_local": import_info.is_local
         }
-        
+
         self.client.execute_query(cypher, params)
-    
-    def _create_relationships(self, analysis: Dict[str, Any]):
+
+    def _create_relationships(self, analysis: dict[str, Any]):
         """Create relationships between nodes."""
-        file_path = analysis['file'].path
-        
+        file_path = analysis["file"].path
+
         # File CONTAINS Class relationships
-        for class_info in analysis['classes']:
+        for class_info in analysis["classes"]:
             cypher = """
             MATCH (f:CodeFile {path: $file_path})
             MATCH (c:Class {name: $class_name, file_path: $file_path})
@@ -236,9 +234,9 @@ class CodeIntelligenceManager:
                 "file_path": file_path,
                 "class_name": class_info.name
             })
-        
+
         # Class HAS_METHOD Method relationships
-        for method_info in analysis['methods']:
+        for method_info in analysis["methods"]:
             if method_info.class_name:
                 cypher = """
                 MATCH (c:Class {name: $class_name, file_path: $file_path})
@@ -263,9 +261,9 @@ class CodeIntelligenceManager:
                     "method_name": method_info.name,
                     "start_line": method_info.start_line
                 })
-        
+
         # File IMPORTS relationships
-        for import_info in analysis['imports']:
+        for import_info in analysis["imports"]:
             cypher = """
             MATCH (f:CodeFile {path: $file_path})
             MATCH (i:Import {module: $module, file_path: $file_path, line_number: $line_number})
@@ -276,8 +274,8 @@ class CodeIntelligenceManager:
                 "module": import_info.module,
                 "line_number": import_info.line_number
             })
-    
-    def get_file_context(self, file_path: str) -> Dict[str, Any]:
+
+    def get_file_context(self, file_path: str) -> dict[str, Any]:
         """Get comprehensive context for a file."""
         cypher = """
         MATCH (f:CodeFile {path: $path})
@@ -293,12 +291,12 @@ class CodeIntelligenceManager:
                collect(DISTINCT i) as imports,
                collect(DISTINCT dep.path) as dependents
         """
-        
+
         result = self.client.execute_query(cypher, {"path": file_path})
-        
+
         if not result:
             return {}
-        
+
         data = result[0]
         return {
             "file": dict(data["f"]) if data["f"] else None,
@@ -308,18 +306,18 @@ class CodeIntelligenceManager:
             "imports": [dict(i) for i in data["imports"] if i],
             "dependents": [path for path in data["dependents"] if path]
         }
-    
-    def find_similar_files(self, file_path: str, limit: int = 10) -> List[Dict[str, Any]]:
+
+    def find_similar_files(self, file_path: str, limit: int = 10) -> list[dict[str, Any]]:
         """Find files similar to the given file based on structure."""
         # Get the target file's characteristics
         context = self.get_file_context(file_path)
         if not context or not context["file"]:
             return []
-        
+
         target_complexity = context["file"]["complexity"]
         target_classes = len(context["classes"])
         target_methods = len(context["class_methods"]) + len(context["file_methods"])
-        
+
         cypher = """
         MATCH (f:CodeFile)
         WHERE f.path <> $path
@@ -341,7 +339,7 @@ class CodeIntelligenceManager:
                method_count,
                similarity_score
         """
-        
+
         params = {
             "path": file_path,
             "target_complexity": target_complexity,
@@ -349,13 +347,13 @@ class CodeIntelligenceManager:
             "target_methods": target_methods,
             "limit": limit
         }
-        
+
         return self.client.execute_query(cypher, params)
-    
-    def get_code_statistics(self) -> Dict[str, Any]:
+
+    def get_code_statistics(self) -> dict[str, Any]:
         """Get comprehensive statistics about the codebase."""
         stats = {}
-        
+
         # Basic counts
         counts_cypher = """
         MATCH (f:CodeFile) 
@@ -367,10 +365,10 @@ class CodeIntelligenceManager:
                count(DISTINCT m) as methods,
                count(DISTINCT i) as imports
         """
-        
+
         counts = self.client.execute_query(counts_cypher)[0]
         stats.update(counts)
-        
+
         # Complexity statistics
         complexity_cypher = """
         MATCH (f:CodeFile)
@@ -380,10 +378,10 @@ class CodeIntelligenceManager:
                avg(f.maintainability_index) as avg_maintainability,
                sum(f.lines) as total_lines
         """
-        
+
         complexity = self.client.execute_query(complexity_cypher)[0]
         stats.update(complexity)
-        
+
         # Top complex files
         top_complex_cypher = """
         MATCH (f:CodeFile)
@@ -391,24 +389,24 @@ class CodeIntelligenceManager:
         ORDER BY f.complexity DESC
         LIMIT 10
         """
-        
+
         stats["most_complex_files"] = self.client.execute_query(top_complex_cypher)
-        
+
         # Language distribution
         lang_cypher = """
         MATCH (f:CodeFile)
         RETURN f.language as language, count(*) as count
         ORDER BY count DESC
         """
-        
+
         stats["language_distribution"] = self.client.execute_query(lang_cypher)
-        
+
         return stats
-    
-    def search_code(self, query: str, search_type: str = "all") -> List[Dict[str, Any]]:
+
+    def search_code(self, query: str, search_type: str = "all") -> list[dict[str, Any]]:
         """Search for code elements by name or content."""
         results = []
-        
+
         if search_type in ["all", "files"]:
             # Search files
             file_cypher = """
@@ -418,7 +416,7 @@ class CodeIntelligenceManager:
                    f.complexity as complexity, f.lines as lines
             """
             results.extend(self.client.execute_query(file_cypher, {"query": query}))
-        
+
         if search_type in ["all", "classes"]:
             # Search classes
             class_cypher = """
@@ -428,7 +426,7 @@ class CodeIntelligenceManager:
                    c.complexity as complexity, c.start_line as start_line
             """
             results.extend(self.client.execute_query(class_cypher, {"query": query}))
-        
+
         if search_type in ["all", "methods"]:
             # Search methods
             method_cypher = """
@@ -439,10 +437,10 @@ class CodeIntelligenceManager:
                    m.class_name as class_name
             """
             results.extend(self.client.execute_query(method_cypher, {"query": query}))
-        
+
         return results
-    
-    def get_dependency_graph(self, file_path: str, depth: int = 2) -> Dict[str, Any]:
+
+    def get_dependency_graph(self, file_path: str, depth: int = 2) -> dict[str, Any]:
         """Get dependency graph for a file."""
         cypher = """
         MATCH path = (f:CodeFile {path: $path})-[:IMPORTS*1..$depth]-(related:CodeFile)
@@ -451,12 +449,12 @@ class CodeIntelligenceManager:
                length(path) as distance,
                relationships(path) as relationships
         """
-        
+
         dependencies = self.client.execute_query(cypher, {
             "path": file_path,
             "depth": depth
         })
-        
+
         return {
             "center_file": file_path,
             "dependencies": dependencies,

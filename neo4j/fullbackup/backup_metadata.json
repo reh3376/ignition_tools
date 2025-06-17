@@ -1,16 +1,16 @@
 {
   "backups": [
     {
-      "timestamp": "20250617_131900",
-      "datetime": "2025-06-17T13:19:00.833434",
-      "reason": "Complete Phase 8.4 implementation with full codebase analysis - 101 Python files, 47,723 lines, 62 dependency relationships, comprehensive analytics data",
-      "node_count": 5438,
-      "relationship_count": 4755,
+      "timestamp": "20250617_144032",
+      "datetime": "2025-06-17T14:40:33.341448",
+      "reason": "Phase 8.5 Development Workflow Integration - Complete Production System",
+      "node_count": 5473,
+      "relationship_count": 4789,
       "version": "1.0.0",
       "backup_type": "full",
       "source": "IGN Scripts Learning System",
-      "filename": "ign_scripts_db_backup_20250617_131900.json",
-      "file_size": 4014107
+      "filename": "ign_scripts_db_backup_20250617_144032.json",
+      "file_size": 4040105
     }
   ]
 }

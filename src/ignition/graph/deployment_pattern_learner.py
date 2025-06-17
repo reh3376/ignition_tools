@@ -38,7 +38,7 @@ Implementation Status:
 import json
 import logging
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 from uuid import uuid4
 
 from .client import IgnitionGraphClient
@@ -67,20 +67,20 @@ class DeploymentPatternLearner:
         target_environment: str,
         gateway_host: str,
         deployment_strategy: str,
-        resources_deployed: List[str],
-        configuration_used: Dict[str, Any],
+        resources_deployed: list[str],
+        configuration_used: dict[str, Any],
         status: str,
         started_at: datetime,
-        completed_at: Optional[datetime] = None,
-        failure_reasons: Optional[List[str]] = None,
+        completed_at: datetime | None = None,
+        failure_reasons: list[str] | None = None,
         rollback_triggered: bool = False,
-        rollback_successful: Optional[bool] = None,
-        user_id: Optional[str] = None,
+        rollback_successful: bool | None = None,
+        user_id: str | None = None,
         automation_triggered: bool = False,
-        execution_log: Optional[str] = None,
-        performance_data: Optional[Dict[str, Any]] = None,
-        lessons_learned: Optional[str] = None,
-        source_environment: Optional[str] = None,
+        execution_log: str | None = None,
+        performance_data: dict[str, Any] | None = None,
+        lessons_learned: str | None = None,
+        source_environment: str | None = None,
     ) -> str:
         """Record a deployment execution for pattern learning.
         
@@ -109,12 +109,12 @@ class DeploymentPatternLearner:
             Deployment execution ID
         """
         execution_id = str(uuid4())
-        
+
         # Calculate duration if completed
         duration_seconds = None
         if completed_at and started_at:
             duration_seconds = int((completed_at - started_at).total_seconds())
-        
+
         # Create deployment execution node
         execution_data = {
             "id": execution_id,
@@ -140,23 +140,23 @@ class DeploymentPatternLearner:
             "performance_data": json.dumps(performance_data) if performance_data else None,
             "lessons_learned": lessons_learned,
         }
-        
+
         query = """
         CREATE (de:DeploymentExecution $props)
         RETURN de.id as execution_id
         """
-        
+
         result = self.client.execute_write_query(query, {"props": execution_data})
-        
+
         if result:
             logger.info(f"Recorded deployment execution: {execution_id}")
-            
+
             # Trigger pattern learning if deployment was successful
             if status == "completed":
                 self._learn_from_successful_deployment(execution_id, execution_data)
             elif status == "failed" and rollback_triggered:
                 self._learn_from_rollback_scenario(execution_id, execution_data)
-                
+
             return execution_id
         else:
             raise Exception(f"Failed to record deployment execution: {execution_name}")
@@ -168,11 +168,11 @@ class DeploymentPatternLearner:
         target_environment: str,
         adaptation_type: str,
         resource_type: str,
-        original_configuration: Dict[str, Any],
-        adapted_configuration: Dict[str, Any],
-        adaptation_rules: List[str],
-        trigger_conditions: List[str],
-        validation_criteria: Optional[List[str]] = None,
+        original_configuration: dict[str, Any],
+        adapted_configuration: dict[str, Any],
+        adaptation_rules: list[str],
+        trigger_conditions: list[str],
+        validation_criteria: list[str] | None = None,
         automation_level: str = "manual",
     ) -> str:
         """Record an environment-specific adaptation pattern.
@@ -194,7 +194,7 @@ class DeploymentPatternLearner:
             Environment adaptation ID
         """
         adaptation_id = str(uuid4())
-        
+
         adaptation_data = {
             "id": adaptation_id,
             "adaptation_name": adaptation_name,
@@ -214,14 +214,14 @@ class DeploymentPatternLearner:
             "confidence_level": 0.5,  # Start with medium confidence
             "is_active": True,
         }
-        
+
         query = """
         CREATE (ea:EnvironmentAdaptation $props)
         RETURN ea.id as adaptation_id
         """
-        
+
         result = self.client.execute_write_query(query, {"props": adaptation_data})
-        
+
         if result:
             logger.info(f"Recorded environment adaptation: {adaptation_id}")
             return adaptation_id
@@ -232,17 +232,17 @@ class DeploymentPatternLearner:
         self,
         scenario_name: str,
         rollback_type: str,
-        trigger_conditions: List[str],
-        failure_patterns: List[str],
+        trigger_conditions: list[str],
+        failure_patterns: list[str],
         rollback_strategy: str,
-        rollback_steps: List[str],
+        rollback_steps: list[str],
         environment: str,
-        resource_types_affected: List[str],
-        recovery_time_target: Optional[int] = None,
+        resource_types_affected: list[str],
+        recovery_time_target: int | None = None,
         data_loss_acceptable: bool = False,
-        validation_steps: Optional[List[str]] = None,
+        validation_steps: list[str] | None = None,
         notification_required: bool = True,
-        escalation_criteria: Optional[List[str]] = None,
+        escalation_criteria: list[str] | None = None,
         automation_level: str = "manual",
     ) -> str:
         """Record a rollback scenario for future reference.
@@ -267,7 +267,7 @@ class DeploymentPatternLearner:
             Rollback scenario ID
         """
         scenario_id = str(uuid4())
-        
+
         scenario_data = {
             "id": scenario_id,
             "scenario_name": scenario_name,
@@ -289,14 +289,14 @@ class DeploymentPatternLearner:
             "automation_level": automation_level,
             "is_active": True,
         }
-        
+
         query = """
         CREATE (rs:RollbackScenario $props)
         RETURN rs.id as scenario_id
         """
-        
+
         result = self.client.execute_write_query(query, {"props": scenario_data})
-        
+
         if result:
             logger.info(f"Recorded rollback scenario: {scenario_id}")
             return scenario_id
@@ -306,11 +306,11 @@ class DeploymentPatternLearner:
     def get_deployment_recommendations(
         self,
         target_environment: str,
-        resource_types: List[str],
-        deployment_strategy: Optional[str] = None,
-        gateway_host: Optional[str] = None,
+        resource_types: list[str],
+        deployment_strategy: str | None = None,
+        gateway_host: str | None = None,
         limit: int = 5,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Get deployment recommendations based on learned patterns.
         
         Args:
@@ -332,22 +332,22 @@ class DeploymentPatternLearner:
             "min_success_count": self.min_success_count,
             "limit": limit,
         }
-        
+
         # Add optional filters
         if deployment_strategy:
             conditions.append("dp.deployment_strategy = $deployment_strategy")
             params["deployment_strategy"] = deployment_strategy
-            
+
         if gateway_host:
             conditions.append("EXISTS { MATCH (de:DeploymentExecution)-[:FOLLOWS_DEPLOYMENT_PATTERN]->(dp) WHERE de.gateway_host = $gateway_host }")
             params["gateway_host"] = gateway_host
-        
+
         # Check for resource type overlap
         conditions.append("ANY(rt IN $resource_types WHERE rt IN dp.resource_types)")
         conditions.append("$target_environment IN dp.environment_types")
-        
+
         where_clause = " AND ".join(conditions)
-        
+
         query = f"""
         MATCH (dp:DeploymentPattern)
         WHERE {where_clause}
@@ -364,15 +364,15 @@ class DeploymentPatternLearner:
         ORDER BY dp.confidence_score DESC, dp.success_count DESC, usage_count DESC
         LIMIT $limit
         """
-        
+
         result = self.client.execute_query(query, params)
-        
+
         recommendations = []
         for record in result:
             pattern = record["dp"]
             try:
                 pattern_data = json.loads(record["pattern_json"])
-                
+
                 recommendation = {
                     "pattern_id": pattern["id"],
                     "pattern_name": pattern["name"],
@@ -392,21 +392,21 @@ class DeploymentPatternLearner:
                     ),
                 }
                 recommendations.append(recommendation)
-                
+
             except (json.JSONDecodeError, KeyError) as e:
                 logger.warning(f"Could not parse pattern data: {e}")
                 continue
-        
+
         return recommendations
 
     def get_environment_adaptations(
         self,
         source_environment: str,
         target_environment: str,
-        resource_type: Optional[str] = None,
-        adaptation_type: Optional[str] = None,
+        resource_type: str | None = None,
+        adaptation_type: str | None = None,
         limit: int = 10,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Get environment-specific adaptations.
         
         Args:
@@ -429,17 +429,17 @@ class DeploymentPatternLearner:
             "target_environment": target_environment,
             "limit": limit,
         }
-        
+
         if resource_type:
             conditions.append("ea.resource_type = $resource_type")
             params["resource_type"] = resource_type
-            
+
         if adaptation_type:
             conditions.append("ea.adaptation_type = $adaptation_type")
             params["adaptation_type"] = adaptation_type
-        
+
         where_clause = " AND ".join(conditions)
-        
+
         query = f"""
         MATCH (ea:EnvironmentAdaptation)
         WHERE {where_clause}
@@ -450,9 +450,9 @@ class DeploymentPatternLearner:
         ORDER BY ea.success_rate DESC, ea.confidence_level DESC, ea.application_count DESC
         LIMIT $limit
         """
-        
+
         result = self.client.execute_query(query, params)
-        
+
         adaptations = []
         for record in result:
             adaptation = record["ea"]
@@ -473,20 +473,20 @@ class DeploymentPatternLearner:
                     "automation_level": adaptation["automation_level"],
                 }
                 adaptations.append(adaptation_data)
-                
+
             except (json.JSONDecodeError, KeyError) as e:
                 logger.warning(f"Could not parse adaptation data: {e}")
                 continue
-        
+
         return adaptations
 
     def get_rollback_scenarios(
         self,
         environment: str,
-        resource_types: Optional[List[str]] = None,
-        rollback_type: Optional[str] = None,
+        resource_types: list[str] | None = None,
+        rollback_type: str | None = None,
         limit: int = 10,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Get applicable rollback scenarios.
         
         Args:
@@ -506,17 +506,17 @@ class DeploymentPatternLearner:
             "environment": environment,
             "limit": limit,
         }
-        
+
         if resource_types:
             conditions.append("ANY(rt IN $resource_types WHERE rt IN rs.resource_types_affected)")
             params["resource_types"] = resource_types
-            
+
         if rollback_type:
             conditions.append("rs.rollback_type = $rollback_type")
             params["rollback_type"] = rollback_type
-        
+
         where_clause = " AND ".join(conditions)
-        
+
         query = f"""
         MATCH (rs:RollbackScenario)
         WHERE {where_clause}
@@ -527,9 +527,9 @@ class DeploymentPatternLearner:
         ORDER BY rs.success_rate DESC, rs.execution_count DESC
         LIMIT $limit
         """
-        
+
         result = self.client.execute_query(query, params)
-        
+
         scenarios = []
         for record in result:
             scenario = record["rs"]
@@ -554,7 +554,7 @@ class DeploymentPatternLearner:
                 "lessons_learned": scenario.get("lessons_learned"),
             }
             scenarios.append(scenario_data)
-        
+
         return scenarios
 
     def record_deployment_metric(
@@ -565,12 +565,12 @@ class DeploymentPatternLearner:
         environment: str,
         metric_value: float,
         unit: str,
-        deployment_strategy: Optional[str] = None,
-        resource_type: Optional[str] = None,
-        baseline_value: Optional[float] = None,
-        target_value: Optional[float] = None,
-        context_data: Optional[Dict[str, Any]] = None,
-        tags: Optional[List[str]] = None,
+        deployment_strategy: str | None = None,
+        resource_type: str | None = None,
+        baseline_value: float | None = None,
+        target_value: float | None = None,
+        context_data: dict[str, Any] | None = None,
+        tags: list[str] | None = None,
     ) -> str:
         """Record a deployment performance metric.
         
@@ -592,7 +592,7 @@ class DeploymentPatternLearner:
             Deployment metric ID
         """
         metric_id = str(uuid4())
-        
+
         metric_data = {
             "id": metric_id,
             "metric_name": metric_name,
@@ -609,14 +609,14 @@ class DeploymentPatternLearner:
             "context_data": json.dumps(context_data) if context_data else None,
             "tags": tags or [],
         }
-        
+
         query = """
         CREATE (dm:DeploymentMetric $props)
         RETURN dm.id as metric_id
         """
-        
+
         result = self.client.execute_write_query(query, {"props": metric_data})
-        
+
         if result:
             logger.info(f"Recorded deployment metric: {metric_id}")
             return metric_id
@@ -625,10 +625,10 @@ class DeploymentPatternLearner:
 
     def get_deployment_analytics(
         self,
-        environment: Optional[str] = None,
+        environment: str | None = None,
         days_back: int = 30,
-        metric_types: Optional[List[str]] = None,
-    ) -> Dict[str, Any]:
+        metric_types: list[str] | None = None,
+    ) -> dict[str, Any]:
         """Get deployment analytics and trends.
         
         Args:
@@ -640,16 +640,16 @@ class DeploymentPatternLearner:
             Analytics data with trends and insights
         """
         since_date = datetime.now() - timedelta(days=days_back)
-        
+
         conditions = [f"de.started_at >= '{since_date.isoformat()}'"]
         params = {"since_date": since_date.isoformat()}
-        
+
         if environment:
             conditions.append("de.target_environment = $environment")
             params["environment"] = environment
-        
+
         where_clause = " AND ".join(conditions)
-        
+
         # Get deployment execution statistics
         deployment_query = f"""
         MATCH (de:DeploymentExecution)
@@ -663,9 +663,9 @@ class DeploymentPatternLearner:
             de.target_environment as environment,
             de.deployment_strategy as strategy
         """
-        
+
         deployment_result = self.client.execute_query(deployment_query, params)
-        
+
         # Get metric trends if requested
         metric_trends = {}
         if metric_types:
@@ -683,13 +683,13 @@ class DeploymentPatternLearner:
                     COUNT(dm) as measurement_count,
                     dm.unit as unit
                 """
-                
+
                 trend_params = {**params, "metric_type": metric_type}
                 trend_result = self.client.execute_query(trend_query, trend_params)
-                
+
                 if trend_result:
                     metric_trends[metric_type] = trend_result[0]
-        
+
         # Compile analytics
         analytics = {
             "period": {
@@ -703,29 +703,29 @@ class DeploymentPatternLearner:
             "rollback_rate": 0.0,
             "insights": [],
         }
-        
+
         # Calculate rates
         if deployment_result and deployment_result[0]["total_deployments"] > 0:
             total = deployment_result[0]["total_deployments"]
             successful = deployment_result[0]["successful_deployments"]
             rollbacks = deployment_result[0]["rollbacks_triggered"]
-            
+
             analytics["success_rate"] = successful / total if total > 0 else 0.0
             analytics["rollback_rate"] = rollbacks / total if total > 0 else 0.0
-            
+
             # Generate insights
             if analytics["success_rate"] < 0.8:
                 analytics["insights"].append("Success rate is below 80% - consider reviewing deployment patterns")
-            
+
             if analytics["rollback_rate"] > 0.1:
                 analytics["insights"].append("Rollback rate is above 10% - investigate common failure patterns")
-            
+
             if deployment_result[0]["avg_duration"] and deployment_result[0]["avg_duration"] > 1800:  # 30 minutes
                 analytics["insights"].append("Average deployment duration is high - consider optimization")
-        
+
         return analytics
 
-    def _learn_from_successful_deployment(self, execution_id: str, execution_data: Dict[str, Any]) -> None:
+    def _learn_from_successful_deployment(self, execution_id: str, execution_data: dict[str, Any]) -> None:
         """Learn patterns from successful deployments."""
         try:
             # Extract pattern characteristics
@@ -739,34 +739,34 @@ class DeploymentPatternLearner:
                     "required_resources": execution_data["resources_deployed"],
                 },
             }
-            
+
             # Check if similar pattern exists
             similar_pattern = self._find_similar_deployment_pattern(pattern_characteristics)
-            
+
             if similar_pattern:
                 # Update existing pattern
                 self._update_deployment_pattern_success(similar_pattern["id"], execution_id)
             else:
                 # Create new pattern
                 self._create_deployment_pattern(execution_data, pattern_characteristics)
-                
+
         except Exception as e:
             logger.warning(f"Failed to learn from successful deployment {execution_id}: {e}")
 
-    def _learn_from_rollback_scenario(self, execution_id: str, execution_data: Dict[str, Any]) -> None:
+    def _learn_from_rollback_scenario(self, execution_id: str, execution_data: dict[str, Any]) -> None:
         """Learn from rollback scenarios."""
         try:
             if execution_data.get("failure_reasons"):
                 # Create or update rollback scenario
                 scenario_name = f"Rollback for {execution_data['deployment_type']} in {execution_data['target_environment']}"
-                
+
                 # Check if similar rollback scenario exists
                 existing_scenario = self._find_similar_rollback_scenario(
                     execution_data["target_environment"],
                     execution_data["failure_reasons"],
                     execution_data["resources_deployed"]
                 )
-                
+
                 if existing_scenario:
                     self._update_rollback_scenario_execution(existing_scenario["id"], execution_data["rollback_successful"])
                 else:
@@ -781,11 +781,11 @@ class DeploymentPatternLearner:
                         environment=execution_data["target_environment"],
                         resource_types_affected=execution_data["resources_deployed"],
                     )
-                    
+
         except Exception as e:
             logger.warning(f"Failed to learn from rollback scenario {execution_id}: {e}")
 
-    def _find_similar_deployment_pattern(self, characteristics: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    def _find_similar_deployment_pattern(self, characteristics: dict[str, Any]) -> dict[str, Any] | None:
         """Find similar deployment patterns."""
         query = """
         MATCH (dp:DeploymentPattern)
@@ -796,18 +796,18 @@ class DeploymentPatternLearner:
         ORDER BY dp.confidence_score DESC
         LIMIT 1
         """
-        
+
         result = self.client.execute_query(query, {
             "deployment_strategy": characteristics["deployment_strategy"],
             "environment_types": characteristics["environment_types"],
             "resource_types": characteristics["resource_types"],
         })
-        
+
         return result[0]["dp"] if result else None
 
     def _find_similar_rollback_scenario(
-        self, environment: str, failure_reasons: List[str], resources: List[str]
-    ) -> Optional[Dict[str, Any]]:
+        self, environment: str, failure_reasons: list[str], resources: list[str]
+    ) -> dict[str, Any] | None:
         """Find similar rollback scenarios."""
         query = """
         MATCH (rs:RollbackScenario)
@@ -818,20 +818,20 @@ class DeploymentPatternLearner:
         ORDER BY rs.success_rate DESC
         LIMIT 1
         """
-        
+
         result = self.client.execute_query(query, {
             "environment": environment,
             "failure_reasons": failure_reasons,
             "resources": resources,
         })
-        
+
         return result[0]["rs"] if result else None
 
-    def _create_deployment_pattern(self, execution_data: Dict[str, Any], characteristics: Dict[str, Any]) -> str:
+    def _create_deployment_pattern(self, execution_data: dict[str, Any], characteristics: dict[str, Any]) -> str:
         """Create a new deployment pattern from successful execution."""
         pattern_id = str(uuid4())
         pattern_name = f"Pattern for {execution_data['deployment_strategy']} in {execution_data['target_environment']}"
-        
+
         pattern_data = {
             "id": pattern_id,
             "name": pattern_name,
@@ -849,7 +849,7 @@ class DeploymentPatternLearner:
             "pattern_data": json.dumps(characteristics),
             "is_active": True,
         }
-        
+
         query = """
         CREATE (dp:DeploymentPattern $props)
         WITH dp
@@ -857,12 +857,12 @@ class DeploymentPatternLearner:
         CREATE (de)-[:FOLLOWS_DEPLOYMENT_PATTERN]->(dp)
         RETURN dp.id as pattern_id
         """
-        
+
         result = self.client.execute_write_query(query, {
             "props": pattern_data,
             "execution_id": execution_data["id"]
         })
-        
+
         if result:
             logger.info(f"Created new deployment pattern: {pattern_id}")
             return pattern_id
@@ -884,7 +884,7 @@ class DeploymentPatternLearner:
         MATCH (de:DeploymentExecution {id: $execution_id})
         CREATE (de)-[:FOLLOWS_DEPLOYMENT_PATTERN]->(dp)
         """
-        
+
         self.client.execute_write_query(query, {
             "pattern_id": pattern_id,
             "execution_id": execution_id
@@ -904,7 +904,7 @@ class DeploymentPatternLearner:
                 ELSE rs.success_rate
             END
         """
-        
+
         self.client.execute_write_query(query, {
             "scenario_id": scenario_id,
             "rollback_successful": rollback_successful
@@ -912,25 +912,25 @@ class DeploymentPatternLearner:
 
     def _calculate_applicability_reasons(
         self,
-        pattern: Dict[str, Any],
+        pattern: dict[str, Any],
         target_environment: str,
-        resource_types: List[str],
-        deployment_strategy: Optional[str],
-    ) -> List[str]:
+        resource_types: list[str],
+        deployment_strategy: str | None,
+    ) -> list[str]:
         """Calculate why a pattern is applicable."""
         reasons = []
-        
+
         if target_environment in pattern.get("environment_types", []):
             reasons.append(f"Proven successful in {target_environment} environment")
-        
+
         matching_resources = set(resource_types) & set(pattern.get("resource_types", []))
         if matching_resources:
             reasons.append(f"Handles similar resources: {', '.join(matching_resources)}")
-        
+
         if deployment_strategy and deployment_strategy == pattern.get("deployment_strategy"):
             reasons.append(f"Uses same deployment strategy: {deployment_strategy}")
-        
+
         if pattern.get("success_count", 0) >= self.min_success_count:
             reasons.append(f"High success rate: {pattern.get('success_count', 0)} successful deployments")
-        
-        return reasons 
+
+        return reasons

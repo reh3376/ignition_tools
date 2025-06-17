@@ -30,14 +30,14 @@ if str(src_path) not in sys.path:
 try:
     # Import the main CLI function from enhanced_cli
     from core.enhanced_cli import main
-    
+
     # Make the main function available for direct import
     __all__ = ["main"]
-    
+
     if __name__ == "__main__":
         # Execute the enhanced CLI when run as a module
         main()
-        
+
 except ImportError as e:
     print(f"❌ Error importing enhanced CLI: {e}")
     print("\n💡 Ensure all dependencies are installed:")
@@ -49,4 +49,4 @@ except Exception as e:
     print(f"❌ Unexpected error starting IGN Scripts CLI: {e}")
     print("\n🔧 Try running the enhanced CLI directly:")
     print("   python -m src.core.enhanced_cli")
-    sys.exit(1) 
+    sys.exit(1)

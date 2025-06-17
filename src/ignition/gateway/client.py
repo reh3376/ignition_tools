@@ -6,8 +6,7 @@ configuration information for export/import operations.
 
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
-from urllib.parse import urlparse
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -17,11 +16,11 @@ class GatewayConfig:
     """Configuration for connecting to an Ignition Gateway."""
     host: str
     port: int = 8088
-    username: Optional[str] = None
-    password: Optional[str] = None
+    username: str | None = None
+    password: str | None = None
     use_ssl: bool = False
     timeout: int = 30
-    
+
     @property
     def base_url(self) -> str:
         """Get the base URL for the gateway."""
@@ -31,7 +30,7 @@ class GatewayConfig:
 
 class IgnitionGatewayClient:
     """Client for connecting to and managing Ignition Gateway resources."""
-    
+
     def __init__(self, config: GatewayConfig):
         """Initialize the gateway client.
         
@@ -41,7 +40,7 @@ class IgnitionGatewayClient:
         self.config = config
         self._connected = False
         self._session = None
-    
+
     def connect(self) -> bool:
         """Connect to the Ignition Gateway.
         
@@ -50,33 +49,33 @@ class IgnitionGatewayClient:
         """
         try:
             logger.info(f"Connecting to Ignition Gateway at {self.config.base_url}")
-            
+
             # Mock connection - in real implementation would authenticate with gateway
             # This would typically use HTTP requests to the gateway web interface
             # or use the SDK if available
-            
+
             self._connected = True
             logger.info("Successfully connected to Ignition Gateway")
             return True
-            
+
         except Exception as e:
             logger.error(f"Failed to connect to gateway: {e}")
             self._connected = False
             return False
-    
+
     def disconnect(self) -> None:
         """Disconnect from the Ignition Gateway."""
         if self._connected:
             logger.info("Disconnecting from Ignition Gateway")
             self._connected = False
             self._session = None
-    
+
     @property
     def is_connected(self) -> bool:
         """Check if connected to the gateway."""
         return self._connected
-    
-    def get_gateway_info(self) -> Dict[str, Any]:
+
+    def get_gateway_info(self) -> dict[str, Any]:
         """Get basic gateway information.
         
         Returns:
@@ -84,7 +83,7 @@ class IgnitionGatewayClient:
         """
         if not self._connected:
             raise RuntimeError("Not connected to gateway")
-        
+
         # Mock implementation
         return {
             "name": "Ignition Gateway",
@@ -94,8 +93,8 @@ class IgnitionGatewayClient:
             "memory_usage": "512MB",
             "uptime": "5 days, 2 hours",
         }
-    
-    def get_projects(self) -> List[Dict[str, Any]]:
+
+    def get_projects(self) -> list[dict[str, Any]]:
         """Get list of all projects on the gateway.
         
         Returns:
@@ -103,7 +102,7 @@ class IgnitionGatewayClient:
         """
         if not self._connected:
             raise RuntimeError("Not connected to gateway")
-        
+
         # Mock implementation - real version would call gateway API
         return [
             {
@@ -115,7 +114,7 @@ class IgnitionGatewayClient:
                 "size": 1024000,
             },
             {
-                "name": "TestProject", 
+                "name": "TestProject",
                 "enabled": False,
                 "inheritance_enabled": False,
                 "client_count": 0,
@@ -123,8 +122,8 @@ class IgnitionGatewayClient:
                 "size": 512000,
             },
         ]
-    
-    def get_project_details(self, project_name: str) -> Dict[str, Any]:
+
+    def get_project_details(self, project_name: str) -> dict[str, Any]:
         """Get detailed information about a specific project.
         
         Args:
@@ -135,7 +134,7 @@ class IgnitionGatewayClient:
         """
         if not self._connected:
             raise RuntimeError("Not connected to gateway")
-        
+
         # Mock implementation
         return {
             "name": project_name,
@@ -153,8 +152,8 @@ class IgnitionGatewayClient:
                 "max_concurrent_sessions": 10,
             },
         }
-    
-    def get_tag_providers(self) -> List[Dict[str, Any]]:
+
+    def get_tag_providers(self) -> list[dict[str, Any]]:
         """Get list of all tag providers.
         
         Returns:
@@ -162,12 +161,12 @@ class IgnitionGatewayClient:
         """
         if not self._connected:
             raise RuntimeError("Not connected to gateway")
-        
+
         # Mock implementation
         return [
             {
                 "name": "default",
-                "type": "internal", 
+                "type": "internal",
                 "enabled": True,
                 "tag_count": 150,
                 "alarms_enabled": True,
@@ -182,8 +181,8 @@ class IgnitionGatewayClient:
                 "endpoint_url": "opc.tcp://localhost:49320",
             },
         ]
-    
-    def get_database_connections(self) -> List[Dict[str, Any]]:
+
+    def get_database_connections(self) -> list[dict[str, Any]]:
         """Get list of all database connections.
         
         Returns:
@@ -191,7 +190,7 @@ class IgnitionGatewayClient:
         """
         if not self._connected:
             raise RuntimeError("Not connected to gateway")
-        
+
         # Mock implementation
         return [
             {
@@ -205,15 +204,15 @@ class IgnitionGatewayClient:
             },
             {
                 "name": "historian_db",
-                "driver": "postgresql", 
+                "driver": "postgresql",
                 "status": "valid",
                 "url": "jdbc:postgresql://localhost:5432/historian",
                 "username": "historian",
                 "max_connections": 10,
             },
         ]
-    
-    def get_device_connections(self) -> List[Dict[str, Any]]:
+
+    def get_device_connections(self) -> list[dict[str, Any]]:
         """Get list of all device connections.
         
         Returns:
@@ -221,7 +220,7 @@ class IgnitionGatewayClient:
         """
         if not self._connected:
             raise RuntimeError("Not connected to gateway")
-        
+
         # Mock implementation
         return [
             {
@@ -237,14 +236,14 @@ class IgnitionGatewayClient:
                 "name": "Modbus_Device",
                 "driver": "Modbus TCP",
                 "enabled": True,
-                "status": "connected", 
+                "status": "connected",
                 "hostname": "192.168.1.101",
                 "port": 502,
                 "unit_id": 1,
             },
         ]
-    
-    def get_security_configuration(self) -> Dict[str, Any]:
+
+    def get_security_configuration(self) -> dict[str, Any]:
         """Get security configuration information.
         
         Returns:
@@ -252,7 +251,7 @@ class IgnitionGatewayClient:
         """
         if not self._connected:
             raise RuntimeError("Not connected to gateway")
-        
+
         # Mock implementation
         return {
             "authentication_profiles": [
@@ -287,8 +286,8 @@ class IgnitionGatewayClient:
                 {"name": "Viewer", "user_count": 15},
             ],
         }
-    
-    def get_alarm_configuration(self) -> Dict[str, Any]:
+
+    def get_alarm_configuration(self) -> dict[str, Any]:
         """Get alarm configuration information.
         
         Returns:
@@ -296,7 +295,7 @@ class IgnitionGatewayClient:
         """
         if not self._connected:
             raise RuntimeError("Not connected to gateway")
-        
+
         # Mock implementation
         return {
             "notification_profiles": [
@@ -335,8 +334,8 @@ class IgnitionGatewayClient:
                 },
             ],
         }
-    
-    def get_gateway_scripts(self) -> List[Dict[str, Any]]:
+
+    def get_gateway_scripts(self) -> list[dict[str, Any]]:
         """Get gateway-scoped scripts.
         
         Returns:
@@ -344,7 +343,7 @@ class IgnitionGatewayClient:
         """
         if not self._connected:
             raise RuntimeError("Not connected to gateway")
-        
+
         # Mock implementation
         return [
             {
@@ -357,7 +356,7 @@ class IgnitionGatewayClient:
             },
             {
                 "name": "Shutdown Script",
-                "type": "shutdown", 
+                "type": "shutdown",
                 "enabled": True,
                 "timeout": 30000,
                 "last_run": "2025-01-27T18:00:00Z",
@@ -373,8 +372,8 @@ class IgnitionGatewayClient:
                 "status": "running",
             },
         ]
-    
-    def export_project(self, project_name: str, export_path: str) -> Dict[str, Any]:
+
+    def export_project(self, project_name: str, export_path: str) -> dict[str, Any]:
         """Export a project using gateway APIs.
         
         Args:
@@ -386,10 +385,10 @@ class IgnitionGatewayClient:
         """
         if not self._connected:
             raise RuntimeError("Not connected to gateway")
-        
+
         # Mock implementation - real version would call gateway export API
         logger.info(f"Exporting project '{project_name}' to {export_path}")
-        
+
         return {
             "success": True,
             "project_name": project_name,
@@ -397,8 +396,8 @@ class IgnitionGatewayClient:
             "file_size": 1024000,
             "export_time": "2025-01-28T12:00:00Z",
         }
-    
-    def import_project(self, import_path: str, import_options: Dict[str, Any]) -> Dict[str, Any]:
+
+    def import_project(self, import_path: str, import_options: dict[str, Any]) -> dict[str, Any]:
         """Import a project using gateway APIs.
         
         Args:
@@ -410,10 +409,10 @@ class IgnitionGatewayClient:
         """
         if not self._connected:
             raise RuntimeError("Not connected to gateway")
-        
+
         # Mock implementation - real version would call gateway import API
         logger.info(f"Importing project from {import_path}")
-        
+
         return {
             "success": True,
             "import_path": import_path,
@@ -422,8 +421,8 @@ class IgnitionGatewayClient:
             "import_time": "2025-01-28T12:00:00Z",
             "conflicts_resolved": 0,
         }
-    
-    def create_gateway_backup(self, backup_path: str) -> Dict[str, Any]:
+
+    def create_gateway_backup(self, backup_path: str) -> dict[str, Any]:
         """Create a gateway backup using gateway APIs.
         
         Args:
@@ -434,10 +433,10 @@ class IgnitionGatewayClient:
         """
         if not self._connected:
             raise RuntimeError("Not connected to gateway")
-        
+
         # Mock implementation - real version would call gateway backup API
         logger.info(f"Creating gateway backup at {backup_path}")
-        
+
         return {
             "success": True,
             "backup_path": backup_path,
@@ -445,8 +444,8 @@ class IgnitionGatewayClient:
             "backup_time": "2025-01-28T12:00:00Z",
             "includes": ["projects", "tags", "databases", "devices", "security"],
         }
-    
-    def restore_gateway_backup(self, backup_path: str, restore_options: Dict[str, Any]) -> Dict[str, Any]:
+
+    def restore_gateway_backup(self, backup_path: str, restore_options: dict[str, Any]) -> dict[str, Any]:
         """Restore a gateway backup using gateway APIs.
         
         Args:
@@ -458,10 +457,10 @@ class IgnitionGatewayClient:
         """
         if not self._connected:
             raise RuntimeError("Not connected to gateway")
-        
+
         # Mock implementation - real version would call gateway restore API
         logger.info(f"Restoring gateway backup from {backup_path}")
-        
+
         return {
             "success": True,
             "backup_path": backup_path,

@@ -23,35 +23,36 @@ import subprocess
 import sys
 from pathlib import Path
 
+
 def main():
     """Launch the IGN Scripts Streamlit web application."""
     print("🚀 Starting IGN Scripts Web UI...")
     print("=" * 50)
-    
+
     # Get the path to the Streamlit app
     ui_dir = Path(__file__).parent
     app_path = ui_dir / "streamlit_app.py"
-    
+
     # Verify the Streamlit app exists
     if not app_path.exists():
         print(f"❌ Streamlit app not found at: {app_path}")
         print("\n💡 Expected file structure:")
         print(f"   {ui_dir}/")
-        print(f"   ├── app.py (this file)")
-        print(f"   └── streamlit_app.py (main app)")
+        print("   ├── app.py (this file)")
+        print("   └── streamlit_app.py (main app)")
         sys.exit(1)
-    
+
     try:
         # Set up environment for Streamlit
         env = os.environ.copy()
-        
+
         # Add src to Python path for imports
         src_path = str(ui_dir.parent)
-        if 'PYTHONPATH' in env:
-            env['PYTHONPATH'] = f"{src_path}:{env['PYTHONPATH']}"
+        if "PYTHONPATH" in env:
+            env["PYTHONPATH"] = f"{src_path}:{env['PYTHONPATH']}"
         else:
-            env['PYTHONPATH'] = src_path
-        
+            env["PYTHONPATH"] = src_path
+
         print("🌐 Launching Streamlit application...")
         print(f"📁 App location: {app_path}")
         print("🔗 URL: http://localhost:8501")
@@ -59,7 +60,7 @@ def main():
         print("   If it doesn't open, manually navigate to: http://localhost:8501")
         print("\n⏹️  Press Ctrl+C to stop the server")
         print("=" * 50)
-        
+
         # Launch Streamlit with the app
         result = subprocess.run([
             sys.executable, "-m", "streamlit", "run", str(app_path),
@@ -67,9 +68,9 @@ def main():
             "--server.enableCORS", "false",
             "--server.enableXsrfProtection", "false"
         ], env=env)
-        
+
         return result.returncode
-        
+
     except KeyboardInterrupt:
         print("\n🛑 Web UI stopped by user")
         return 0
@@ -91,4 +92,4 @@ def launch_ui():
     return main()
 
 if __name__ == "__main__":
-    sys.exit(main()) 
+    sys.exit(main())

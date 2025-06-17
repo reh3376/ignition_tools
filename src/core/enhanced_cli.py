@@ -2724,5 +2724,15 @@ def similar(file_path: str, element_name: str, limit: int):
         console.print(f"❌ Error finding similar implementations: {e!s}", style="red")
 
 
+# Import and add module development commands
+try:
+    from src.ignition.modules.module_cli import module_group
+
+    # Add module commands to the main CLI
+    main.add_command(module_group)
+except ImportError as e:
+    console.print(f"⚠️ Module commands not available: {e}", style="yellow")
+
+
 if __name__ == "__main__":
     main()
