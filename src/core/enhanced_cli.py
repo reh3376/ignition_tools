@@ -8,9 +8,9 @@ This module provides a rich, interactive command-line interface with:
 - Real-time analytics and insights
 """
 
+import logging
 from datetime import datetime
 from typing import Any
-import logging
 
 import click
 from rich.console import Console
@@ -2150,6 +2150,7 @@ def status(repository: str | None, detailed: bool):
         graph_client = None
         try:
             from src.ignition.graph.client import IgnitionGraphClient
+
             graph_client = IgnitionGraphClient()
             if graph_client.connect():
                 logger.debug("Graph client connected for version control")
@@ -2312,134 +2313,408 @@ def code():
 
 
 @code.command()
-@click.option('--detailed', is_flag=True, help='Show detailed information')
+@click.option("--detailed", is_flag=True, help="Show detailed information")
 def code_status(detailed: bool):
     """Show code intelligence system status."""
     try:
-        from src.ignition.graph.client import IgnitionGraphClient
         from src.ignition.code_intelligence import CodeIntelligenceManager
-        
+        from src.ignition.graph.client import IgnitionGraphClient
+
         with console.status("[bold blue]Checking code intelligence status..."):
             # Connect to database
             client = IgnitionGraphClient()
             if not client.connect():
                 console.print("❌ Failed to connect to Neo4j database", style="red")
                 return
-            
+
             manager = CodeIntelligenceManager(client)
             stats = manager.get_code_statistics()
             schema_info = manager.schema.get_schema_info()
-        
+
         # Display status
         console.print("\n🧠 Code Intelligence System Status", style="bold blue")
         console.print("=" * 50)
-        
+
         # Basic statistics
-        console.print(f"📊 Code Statistics:")
+        console.print("📊 Code Statistics:")
         console.print(f"  Files: {stats.get('files', 0)}")
         console.print(f"  Classes: {stats.get('classes', 0)}")
         console.print(f"  Methods: {stats.get('methods', 0)}")
         console.print(f"  Imports: {stats.get('imports', 0)}")
-        
+
         if detailed:
             # Schema information
-            console.print(f"\n🗄️ Database Schema:")
+            console.print("\n🗄️ Database Schema:")
             console.print(f"  Constraints: {len(schema_info.get('constraints', []))}")
             console.print(f"  Indexes: {len(schema_info.get('indexes', []))}")
-            console.print(f"  Schema Version: {schema_info.get('schema_version', 'Unknown')}")
-        
+            console.print(
+                f"  Schema Version: {schema_info.get('schema_version', 'Unknown')}"
+            )
+
         console.print("\n✅ Code Intelligence System is operational", style="green")
-        
+
     except Exception as e:
         console.print(f"❌ Error: {e}", style="red")
 
 
 @code.command()
-@click.argument('file_path', type=click.Path(exists=True))
-@click.option('--detailed', is_flag=True, help='Show detailed analysis')
+@click.argument("file_path", type=click.Path(exists=True))
+@click.option("--detailed", is_flag=True, help="Show detailed analysis")
 def analyze_file(file_path: str, detailed: bool):
     """Analyze a specific file and store results."""
     try:
-        from src.ignition.graph.client import IgnitionGraphClient
-        from src.ignition.code_intelligence import CodeIntelligenceManager
         from pathlib import Path
-        
+
+        from src.ignition.code_intelligence import CodeIntelligenceManager
+        from src.ignition.graph.client import IgnitionGraphClient
+
         file_path_obj = Path(file_path).absolute()
-        
+
         with console.status(f"[bold blue]Analyzing {file_path}..."):
             client = IgnitionGraphClient()
             if not client.connect():
                 console.print("❌ Failed to connect to Neo4j database", style="red")
                 return
-            
+
             manager = CodeIntelligenceManager(client)
             success = manager.analyze_and_store_file(file_path_obj)
-        
+
         if success:
             console.print(f"✅ Successfully analyzed: {file_path}", style="green")
-            
+
             if detailed:
                 # Get file context
                 relative_path = str(file_path_obj.relative_to(Path.cwd()))
                 context = manager.get_file_context(relative_path)
-                
+
                 if context:
                     console.print(f"\n📁 File Analysis: {relative_path}", style="bold")
-                    
-                    file_info = context.get('file', {})
+
+                    file_info = context.get("file", {})
                     console.print(f"  Lines: {file_info.get('lines', 'N/A')}")
                     console.print(f"  Complexity: {file_info.get('complexity', 'N/A')}")
-                    console.print(f"  Maintainability: {file_info.get('maintainability_index', 'N/A'):.1f}")
-                    
-                    classes = context.get('classes', [])
-                    methods = context.get('class_methods', []) + context.get('file_methods', [])
-                    imports = context.get('imports', [])
-                    
+                    console.print(
+                        f"  Maintainability: {file_info.get('maintainability_index', 'N/A'):.1f}"
+                    )
+
+                    classes = context.get("classes", [])
+                    methods = context.get("class_methods", []) + context.get(
+                        "file_methods", []
+                    )
+                    imports = context.get("imports", [])
+
                     console.print(f"  Classes: {len(classes)}")
                     console.print(f"  Methods: {len(methods)}")
                     console.print(f"  Imports: {len(imports)}")
         else:
             console.print(f"❌ Failed to analyze: {file_path}", style="red")
-            
+
     except Exception as e:
         console.print(f"❌ Error: {e}", style="red")
 
 
 @code.command()
-@click.argument('query')
-@click.option('--type', 'search_type', type=click.Choice(['all', 'files', 'classes', 'methods']), 
-              default='all', help='Type of code elements to search')
-@click.option('--limit', default=10, help='Maximum number of results')
+@click.argument("query")
+@click.option(
+    "--type",
+    "search_type",
+    type=click.Choice(["all", "files", "classes", "methods"]),
+    default="all",
+    help="Type of code elements to search",
+)
+@click.option("--limit", default=10, help="Maximum number of results")
 def search_code(query: str, search_type: str, limit: int):
     """Search for code elements by name or content."""
     try:
-        from src.ignition.graph.client import IgnitionGraphClient
         from src.ignition.code_intelligence import CodeIntelligenceManager
-        
+        from src.ignition.graph.client import IgnitionGraphClient
+
         with console.status("[bold blue]Searching..."):
             client = IgnitionGraphClient()
             if not client.connect():
                 console.print("❌ Failed to connect to Neo4j database", style="red")
                 return
-            
+
             manager = CodeIntelligenceManager(client)
             results = manager.search_code(query, search_type)
-        
+
         if not results:
             console.print(f"No results found for '{query}'", style="yellow")
             return
-        
-        console.print(f"\n🔍 Search Results for '{query}' ({search_type})", style="bold blue")
-        console.print(f"Found {len(results)} results (showing first {min(limit, len(results))})")
-        
+
+        console.print(
+            f"\n🔍 Search Results for '{query}' ({search_type})", style="bold blue"
+        )
+        console.print(
+            f"Found {len(results)} results (showing first {min(limit, len(results))})"
+        )
+
         for i, result in enumerate(results[:limit], 1):
-            console.print(f"{i}. {result.get('type', 'N/A')}: {result.get('name', 'N/A')}")
+            console.print(
+                f"{i}. {result.get('type', 'N/A')}: {result.get('name', 'N/A')}"
+            )
             console.print(f"   File: {result.get('file_path', 'N/A')}")
             console.print(f"   Complexity: {result.get('complexity', 'N/A')}")
             console.print()
-        
+
     except Exception as e:
         console.print(f"❌ Error: {e}", style="red")
+
+
+# Analytics and Optimization commands (Phase 8.4)
+@code.group(name="analytics")
+def analytics():
+    """📊 Advanced analytics and optimization tools."""
+    pass
+
+
+# Import and add analytics commands
+try:
+    from src.ignition.code_intelligence.analytics_cli import analytics_group
+
+    # Add all analytics commands to the main analytics group
+    for command in analytics_group.commands.values():
+        analytics.add_command(command)
+except ImportError as e:
+    console.print(f"⚠️ Analytics commands not available: {e}", style="yellow")
+
+
+# AI Assistant Enhancement commands
+@code.group(name="ai")
+def ai_assistant():
+    """🤖 AI Assistant Enhancement commands for context-aware development."""
+    pass
+
+
+@ai_assistant.command()
+@click.argument("file_path")
+@click.option(
+    "--context-size",
+    type=click.Choice(["small", "medium", "large"]),
+    default="medium",
+    help="Size of context to retrieve",
+)
+def context(file_path: str, context_size: str):
+    """Get smart context for a file instead of reading entire file."""
+    try:
+        from src.ignition.code_intelligence.ai_assistant_enhancement import (
+            AIAssistantEnhancement,
+        )
+        from src.ignition.code_intelligence.manager import CodeIntelligenceManager
+        from src.ignition.graph.client import IgnitionGraphClient
+
+        client = IgnitionGraphClient()
+        if not client.connect():
+            console.print("❌ Failed to connect to Neo4j database", style="red")
+            return
+
+        manager = CodeIntelligenceManager(client)
+        ai_enhancement = AIAssistantEnhancement(manager)
+
+        context_data = ai_enhancement.get_smart_context(file_path, context_size)
+
+        console.print(f"\n🧠 Smart Context: {file_path}", style="bold blue")
+
+        if context_data.file_metrics:
+            metrics = context_data.file_metrics
+            console.print(
+                Panel(
+                    f"Lines: {metrics.get('lines', 'N/A')}\n"
+                    f"Complexity: {metrics.get('complexity', 'N/A'):.1f}\n"
+                    f"Maintainability: {metrics.get('maintainability_index', 'N/A'):.1f}",
+                    title="📊 File Metrics",
+                )
+            )
+
+        if context_data.refactoring_suggestions:
+            console.print("\n💡 Refactoring Suggestions:")
+            for suggestion in context_data.refactoring_suggestions:
+                priority_color = {
+                    "high": "red",
+                    "medium": "yellow",
+                    "low": "green",
+                }.get(suggestion.get("priority", "low"), "white")
+                console.print(
+                    f"  • [{priority_color}]{suggestion.get('description', 'No description')}[/{priority_color}]"
+                )
+
+        if context_data.risk_factors:
+            console.print("\n⚠️ Risk Factors:")
+            for risk in context_data.risk_factors:
+                level_color = {"high": "red", "medium": "yellow", "low": "green"}.get(
+                    risk.get("level", "low"), "white"
+                )
+                console.print(
+                    f"  • [{level_color}]{risk.get('description', 'No description')}[/{level_color}]"
+                )
+
+    except Exception as e:
+        console.print(f"❌ Error getting context: {e!s}", style="red")
+
+
+@ai_assistant.command()
+@click.argument("file_path")
+@click.argument("query")
+@click.option("--max-snippets", default=5, help="Maximum number of snippets to return")
+def snippets(file_path: str, query: str, max_snippets: int):
+    """Get relevant code snippets instead of reading entire file."""
+    try:
+        from src.ignition.code_intelligence.ai_assistant_enhancement import (
+            AIAssistantEnhancement,
+        )
+        from src.ignition.code_intelligence.manager import CodeIntelligenceManager
+        from src.ignition.graph.client import IgnitionGraphClient
+
+        client = IgnitionGraphClient()
+        if not client.connect():
+            console.print("❌ Failed to connect to Neo4j database", style="red")
+            return
+
+        manager = CodeIntelligenceManager(client)
+        ai_enhancement = AIAssistantEnhancement(manager)
+
+        snippets_data = ai_enhancement.get_relevant_snippets(
+            file_path, query, max_snippets
+        )
+
+        if not snippets_data:
+            console.print("No relevant snippets found", style="yellow")
+            return
+
+        console.print(f"\n🔍 Relevant Snippets for: '{query}'", style="bold blue")
+
+        for i, snippet in enumerate(snippets_data, 1):
+            console.print(
+                f"\n📌 Snippet {i}: {snippet['type'].title()} '{snippet['name']}'"
+            )
+            console.print(f"   Relevance: {snippet['relevance_score']:.2f}")
+            console.print(
+                f"   Lines: {snippet.get('start_line', '?')}-{snippet.get('end_line', '?')}"
+            )
+
+            if snippet.get("docstring"):
+                console.print(Panel(snippet["docstring"], title="Documentation"))
+
+    except Exception as e:
+        console.print(f"❌ Error getting snippets: {e!s}", style="red")
+
+
+@ai_assistant.command()
+@click.argument("file_path")
+@click.option("--change-description", default="", help="Description of planned changes")
+def impact(file_path: str, change_description: str):
+    """Analyze potential impact of changes to a file."""
+    try:
+        from src.ignition.code_intelligence.ai_assistant_enhancement import (
+            AIAssistantEnhancement,
+        )
+        from src.ignition.code_intelligence.manager import CodeIntelligenceManager
+        from src.ignition.graph.client import IgnitionGraphClient
+
+        client = IgnitionGraphClient()
+        if not client.connect():
+            console.print("❌ Failed to connect to Neo4j database", style="red")
+            return
+
+        manager = CodeIntelligenceManager(client)
+        ai_enhancement = AIAssistantEnhancement(manager)
+
+        impact_analysis = ai_enhancement.analyze_change_impact(
+            file_path, change_description
+        )
+
+        console.print(f"\n🎯 Change Impact Analysis: {file_path}", style="bold blue")
+
+        risk_color = {
+            "critical": "red",
+            "high": "red",
+            "medium": "yellow",
+            "low": "green",
+        }.get(impact_analysis.risk_level, "white")
+        console.print(
+            Panel(
+                f"Risk Level: [{risk_color}]{impact_analysis.risk_level.upper()}[/{risk_color}]\n"
+                f"Confidence: {impact_analysis.confidence_score:.1%}",
+                title="🚨 Risk Assessment",
+            )
+        )
+
+        if impact_analysis.affected_files:
+            console.print(
+                f"\n📁 Affected Files ({len(impact_analysis.affected_files)}):"
+            )
+            for file in impact_analysis.affected_files[:10]:
+                console.print(f"  • {file}")
+
+        if impact_analysis.breaking_changes:
+            console.print("\n💥 Potential Breaking Changes:")
+            for change in impact_analysis.breaking_changes:
+                severity_color = {
+                    "high": "red",
+                    "medium": "yellow",
+                    "low": "green",
+                }.get(change.get("severity", "low"), "white")
+                console.print(
+                    f"  • [{severity_color}]{change['description']}[/{severity_color}]"
+                )
+
+    except Exception as e:
+        console.print(f"❌ Error analyzing impact: {e!s}", style="red")
+
+
+@ai_assistant.command()
+@click.argument("file_path")
+@click.argument("element_name")
+@click.option("--limit", default=5, help="Maximum number of suggestions")
+def similar(file_path: str, element_name: str, limit: int):
+    """Find similar implementations in the codebase."""
+    try:
+        from src.ignition.code_intelligence.ai_assistant_enhancement import (
+            AIAssistantEnhancement,
+        )
+        from src.ignition.code_intelligence.manager import CodeIntelligenceManager
+        from src.ignition.graph.client import IgnitionGraphClient
+
+        client = IgnitionGraphClient()
+        if not client.connect():
+            console.print("❌ Failed to connect to Neo4j database", style="red")
+            return
+
+        manager = CodeIntelligenceManager(client)
+        ai_enhancement = AIAssistantEnhancement(manager)
+
+        suggestions = ai_enhancement.suggest_similar_implementations(
+            file_path, element_name
+        )
+
+        if not suggestions:
+            console.print(
+                f"No similar implementations found for '{element_name}'", style="yellow"
+            )
+            return
+
+        console.print(
+            f"\n🔍 Similar Implementations for: '{element_name}'", style="bold blue"
+        )
+
+        table = Table(show_header=True, header_style="bold magenta")
+        table.add_column("Name", style="cyan")
+        table.add_column("Type", style="green")
+        table.add_column("File", style="blue")
+        table.add_column("Similarity", style="yellow")
+
+        for suggestion in suggestions[:limit]:
+            table.add_row(
+                suggestion["name"],
+                suggestion["type"],
+                suggestion["file_path"].split("/")[-1],  # Just filename
+                f"{suggestion.get('similarity_score', 0):.2f}",
+            )
+
+        console.print(table)
+
+    except Exception as e:
+        console.print(f"❌ Error finding similar implementations: {e!s}", style="red")
 
 
 if __name__ == "__main__":

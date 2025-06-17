@@ -55,6 +55,11 @@ streamlit>=1.28.0
 neo4j>=5.14.0
 py2neo>=2021.2.4
 
+# Vector Embeddings for Code Intelligence (Phase 8.2)
+sentence-transformers>=2.2.2
+torch>=2.0.0
+transformers>=4.30.0
+
 # Type stubs
 types-requests==2.31.0.20240125
 types-python-dateutil==2.8.19.14

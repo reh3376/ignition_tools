@@ -1,0 +1,82 @@
+✓ Learning system connected
+╭──────────────────────── 🚀 Welcome ────────────────────────╮
+│                                                            │
+│  IGN Scripts v0.1.0                                        │
+│  Intelligent Ignition Script Generation & Learning System  │
+│                                                            │
+│  🔧 Script Generator: Ready                                │
+│  📊 Learning System: 🧠 Connected                          │
+│                                                            │
+╰────────────────────────────────────────────────────────────╯
+╭─────────────────────────────────────────── 💡 Smart Features ────────────────────────────────────────────╮
+│  💡 Commands are tracked to improve recommendations                                                      │
+│  🎯 Use 'ign learning' to explore usage patterns                                                         │
+│  📈 Get personalized suggestions with 'ign recommend'                                                    │
+│  🔍 Launch interactive explorer with 'ign learning explore'                                              │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+🕸️  Analyzing Dependency Graph...
+```mermaid
+graph TD
+    client["client.py"] :::high
+    manager["manager.py"] :::low
+    enhanced_cli["enhanced_cli.py"] :::critical
+    manager["manager.py"] :::medium
+    cli_commands["cli_commands.py"] :::medium
+    analytics_cli["analytics_cli.py"] :::medium
+    __init__["__init__.py"] :::low
+    analyzer["analyzer.py"] :::low
+    dependency_analyzer["dependency_analyzer.py"] :::low
+    usage_tracker["usage_tracker.py"] :::low
+    pattern_analyzer["pattern_analyzer.py"] :::medium
+    ai_cli_commands["ai_cli_commands.py"] :::low
+    code_splitter["code_splitter.py"] :::medium
+    learning_integration["learning_integration.py"] :::medium
+    change_tracker["change_tracker.py"] :::medium
+    code_intelligence_cli["code_intelligence_cli.py"] :::low
+    release_planner["release_planner.py"] :::low
+    refactoring_workflow["refactoring_workflow.py"] :::medium
+    ai_assistant_enhancement["ai_assistant_enhancement.py"] :::medium
+    security["security.py"] :::low
+    refactoring_workflow --> code_splitter
+    cli_commands --> code_splitter
+    analytics_cli --> dependency_analyzer
+    manager --> dependency_analyzer
+    __init__ --> dependency_analyzer
+    manager --> change_tracker
+    __init__ --> change_tracker
+    code_splitter --> analyzer
+    manager --> analyzer
+    __init__ --> analyzer
+    analytics_cli --> manager
+    ai_cli_commands --> manager
+    cli_commands --> manager
+    code_intelligence_cli --> manager
+    enhanced_cli --> manager
+    __init__ --> manager
+    cli_commands --> refactoring_workflow
+    ai_cli_commands --> ai_assistant_enhancement
+    enhanced_cli --> ai_assistant_enhancement
+    __init__ --> security
+    client --> security
+    enhanced_cli --> usage_tracker
+    learning_integration --> usage_tracker
+    manager --> release_planner
+    __init__ --> release_planner
+    pattern_analyzer --> client
+    usage_tracker --> client
+    __init__ --> client
+    analytics_cli --> client
+    ai_cli_commands --> client
+    code_intelligence_cli --> client
+    enhanced_cli --> client
+    learning_integration --> client
+    enhanced_cli --> pattern_analyzer
+    learning_integration --> pattern_analyzer
+    __init__ --> manager
+    enhanced_cli --> manager
+    classDef critical fill:#ff6b6b
+    classDef high fill:#ffa726
+    classDef medium fill:#ffeb3b
+    classDef low fill:#4caf50
+```
+⠋ Analyzing relationships...

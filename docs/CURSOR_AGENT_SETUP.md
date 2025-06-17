@@ -12,7 +12,7 @@ Add the following to your Cursor settings in the **Indexing & Docs** section:
 #### **Project Context Instructions:**
 ```
 This is the IGN Scripts project with a comprehensive Code Intelligence System.
-Phase 8.1 has been completed, providing automated refactoring capabilities.
+Phase 8.2 has been completed, providing automated refactoring capabilities with vector embeddings.
 
 IMPORTANT: All new agents/chat sessions MUST initialize the knowledge discovery system:
 
@@ -25,21 +25,22 @@ print(f"✅ Connected to {len(context['knowledge_base_status'])} knowledge bases
 
 Available knowledge bases:
 - Neo4j Graph Database (3,691+ nodes) for code structure analysis
+- Vector Embeddings System (384D) for semantic code search
 - Git History Integration (65+ commits) for evolution tracking
 - Refactoring Tracking System for operation documentation
-- Vector Embeddings for semantic code search
 
-Key capabilities: automated refactoring, large file detection, git integration,
-architecture diagram generation, comprehensive impact analysis.
+Key capabilities: automated refactoring, semantic code search, large file detection,
+git integration, architecture diagram generation, comprehensive impact analysis.
 
 CLI commands available with 'refactor' prefix (12 total commands).
-Current phase: 8.1 (Completed). Project root: /Users/reh3376/repos/IGN_scripts
+Current phase: 8.2 (Completed). Project root: /Users/reh3376/repos/IGN_scripts
 ```
 
 #### **Additional Documentation Paths:**
 ```
 docs/roadmap.md
 docs/PHASE_8_1_COMPLETION_SUMMARY.md
+docs/PHASE_8_2_VECTOR_EMBEDDINGS_SETUP.md
 docs/AGENT_KNOWLEDGE_SYSTEM.md
 src/ignition/code_intelligence/
 examples/new_agent_initialization.py
@@ -65,9 +66,9 @@ For the IGN Scripts project: Always run `from ignition.code_intelligence import 
 ### **2. Settings → Workspace → AI Instructions**
 Project-specific AI instructions:
 ```
-IGN Scripts Code Intelligence System (Phase 8.1 Complete)
+IGN Scripts Code Intelligence System (Phase 8.2 Complete)
 - Initialize knowledge discovery: initialize_agent_knowledge()
-- Available: Neo4j DB, Git integration, refactoring tools
+- Available: Neo4j DB, Vector embeddings, Git integration, refactoring tools
 - CLI: 12 'refactor' commands available
 - See docs/AGENT_KNOWLEDGE_SYSTEM.md for details
 ```
@@ -88,13 +89,14 @@ context = initialize_agent_knowledge()
 
 ## Project Context
 - Name: IGN Scripts - Code Intelligence System
-- Phase: 8.1 (Completed)
-- Knowledge Bases: Neo4j (3,691+ nodes), Git (65+ commits)
+- Phase: 8.2 (Completed)
+- Knowledge Bases: Neo4j (3,691+ nodes), Vector Embeddings (384D), Git (65+ commits)
 - CLI: 12 refactor commands available
-- Key Files: docs/roadmap.md, docs/PHASE_8_1_COMPLETION_SUMMARY.md
+- Key Files: docs/roadmap.md, docs/PHASE_8_2_VECTOR_EMBEDDINGS_SETUP.md
 
 ## Available Tools
 - Automated refactoring with safety guarantees
+- Semantic code search with vector embeddings
 - Large file detection and intelligent splitting
 - Git integration with evolution tracking
 - Architecture diagram generation
