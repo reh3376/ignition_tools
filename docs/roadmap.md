@@ -901,6 +901,34 @@ Implement a comprehensive code intelligence system using Neo4j for structural re
 
 **Status**: All Phase 8.4 objectives completed. Advanced analytics and optimization tools are fully operational, providing comprehensive insights into codebase health, dependencies, technical debt, and performance optimization opportunities.
 
+#### **🎨 UI Integration Requirements** 📝 **PENDING**
+**Note**: All Phase 8 functionality has been implemented for CLI interface. The following Streamlit UI integrations are needed to provide web-based access to code intelligence features:
+
+- [ ] **Phase 8.1 UI Integration**
+  - [ ] Code structure visualization in Streamlit UI
+  - [ ] Interactive refactoring workflow interface
+  - [ ] Large file detection dashboard
+  - [ ] Refactoring history and tracking UI
+- [ ] **Phase 8.2 UI Integration**
+  - [ ] Vector embeddings search interface
+  - [ ] Semantic code search with natural language queries
+  - [ ] Code similarity visualization and exploration
+- [ ] **Phase 8.3 UI Integration**
+  - [ ] AI assistant enhancement dashboard
+  - [ ] Smart context loading interface
+  - [ ] Change impact analysis visualization
+  - [ ] Code suggestion and recommendation UI
+- [ ] **Phase 8.4 UI Integration**
+  - [ ] Advanced analytics dashboard with interactive charts
+  - [ ] Dependency graph visualization (interactive network diagrams)
+  - [ ] Technical debt heatmaps and drill-down interfaces
+  - [ ] Performance optimization insights dashboard
+  - [ ] Documentation synchronization monitoring UI
+
+**Priority**: Medium (CLI functionality is complete and operational)
+**Estimated Effort**: 3-4 weeks for comprehensive UI integration
+**Dependencies**: Existing Streamlit framework, plotly/charts for visualizations
+
 ### **Phase 8.5: Integration & Production Deployment** 🚀 **Week 9-10**
 
 #### **CLI Integration**

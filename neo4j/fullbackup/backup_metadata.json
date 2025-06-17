@@ -1,16 +1,16 @@
 {
   "backups": [
     {
-      "timestamp": "20250616_161526",
-      "datetime": "2025-06-16T16:15:27.205435",
-      "reason": "COMPLETE SYSTEM BACKUP - Full Ignition Learning System + Deployment Pattern Learning - Ready for full restore",
-      "node_count": 3601,
-      "relationship_count": 2957,
+      "timestamp": "20250617_131900",
+      "datetime": "2025-06-17T13:19:00.833434",
+      "reason": "Complete Phase 8.4 implementation with full codebase analysis - 101 Python files, 47,723 lines, 62 dependency relationships, comprehensive analytics data",
+      "node_count": 5438,
+      "relationship_count": 4755,
       "version": "1.0.0",
       "backup_type": "full",
       "source": "IGN Scripts Learning System",
-      "filename": "ign_scripts_db_backup_20250616_161526.json",
-      "file_size": 2614210
+      "filename": "ign_scripts_db_backup_20250617_131900.json",
+      "file_size": 4014107
     }
   ]
 }
