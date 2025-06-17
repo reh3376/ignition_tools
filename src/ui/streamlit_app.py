@@ -38,7 +38,7 @@ except ImportError:
     def show_smart_recommendations(current_action: str, container=None):
         pass
 
-    def show_learning_status():
+    def show_learning_status() -> bool:
         return False
 
     def show_usage_insights():
@@ -297,9 +297,11 @@ def render_template_generator() -> None:
                 selected_template,
                 {
                     "component_name": component_name,
-                    "action_type": action_type
-                    if "button_click_handler" in selected_template
-                    else None,
+                    "action_type": (
+                        action_type
+                        if "button_click_handler" in selected_template
+                        else None
+                    ),
                 },
             )
 
@@ -520,18 +522,19 @@ def render_export_page() -> None:
     """Render the export page."""
     try:
         from src.ui.pages.export_import import show_export_import_page
+
         show_export_import_page()
     except ImportError as e:
         st.error(f"❌ Export/Import System not available: {e}")
         st.markdown("## 📦 Project Export")
         st.info("🚧 Export/Import System is being developed!")
-        
+
         st.markdown(
             """
         ### Available Export Features:
 
         - **Gateway Backup Format** - Export as .gwbk files
-        - **Project Archive** - Create Ignition project zips  
+        - **Project Archive** - Create Ignition project zips
         - **Resource Export** - Export individual resources
         - **Version Control Preparation** - Structure for git integration
         - **Deployment Packages** - Ready-to-deploy script packages
@@ -564,368 +567,438 @@ def render_gateways_page() -> None:
         with tab1:
             st.subheader("Configured Gateways")
 
-            configs = manager.list_configs()
+            try:
+                configs = manager.list_configs()  # type: ignore[attr-defined]
 
-            if not configs:
-                st.info(
-                    "🔧 No gateways configured. Add gateways using the Configuration tab or by setting up your .env file."
-                )
-
-                with st.expander("Quick Setup Instructions"):
-                    st.markdown(
-                        """
-                    **To configure gateways:**
-                    1. Copy `gateway_config.env` to `.env`
-                    2. Edit with your gateway details:
-                    ```
-                    IGN_GATEWAYS=local_dev
-                    IGN_LOCAL_DEV_HOST=localhost
-                    IGN_LOCAL_DEV_PORT=8088
-                    IGN_LOCAL_DEV_USERNAME=admin
-                    IGN_LOCAL_DEV_PASSWORD=password
-                    ```
-                    3. Restart the application
-                    """
+                if not configs:
+                    st.info(
+                        "🔧 No gateways configured. Add gateways using the Configuration tab or by setting up your .env file."
                     )
-            else:
-                # Display gateway cards
-                for config_name in configs:
-                    config = manager.get_config(config_name)
-                    if config:
-                        with st.container():
-                            col1, col2, col3 = st.columns([3, 1, 1])
 
-                            with col1:
-                                st.markdown(f"**🏢 {config.name}**")
-                                st.text(f"URL: {config.base_url}")
-                                st.text(f"Auth: {config.auth_type} ({config.username})")
-                                st.text(
-                                    f"SSL: {'✓' if config.verify_ssl else '✗'} | Timeout: {config.timeout}s"
-                                )
+                    with st.expander("Quick Setup Instructions"):
+                        st.markdown(
+                            """
+                        **To configure gateways:**
+                        1. Copy `gateway_config.env` to `.env`
+                        2. Edit with your gateway details:
+                        ```
+                        IGN_GATEWAYS=local_dev
+                        IGN_LOCAL_DEV_HOST=localhost
+                        IGN_LOCAL_DEV_PORT=8088
+                        IGN_LOCAL_DEV_USERNAME=admin
+                        IGN_LOCAL_DEV_PASSWORD=password
+                        ```
+                        3. Restart the application
+                        """
+                        )
+                else:
+                    # Display gateway cards
+                    for config_name in configs:
+                        config = manager.get_config(config_name)
+                        if config:
+                            with st.container():
+                                col1, col2, col3 = st.columns([3, 1, 1])
 
-                                if config.description:
-                                    st.caption(config.description)
-
-                                if config.tags:
-                                    tags_display = " ".join(
-                                        [f"`{tag}`" for tag in config.tags]
+                                with col1:
+                                    st.markdown(f"**🏢 {config.name}**")
+                                    st.text(f"URL: {config.base_url}")
+                                    st.text(
+                                        f"Auth: {config.auth_type} ({config.username})"
                                     )
-                                    st.markdown(f"Tags: {tags_display}")
+                                    st.text(
+                                        f"SSL: {'✓' if config.verify_ssl else '✗'} | Timeout: {config.timeout}s"
+                                    )
 
-                            with col2:
-                                test_key = f"test_{config_name}"
-                                if st.button("🧪 Test", key=test_key):
-                                    with st.spinner(
-                                        f"Testing connection to {config.name}..."
-                                    ):
-                                        try:
-                                            client = IgnitionGatewayClient(
-                                                config=config
-                                            )
-                                            if client.connect():
-                                                st.success(
-                                                    f"✅ Connection to {config.name} successful!"
-                                                )
-                                                client.disconnect()
-                                            else:
-                                                st.error(
-                                                    f"❌ Connection to {config.name} failed"
-                                                )
-                                        except Exception as e:
-                                            st.error(f"❌ Error: {e!s}")
+                                    if config.description:
+                                        st.caption(config.description)
 
-                            with col3:
-                                health_key = f"health_{config_name}"
-                                if st.button("🏥 Health", key=health_key):
-                                    with st.spinner(
-                                        f"Checking health of {config.name}..."
-                                    ):
-                                        try:
-                                            with IgnitionGatewayClient(
-                                                config=config
-                                            ) as client:
-                                                health_data = client.health_check()
+                                    if config.tags:
+                                        tags_display = " ".join(
+                                            [f"`{tag}`" for tag in config.tags]
+                                        )
+                                        st.markdown(f"Tags: {tags_display}")
 
-                                                status = health_data.get(
-                                                    "overall_status", "unknown"
+                                with col2:
+                                    test_key = f"test_{config_name}"
+                                    if st.button("🧪 Test", key=test_key):
+                                        with st.spinner(
+                                            f"Testing connection to {config.name}..."
+                                        ):
+                                            try:
+                                                client = IgnitionGatewayClient(
+                                                    config=config  # type: ignore[arg-type]
                                                 )
-                                                if status == "healthy":
+                                                if client.connect():
                                                     st.success(
-                                                        f"✅ {config.name} is healthy"
+                                                        f"✅ Connection to {config.name} successful!"
                                                     )
-                                                elif status == "warning":
-                                                    st.warning(
-                                                        f"⚠️ {config.name} has warnings"
-                                                    )
+                                                    client.disconnect()
                                                 else:
                                                     st.error(
-                                                        f"❌ {config.name} is unhealthy"
+                                                        f"❌ Connection to {config.name} failed"
                                                     )
+                                            except Exception as e:
+                                                st.error(f"❌ Error: {e!s}")
 
-                                                # Show detailed health info
-                                                with st.expander("Health Details"):
-                                                    checks = health_data.get(
-                                                        "checks", {}
+                                with col3:
+                                    health_key = f"health_{config_name}"
+                                    if st.button("🏥 Health", key=health_key):
+                                        with st.spinner(
+                                            f"Checking health of {config.name}..."
+                                        ):
+                                            try:
+                                                with IgnitionGatewayClient(
+                                                    config=config  # type: ignore[arg-type]
+                                                ) as client:  # type: ignore[attr-defined]
+                                                    health_data = client.health_check()
+
+                                                    status = health_data.get(
+                                                        "overall_status", "unknown"
                                                     )
-                                                    for (
-                                                        check_name,
-                                                        check_result,
-                                                    ) in checks.items():
-                                                        check_status = check_result.get(
-                                                            "status", "unknown"
+                                                    if status == "healthy":
+                                                        st.success(
+                                                            f"✅ {config.name} is healthy"
                                                         )
-                                                        details = check_result.get(
-                                                            "details", ""
+                                                    elif status == "warning":
+                                                        st.warning(
+                                                            f"⚠️ {config.name} has warnings"
+                                                        )
+                                                    else:
+                                                        st.error(
+                                                            f"❌ {config.name} is unhealthy"
                                                         )
 
-                                                        if check_status == "healthy":
-                                                            st.success(
-                                                                f"✅ {check_name.replace('_', ' ').title()}: {details}"
+                                                    # Show detailed health info
+                                                    with st.expander("Health Details"):
+                                                        checks = health_data.get(
+                                                            "checks", {}
+                                                        )
+                                                        for (
+                                                            check_name,
+                                                            check_result,
+                                                        ) in checks.items():
+                                                            check_status = (
+                                                                check_result.get(
+                                                                    "status", "unknown"
+                                                                )
                                                             )
-                                                        elif check_status == "warning":
-                                                            st.warning(
-                                                                f"⚠️ {check_name.replace('_', ' ').title()}: {details}"
+                                                            details = check_result.get(
+                                                                "details", ""
                                                             )
-                                                        else:
-                                                            st.error(
-                                                                f"❌ {check_name.replace('_', ' ').title()}: {details}"
-                                                            )
-                                        except Exception as e:
-                                            st.error(f"❌ Health check failed: {e!s}")
 
-                            st.divider()
+                                                            if (
+                                                                check_status
+                                                                == "healthy"
+                                                            ):
+                                                                st.success(
+                                                                    f"✅ {check_name.replace('_', ' ').title()}: {details}"
+                                                                )
+                                                            elif (
+                                                                check_status
+                                                                == "warning"
+                                                            ):
+                                                                st.warning(
+                                                                    f"⚠️ {check_name.replace('_', ' ').title()}: {details}"
+                                                                )
+                                                            else:
+                                                                st.error(
+                                                                    f"❌ {check_name.replace('_', ' ').title()}: {details}"
+                                                                )
+                                            except Exception as e:
+                                                st.error(
+                                                    f"❌ Health check failed: {e!s}"
+                                                )
+
+                                st.divider()
+
+            except Exception as e:
+                st.error("❌ Gateway system not available")
+                st.error(f"Import error: {e!s}")
+                st.info(
+                    "Make sure the gateway modules are properly installed and accessible."
+                )
 
         with tab2:
             st.subheader("Connection Test")
 
-            configs = manager.list_configs()
-            if not configs:
-                st.info("No gateways configured. Please set up gateways first.")
-            else:
-                selected_gateway = st.selectbox(
-                    "Select gateway to test:",
-                    options=configs,
-                    format_func=lambda x: f"{x} ({manager.get_config(x).base_url if manager.get_config(x) else 'Error'})",
-                )
-
-                if st.button("🔌 Test Connection", use_container_width=True):
-                    config = manager.get_config(selected_gateway)
-                    if config:
-                        with st.spinner(f"Testing connection to {config.name}..."):
-                            try:
-                                progress_bar = st.progress(0)
-                                status_text = st.empty()
-
-                                status_text.text("Creating client...")
-                                progress_bar.progress(25)
-
-                                client = IgnitionGatewayClient(config=config)
-
-                                status_text.text("Connecting...")
-                                progress_bar.progress(50)
-
-                                if client.connect():
-                                    status_text.text("Getting gateway information...")
-                                    progress_bar.progress(75)
-
-                                    info = client.get_gateway_info()
-
-                                    progress_bar.progress(100)
-                                    status_text.text("Connection successful!")
-
-                                    st.success(
-                                        "✅ Connection established successfully!"
-                                    )
-
-                                    if info:
-                                        st.subheader("Gateway Information")
-
-                                        # Display gateway info in columns
-                                        col1, col2 = st.columns(2)
-
-                                        with col1:
-                                            for key, value in info.items():
-                                                if (
-                                                    key != "gateway_info_raw"
-                                                    and isinstance(
-                                                        value, str | int | float | bool
-                                                    )
-                                                ):
-                                                    st.metric(
-                                                        key.replace("_", " ").title(),
-                                                        str(value),
-                                                    )
-
-                                        with col2:
-                                            if "gateway_info_raw" in info:
-                                                st.text_area(
-                                                    "Raw Gateway Data",
-                                                    str(info["gateway_info_raw"])[:500]
-                                                    + "...",
-                                                )
-
-                                    client.disconnect()
-                                else:
-                                    progress_bar.progress(100)
-                                    status_text.text("Connection failed!")
-                                    st.error("❌ Connection failed")
-
-                            except Exception as e:
-                                st.error(f"❌ Connection error: {e!s}")
-
-                                # Provide troubleshooting tips
-                                with st.expander("🔧 Troubleshooting Tips"):
-                                    st.markdown(
-                                        """
-                                    **Common issues:**
-                                    - **Connection refused**: Gateway may not be running or accessible
-                                    - **SSL/TLS errors**: Try disabling SSL verification for development
-                                    - **Authentication failed**: Check username and password
-                                    - **Timeout**: Gateway may be slow or network issues
-
-                                    **Next steps:**
-                                    1. Verify gateway is running and accessible
-                                    2. Check network connectivity
-                                    3. Validate credentials
-                                    4. Try the CLI: `ign gateway test`
-                                    """
-                                    )
-
-        with tab3:
-            st.subheader("Health Check")
-
-            configs = manager.list_configs()
-            if not configs:
-                st.info("No gateways configured. Please set up gateways first.")
-            else:
-                # Option to check all gateways or specific one
-                check_all = st.checkbox("Check all gateways", value=False)
-
-                if check_all:
-                    if st.button(
-                        "🏥 Check All Gateways Health", use_container_width=True
-                    ):
-                        with st.spinner("Checking health of all gateways..."):
-                            try:
-                                from src.ignition.gateway.client import (
-                                    GatewayConnectionPool,
-                                )
-
-                                pool = GatewayConnectionPool()
-                                for config_name in configs:
-                                    pool.add_client(config_name)
-
-                                health_results = pool.health_check_all()
-
-                                # Display results
-                                for gateway_name, health_data in health_results.items():
-                                    status = health_data.get(
-                                        "overall_status", "unknown"
-                                    )
-
-                                    if status == "healthy":
-                                        st.success(f"✅ **{gateway_name}** - Healthy")
-                                    elif status == "warning":
-                                        st.warning(f"⚠️ **{gateway_name}** - Warning")
-                                    else:
-                                        st.error(f"❌ **{gateway_name}** - Unhealthy")
-
-                                    # Show detailed checks
-                                    with st.expander(f"Details for {gateway_name}"):
-                                        checks = health_data.get("checks", {})
-                                        for check_name, check_result in checks.items():
-                                            check_status = check_result.get(
-                                                "status", "unknown"
-                                            )
-                                            details = check_result.get("details", "")
-                                            value_ms = check_result.get(
-                                                "value_ms", None
-                                            )
-
-                                            check_display = f"{check_name.replace('_', ' ').title()}"
-                                            if value_ms:
-                                                check_display += f" ({value_ms}ms)"
-                                            if details:
-                                                check_display += f": {details}"
-
-                                            if check_status == "healthy":
-                                                st.success(f"✅ {check_display}")
-                                            elif check_status == "warning":
-                                                st.warning(f"⚠️ {check_display}")
-                                            else:
-                                                st.error(f"❌ {check_display}")
-                            except Exception as e:
-                                st.error(f"❌ Health check failed: {e!s}")
+            try:
+                configs = manager.list_configs()  # type: ignore[attr-defined]
+                if not configs:
+                    st.info("No gateways configured. Please set up gateways first.")
                 else:
                     selected_gateway = st.selectbox(
-                        "Select gateway for health check:",
+                        "Select gateway to test:",
                         options=configs,
                         format_func=lambda x: f"{x} ({manager.get_config(x).base_url if manager.get_config(x) else 'Error'})",
                     )
 
-                    if st.button("🏥 Check Health", use_container_width=True):
+                    if st.button("🔌 Test Connection", use_container_width=True):
                         config = manager.get_config(selected_gateway)
                         if config:
-                            with st.spinner(f"Checking health of {config.name}..."):
+                            with st.spinner(f"Testing connection to {config.name}..."):
                                 try:
-                                    with IgnitionGatewayClient(config=config) as client:
-                                        health_data = client.health_check()
+                                    progress_bar = st.progress(0)
+                                    status_text = st.empty()
 
-                                        # Overall status
+                                    status_text.text("Creating client...")
+                                    progress_bar.progress(25)
+
+                                    client = IgnitionGatewayClient(config=config)  # type: ignore[arg-type]
+
+                                    status_text.text("Connecting...")
+                                    progress_bar.progress(50)
+
+                                    if client.connect():
+                                        status_text.text(
+                                            "Getting gateway information..."
+                                        )
+                                        progress_bar.progress(75)
+
+                                        info = client.get_gateway_info()
+
+                                        progress_bar.progress(100)
+                                        status_text.text("Connection successful!")
+
+                                        st.success(
+                                            "✅ Connection established successfully!"
+                                        )
+
+                                        if info:
+                                            st.subheader("Gateway Information")
+
+                                            # Display gateway info in columns
+                                            col1, col2 = st.columns(2)
+
+                                            with col1:
+                                                for key, value in info.items():
+                                                    if (
+                                                        key != "gateway_info_raw"
+                                                        and isinstance(
+                                                            value,
+                                                            str | int | float | bool,
+                                                        )
+                                                    ):
+                                                        st.metric(
+                                                            key.replace(
+                                                                "_", " "
+                                                            ).title(),
+                                                            str(value),
+                                                        )
+
+                                            with col2:
+                                                if "gateway_info_raw" in info:
+                                                    st.text_area(
+                                                        "Raw Gateway Data",
+                                                        str(info["gateway_info_raw"])[
+                                                            :500
+                                                        ]
+                                                        + "...",
+                                                    )
+
+                                        client.disconnect()
+                                    else:
+                                        progress_bar.progress(100)
+                                        status_text.text("Connection failed!")
+                                        st.error("❌ Connection failed")
+
+                                except Exception as e:
+                                    st.error(f"❌ Connection error: {e!s}")
+
+                                    # Provide troubleshooting tips
+                                    with st.expander("🔧 Troubleshooting Tips"):
+                                        st.markdown(
+                                            """
+                                        **Common issues:**
+                                        - **Connection refused**: Gateway may not be running or accessible
+                                        - **SSL/TLS errors**: Try disabling SSL verification for development
+                                        - **Authentication failed**: Check username and password
+                                        - **Timeout**: Gateway may be slow or network issues
+
+                                        **Next steps:**
+                                        1. Verify gateway is running and accessible
+                                        2. Check network connectivity
+                                        3. Validate credentials
+                                        4. Try the CLI: `ign gateway test`
+                                        """
+                                        )
+
+            except Exception as e:
+                st.error("❌ Gateway system not available")
+                st.error(f"Import error: {e!s}")
+                st.info(
+                    "Make sure the gateway modules are properly installed and accessible."
+                )
+
+        with tab3:
+            st.subheader("Health Check")
+
+            try:
+                configs = manager.list_configs()  # type: ignore[attr-defined]
+                if not configs:
+                    st.info("No gateways configured. Please set up gateways first.")
+                else:
+                    # Option to check all gateways or specific one
+                    check_all = st.checkbox("Check all gateways", value=False)
+
+                    if check_all:
+                        if st.button(
+                            "🏥 Check All Gateways Health", use_container_width=True
+                        ):
+                            with st.spinner("Checking health of all gateways..."):
+                                try:
+                                    from src.ignition.gateway.client import (
+                                        GatewayConnectionPool,  # type: ignore[import]
+                                    )
+
+                                    pool = GatewayConnectionPool()
+                                    for config_name in configs:
+                                        pool.add_client(config_name)
+
+                                    health_results = pool.health_check_all()
+
+                                    # Display results
+                                    for (
+                                        gateway_name,
+                                        health_data,
+                                    ) in health_results.items():
                                         status = health_data.get(
                                             "overall_status", "unknown"
                                         )
-                                        timestamp = health_data.get(
-                                            "timestamp", "unknown"
-                                        )
 
                                         if status == "healthy":
-                                            st.success("✅ **Overall Status: HEALTHY**")
+                                            st.success(
+                                                f"✅ **{gateway_name}** - Healthy"
+                                            )
                                         elif status == "warning":
-                                            st.warning("⚠️ **Overall Status: WARNING**")
+                                            st.warning(
+                                                f"⚠️ **{gateway_name}** - Warning"
+                                            )
                                         else:
-                                            st.error("❌ **Overall Status: UNHEALTHY**")
-
-                                        st.info(f"🕐 Timestamp: {timestamp}")
-
-                                        # Detailed health checks
-                                        st.subheader("Detailed Health Checks")
-
-                                        checks = health_data.get("checks", {})
-                                        for check_name, check_result in checks.items():
-                                            check_status = check_result.get(
-                                                "status", "unknown"
-                                            )
-                                            details = check_result.get("details", "")
-                                            value_ms = check_result.get(
-                                                "value_ms", None
+                                            st.error(
+                                                f"❌ **{gateway_name}** - Unhealthy"
                                             )
 
-                                            with st.container():
-                                                col1, col2 = st.columns([1, 3])
+                                        # Show detailed checks
+                                        with st.expander(f"Details for {gateway_name}"):
+                                            checks = health_data.get("checks", {})
+                                            for (
+                                                check_name,
+                                                check_result,
+                                            ) in checks.items():
+                                                check_status = check_result.get(
+                                                    "status", "unknown"
+                                                )
+                                                details = check_result.get(
+                                                    "details", ""
+                                                )
+                                                value_ms = check_result.get(
+                                                    "value_ms", None
+                                                )
 
-                                                with col1:
-                                                    if check_status == "healthy":
-                                                        st.success("✅")
-                                                    elif check_status == "warning":
-                                                        st.warning("⚠️")
-                                                    else:
-                                                        st.error("❌")
+                                                check_display = f"{check_name.replace('_', ' ').title()}"
+                                                if value_ms:
+                                                    check_display += f" ({value_ms}ms)"
+                                                if details:
+                                                    check_display += f": {details}"
 
-                                                with col2:
-                                                    check_display = check_name.replace(
-                                                        "_", " "
-                                                    ).title()
-                                                    if value_ms:
-                                                        check_display += (
-                                                            f" ({value_ms}ms)"
-                                                        )
-
-                                                    st.write(f"**{check_display}**")
-                                                    if details:
-                                                        st.caption(details)
+                                                if check_status == "healthy":
+                                                    st.success(f"✅ {check_display}")
+                                                elif check_status == "warning":
+                                                    st.warning(f"⚠️ {check_display}")
+                                                else:
+                                                    st.error(f"❌ {check_display}")
                                 except Exception as e:
                                     st.error(f"❌ Health check failed: {e!s}")
+                    else:
+                        selected_gateway = st.selectbox(
+                            "Select gateway for health check:",
+                            options=configs,
+                            format_func=lambda x: f"{x} ({manager.get_config(x).base_url if manager.get_config(x) else 'Error'})",
+                        )
+
+                        if st.button("🏥 Check Health", use_container_width=True):
+                            config = manager.get_config(selected_gateway)
+                            if config:
+                                with st.spinner(f"Checking health of {config.name}..."):
+                                    try:
+                                        with IgnitionGatewayClient(config=config) as client:  # type: ignore[arg-type,attr-defined]
+                                            health_data = client.health_check()
+
+                                            # Overall status
+                                            status = health_data.get(
+                                                "overall_status", "unknown"
+                                            )
+                                            timestamp = health_data.get(
+                                                "timestamp", "unknown"
+                                            )
+
+                                            if status == "healthy":
+                                                st.success(
+                                                    "✅ **Overall Status: HEALTHY**"
+                                                )
+                                            elif status == "warning":
+                                                st.warning(
+                                                    "⚠️ **Overall Status: WARNING**"
+                                                )
+                                            else:
+                                                st.error(
+                                                    "❌ **Overall Status: UNHEALTHY**"
+                                                )
+
+                                            st.info(f"🕐 Timestamp: {timestamp}")
+
+                                            # Detailed health checks
+                                            st.subheader("Detailed Health Checks")
+
+                                            checks = health_data.get("checks", {})
+                                            for (
+                                                check_name,
+                                                check_result,
+                                            ) in checks.items():
+                                                check_status = check_result.get(
+                                                    "status", "unknown"
+                                                )
+                                                details = check_result.get(
+                                                    "details", ""
+                                                )
+                                                value_ms = check_result.get(
+                                                    "value_ms", None
+                                                )
+
+                                                with st.container():
+                                                    col1, col2 = st.columns([1, 3])
+
+                                                    with col1:
+                                                        if check_status == "healthy":
+                                                            st.success("✅")
+                                                        elif check_status == "warning":
+                                                            st.warning("⚠️")
+                                                        else:
+                                                            st.error("❌")
+
+                                                    with col2:
+                                                        check_display = (
+                                                            check_name.replace(
+                                                                "_", " "
+                                                            ).title()
+                                                        )
+                                                        if value_ms:
+                                                            check_display += (
+                                                                f" ({value_ms}ms)"
+                                                            )
+
+                                                        st.write(f"**{check_display}**")
+                                                        if details:
+                                                            st.caption(details)
+                                    except Exception as e:
+                                        st.error(f"❌ Health check failed: {e!s}")
+
+            except Exception as e:
+                st.error("❌ Gateway system not available")
+                st.error(f"Import error: {e!s}")
+                st.info(
+                    "Make sure the gateway modules are properly installed and accessible."
+                )
 
         with tab4:
             st.subheader("Gateway Configuration")
@@ -1050,7 +1123,7 @@ def render_gateways_page() -> None:
                 "🔍 Check Environment Configuration", use_container_width=True
             ):
                 try:
-                    configs = manager.list_configs()
+                    configs = manager.list_configs()  # type: ignore[attr-defined]
 
                     if configs:
                         st.success(f"✅ Found {len(configs)} configured gateway(s)")

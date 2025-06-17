@@ -46,7 +46,7 @@ class RefactoringResult:
     backup_location: str
     success: bool
     error_message: str | None = None
-    validation_results: dict[str, Any] = None
+    validation_results: dict[str, Any] | None = None
     rollback_available: bool = True
 
 
@@ -57,7 +57,7 @@ class ValidationResult:
     validation_type: str
     success: bool
     message: str
-    details: dict[str, Any] = None
+    details: dict[str, Any] | None = None
 
 
 class RefactoringWorkflow:
@@ -314,7 +314,7 @@ class RefactoringWorkflow:
 
     def _validate_final_workflow(self, workflow_state: dict) -> ValidationResult:
         """Perform final validation of the entire workflow."""
-        details = {
+        details: dict[str, Any] = {
             "operations_completed": len(workflow_state["completed_operations"]),
             "operations_failed": len(workflow_state["failed_operations"]),
             "files_modified": len(workflow_state["modified_files"]),
