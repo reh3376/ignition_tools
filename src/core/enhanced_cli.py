@@ -2476,6 +2476,16 @@ except ImportError as e:
     console.print(f"⚠️ Analytics commands not available: {e}", style="yellow")
 
 
+# Import and add workflow commands
+try:
+    from src.ignition.code_intelligence.workflow_cli import workflow_group
+
+    # Add workflow commands to the code group
+    code.add_command(workflow_group)
+except ImportError as e:
+    console.print(f"⚠️ Workflow commands not available: {e}", style="yellow")
+
+
 # AI Assistant Enhancement commands
 @code.group(name="ai")
 def ai_assistant():
