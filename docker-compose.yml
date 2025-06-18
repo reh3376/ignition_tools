@@ -14,7 +14,7 @@
 #   python3 scripts/run_tests.py --all
 #   python3 scripts/monitor_logs.py --live
 #
-version: '3.8'
+version: "3.8"
 
 services:
   # Neo4j Graph Database - AI Assistant Persistent Memory
@@ -22,15 +22,15 @@ services:
     image: neo4j:5.15-community
     container_name: ign-scripts-neo4j
     ports:
-      - "7474:7474"  # HTTP
-      - "7687:7687"  # Bolt
+      - "7474:7474" # HTTP
+      - "7687:7687" # Bolt
     environment:
       NEO4J_AUTH: neo4j/ignition-graph
       NEO4J_PLUGINS: '["apoc"]'
-      NEO4J_apoc_export_file_enabled: 'true'
-      NEO4J_apoc_import_file_enabled: 'true'
-      NEO4J_apoc_import_file_use__neo4j__config: 'true'
-      NEO4J_ACCEPT_LICENSE_AGREEMENT: 'yes'
+      NEO4J_apoc_export_file_enabled: "true"
+      NEO4J_apoc_import_file_enabled: "true"
+      NEO4J_apoc_import_file_use__neo4j__config: "true"
+      NEO4J_ACCEPT_LICENSE_AGREEMENT: "yes"
     volumes:
       - ./graph-data/data:/data
       - ./graph-data/logs:/logs
@@ -48,13 +48,219 @@ services:
         max-size: "10m"
         max-file: "3"
 
+  # Supabase PostgreSQL Database - Relational Data Storage
+  supabase-db:
+    image: postgres:15-alpine
+    container_name: ign-scripts-supabase-db
+    ports:
+      - "5432:5432" # PostgreSQL
+    environment:
+      POSTGRES_DB: ${SUPABASE_DB_NAME:-ignition}
+      POSTGRES_USER: ${SUPABASE_DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${SUPABASE_DB_PASSWORD:-ignition-supabase}
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - ./supabase-data/db:/var/lib/postgresql/data
+      - ./supabase-data/init:/docker-entrypoint-initdb.d
+      - ./supabase-data/backups:/backups
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${SUPABASE_DB_USER:-postgres} -d ${SUPABASE_DB_NAME:-ignition}",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Supabase API Gateway - REST and GraphQL APIs
+  supabase-api:
+    image: supabase/gotrue:v2.99.0
+    container_name: ign-scripts-supabase-api
+    ports:
+      - "8000:8000" # API Gateway
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 8000
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://${SUPABASE_DB_USER:-postgres}:${SUPABASE_DB_PASSWORD:-ignition-supabase}@supabase-db:5432/${SUPABASE_DB_NAME:-ignition}?sslmode=disable
+      GOTRUE_SITE_URL: ${SUPABASE_SITE_URL:-http://localhost:3000}
+      GOTRUE_URI_ALLOW_LIST: ${SUPABASE_URI_ALLOW_LIST:-http://localhost:3000,http://localhost:8501,http://localhost:8502}
+      GOTRUE_JWT_SECRET: ${SUPABASE_JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
+      GOTRUE_JWT_EXP: 3600
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_ADMIN_GROUP_NAME: service_role
+      GOTRUE_DISABLE_SIGNUP: false
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: true
+      GOTRUE_MAILER_AUTOCONFIRM: true
+      GOTRUE_LOG_LEVEL: info
+    depends_on:
+      - supabase-db
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8000/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Supabase PostgREST - Auto-generated REST API
+  supabase-rest:
+    image: postgrest/postgrest:v11.2.0
+    container_name: ign-scripts-supabase-rest
+    ports:
+      - "3000:3000" # REST API
+    environment:
+      PGRST_DB_URI: postgres://${SUPABASE_DB_USER:-postgres}:${SUPABASE_DB_PASSWORD:-ignition-supabase}@supabase-db:5432/${SUPABASE_DB_NAME:-ignition}
+      PGRST_DB_SCHEMAS: public,auth
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${SUPABASE_JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
+      PGRST_DB_USE_LEGACY_GUCS: false
+      PGRST_APP_SETTINGS_JWT_SECRET: ${SUPABASE_JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
+      PGRST_APP_SETTINGS_JWT_EXP: 3600
+    depends_on:
+      - supabase-db
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3000/",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Supabase Real-time - WebSocket subscriptions
+  supabase-realtime:
+    image: supabase/realtime:v2.25.35
+    container_name: ign-scripts-supabase-realtime
+    ports:
+      - "4000:4000" # Real-time WebSocket
+    environment:
+      PORT: 4000
+      DB_HOST: supabase-db
+      DB_PORT: 5432
+      DB_USER: ${SUPABASE_DB_USER:-postgres}
+      DB_PASSWORD: ${SUPABASE_DB_PASSWORD:-ignition-supabase}
+      DB_NAME: ${SUPABASE_DB_NAME:-ignition}
+      DB_AFTER_CONNECT_QUERY: "SET search_path TO _realtime"
+      DB_ENC_KEY: supabaserealtime
+      API_JWT_SECRET: ${SUPABASE_JWT_SECRET:-super-secret-jwt-token-with-at-least-32-characters-long}
+      FLY_ALLOC_ID: fly123
+      FLY_APP_NAME: realtime
+      SECRET_KEY_BASE: UpNVntn3cDxHJpq99YMc1T1AQgQpc8kfYTuRgBiYa15BLrx8etQoXz3gZv1/u2oq
+      ERL_AFLAGS: -proto_dist inet_tcp
+      ENABLE_TAILSCALE: false
+      DNS_NODES: "''"
+    depends_on:
+      - supabase-db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Supabase Studio - Database Management Dashboard
+  supabase-studio:
+    image: supabase/studio:20240101-ce42139
+    container_name: ign-scripts-supabase-studio
+    ports:
+      - "3001:3000" # Studio Dashboard
+    environment:
+      STUDIO_PG_META_URL: http://supabase-meta:8080
+      POSTGRES_PASSWORD: ${SUPABASE_DB_PASSWORD:-ignition-supabase}
+      DEFAULT_ORGANIZATION_NAME: ${SUPABASE_ORG_NAME:-IGN Scripts}
+      DEFAULT_PROJECT_NAME: ${SUPABASE_PROJECT_NAME:-IGN Scripts Development}
+      SUPABASE_URL: http://supabase-api:8000
+      SUPABASE_REST_URL: http://supabase-rest:3000
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0}
+      SUPABASE_SERVICE_KEY: ${SUPABASE_SERVICE_KEY:-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU}
+      LOGFLARE_API_KEY: ${LOGFLARE_API_KEY:-your-logflare-api-key}
+      LOGFLARE_URL: ${LOGFLARE_URL:-http://localhost:4000}
+      NEXT_PUBLIC_ENABLE_LOGS: true
+    depends_on:
+      - supabase-db
+      - supabase-meta
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Supabase Meta - Database metadata and migrations
+  supabase-meta:
+    image: supabase/postgres-meta:v0.68.0
+    container_name: ign-scripts-supabase-meta
+    ports:
+      - "8080:8080" # Meta API
+    environment:
+      PG_META_PORT: 8080
+      PG_META_DB_HOST: supabase-db
+      PG_META_DB_PORT: 5432
+      PG_META_DB_NAME: ${SUPABASE_DB_NAME:-ignition}
+      PG_META_DB_USER: ${SUPABASE_DB_USER:-postgres}
+      PG_META_DB_PASSWORD: ${SUPABASE_DB_PASSWORD:-ignition-supabase}
+    depends_on:
+      - supabase-db
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
   # MCP Docker Service
   mcp:
     image: ghcr.io/reh3376/mcp:latest
     container_name: ign-scripts-mcp
     ports:
-      - "8080:8080"  # MCP API
-      - "8081:8081"  # MCP Web UI
+      - "8080:8080" # MCP API
+      - "8081:8081" # MCP Web UI
     environment:
       MCP_API_KEY: ${MCP_API_KEY:-default_key}
       MCP_ADMIN_USER: ${MCP_ADMIN_USER:-admin}
@@ -80,7 +286,7 @@ services:
     image: ghcr.io/reh3376/mcp-tools:latest
     container_name: ign-scripts-mcp-tools
     ports:
-      - "8082:8082"  # MCP Tools API
+      - "8082:8082" # MCP Tools API
     environment:
       MCP_TOOLS_API_KEY: ${MCP_TOOLS_API_KEY:-default_tools_key}
       MCP_TOOLS_LOG_LEVEL: INFO
@@ -126,7 +332,19 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    command: ["python", "-m", "pytest", "tests/", "-v", "--tb=short", "--log-cli-level=INFO", "--cov=src", "--cov-report=html:/app/coverage-reports/", "--html=/app/test-results/report.html"]
+    command:
+      [
+        "python",
+        "-m",
+        "pytest",
+        "tests/",
+        "-v",
+        "--tb=short",
+        "--log-cli-level=INFO",
+        "--cov=src",
+        "--cov-report=html:/app/coverage-reports/",
+        "--html=/app/test-results/report.html",
+      ]
 
   ign-scripts-dev:
     build:
@@ -150,7 +368,16 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    command: ["streamlit", "run", "src/ui/streamlit_app.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
+    command:
+      [
+        "streamlit",
+        "run",
+        "src/ui/streamlit_app.py",
+        "--server.port",
+        "8501",
+        "--server.address",
+        "0.0.0.0",
+      ]
 
   ign-scripts-benchmark:
     build:
@@ -159,7 +386,7 @@ services:
     container_name: ign_scripts_benchmark
     environment:
       - PYTHONPATH=/app
-      - PYTHONUNBUFFERED=1
+      - PYTHUNBUFFERED=1
       - LOG_LEVEL=INFO
     volumes:
       - ./tests:/app/tests
@@ -171,4 +398,13 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-    command: ["python", "-m", "pytest", "tests/test_performance.py", "-v", "--benchmark-only", "--benchmark-json=/app/test-results/benchmark.json"]
+    command:
+      [
+        "python",
+        "-m",
+        "pytest",
+        "tests/test_performance.py",
+        "-v",
+        "--benchmark-only",
+        "--benchmark-json=/app/test-results/benchmark.json",
+      ]

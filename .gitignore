@@ -483,3 +483,4 @@ build/
 scripts/opcua_test_config.env
 opcua_test_config.env
 *.opcua.env
+tools/

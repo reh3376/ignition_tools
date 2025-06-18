@@ -58,6 +58,9 @@ Explore usage patterns, get recommendations, and view analytics.
 #### 🔗 Gateway Connections (`gateway`)
 Manage connections to Ignition gateways for testing and deployment.
 
+#### 📦 Import/Export (`import`/`export`)
+Import and export Ignition projects with comprehensive validation.
+
 #### 🗄️ Database Backup (`backup`)
 Manage Neo4j database backups and restore operations.
 
@@ -199,6 +202,123 @@ Discover available endpoints on a gateway.
 ```bash
 # Launch endpoint discovery tool
 python -m src.core.enhanced_cli gateway discover
+
+## 📦 Import/Export Commands ✅ **NEW**
+
+### `ign import-project`
+Import Ignition projects with comprehensive validation and multiple deployment modes.
+
+#### Basic Usage
+```bash
+# Import project with default merge mode
+python -m src.core.enhanced_cli import-project test_project.json test_project
+
+# Import with overwrite mode (replaces existing project)
+python -m src.core.enhanced_cli import-project project.proj MyProject --mode overwrite
+
+# Dry run to test import without making changes
+python -m src.core.enhanced_cli import-project backup.gwbk ProjectName --dry-run
+
+# Skip conflicts mode (conservative approach)
+python -m src.core.enhanced_cli import-project export.zip NewProject --mode skip_conflicts
+```
+
+#### Import Modes
+- **`merge`** (default): Merge resources with existing project
+- **`overwrite`**: Replace existing project completely
+- **`skip_conflicts`**: Skip conflicting resources
+
+#### Supported File Formats
+- `.proj` - Project export files
+- `.gwbk` - Gateway backup files
+- `.json` - JSON export files
+- `.zip` - Compressed export files
+
+#### Features
+- **Rich Terminal Output**: Beautiful colored panels and progress indicators
+- **Comprehensive Validation**: File format, size, and type validation
+- **Dry Run Capability**: Test imports without making changes
+- **Error Handling**: Graceful handling with detailed error messages
+- **Import Tracking**: Unique import job IDs for tracking
+
+#### Sample Output
+```
+╭─────────────────── Import Configuration ───────────────────╮
+│ File: test_project.json                                     │
+│ Project: test_project                                       │
+│ Mode: MERGE                                                 │
+│ Dry Run: Yes                                               │
+╰─────────────────────────────────────────────────────────────╯
+
+✅ Import completed successfully!
+Import ID: d216aaa7-973e-4729-95b9-b67122c5b806
+Execution time: 0.00s
+
+📊 Import Summary:
+• projects: 1 items
+```
+
+### `ign validate-import`
+Validate import files before importing with detailed issue reporting.
+
+#### Basic Usage
+```bash
+# Validate a project file
+python -m src.core.enhanced_cli validate-import test_project.json
+
+# Validate gateway backup
+python -m src.core.enhanced_cli validate-import backup.gwbk
+
+# Validate compressed export
+python -m src.core.enhanced_cli validate-import project_export.zip
+```
+
+#### Validation Checks
+- **File Format**: Validates file extension and structure
+- **File Size**: Checks file size limits and accessibility
+- **File Type Detection**: Automatically detects project, gateway backup, or resource files
+- **Content Structure**: Basic structural validation
+
+#### Validation Severity Levels
+- **CRITICAL**: Issues that prevent import
+- **ERROR**: Serious issues that may cause import failure
+- **WARNING**: Issues that may cause problems but allow import
+- **INFO**: Informational messages about the import file
+
+#### Sample Output
+```
+╭──────────────── Validation Results ────────────────╮
+│ File: test_project.json                             │
+│ Status: ✅ Valid                                    │
+│ Type: unknown                                       │
+│ Issues: 0                                          │
+╰─────────────────────────────────────────────────────╯
+
+✅ File validation completed successfully
+No issues found - file is ready for import
+```
+
+#### Error Example
+```
+╭──────────────── Validation Results ────────────────╮
+│ File: corrupted.json                                │
+│ Status: ❌ Invalid                                  │
+│ Type: unknown                                       │
+│ Issues: 2                                          │
+╰─────────────────────────────────────────────────────╯
+
+❌ Validation Issues Found:
+
+🔴 CRITICAL: File does not exist or is not accessible
+   Context: file
+   Resource: corrupted.json
+
+🔴 CRITICAL: Cannot validate non-existent file
+   Context: file
+   Resource: corrupted.json
+
+❌ File validation failed - please resolve issues before importing
+```
 
 ## 🗄️ Database Backup Commands
 

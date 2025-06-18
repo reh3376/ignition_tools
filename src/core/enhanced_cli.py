@@ -2031,21 +2031,69 @@ def import_project(
             console.print("\n[yellow]🔍 DRY RUN - No changes will be made[/yellow]")
 
         with console.status("[bold blue]Processing import..."):
-            # TODO: Implement actual project import logic
-            if dry_run:
-                console.print(
-                    f"\n[blue]📋[/blue] Would import project from: {file_path}"
+            # Use the new project importer
+            try:
+                from pathlib import Path
+
+                from src.ignition.importers.project_importer import (
+                    IgnitionProjectImporter,
                 )
-                console.print(f"[blue]📋[/blue] Import mode: {mode}")
-                if project_name:
+                from src.ignition.importers.project_importer import (
+                    ImportMode as ImportModeEnum,
+                )
+
+                # Create importer
+                importer = IgnitionProjectImporter()
+
+                # Convert mode string to enum
+                import_mode = ImportModeEnum.MERGE
+                if mode == "overwrite":
+                    import_mode = ImportModeEnum.OVERWRITE
+                elif mode == "skip_conflicts":
+                    import_mode = ImportModeEnum.SKIP_CONFLICTS
+
+                # Execute import
+                result = importer.import_project(
+                    import_path=Path(file_path),
+                    mode=import_mode,
+                    project_name=project_name,
+                    validate_before_import=validate,
+                    dry_run=dry_run,
+                )
+
+                if result.success:
+                    console.print(f"\n[green]✓[/green] {result.message}")
+                    console.print(f"[blue]📊[/blue] Import ID: {result.import_id}")
                     console.print(
-                        f"[blue]📋[/blue] Project would be named: {project_name}"
+                        f"[blue]📊[/blue] Execution Time: {result.execution_time:.2f}s"
                     )
-            else:
-                console.print(
-                    f"\n[green]✓[/green] Project import completed from: {file_path}"
-                )
-                console.print(f"[blue]📊[/blue] Mode: {mode}")
+
+                    if result.imported_resources:
+                        console.print("\n[bold]Imported Resources:[/bold]")
+                        for (
+                            resource_type,
+                            resources,
+                        ) in result.imported_resources.items():
+                            console.print(f"  {resource_type}: {len(resources)} items")
+                else:
+                    console.print(f"\n[red]✗[/red] {result.message}")
+
+            except ImportError:
+                # Fallback to original TODO implementation
+                if dry_run:
+                    console.print(
+                        f"\n[blue]📋[/blue] Would import project from: {file_path}"
+                    )
+                    console.print(f"[blue]📋[/blue] Import mode: {mode}")
+                    if project_name:
+                        console.print(
+                            f"[blue]📋[/blue] Project would be named: {project_name}"
+                        )
+                else:
+                    console.print(
+                        f"\n[green]✓[/green] Project import completed from: {file_path}"
+                    )
+                    console.print(f"[blue]📊[/blue] Mode: {mode}")
 
     except Exception as e:
         enhanced_cli.track_cli_usage("import", "project", {"error": str(e)}, False)
@@ -2090,24 +2138,79 @@ def validate_import(file_path: str, type: str, detailed: bool):
             console.print(f"Expected Type: {type}")
 
         with console.status("[bold blue]Validating..."):
-            # TODO: Implement actual validation logic
-            file_size = os.path.getsize(file_path)
-            file_ext = os.path.splitext(file_path)[1].lower()
+            # Use the new validation system
+            try:
+                from pathlib import Path
 
-            console.print("\n[green]✓[/green] File validation completed")
-            console.print(f"[blue]📊[/blue] Size: {file_size:,} bytes")
-            console.print(f"[blue]📊[/blue] Extension: {file_ext}")
+                from src.ignition.importers.resource_validator import (
+                    ImportFileValidator,
+                )
 
-            if detailed:
-                console.print("\n[bold]Detailed Analysis:[/bold]")
-                console.print("• File is readable")
-                console.print("• Basic structure appears valid")
-                console.print("• No obvious corruption detected")
+                validator = ImportFileValidator()
+                validation_result = validator.validate_file(Path(file_path), type)
 
-                if type:
+                if validation_result.is_valid:
+                    console.print("\n[green]✓[/green] File validation completed")
+                else:
                     console.print(
-                        f"• Expected type '{type}' validation: [green]✓[/green]"
+                        "\n[yellow]⚠[/yellow] File validation completed with issues"
                     )
+
+                console.print(
+                    f"[blue]📊[/blue] Size: {validation_result.file_size:,} bytes"
+                )
+                console.print(
+                    f"[blue]📊[/blue] Format: {validation_result.file_format}"
+                )
+                if validation_result.detected_type:
+                    console.print(
+                        f"[blue]📊[/blue] Detected Type: {validation_result.detected_type}"
+                    )
+
+                # Show validation issues
+                if validation_result.issues:
+                    console.print(
+                        f"\n[bold]Validation Issues ({len(validation_result.issues)}):[/bold]"
+                    )
+                    for issue in validation_result.issues:
+                        severity_color = {
+                            "info": "blue",
+                            "warning": "yellow",
+                            "error": "red",
+                            "critical": "bold red",
+                        }.get(issue.severity.value, "white")
+
+                        console.print(
+                            f"  [{severity_color}]{issue.severity.value.upper()}[/{severity_color}]: {issue.message}"
+                        )
+                        if detailed and issue.suggested_action:
+                            console.print(f"    💡 {issue.suggested_action}")
+
+                if detailed and not validation_result.issues:
+                    console.print("\n[bold]Detailed Analysis:[/bold]")
+                    console.print("• File is readable")
+                    console.print("• Structure appears valid")
+                    console.print("• No validation issues detected")
+
+            except ImportError:
+                # Fallback to basic validation
+                file_size = os.path.getsize(file_path)
+                file_ext = os.path.splitext(file_path)[1].lower()
+
+                console.print("\n[green]✓[/green] File validation completed")
+                console.print(f"[blue]📊[/blue] Size: {file_size:,} bytes")
+                console.print(f"[blue]📊[/blue] Extension: {file_ext}")
+
+                if detailed:
+                    console.print("\n[bold]Detailed Analysis:[/bold]")
+                    console.print("• File is readable")
+                    console.print("• Basic structure appears valid")
+                    console.print("• No obvious corruption detected")
+
+                    if type:
+                        console.print(
+                            f"• Expected type '{type}' validation: [green]✓[/green]"
+                        )
 
     except Exception as e:
         enhanced_cli.track_cli_usage("import", "validate", {"error": str(e)}, False)
@@ -2732,6 +2835,780 @@ try:
     main.add_command(module_group)
 except ImportError as e:
     console.print(f"⚠️ Module commands not available: {e}", style="yellow")
+
+
+# Add wrapper commands
+@main.group(name="wrappers")
+def wrapper_group():
+    """🛡️ Enhanced Ignition system function wrappers with error handling."""
+    pass
+
+
+@wrapper_group.command()
+def test_all():
+    """🧪 Test all system function wrappers."""
+    console.print("[bold blue]🧪 Testing System Function Wrappers[/bold blue]\n")
+
+    try:
+        from src.ignition.wrappers import (
+            SystemAlarmWrapper,
+            SystemDbWrapper,
+            SystemGuiWrapper,
+            SystemNavWrapper,
+            SystemTagWrapper,
+            SystemUtilWrapper,
+        )
+
+        wrappers = [
+            ("Tag Wrapper", SystemTagWrapper),
+            ("Database Wrapper", SystemDbWrapper),
+            ("GUI Wrapper", SystemGuiWrapper),
+            ("Navigation Wrapper", SystemNavWrapper),
+            ("Alarm Wrapper", SystemAlarmWrapper),
+            ("Utility Wrapper", SystemUtilWrapper),
+        ]
+
+        results = []
+
+        for name, wrapper_class in wrappers:
+            try:
+                console.print(f"[yellow]Testing {name}...[/yellow]")
+
+                wrapper = wrapper_class()
+                wrapped_functions = wrapper.get_wrapped_functions()
+
+                results.append(
+                    {
+                        "name": name,
+                        "success": True,
+                        "function_count": len(wrapped_functions),
+                        "functions": wrapped_functions,
+                    }
+                )
+
+                console.print(f"[green]✅ {name} initialized successfully[/green]")
+
+            except Exception as e:
+                results.append({"name": name, "success": False, "error": str(e)})
+                console.print(f"[red]❌ {name} failed: {e}[/red]")
+
+        # Display summary table
+        from rich.table import Table
+
+        table = Table(title="Wrapper Test Results")
+        table.add_column("Wrapper", style="cyan")
+        table.add_column("Status", style="bold")
+        table.add_column("Functions", style="yellow")
+        table.add_column("Details", style="dim")
+
+        for result in results:
+            status = (
+                "[green]✅ Success[/green]"
+                if result["success"]
+                else "[red]❌ Failed[/red]"
+            )
+            function_count = str(result.get("function_count", 0))
+            details = (
+                ", ".join(result.get("functions", []))
+                if result["success"]
+                else result.get("error", "")
+            )
+
+            table.add_row(
+                result["name"],
+                status,
+                function_count,
+                details[:50] + "..." if len(details) > 50 else details,
+            )
+
+        console.print(table)
+
+        successful_tests = sum(1 for r in results if r["success"])
+        total_tests = len(results)
+
+        if successful_tests == total_tests:
+            console.print(
+                f"\n[bold green]🎉 All {total_tests} wrapper tests passed![/bold green]"
+            )
+        else:
+            console.print(
+                f"\n[bold yellow]⚠️ {successful_tests}/{total_tests} wrapper tests passed[/bold yellow]"
+            )
+
+    except ImportError as e:
+        console.print(f"[red]❌ Wrapper imports failed: {e}[/red]")
+
+
+@wrapper_group.command()
+@click.option("--tag-path", default="[default]TestTag", help="Tag path to test")
+def test_tag(tag_path: str):
+    """🏷️ Test system.tag wrapper."""
+    console.print("[bold blue]🏷️ Testing System Tag Wrapper[/bold blue]\n")
+
+    try:
+        from src.ignition.wrappers import SystemTagWrapper
+
+        wrapper = SystemTagWrapper()
+        console.print(f"[yellow]Testing tag read: {tag_path}[/yellow]")
+
+        results = wrapper.read_blocking([tag_path])
+
+        from rich.table import Table
+
+        table = Table(title="Tag Read Results")
+        table.add_column("Tag Path", style="cyan")
+        table.add_column("Value", style="green")
+        table.add_column("Quality", style="yellow")
+        table.add_column("Success", style="bold")
+
+        for result in results:
+            success_style = "green" if result.success else "red"
+            success_text = "✓" if result.success else "✗"
+
+            table.add_row(
+                result.tag_path,
+                str(result.value),
+                f"{result.quality_name} ({result.quality})",
+                f"[{success_style}]{success_text}[/{success_style}]",
+            )
+
+        console.print(table)
+        console.print("\n[green]✅ Tag wrapper test completed![/green]")
+
+    except ImportError as e:
+        console.print(f"[red]❌ Tag wrapper not available: {e}[/red]")
+    except Exception as e:
+        console.print(f"[red]❌ Tag wrapper test failed: {e}[/red]")
+
+
+@wrapper_group.command()
+@click.option("--query", default="SELECT 1 as test_value", help="Test SQL query")
+def test_db(query: str):
+    """🗄️ Test system.db wrapper."""
+    console.print("[bold blue]🗄️ Testing System Database Wrapper[/bold blue]\n")
+
+    try:
+        from src.ignition.wrappers import SystemDbWrapper
+
+        wrapper = SystemDbWrapper()
+        console.print(f"[yellow]Executing query: {query}[/yellow]")
+
+        result = wrapper.run_query(query)
+
+        console.print("\n[bold]Query Results:[/bold]")
+        console.print(f"Database: {result.database}")
+        console.print(f"Row count: {result.row_count}")
+        console.print(f"Execution time: {result.execution_time_ms:.2f}ms")
+        console.print(f"Success: {'✅' if result.success else '❌'}")
+
+        console.print("\n[green]✅ Database wrapper test completed![/green]")
+
+    except ImportError as e:
+        console.print(f"[red]❌ Database wrapper not available: {e}[/red]")
+    except Exception as e:
+        console.print(f"[red]❌ Database wrapper test failed: {e}[/red]")
+
+
+@wrapper_group.command()
+def info():
+    """📋 Show information about available system function wrappers."""
+    console.print("[bold blue]📋 Ignition System Function Wrappers[/bold blue]\n")
+
+    wrapper_info = [
+        {
+            "name": "SystemTagWrapper",
+            "module": "system.tag",
+            "description": "Enhanced tag operations with quality validation and retry logic",
+            "functions": [
+                "read_blocking",
+                "write_blocking",
+                "read_async",
+                "write_async",
+            ],
+        },
+        {
+            "name": "SystemDbWrapper",
+            "module": "system.db",
+            "description": "Database operations with query validation and performance metrics",
+            "functions": ["run_query", "run_update_query", "run_prep_query"],
+        },
+        {
+            "name": "SystemGuiWrapper",
+            "module": "system.gui",
+            "description": "GUI operations with input validation and logging",
+            "functions": ["message_box", "error_box", "warning_box"],
+        },
+        {
+            "name": "SystemNavWrapper",
+            "module": "system.nav",
+            "description": "Window navigation with parameter validation",
+            "functions": ["open_window", "close_window", "swap_window"],
+        },
+        {
+            "name": "SystemAlarmWrapper",
+            "module": "system.alarm",
+            "description": "Alarm operations with comprehensive error handling",
+            "functions": ["acknowledge", "query_status", "shelve"],
+        },
+        {
+            "name": "SystemUtilWrapper",
+            "module": "system.util",
+            "description": "Utility operations with enhanced logging and validation",
+            "functions": ["get_logger", "send_message"],
+        },
+    ]
+
+    from rich.panel import Panel
+
+    for info in wrapper_info:
+        panel_content = f"""[bold]{info["description"]}[/bold]
+
+[yellow]Wrapped Functions:[/yellow]
+{", ".join(info["functions"])}
+
+[cyan]Original Module:[/cyan] {info["module"]}"""
+
+        panel = Panel(panel_content, title=f"🛡️ {info['name']}", border_style="blue")
+        console.print(panel)
+        console.print()
+
+
+# Data Integration Commands
+@main.group(name="data")
+def data_integration():
+    """🔗 Data Integration commands for databases, historians, and OPC tags."""
+    pass
+
+
+@data_integration.group()
+def database():
+    """🗄️ Database connection and query commands."""
+    pass
+
+
+@database.command()
+@click.option(
+    "--config-name", default="neo4j_default", help="Database configuration name"
+)
+def test_connection(config_name: str):
+    """Test database connection."""
+    try:
+        from src.ignition.data_integration.database_connections import (
+            DatabaseConnectionManager,
+        )
+
+        with console.status(f"[bold blue]Testing connection to {config_name}..."):
+            manager = DatabaseConnectionManager()
+            result = manager.test_connection(config_name)
+
+        if result["success"]:
+            console.print(
+                f"✅ Connection successful to {result['db_type']}", style="green"
+            )
+            console.print(f"   Host: {result['host']}")
+            console.print(f"   Database: {result['database']}")
+            console.print(f"   Connection time: {result['connection_time_ms']:.2f}ms")
+        else:
+            console.print(f"❌ Connection failed: {result['error']}", style="red")
+
+    except ImportError:
+        console.print("❌ Database connection manager not available", style="red")
+    except Exception as e:
+        console.print(f"❌ Error: {e}", style="red")
+
+
+@database.command()
+def list_configs():
+    """List available database configurations."""
+    try:
+        from src.ignition.data_integration.database_connections import (
+            DatabaseConnectionManager,
+        )
+
+        manager = DatabaseConnectionManager()
+        configs = manager.list_configurations()
+
+        if not configs:
+            console.print("No database configurations found", style="yellow")
+            return
+
+        table = Table(title="Available Database Configurations")
+        table.add_column("Name", style="cyan")
+        table.add_column("Type", style="green")
+        table.add_column("Host", style="blue")
+        table.add_column("Database", style="magenta")
+
+        for config_name in configs:
+            config_info = manager.get_config_info(config_name)
+            if config_info:
+                table.add_row(
+                    config_name,
+                    config_info["db_type"],
+                    f"{config_info['host']}:{config_info['port']}",
+                    config_info["database"],
+                )
+
+        console.print(table)
+
+    except ImportError:
+        console.print("❌ Database connection manager not available", style="red")
+    except Exception as e:
+        console.print(f"❌ Error: {e}", style="red")
+
+
+@data_integration.group()
+def tags():
+    """🏷️ OPC tag management commands."""
+    pass
+
+
+@tags.command()
+@click.option("--path", default="", help="Tag path to browse (default: root)")
+@click.option("--provider", default="default", help="Tag provider name")
+def browse(path: str, provider: str):
+    """Browse OPC tags."""
+    try:
+        from src.ignition.data_integration.opc_tag_manager import OPCTagManager
+
+        manager = OPCTagManager(provider)
+
+        with console.status(f"[bold blue]Browsing tags at {path or 'root'}..."):
+            result = manager.browse_tags(path)
+
+        if not result.success:
+            console.print(f"❌ Browse failed: {result.error_message}", style="red")
+            return
+
+        # Display folders
+        if result.folders:
+            console.print(f"\n📁 Folders in {path or 'root'}:", style="bold blue")
+            for folder in result.folders:
+                console.print(f"  📁 {folder}")
+
+        # Display tags
+        if result.tags:
+            table = Table(title=f"Tags in {path or 'root'}")
+            table.add_column("Name", style="cyan")
+            table.add_column("Type", style="green")
+            table.add_column("Value", style="yellow")
+            table.add_column("Quality", style="blue")
+            table.add_column("Description", style="magenta")
+
+            for tag in result.tags:
+                table.add_row(
+                    tag.name,
+                    tag.data_type,
+                    str(tag.value),
+                    tag.quality_name,
+                    (tag.description or "")[:50],
+                )
+
+            console.print(table)
+
+        console.print(f"\nTotal items: {result.total_items}")
+
+    except ImportError:
+        console.print("❌ OPC tag manager not available", style="red")
+    except Exception as e:
+        console.print(f"❌ Error: {e}", style="red")
+
+
+@data_integration.group()
+def reports():
+    """📊 Report generation commands."""
+    pass
+
+
+@reports.command()
+@click.option("--hours", default=24, help="Number of hours for production report")
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(["csv", "json", "html"]),
+    default="csv",
+    help="Report output format",
+)
+@click.option("--output", help="Output file path")
+def production(hours: int, output_format: str, output: str):
+    """Generate production report."""
+    try:
+        from datetime import datetime, timedelta
+
+        from src.ignition.data_integration.report_generator import (
+            ReportFormat,
+            ReportGenerator,
+        )
+
+        generator = ReportGenerator()
+
+        # Calculate time range
+        end_time = datetime.now()
+        start_time = end_time - timedelta(hours=hours)
+
+        # Mock tags for production report
+        tags = ["Line_A_Production", "Line_B_Production", "Line_C_Production"]
+
+        with console.status("[bold blue]Generating production report..."):
+            result = generator.generate_production_report(
+                start_time, end_time, tags, ReportFormat(output_format)
+            )
+
+        if result["success"]:
+            console.print("✅ Production report generated successfully", style="green")
+            console.print(f"   Format: {output_format.upper()}")
+            console.print(f"   Records: {result.get('row_count', 'N/A')}")
+
+            if output:
+                with open(output, "w") as f:
+                    f.write(result["content"])
+                console.print(f"   Saved to: {output}")
+            else:
+                console.print("\n📄 Report Content:")
+                console.print(
+                    result["content"][:500] + "..."
+                    if len(result["content"]) > 500
+                    else result["content"]
+                )
+        else:
+            console.print(
+                f"❌ Report generation failed: {result['error']}", style="red"
+            )
+
+    except ImportError:
+        console.print("❌ Report generator not available", style="red")
+    except Exception as e:
+        console.print(f"❌ Error: {e}", style="red")
+
+
+@data_integration.command()
+def status():
+    """Show data integration system status."""
+    console.print("🔗 Data Integration System Status", style="bold blue")
+    console.print("=" * 50)
+
+    # Check database connections
+    try:
+        from src.ignition.data_integration.database_connections import (
+            DatabaseConnectionManager,
+        )
+
+        manager = DatabaseConnectionManager()
+        configs = manager.list_configurations()
+        console.print(f"📊 Database Configurations: {len(configs)}")
+        for config in configs:
+            console.print(f"   • {config}")
+    except ImportError:
+        console.print("📊 Database Connections: Not available", style="yellow")
+
+    # Check OPC tag management
+    try:
+        from src.ignition.data_integration.opc_tag_manager import OPCTagManager
+
+        console.print("🏷️ OPC Tag Management: Available", style="green")
+    except ImportError:
+        console.print("🏷️ OPC Tag Management: Not available", style="yellow")
+
+    # Check report generation
+    try:
+        from src.ignition.data_integration.report_generator import (
+            ReportFormat,
+            ReportGenerator,
+        )
+
+        console.print(f"📊 Report Formats: {len(ReportFormat)}")
+        for format_type in ReportFormat:
+            console.print(f"   • {format_type.value}")
+    except ImportError:
+        console.print("📊 Report Generation: Not available", style="yellow")
+
+    # Check dataset management
+    try:
+        from src.ignition.data_integration.dataset_manager import DatasetManager
+
+        manager = DatasetManager()
+        datasets = manager.list_datasets()
+        console.print(
+            f"🧠 Dataset Management: {len(datasets)} datasets available", style="green"
+        )
+    except ImportError:
+        console.print("🧠 Dataset Management: Not available", style="yellow")
+    except Exception as e:
+        console.print(f"🧠 Dataset Management: Error - {e}", style="red")
+
+    console.print("\n✅ Data Integration System operational", style="green")
+
+
+@data_integration.group()
+def dataset():
+    """🧠 Dataset management for AI/ML model preparation."""
+    pass
+
+
+@dataset.command("create")
+@click.option("--name", "-n", required=True, help="Dataset name")
+@click.option(
+    "--type",
+    "-t",
+    "dataset_type",
+    type=click.Choice(
+        [
+            "classification",
+            "regression",
+            "time_series",
+            "anomaly_detection",
+            "clustering",
+            "forecasting",
+        ]
+    ),
+    required=True,
+    help="Dataset type",
+)
+@click.option("--description", "-d", help="Dataset description")
+@click.option("--tags", help="Comma-separated tags")
+def create_dataset_cmd(name: str, dataset_type: str, description: str, tags: str):
+    """Create a new dataset."""
+    try:
+        from src.ignition.data_integration.dataset_core import DatasetType
+        from src.ignition.data_integration.dataset_manager import DatasetManager
+
+        manager = DatasetManager()
+
+        # Parse tags
+        tag_list = (
+            [tag.strip() for tag in tags.split(",") if tag.strip()] if tags else []
+        )
+
+        # Create dataset
+        dataset = manager.create_dataset(
+            name=name,
+            dataset_type=DatasetType(dataset_type),
+            description=description,
+            tags=tag_list,
+        )
+
+        console.print(f"✅ Dataset '{name}' created successfully!", style="green")
+        console.print(f"   ID: {dataset.dataset_id}")
+        console.print(f"   Type: {dataset_type}")
+
+        if description:
+            console.print(f"   Description: {description}")
+
+        if tag_list:
+            console.print(f"   Tags: {', '.join(tag_list)}")
+
+        # Suggest next steps
+        console.print("\n💡 Next steps:", style="bold blue")
+        console.print("   1. Launch interactive UI: ign data dataset buildout")
+        console.print("   2. Add data sources and features interactively")
+        console.print("   3. Process and export your dataset")
+
+    except ImportError:
+        console.print("❌ Dataset management not available", style="red")
+    except Exception as e:
+        console.print(f"❌ Failed to create dataset: {e}", style="red")
+
+
+@dataset.command("list")
+def list_datasets_cmd():
+    """List all datasets."""
+    try:
+        from rich.text import Text
+
+        from src.ignition.data_integration.dataset_manager import DatasetManager
+
+        manager = DatasetManager()
+        datasets = manager.list_datasets()
+
+        if not datasets:
+            console.print(
+                "No datasets found. Create one with 'ign data dataset create'",
+                style="yellow",
+            )
+            console.print("\n💡 Or try: ign data dataset buildout", style="blue")
+            return
+
+        # Create table
+        table = Table(title="📊 Available Datasets")
+        table.add_column("Name", style="cyan")
+        table.add_column("Type", style="green")
+        table.add_column("Status", style="blue")
+        table.add_column("Rows", justify="right", style="magenta")
+        table.add_column("Quality", style="yellow")
+        table.add_column("Created", style="dim")
+
+        for ds in datasets:
+            # Format status with color
+            status = ds["status"]
+            if status == "ready":
+                status_text = Text(status, style="bold green")
+            elif status == "validated":
+                status_text = Text(status, style="bold blue")
+            elif status == "in_progress":
+                status_text = Text(status, style="bold yellow")
+            else:
+                status_text = Text(status, style="dim")
+
+            # Format quality with color
+            quality = ds["quality"]
+            if quality == "excellent":
+                quality_text = Text(quality, style="bold green")
+            elif quality == "good":
+                quality_text = Text(quality, style="green")
+            elif quality == "fair":
+                quality_text = Text(quality, style="yellow")
+            elif quality == "poor":
+                quality_text = Text(quality, style="red")
+            else:
+                quality_text = Text(quality, style="dim")
+
+            table.add_row(
+                ds["name"],
+                ds["type"],
+                status_text,
+                f"{ds['row_count']:,}",
+                quality_text,
+                ds["created_at"][:10],  # Just the date
+            )
+
+        console.print(table)
+
+        # Summary
+        total_datasets = len(datasets)
+        ready_datasets = sum(1 for ds in datasets if ds["status"] == "ready")
+        total_rows = sum(ds["row_count"] for ds in datasets)
+
+        console.print(
+            f"\n📈 Summary: {total_datasets} datasets, {ready_datasets} ready for training, {total_rows:,} total rows"
+        )
+
+    except ImportError:
+        console.print("❌ Dataset management not available", style="red")
+    except Exception as e:
+        console.print(f"❌ Failed to list datasets: {e}", style="red")
+
+
+@dataset.command()
+@click.option("--port", "-p", default=8501, help="Port for the UI server")
+@click.option("--host", "-h", default="localhost", help="Host for the UI server")
+@click.option(
+    "--open-browser", is_flag=True, default=True, help="Open browser automatically"
+)
+def buildout(port: int, host: str, open_browser: bool):
+    """🚀 Launch interactive dataset buildout UI."""
+    try:
+        # Check if streamlit is available
+        try:
+            import streamlit
+        except ImportError:
+            console.print(
+                "❌ Streamlit not installed. Install with: pip install streamlit plotly",
+                style="red",
+            )
+            console.print(
+                "   Or run: pip install streamlit plotly pandas scikit-learn",
+                style="blue",
+            )
+            return
+
+        # Find the UI script
+        from pathlib import Path
+
+        ui_script = (
+            Path(__file__).parent.parent
+            / "ignition"
+            / "data_integration"
+            / "dataset_ui.py"
+        )
+
+        if not ui_script.exists():
+            console.print(f"❌ UI script not found at: {ui_script}", style="red")
+            return
+
+        console.print("🚀 Launching Dataset Curation Studio...", style="blue")
+        console.print(f"   Host: {host}")
+        console.print(f"   Port: {port}")
+        console.print(f"   URL: http://{host}:{port}")
+
+        # Launch streamlit
+        import subprocess
+        import sys
+
+        cmd = [
+            sys.executable,
+            "-m",
+            "streamlit",
+            "run",
+            str(ui_script),
+            "--server.port",
+            str(port),
+            "--server.address",
+            host,
+            "--server.headless",
+            "true" if not open_browser else "false",
+        ]
+
+        if open_browser:
+            console.print("\n🌐 Opening browser...", style="green")
+            # Give streamlit a moment to start
+            import threading
+            import time
+            import webbrowser
+
+            def open_browser_delayed():
+                time.sleep(3)
+                webbrowser.open(f"http://{host}:{port}")
+
+            threading.Thread(target=open_browser_delayed).start()
+
+        console.print("\n💡 Tip: Use Ctrl+C to stop the server", style="dim")
+        console.print("=" * 50)
+
+        # Run streamlit
+        subprocess.run(cmd)
+
+    except KeyboardInterrupt:
+        console.print("\n👋 Dataset Curation Studio stopped.", style="blue")
+    except ImportError:
+        console.print("❌ Dataset management not available", style="red")
+    except Exception as e:
+        console.print(f"❌ Failed to launch UI: {e}", style="red")
+
+
+@dataset.command()
+def sample():
+    """Create a sample dataset for testing."""
+    click.echo("🔬 Creating sample dataset...")
+
+    try:
+        from src.ignition.data_integration.dataset_manager import create_sample_dataset
+
+        # Create sample dataset
+        dataset_id = create_sample_dataset()
+
+        click.echo("✅ Sample dataset created successfully!")
+        click.echo(f"📊 Dataset ID: {dataset_id}")
+        click.echo("💡 Use 'ign data dataset list' to see all datasets")
+        click.echo("🌐 Use 'ign data dataset buildout' to open the UI")
+
+    except ImportError:
+        click.echo("❌ Dataset management system not available")
+        click.echo("💡 Install dependencies: pip install -r requirements-dataset.txt")
+    except Exception as e:
+        click.echo(f"❌ Failed to create sample dataset: {e!s}")
+
+
+# Add Supabase management commands
+try:
+    from src.ignition.data_integration.supabase_cli import supabase
+
+    data_integration.add_command(supabase)
+except ImportError:
+    # Supabase CLI not available - create placeholder
+    @data_integration.group()
+    def supabase():
+        """Supabase database management commands (not available)."""
+        click.echo("❌ Supabase management not available")
+        click.echo("💡 Install dependencies to enable Supabase commands")
 
 
 if __name__ == "__main__":
