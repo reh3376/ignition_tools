@@ -2,6 +2,7 @@
 
 import sys
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -12,7 +13,7 @@ sys.path.insert(0, str(mcp_tools_root / "src"))
 try:
     from fastapi.testclient import TestClient
 
-    from main import app
+    from main import app  # type: ignore[attr-defined]
 
     FASTAPI_AVAILABLE = True
 except ImportError:
@@ -24,14 +25,14 @@ except ImportError:
 @pytest.fixture
 def client():
     """Create a test client for the FastAPI app."""
-    if not FASTAPI_AVAILABLE:
-        pytest.skip("FastAPI not available")
+    if not FASTAPI_AVAILABLE or app is None:
+        pytest.skip("FastAPI not available or app is None")
 
-    return TestClient(app)
+    return TestClient(app)  # type: ignore[misc]
 
 
 @pytest.fixture
-def mock_mcp_service():
+def mock_mcp_service() -> dict[str, Any]:
     """Mock MCP service responses."""
     return {
         "health": {
@@ -49,7 +50,7 @@ def mock_mcp_service():
 
 
 @pytest.fixture
-def sample_test_data():
+def sample_test_data() -> dict[str, Any]:
     """Provide sample test data for testing."""
     return {
         "test_id": "TEST_001",
