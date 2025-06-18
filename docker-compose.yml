@@ -1,3 +1,5 @@
+%YAML 1.2
+---
 # IGN Scripts Docker Testing Environment
 #
 # Three specialized services for comprehensive testing and development:

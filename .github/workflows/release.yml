@@ -1,9 +1,11 @@
+%YAML 1.2
+---
 name: Release
 
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   release:
@@ -12,83 +14,83 @@ jobs:
       contents: write
 
     steps:
-    - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.1
 
-    - name: Set up Python
-      uses: actions/setup-python@v5.0.0
-      with:
-        python-version: "3.11"
+      - name: Set up Python
+        uses: actions/setup-python@v5.0.0
+        with:
+          python-version: "3.11"
 
-    - name: Install uv
-      run: |
-        curl -LsSf https://astral.sh/uv/install.sh | sh
-        echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
-    - name: Create virtual environment and install dependencies
-      run: |
-        uv venv
-        source .venv/bin/activate
-        uv cache clean
-        uv pip install pytest pytest-cov build
-        if [ -f requirements.txt ]; then
-          uv pip install -r requirements.txt
-        fi
+      - name: Create virtual environment and install dependencies
+        run: |
+          uv venv
+          source .venv/bin/activate
+          uv cache clean
+          uv pip install pytest pytest-cov build
+          if [ -f requirements.txt ]; then
+            uv pip install -r requirements.txt
+          fi
 
-    - name: Run full test suite
-      run: |
-        source .venv/bin/activate
-        pytest tests/ --cov=src --cov-report=xml -v
+      - name: Run full test suite
+        run: |
+          source .venv/bin/activate
+          pytest tests/ --cov=src --cov-report=xml -v
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Build and push Docker images
-      run: |
-        # Build and push MCP service
-        cd mcp
-        docker build -t ghcr.io/reh3376/mcp:${{ github.ref_name }} .
-        docker build -t ghcr.io/reh3376/mcp:latest .
-        docker push ghcr.io/reh3376/mcp:${{ github.ref_name }}
-        docker push ghcr.io/reh3376/mcp:latest
-        
-        # Build and push MCP Tools service
-        cd ../mcp-tools
-        docker build -t ghcr.io/reh3376/mcp-tools:${{ github.ref_name }} .
-        docker build -t ghcr.io/reh3376/mcp-tools:latest .
-        docker push ghcr.io/reh3376/mcp-tools:${{ github.ref_name }}
-        docker push ghcr.io/reh3376/mcp-tools:latest
+      - name: Build and push Docker images
+        run: |
+          # Build and push MCP service
+          cd mcp
+          docker build -t ghcr.io/reh3376/mcp:${{ github.ref_name }} .
+          docker build -t ghcr.io/reh3376/mcp:latest .
+          docker push ghcr.io/reh3376/mcp:${{ github.ref_name }}
+          docker push ghcr.io/reh3376/mcp:latest
 
-    - name: Build package
-      run: |
-        source .venv/bin/activate
-        python -m build
+          # Build and push MCP Tools service
+          cd ../mcp-tools
+          docker build -t ghcr.io/reh3376/mcp-tools:${{ github.ref_name }} .
+          docker build -t ghcr.io/reh3376/mcp-tools:latest .
+          docker push ghcr.io/reh3376/mcp-tools:${{ github.ref_name }}
+          docker push ghcr.io/reh3376/mcp-tools:latest
 
-    - name: Create Release
-      uses: softprops/action-gh-release@v2
-      with:
-        name: Release ${{ github.ref_name }}
-        body: |
-          Release ${{ github.ref_name }} of IGN Scripts
+      - name: Build package
+        run: |
+          source .venv/bin/activate
+          python -m build
 
-          ## Changes
-          - See commit history for detailed changes
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ github.ref_name }}
+          body: |
+            Release ${{ github.ref_name }} of IGN Scripts
 
-          ## Docker Image
-          ```bash
-          docker pull ghcr.io/${{ github.repository }}:${{ github.ref_name }}
-          ```
+            ## Changes
+            - See commit history for detailed changes
 
-          ## Installation
-          ```bash
-          pip install ign-scripts==${{ github.ref_name }}
-          ```
-        files: dist/*
-        draft: false
-        prerelease: false
+            ## Docker Image
+            ```bash
+            docker pull ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+            ```
+
+            ## Installation
+            ```bash
+            pip install ign-scripts==${{ github.ref_name }}
+            ```
+          files: dist/*
+          draft: false
+          prerelease: false

@@ -1,3 +1,5 @@
+%YAML 1.2
+---
 site_name: MCP Service Documentation
 site_description: Documentation for the Machine Control Program (MCP) service
 site_author: IGN Scripts Team
@@ -16,16 +18,16 @@ theme:
 nav:
   - Home: index.md
   - Getting Started:
-    - Installation: getting-started/installation.md
-    - Configuration: getting-started/configuration.md
-    - Quick Start: getting-started/quickstart.md
+      - Installation: getting-started/installation.md
+      - Configuration: getting-started/configuration.md
+      - Quick Start: getting-started/quickstart.md
   - API Reference:
-    - Endpoints: api/endpoints.md
-    - Models: api/models.md
+      - Endpoints: api/endpoints.md
+      - Models: api/models.md
   - Development:
-    - Contributing: development/contributing.md
-    - Testing: development/testing.md
-    - Docker: development/docker.md
+      - Contributing: development/contributing.md
+      - Testing: development/testing.md
+      - Docker: development/docker.md
 
 markdown_extensions:
   - pymdownx.highlight
@@ -35,4 +37,4 @@ markdown_extensions:
   - admonition
   - footnotes
   - toc:
-      permalink: true 
+      permalink: true
