@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 """Intelligent Code Splitting Engine.
 
 This module implements automated code splitting for large files while preserving:
@@ -50,7 +48,9 @@ class CodeExtraction:
 class CodeSplitter:
     """Splits large files into smaller, more maintainable modules."""
 
-    def __init__(self) -> None:
+    def __init__(
+        self, preserve_git_history: bool = True, max_file_lines: int = 1000
+    ) -> None:
         self.preserve_git_history = preserve_git_history
         self.max_file_lines = max_file_lines
         self.recommendation_engine = RefactoringRecommendationEngine()
@@ -549,7 +549,8 @@ class CodeSplitter:
 class BatchCodeSplitter:
     """Splits multiple files in a coordinated batch operation."""
 
-    def __init__(self) -> None:
+    def __init__(self, preserve_git_history: bool = True) -> None:
+        self.preserve_git_history = preserve_git_history
         self.splitter = CodeSplitter(preserve_git_history=preserve_git_history)
         self.detector = RefactoringRecommendationEngine().detector
 

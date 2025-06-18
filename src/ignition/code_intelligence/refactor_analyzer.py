@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 """Automated Code Refactoring System - Large File Detection & Analysis.
 
 This module implements intelligent analysis of oversized Python files to identify
@@ -49,7 +47,9 @@ class SplitRecommendation:
 class LargeFileDetector:
     """Detects and analyzes files that exceed size thresholds."""
 
-    def __init__(self) -> None:
+    def __init__(
+        self, line_threshold: int = 950, complexity_threshold: float = 50.0
+    ) -> None:
         self.line_threshold = line_threshold
         self.complexity_threshold = complexity_threshold
         self.analyzer = CodeAnalyzer()

@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 """Code Analyzer for extracting structure from Python files using AST."""
 
 import ast
@@ -20,31 +18,31 @@ class ComplexityCalculator(ast.NodeVisitor):
     def __init__(self) -> None:
         self.complexity = 1  # Base complexity
 
-    def visit_If(self) -> None:
+    def visit_If(self, node: ast.If) -> None:
         self.complexity += 1
         self.generic_visit(node)
 
-    def visit_While(self) -> None:
+    def visit_While(self, node: ast.While) -> None:
         self.complexity += 1
         self.generic_visit(node)
 
-    def visit_For(self) -> None:
+    def visit_For(self, node: ast.For) -> None:
         self.complexity += 1
         self.generic_visit(node)
 
-    def visit_Try(self) -> None:
+    def visit_Try(self, node: ast.Try) -> None:
         self.complexity += len(node.handlers)
         self.generic_visit(node)
 
-    def visit_With(self) -> None:
+    def visit_With(self, node: ast.With) -> None:
         self.complexity += 1
         self.generic_visit(node)
 
-    def visit_BoolOp(self) -> None:
+    def visit_BoolOp(self, node: ast.BoolOp) -> None:
         self.complexity += len(node.values) - 1
         self.generic_visit(node)
 
-    def visit_Compare(self) -> None:
+    def visit_Compare(self, node: ast.Compare) -> None:
         self.complexity += len(node.comparators)
         self.generic_visit(node)
 
@@ -190,7 +188,7 @@ class CodeAnalyzer:
 
                 class_node = ClassNode(
                     name=node.name,
-                    file_path=str(file_path.relative_to(Path.cwd())),
+                    file_path=self._get_relative_path(file_path),
                     start_line=node.lineno,
                     end_line=getattr(node, "end_lineno", node.lineno),
                     methods_count=methods_count,
@@ -244,7 +242,7 @@ class CodeAnalyzer:
                 method_node = MethodNode(
                     name=node.name,
                     class_name=class_name,
-                    file_path=str(file_path.relative_to(Path.cwd())),
+                    file_path=self._get_relative_path(file_path),
                     start_line=node.lineno,
                     end_line=getattr(node, "end_lineno", node.lineno),
                     parameters=parameters,
@@ -269,7 +267,7 @@ class CodeAnalyzer:
                         module=alias.name,
                         alias=alias.asname,
                         from_module=None,
-                        file_path=str(file_path.relative_to(Path.cwd())),
+                        file_path=self._get_relative_path(file_path),
                         line_number=node.lineno,
                         is_local=self._is_local_import(alias.name),
                     )
@@ -283,7 +281,7 @@ class CodeAnalyzer:
                         module=alias.name,
                         alias=alias.asname,
                         from_module=node.module,
-                        file_path=str(file_path.relative_to(Path.cwd())),
+                        file_path=self._get_relative_path(file_path),
                         line_number=node.lineno,
                         is_local=self._is_local_import(node.module),
                     )
