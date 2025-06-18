@@ -1,34 +1,61 @@
 """Test configuration for MCP Tools service tests."""
 
 import sys
+from collections.abc import Generator
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any, Optional
 
 import pytest
+
+if TYPE_CHECKING:
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
 
 # Add the MCP Tools src directory to Python path
 mcp_tools_root = Path(__file__).parent.parent
 sys.path.insert(0, str(mcp_tools_root / "src"))
 
+# Type-safe imports with proper error handling
+FASTAPI_AVAILABLE = False
+TestClientClass: type["TestClient"] | None = None
+app_instance: Optional["FastAPI"] = None
+
 try:
     from fastapi.testclient import TestClient
 
-    from main import app  # type: ignore[attr-defined]
+    TestClientClass = TestClient
 
-    FASTAPI_AVAILABLE = True
+    # Import the main module and extract the app safely
+    import main
+
+    app_instance = getattr(main, "app", None)
+
+    if app_instance is not None:
+        FASTAPI_AVAILABLE = True
+    else:
+        raise ImportError("main module does not have 'app' attribute")
+
 except ImportError:
     FASTAPI_AVAILABLE = False
-    TestClient = None
-    app = None
+    TestClientClass = None
+    app_instance = None
 
 
 @pytest.fixture
-def client():
+def client() -> Generator["TestClient", None, None]:
     """Create a test client for the FastAPI app."""
-    if not FASTAPI_AVAILABLE or app is None:
-        pytest.skip("FastAPI not available or app is None")
+    if not FASTAPI_AVAILABLE:
+        pytest.skip("FastAPI not available")
 
-    return TestClient(app)  # type: ignore[misc]
+    if TestClientClass is None:
+        pytest.skip("TestClient class not imported")
+
+    if app_instance is None:
+        pytest.skip("FastAPI app instance not found")
+
+    # At this point, type checker knows all components are available
+    with TestClientClass(app_instance) as test_client:
+        yield test_client
 
 
 @pytest.fixture
