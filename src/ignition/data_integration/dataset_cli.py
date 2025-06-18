@@ -1,4 +1,4 @@
-"""Dataset Management CLI Commands
+"""Dataset Management CLI Commands.
 
 This module provides CLI commands for dataset creation, management, and
 launching the interactive UI for dataset curation.
@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 
 @click.group()
-def dataset():
+def dataset() -> None:
     """🧠 Dataset management for AI/ML model preparation."""
     pass
 
@@ -45,7 +45,9 @@ def dataset():
 )
 @click.option("--description", "-d", help="Dataset description")
 @click.option("--tags", help="Comma-separated tags")
-def create(name: str, dataset_type: str, description: str | None, tags: str | None):
+def create(
+    name: str, dataset_type: str, description: str | None, tags: str | None
+) -> None:
     """Create a new dataset."""
     try:
         manager = DatasetManager()
@@ -86,7 +88,7 @@ def create(name: str, dataset_type: str, description: str | None, tags: str | No
 
 
 @dataset.command()
-def list():
+def list() -> None:
     """List all datasets."""
     try:
         manager = DatasetManager()
@@ -159,7 +161,7 @@ def list():
 
 @dataset.command()
 @click.argument("dataset_id")
-def info(dataset_id: str):
+def info(dataset_id: str) -> None:
     """Show detailed information about a dataset."""
     try:
         manager = DatasetManager()
@@ -240,7 +242,7 @@ Size: {dataset.file_size_mb:.2f} MB
 
 @dataset.command()
 @click.argument("dataset_id")
-def process(dataset_id: str):
+def process(dataset_id: str) -> None:
     """Process a dataset (extract, transform, validate)."""
     try:
         manager = DatasetManager()
@@ -281,7 +283,7 @@ def process(dataset_id: str):
 @click.option(
     "--include-metadata", is_flag=True, default=True, help="Include metadata in export"
 )
-def export(dataset_id: str, format_type: str, include_metadata: bool):
+def export(dataset_id: str, format_type: str, include_metadata: bool) -> None:
     """Export a dataset."""
     try:
         manager = DatasetManager()
@@ -311,7 +313,7 @@ def export(dataset_id: str, format_type: str, include_metadata: bool):
 @dataset.command()
 @click.argument("dataset_id")
 @click.confirmation_option(prompt="Are you sure you want to delete this dataset?")
-def delete(dataset_id: str):
+def delete(dataset_id: str) -> None:
     """Delete a dataset."""
     try:
         manager = DatasetManager()
@@ -340,7 +342,7 @@ def delete(dataset_id: str):
 @click.option(
     "--open-browser", is_flag=True, default=True, help="Open browser automatically"
 )
-def buildout(port: int, host: str, open_browser: bool):
+def buildout(port: int, host: str, open_browser: bool) -> None:
     """🚀 Launch interactive dataset buildout UI."""
     try:
         # Check if streamlit is available
@@ -386,7 +388,7 @@ def buildout(port: int, host: str, open_browser: bool):
             import threading
             import time
 
-            def open_browser_delayed():
+            def open_browser_delayed() -> None:
                 time.sleep(2)
                 webbrowser.open(f"http://{host}:{port}")
 
@@ -406,7 +408,7 @@ def buildout(port: int, host: str, open_browser: bool):
 
 @dataset.command()
 @click.option("--dataset-id", help="Specific dataset ID to check")
-def status(dataset_id: str | None):
+def status(dataset_id: str | None) -> None:
     """Show dataset system status."""
     try:
         manager = DatasetManager()
@@ -474,7 +476,7 @@ def status(dataset_id: str | None):
 
 
 @dataset.command()
-def sample():
+def sample() -> None:
     """Create a sample dataset for testing."""
     try:
         from .dataset_manager import create_sample_dataset
@@ -496,7 +498,7 @@ def sample():
 
 # Additional helper commands for feature and source management
 @dataset.group()
-def source():
+def source() -> None:
     """Manage dataset data sources."""
     pass
 
@@ -511,7 +513,7 @@ def source():
     help="Type of data source",
 )
 @click.option("--config", help="JSON configuration for the source")
-def add(dataset_id: str, source_type: str, config: str):
+def add(dataset_id: str, source_type: str, config: str) -> None:
     """Add a data source to a dataset."""
     try:
         import json
@@ -543,7 +545,7 @@ def add(dataset_id: str, source_type: str, config: str):
 
 
 @dataset.group()
-def feature():
+def feature() -> None:
     """Manage dataset features."""
     pass
 

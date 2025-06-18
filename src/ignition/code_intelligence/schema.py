@@ -70,7 +70,7 @@ class ImportNode:
 class CodeSchema:
     """Manages Neo4j schema for code intelligence."""
 
-    def __init__(self, graph_client):
+    def __init__(self, graph_client) -> None:
         """Initialize with graph client."""
         self.client = graph_client
 
@@ -93,13 +93,13 @@ class CodeSchema:
             logger.error(f"Failed to create schema: {e}")
             return False
 
-    def _create_constraints(self):
+    def _create_constraints(self) -> None:
         """Create uniqueness constraints."""
         constraints = [
             "CREATE CONSTRAINT code_file_path IF NOT EXISTS FOR (f:CodeFile) REQUIRE f.path IS UNIQUE",
             "CREATE CONSTRAINT class_unique IF NOT EXISTS FOR (c:Class) REQUIRE (c.name, c.file_path) IS UNIQUE",
             "CREATE CONSTRAINT method_unique IF NOT EXISTS FOR (m:Method) REQUIRE (m.name, m.file_path, m.start_line) IS UNIQUE",
-            "CREATE CONSTRAINT import_unique IF NOT EXISTS FOR (i:Import) REQUIRE (i.module, i.file_path, i.line_number) IS UNIQUE"
+            "CREATE CONSTRAINT import_unique IF NOT EXISTS FOR (i:Import) REQUIRE (i.module, i.file_path, i.line_number) IS UNIQUE",
         ]
 
         for constraint in constraints:
@@ -109,14 +109,14 @@ class CodeSchema:
             except Exception as e:
                 logger.debug(f"Constraint may already exist: {e}")
 
-    def _create_indexes(self):
+    def _create_indexes(self) -> None:
         """Create performance indexes."""
         indexes = [
             "CREATE INDEX code_file_modified IF NOT EXISTS FOR (f:CodeFile) ON (f.last_modified)",
             "CREATE INDEX code_file_complexity IF NOT EXISTS FOR (f:CodeFile) ON (f.complexity)",
             "CREATE INDEX class_complexity IF NOT EXISTS FOR (c:Class) ON (c.complexity)",
             "CREATE INDEX method_complexity IF NOT EXISTS FOR (m:Method) ON (m.complexity)",
-            "CREATE INDEX import_module IF NOT EXISTS FOR (i:Import) ON (i.module)"
+            "CREATE INDEX import_module IF NOT EXISTS FOR (i:Import) ON (i.module)",
         ]
 
         for index in indexes:
@@ -126,21 +126,21 @@ class CodeSchema:
             except Exception as e:
                 logger.debug(f"Index may already exist: {e}")
 
-    def _create_vector_indexes(self):
+    def _create_vector_indexes(self) -> None:
         """Create vector indexes for embeddings."""
         vector_indexes = [
             {
                 "name": "code_file_embeddings",
-                "query": "CREATE VECTOR INDEX code_file_embeddings IF NOT EXISTS FOR (f:CodeFile) ON (f.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}"
+                "query": "CREATE VECTOR INDEX code_file_embeddings IF NOT EXISTS FOR (f:CodeFile) ON (f.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",
             },
             {
                 "name": "class_embeddings",
-                "query": "CREATE VECTOR INDEX class_embeddings IF NOT EXISTS FOR (c:Class) ON (c.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}"
+                "query": "CREATE VECTOR INDEX class_embeddings IF NOT EXISTS FOR (c:Class) ON (c.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",
             },
             {
                 "name": "method_embeddings",
-                "query": "CREATE VECTOR INDEX method_embeddings IF NOT EXISTS FOR (m:Method) ON (m.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}"
-            }
+                "query": "CREATE VECTOR INDEX method_embeddings IF NOT EXISTS FOR (m:Method) ON (m.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",
+            },
         ]
 
         for index_info in vector_indexes:
@@ -148,7 +148,9 @@ class CodeSchema:
                 self.client.execute_query(index_info["query"])
                 logger.info(f"Created vector index: {index_info['name']}")
             except Exception as e:
-                logger.debug(f"Vector index {index_info['name']} may already exist: {e}")
+                logger.debug(
+                    f"Vector index {index_info['name']} may already exist: {e}"
+                )
 
     def get_schema_info(self) -> dict[str, Any]:
         """Get information about the current schema."""
@@ -164,14 +166,16 @@ class CodeSchema:
             # Get node counts
             node_counts = {}
             for node_type in ["CodeFile", "Class", "Method", "Import"]:
-                count_result = self.client.execute_query(f"MATCH (n:{node_type}) RETURN count(n) as count")
+                count_result = self.client.execute_query(
+                    f"MATCH (n:{node_type}) RETURN count(n) as count"
+                )
                 node_counts[node_type] = count_result[0]["count"] if count_result else 0
 
             return {
                 "constraints": constraints,
                 "indexes": indexes,
                 "node_counts": node_counts,
-                "schema_version": "1.0.0"
+                "schema_version": "1.0.0",
             }
 
         except Exception as e:

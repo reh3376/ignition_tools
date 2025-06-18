@@ -1,4 +1,4 @@
-"""AI Assistant Enhancement System - Phase 8.3
+"""AI Assistant Enhancement System - Phase 8.3.
 
 This module provides intelligent context loading and code suggestions for AI assistants,
 replacing large file reads with targeted context queries and providing smart recommendations.
@@ -45,7 +45,7 @@ class ChangeImpactAnalysis:
 class AIAssistantEnhancement:
     """Main class for AI Assistant Enhancement capabilities."""
 
-    def __init__(self, code_manager, git_integration=None, embedder=None):
+    def __init__(self, code_manager, git_integration=None, embedder=None) -> None:
         """Initialize AI Assistant Enhancement system.
 
         Args:
@@ -657,7 +657,7 @@ class AIAssistantEnhancement:
         gaps = []
 
         # Simple heuristic: check if there are corresponding test files
-        test_file_patterns = [
+        [
             file_path.replace(".py", "_test.py"),
             file_path.replace(".py", "_tests.py"),
             f"test_{Path(file_path).name}",

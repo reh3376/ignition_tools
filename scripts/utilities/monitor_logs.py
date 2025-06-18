@@ -138,9 +138,9 @@ class LogAnalyzer:
                     analysis["errors"].append(
                         {
                             "timestamp": entry["timestamp"],
-                            "message": message[:200] + "..."
-                            if len(message) > 200
-                            else message,
+                            "message": (
+                                message[:200] + "..." if len(message) > 200 else message
+                            ),
                         }
                     )
 
@@ -149,9 +149,9 @@ class LogAnalyzer:
                     analysis["warnings"].append(
                         {
                             "timestamp": entry["timestamp"],
-                            "message": message[:200] + "..."
-                            if len(message) > 200
-                            else message,
+                            "message": (
+                                message[:200] + "..." if len(message) > 200 else message
+                            ),
                         }
                     )
 
@@ -179,9 +179,9 @@ class LogAnalyzer:
                             match.group(1)
                         )
                     elif "skipped" in pattern:
-                        analysis["performance_metrics"]["test_results"][
-                            "skipped"
-                        ] = int(match.group(1))
+                        analysis["performance_metrics"]["test_results"]["skipped"] = (
+                            int(match.group(1))
+                        )
 
         # Generate recommendations
         analysis["recommendations"] = self.generate_recommendations(analysis)

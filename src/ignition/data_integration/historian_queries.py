@@ -129,7 +129,7 @@ class QueryOptions:
 class HistorianQueryGenerator:
     """Generator for historian database queries."""
 
-    def __init__(self, historian_type: HistorianType):
+    def __init__(self, historian_type: HistorianType) -> None:
         """Initialize the query generator."""
         self.historian_type = historian_type
         self.logger = logging.getLogger(f"{__name__}.{historian_type.value}")

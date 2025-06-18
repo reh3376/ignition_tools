@@ -177,7 +177,9 @@ class LearningSystemUI:
                     if st.button(f"📋 Browse Templates #{i}", key=f"rec_template_{i}"):
                         st.session_state.page = "templates"
                         st.rerun()
-                elif action == "validation" and st.button(f"✅ Validate Script #{i}", key=f"rec_validate_{i}"):
+                elif action == "validation" and st.button(
+                    f"✅ Validate Script #{i}", key=f"rec_validate_{i}"
+                ):
                     st.session_state.page = "validation"
                     st.rerun()
 
@@ -363,9 +365,11 @@ class LearningSystemUI:
                             "Confidence (1→2)": f"{pattern.get('confidence_1_to_2', 0):.1%}",
                             "Confidence (2→1)": f"{pattern.get('confidence_2_to_1', 0):.1%}",
                             "Support": f"{pattern.get('support', 0):.1%}",
-                            "Created": pattern.get("created_at", "")[:10]
-                            if pattern.get("created_at")
-                            else "",
+                            "Created": (
+                                pattern.get("created_at", "")[:10]
+                                if pattern.get("created_at")
+                                else ""
+                            ),
                         }
                     )
 
@@ -393,9 +397,11 @@ class LearningSystemUI:
                             "Usage Count": pattern.get("usage_count", 0),
                             "Success Rate": f"{pattern.get('success_rate', 0):.1%}",
                             "Avg Generation Time": f"{pattern.get('avg_generation_time', 0):.2f}s",
-                            "Last Used": pattern.get("last_used", "")[:10]
-                            if pattern.get("last_used")
-                            else "",
+                            "Last Used": (
+                                pattern.get("last_used", "")[:10]
+                                if pattern.get("last_used")
+                                else ""
+                            ),
                         }
                     )
 

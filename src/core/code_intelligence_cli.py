@@ -30,7 +30,7 @@ def status(detailed: bool):
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
-            console=console
+            console=console,
         ) as progress:
             task = progress.add_task("Connecting to database...", total=None)
 
@@ -68,7 +68,9 @@ def status(detailed: bool):
             console.print("\n🗄️ Database Schema", style="bold")
             console.print(f"Constraints: {len(schema_info.get('constraints', []))}")
             console.print(f"Indexes: {len(schema_info.get('indexes', []))}")
-            console.print(f"Schema Version: {schema_info.get('schema_version', 'Unknown')}")
+            console.print(
+                f"Schema Version: {schema_info.get('schema_version', 'Unknown')}"
+            )
 
             # Node counts
             node_counts = schema_info.get("node_counts", {})
@@ -98,7 +100,7 @@ def analyze(file_path: str, detailed: bool):
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
-            console=console
+            console=console,
         ) as progress:
             task = progress.add_task("Connecting to database...", total=None)
 
@@ -127,10 +129,14 @@ def analyze(file_path: str, detailed: bool):
                     file_info = context.get("file", {})
                     console.print(f"Lines: {file_info.get('lines', 'N/A')}")
                     console.print(f"Complexity: {file_info.get('complexity', 'N/A')}")
-                    console.print(f"Maintainability: {file_info.get('maintainability_index', 'N/A'):.1f}")
+                    console.print(
+                        f"Maintainability: {file_info.get('maintainability_index', 'N/A'):.1f}"
+                    )
 
                     classes = context.get("classes", [])
-                    methods = context.get("class_methods", []) + context.get("file_methods", [])
+                    methods = context.get("class_methods", []) + context.get(
+                        "file_methods", []
+                    )
                     imports = context.get("imports", [])
 
                     console.print(f"Classes: {len(classes)}")
@@ -140,12 +146,16 @@ def analyze(file_path: str, detailed: bool):
                     if classes:
                         console.print("\n📦 Classes:")
                         for cls in classes[:5]:  # Show first 5
-                            console.print(f"  • {cls.get('name')} (complexity: {cls.get('complexity')})")
+                            console.print(
+                                f"  • {cls.get('name')} (complexity: {cls.get('complexity')})"
+                            )
 
                     if methods:
                         console.print("\n🔧 Methods:")
                         for method in methods[:5]:  # Show first 5
-                            console.print(f"  • {method.get('name')} (complexity: {method.get('complexity')})")
+                            console.print(
+                                f"  • {method.get('name')} (complexity: {method.get('complexity')})"
+                            )
         else:
             console.print(f"❌ Failed to analyze: {file_path}", style="red")
 
@@ -168,7 +178,7 @@ def scan(directory_path: str, recursive: bool):
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
-            console=console
+            console=console,
         ) as progress:
             task = progress.add_task("Connecting to database...", total=None)
 
@@ -183,10 +193,15 @@ def scan(directory_path: str, recursive: bool):
             progress.update(task, description=f"Scanning {directory_path}...")
             results = manager.analyze_and_store_directory(dir_path, recursive)
 
-        console.print(f"\n📂 Directory Scan Results: {directory_path}", style="bold blue")
+        console.print(
+            f"\n📂 Directory Scan Results: {directory_path}", style="bold blue"
+        )
         console.print(f"Files processed: {results['files_processed']}")
         console.print(f"Files successful: {results['files_successful']}", style="green")
-        console.print(f"Files failed: {results['files_failed']}", style="red" if results["files_failed"] > 0 else "white")
+        console.print(
+            f"Files failed: {results['files_failed']}",
+            style="red" if results["files_failed"] > 0 else "white",
+        )
 
         if results["errors"]:
             console.print("\n❌ Errors encountered:")
@@ -203,8 +218,13 @@ def scan(directory_path: str, recursive: bool):
 
 @code.command()
 @click.argument("query")
-@click.option("--type", "search_type", type=click.Choice(["all", "files", "classes", "methods"]),
-              default="all", help="Type of code elements to search")
+@click.option(
+    "--type",
+    "search_type",
+    type=click.Choice(["all", "files", "classes", "methods"]),
+    default="all",
+    help="Type of code elements to search",
+)
 @click.option("--limit", default=10, help="Maximum number of results")
 def search(query: str, search_type: str, limit: int):
     """Search for code elements by name or content."""
@@ -215,9 +235,9 @@ def search(query: str, search_type: str, limit: int):
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
-            console=console
+            console=console,
         ) as progress:
-            task = progress.add_task("Searching...", total=None)
+            progress.add_task("Searching...", total=None)
 
             client = IgnitionGraphClient()
             if not client.connect():
@@ -231,8 +251,12 @@ def search(query: str, search_type: str, limit: int):
             console.print(f"No results found for '{query}'", style="yellow")
             return
 
-        console.print(f"\n🔍 Search Results for '{query}' ({search_type})", style="bold blue")
-        console.print(f"Found {len(results)} results (showing first {min(limit, len(results))})")
+        console.print(
+            f"\n🔍 Search Results for '{query}' ({search_type})", style="bold blue"
+        )
+        console.print(
+            f"Found {len(results)} results (showing first {min(limit, len(results))})"
+        )
 
         # Create results table
         table = Table()
@@ -248,7 +272,7 @@ def search(query: str, search_type: str, limit: int):
                 result.get("name", "N/A"),
                 result.get("file_path", "N/A"),
                 str(result.get("complexity", "N/A")),
-                str(result.get("start_line", "N/A"))
+                str(result.get("start_line", "N/A")),
             )
 
         console.print(table)
@@ -269,9 +293,9 @@ def context(file_path: str):
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
-            console=console
+            console=console,
         ) as progress:
-            task = progress.add_task("Getting context...", total=None)
+            progress.add_task("Getting context...", total=None)
 
             client = IgnitionGraphClient()
             if not client.connect():
@@ -283,27 +307,33 @@ def context(file_path: str):
 
         if not context_data or not context_data.get("file"):
             console.print(f"No context found for '{file_path}'", style="yellow")
-            console.print("Make sure the file has been analyzed first using 'ign code analyze'")
+            console.print(
+                "Make sure the file has been analyzed first using 'ign code analyze'"
+            )
             return
 
         console.print(f"\n📁 File Context: {file_path}", style="bold blue")
 
         file_info = context_data["file"]
-        console.print(Panel(
-            f"Lines: {file_info.get('lines', 'N/A')}\n"
-            f"Complexity: {file_info.get('complexity', 'N/A')}\n"
-            f"Maintainability: {file_info.get('maintainability_index', 'N/A'):.1f}\n"
-            f"Language: {file_info.get('language', 'N/A')}\n"
-            f"Size: {file_info.get('size_bytes', 'N/A')} bytes",
-            title="📊 File Metrics"
-        ))
+        console.print(
+            Panel(
+                f"Lines: {file_info.get('lines', 'N/A')}\n"
+                f"Complexity: {file_info.get('complexity', 'N/A')}\n"
+                f"Maintainability: {file_info.get('maintainability_index', 'N/A'):.1f}\n"
+                f"Language: {file_info.get('language', 'N/A')}\n"
+                f"Size: {file_info.get('size_bytes', 'N/A')} bytes",
+                title="📊 File Metrics",
+            )
+        )
 
         # Classes
         classes = context_data.get("classes", [])
         if classes:
             console.print(f"\n📦 Classes ({len(classes)}):")
             for cls in classes:
-                console.print(f"  • {cls.get('name')} (lines {cls.get('start_line')}-{cls.get('end_line')}, complexity: {cls.get('complexity')})")
+                console.print(
+                    f"  • {cls.get('name')} (lines {cls.get('start_line')}-{cls.get('end_line')}, complexity: {cls.get('complexity')})"
+                )
 
         # Methods
         class_methods = context_data.get("class_methods", [])
@@ -313,8 +343,12 @@ def context(file_path: str):
         if all_methods:
             console.print(f"\n🔧 Methods ({len(all_methods)}):")
             for method in all_methods:
-                class_info = f" [{method.get('class_name')}]" if method.get("class_name") else ""
-                console.print(f"  • {method.get('name')}{class_info} (line {method.get('start_line')}, complexity: {method.get('complexity')})")
+                class_info = (
+                    f" [{method.get('class_name')}]" if method.get("class_name") else ""
+                )
+                console.print(
+                    f"  • {method.get('name')}{class_info} (line {method.get('start_line')}, complexity: {method.get('complexity')})"
+                )
 
         # Imports
         imports = context_data.get("imports", [])

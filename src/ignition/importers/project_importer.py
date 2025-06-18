@@ -1,4 +1,4 @@
-"""Ignition Project Importer - Basic Implementation
+"""Ignition Project Importer - Basic Implementation.
 
 This module provides basic import functionality for Ignition projects.
 This is a simplified version to integrate with the CLI system.

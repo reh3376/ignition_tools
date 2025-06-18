@@ -1,4 +1,6 @@
-"""Refactoring Documentation & Tracking System
+from typing import Dict, List
+
+"""Refactoring Documentation & Tracking System.
 
 This module provides comprehensive tracking and documentation for refactoring operations,
 including architecture diagram generation, Neo4j history tracking, and impact reporting.
@@ -48,7 +50,7 @@ class ArchitectureDiagram:
     svg_content: str | None = None
     created_at: datetime = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.created_at is None:
             self.created_at = datetime.now()
 
@@ -85,7 +87,7 @@ class RefactoringMetrics:
 class RefactoringTracker:
     """Tracks and documents refactoring operations."""
 
-    def __init__(self, project_root: Path, graph_client=None):
+    def __init__(self) -> None:
         self.project_root = project_root
         self.graph_client = graph_client
         self.tracking_dir = project_root / ".refactoring_tracking"
@@ -390,7 +392,7 @@ graph LR
             RETURN ro
             """
 
-            result = self.graph_client.execute_query(
+            self.graph_client.execute_query(
                 cypher,
                 {
                     "operation_id": operation.operation_id,
@@ -706,7 +708,7 @@ graph LR
     ) -> None:
         """Generate documentation for the operation."""
         # Generate architecture diagram
-        diagram = self.generate_architecture_diagram(operation)
+        self.generate_architecture_diagram(operation)
 
         # Create TODO comments for affected files
         for file_path in operation.target_files:
@@ -836,7 +838,7 @@ graph LR
         }
 
 
-def main():
+def main() -> None:
     """Main function for testing the refactoring tracker."""
     tracker = RefactoringTracker(Path.cwd())
 

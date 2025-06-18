@@ -202,7 +202,7 @@ class ContextProcessor:
 
                 progress.update(task, description=f"Processing batch {batch_count}...")
 
-                batch_results = self.process_batch(batch_files, task, progress)
+                self.process_batch(batch_files, task, progress)
 
         # Calculate final metrics
         processing_time = time.time() - self.start_time

@@ -73,7 +73,7 @@ try:
                 metrics = data["metrics"]
                 if isinstance(metrics, dict):
                     for key, value in metrics.items():
-                        if not isinstance(value, (int, float)):
+                        if not isinstance(value, int | float):
                             raise HTTPException(
                                 status_code=400,
                                 detail={

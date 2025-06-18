@@ -1,4 +1,6 @@
-"""Automated Code Refactoring System - Large File Detection & Analysis
+from typing import Dict, List
+
+"""Automated Code Refactoring System - Large File Detection & Analysis.
 
 This module implements intelligent analysis of oversized Python files to identify
 refactoring opportunities and single responsibility violations.
@@ -47,7 +49,7 @@ class SplitRecommendation:
 class LargeFileDetector:
     """Detects and analyzes files that exceed size thresholds."""
 
-    def __init__(self, line_threshold: int = 1000, complexity_threshold: float = 50.0):
+    def __init__(self) -> None:
         self.line_threshold = line_threshold
         self.complexity_threshold = complexity_threshold
         self.analyzer = CodeAnalyzer()
@@ -113,7 +115,7 @@ class LargeFileDetector:
 class SingleResponsibilityAnalyzer:
     """Analyzes files for single responsibility principle violations."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.analyzer = CodeAnalyzer()
 
     def analyze_file(self, file_path: Path) -> list[str]:
@@ -234,7 +236,7 @@ class SingleResponsibilityAnalyzer:
 class RefactoringRecommendationEngine:
     """Generates intelligent refactoring recommendations for oversized files."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.detector = LargeFileDetector()
         self.sr_analyzer = SingleResponsibilityAnalyzer()
         self.analyzer = CodeAnalyzer()
@@ -444,7 +446,7 @@ class RefactoringRecommendationEngine:
             return file_path.stem
 
 
-def main():
+def main() -> None:
     """Main function for testing the refactor analyzer."""
     detector = LargeFileDetector()
     engine = RefactoringRecommendationEngine()

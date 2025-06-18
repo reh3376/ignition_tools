@@ -62,12 +62,22 @@ def main():
         print("=" * 50)
 
         # Launch Streamlit with the app
-        result = subprocess.run([
-            sys.executable, "-m", "streamlit", "run", str(app_path),
-            "--server.headless", "false",
-            "--server.enableCORS", "false",
-            "--server.enableXsrfProtection", "false"
-        ], env=env)
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "streamlit",
+                "run",
+                str(app_path),
+                "--server.headless",
+                "false",
+                "--server.enableCORS",
+                "false",
+                "--server.enableXsrfProtection",
+                "false",
+            ],
+            env=env,
+        )
 
         return result.returncode
 
@@ -87,9 +97,11 @@ def main():
         print(f"   streamlit run {app_path}")
         return 1
 
+
 def launch_ui():
     """Alternative entry point for backwards compatibility."""
     return main()
+
 
 if __name__ == "__main__":
     sys.exit(main())

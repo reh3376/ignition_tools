@@ -10,9 +10,9 @@ from contextlib import contextmanager
 from typing import Any
 
 from dotenv import load_dotenv
+from neo4j.exceptions import AuthError, ServiceUnavailable
 
 from neo4j import GraphDatabase
-from neo4j.exceptions import AuthError, ServiceUnavailable
 
 from .schema import GraphNode, GraphRelationship, IgnitionGraphSchema
 
@@ -157,8 +157,7 @@ class IgnitionGraphClient:
             query = node.to_cypher_merge()
             self.execute_write_query(query, node.properties)
             logger.debug(
-                f"Created node: {node.node_type.value} - "
-                f"{node.properties.get('name', 'unknown')}"
+                f"Created node: {node.node_type.value} - {node.properties.get('name', 'unknown')}"
             )
             return True
         except Exception as e:
@@ -327,10 +326,7 @@ class IgnitionGraphClient:
 
                 # Test write (create and delete a temporary node)
                 try:
-                    test_query = (
-                        "CREATE (test:HealthCheck {name: 'test', timestamp: timestamp()}) "
-                        "RETURN test"
-                    )
+                    test_query = "CREATE (test:HealthCheck {name: 'test', timestamp: timestamp()}) RETURN test"
                     self.execute_write_query(test_query)
 
                     cleanup_query = (

@@ -1,4 +1,4 @@
-"""CLI Integration for Advanced Analytics Dashboard - Phase 8.4
+"""CLI Integration for Advanced Analytics Dashboard - Phase 8.4.
 
 Provides command-line interface for code intelligence analytics and optimization insights.
 """
@@ -41,7 +41,7 @@ def _initialize_systems():
 
 
 @click.group(name="analytics")
-def analytics_group():
+def analytics_group() -> None:
     """Advanced analytics and optimization tools."""
     pass
 
@@ -56,7 +56,7 @@ def analytics_group():
     help="Output format",
 )
 @click.option("--save", "-s", type=click.Path(), help="Save results to file")
-def health(days: int, format: str, save: str):
+def health(days: int, format: str, save: str) -> None:
     """Generate comprehensive codebase health metrics."""
     console.print("🏥 Analyzing Codebase Health...", style="bold blue")
 
@@ -105,7 +105,7 @@ def health(days: int, format: str, save: str):
     help="Output format",
 )
 @click.option("--save", "-s", type=click.Path(), help="Save graph data to file")
-def dependencies(max_nodes: int, format: str, save: str):
+def dependencies(max_nodes: int, format: str, save: str) -> None:
     """Analyze dependency graph and coupling."""
     console.print("🕸️  Analyzing Dependency Graph...", style="bold blue")
 
@@ -166,7 +166,7 @@ def dependencies(max_nodes: int, format: str, save: str):
     default="all",
     help="Filter by severity",
 )
-def debt(format: str, severity: str):
+def debt(format: str, severity: str) -> None:
     """Identify and prioritize technical debt."""
     console.print("💳 Analyzing Technical Debt...", style="bold blue")
 
@@ -213,7 +213,7 @@ def debt(format: str, severity: str):
     default="table",
     help="Output format",
 )
-def trends(days: int, format: str):
+def trends(days: int, format: str) -> None:
     """Analyze complexity and quality trends."""
     console.print("📈 Analyzing Code Trends...", style="bold blue")
 
@@ -261,7 +261,7 @@ def trends(days: int, format: str):
     default="table",
     help="Output format",
 )
-def optimization(format: str):
+def optimization(format: str) -> None:
     """Generate performance optimization insights."""
     console.print("⚡ Generating Optimization Insights...", style="bold blue")
 
@@ -319,7 +319,7 @@ def optimization(format: str):
 
 
 @analytics_group.command()
-def refresh():
+def refresh() -> None:
     """Refresh dependency relationships between code files."""
     console.print("🔄 Refreshing Dependencies...", style="bold blue")
 
@@ -383,7 +383,7 @@ def refresh():
     default="table",
     help="Output format",
 )
-def docs(check_sync: bool, update_api: bool, validate_refs: bool, format: str):
+def docs(check_sync: bool, update_api: bool, validate_refs: bool, format: str) -> None:
     """Documentation synchronization and validation."""
     console.print("📚 Analyzing Documentation...", style="bold blue")
 
@@ -497,7 +497,7 @@ def _display_health_table(metrics):
         console.print(comp_table)
 
 
-def _display_detailed_health_report(metrics):
+def _display_detailed_health_report(metrics) -> None:
     """Display detailed health report."""
     console.print(
         Panel(
@@ -543,7 +543,7 @@ def _display_detailed_health_report(metrics):
             )
 
 
-def _display_dependency_table(nodes, edges):
+def _display_dependency_table(nodes, edges) -> None:
     """Display dependency graph in table format."""
     # Nodes table
     nodes_table = Table(title="🕸️  Dependency Graph - Nodes", show_header=True)
@@ -583,7 +583,7 @@ def _display_dependency_table(nodes, edges):
         )
 
 
-def _display_mermaid_graph(nodes, edges):
+def _display_mermaid_graph(nodes, edges) -> None:
     """Display dependency graph in Mermaid format."""
     console.print("```mermaid")
     console.print("graph TD")
@@ -619,7 +619,7 @@ def _display_mermaid_graph(nodes, edges):
     console.print("```")
 
 
-def _display_debt_table(metrics, severity_filter):
+def _display_debt_table(metrics, severity_filter) -> None:
     """Display technical debt in table format."""
     # Debt overview
     console.print(
@@ -667,7 +667,7 @@ def _display_debt_table(metrics, severity_filter):
         console.print(candidates_table)
 
 
-def _display_debt_tree(metrics):
+def _display_debt_tree(metrics) -> None:
     """Display technical debt in tree format."""
     tree = Tree("💳 Technical Debt Analysis")
 
@@ -695,7 +695,7 @@ def _display_debt_tree(metrics):
     console.print(tree)
 
 
-def _display_trends_table(trends_data):
+def _display_trends_table(trends_data) -> None:
     """Display trends analysis in table format."""
     # Complexity trends
     comp_table = Table(title="📈 Complexity Trends", show_header=True)
@@ -736,7 +736,7 @@ def _display_trends_table(trends_data):
         console.print(dist_table)
 
 
-def _display_optimization_insights(insights):
+def _display_optimization_insights(insights) -> None:
     """Display optimization insights."""
     # Bottlenecks
     if insights["bottlenecks"]:
@@ -780,7 +780,7 @@ def _display_optimization_insights(insights):
             console.print(f"   {i}. {rec}")
 
 
-def _display_documentation_status(results):
+def _display_documentation_status(results) -> None:
     """Display documentation analysis results."""
     if "sync_status" in results:
         sync_table = Table(title="📚 Documentation Sync Status", show_header=True)

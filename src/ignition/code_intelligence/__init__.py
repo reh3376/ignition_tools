@@ -1,4 +1,4 @@
-"""IGN Scripts Code Intelligence System
+"""IGN Scripts Code Intelligence System.
 
 This module provides comprehensive code intelligence capabilities including:
 - Automated refactoring with safety guarantees

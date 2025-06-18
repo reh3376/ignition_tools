@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class GatewayConfig:
     """Configuration for connecting to an Ignition Gateway."""
+
     host: str
     port: int = 8088
     username: str | None = None
@@ -33,7 +34,7 @@ class IgnitionGatewayClient:
 
     def __init__(self, config: GatewayConfig):
         """Initialize the gateway client.
-        
+
         Args:
             config: Gateway connection configuration
         """
@@ -43,7 +44,7 @@ class IgnitionGatewayClient:
 
     def connect(self) -> bool:
         """Connect to the Ignition Gateway.
-        
+
         Returns:
             True if connection successful, False otherwise
         """
@@ -77,7 +78,7 @@ class IgnitionGatewayClient:
 
     def get_gateway_info(self) -> dict[str, Any]:
         """Get basic gateway information.
-        
+
         Returns:
             Dictionary containing gateway information
         """
@@ -96,7 +97,7 @@ class IgnitionGatewayClient:
 
     def get_projects(self) -> list[dict[str, Any]]:
         """Get list of all projects on the gateway.
-        
+
         Returns:
             List of project information dictionaries
         """
@@ -125,10 +126,10 @@ class IgnitionGatewayClient:
 
     def get_project_details(self, project_name: str) -> dict[str, Any]:
         """Get detailed information about a specific project.
-        
+
         Args:
             project_name: Name of the project
-            
+
         Returns:
             Detailed project information
         """
@@ -155,7 +156,7 @@ class IgnitionGatewayClient:
 
     def get_tag_providers(self) -> list[dict[str, Any]]:
         """Get list of all tag providers.
-        
+
         Returns:
             List of tag provider information
         """
@@ -184,7 +185,7 @@ class IgnitionGatewayClient:
 
     def get_database_connections(self) -> list[dict[str, Any]]:
         """Get list of all database connections.
-        
+
         Returns:
             List of database connection information
         """
@@ -214,7 +215,7 @@ class IgnitionGatewayClient:
 
     def get_device_connections(self) -> list[dict[str, Any]]:
         """Get list of all device connections.
-        
+
         Returns:
             List of device connection information
         """
@@ -245,7 +246,7 @@ class IgnitionGatewayClient:
 
     def get_security_configuration(self) -> dict[str, Any]:
         """Get security configuration information.
-        
+
         Returns:
             Security configuration details
         """
@@ -289,7 +290,7 @@ class IgnitionGatewayClient:
 
     def get_alarm_configuration(self) -> dict[str, Any]:
         """Get alarm configuration information.
-        
+
         Returns:
             Alarm configuration details
         """
@@ -337,7 +338,7 @@ class IgnitionGatewayClient:
 
     def get_gateway_scripts(self) -> list[dict[str, Any]]:
         """Get gateway-scoped scripts.
-        
+
         Returns:
             List of gateway script information
         """
@@ -375,11 +376,11 @@ class IgnitionGatewayClient:
 
     def export_project(self, project_name: str, export_path: str) -> dict[str, Any]:
         """Export a project using gateway APIs.
-        
+
         Args:
             project_name: Name of the project to export
             export_path: Path where to save the export
-            
+
         Returns:
             Export operation result
         """
@@ -397,13 +398,15 @@ class IgnitionGatewayClient:
             "export_time": "2025-01-28T12:00:00Z",
         }
 
-    def import_project(self, import_path: str, import_options: dict[str, Any]) -> dict[str, Any]:
+    def import_project(
+        self, import_path: str, import_options: dict[str, Any]
+    ) -> dict[str, Any]:
         """Import a project using gateway APIs.
-        
+
         Args:
             import_path: Path to the project file to import
             import_options: Import configuration options
-            
+
         Returns:
             Import operation result
         """
@@ -424,10 +427,10 @@ class IgnitionGatewayClient:
 
     def create_gateway_backup(self, backup_path: str) -> dict[str, Any]:
         """Create a gateway backup using gateway APIs.
-        
+
         Args:
             backup_path: Path where to save the backup
-            
+
         Returns:
             Backup operation result
         """
@@ -445,13 +448,15 @@ class IgnitionGatewayClient:
             "includes": ["projects", "tags", "databases", "devices", "security"],
         }
 
-    def restore_gateway_backup(self, backup_path: str, restore_options: dict[str, Any]) -> dict[str, Any]:
+    def restore_gateway_backup(
+        self, backup_path: str, restore_options: dict[str, Any]
+    ) -> dict[str, Any]:
         """Restore a gateway backup using gateway APIs.
-        
+
         Args:
             backup_path: Path to the backup file to restore
             restore_options: Restore configuration options
-            
+
         Returns:
             Restore operation result
         """

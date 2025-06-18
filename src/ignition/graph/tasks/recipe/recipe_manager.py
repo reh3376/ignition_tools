@@ -210,9 +210,11 @@ class RecipeManager:
                 "status": "running",
                 "start_time": datetime.now(),
                 "progress_percent": 0,
-                "current_step": recipe_data["steps"][0]["name"]
-                if recipe_data["steps"]
-                else "initial",
+                "current_step": (
+                    recipe_data["steps"][0]["name"]
+                    if recipe_data["steps"]
+                    else "initial"
+                ),
                 "execution_parameters": execution_parameters or {},
                 "step_history": [],
             }

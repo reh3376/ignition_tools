@@ -36,7 +36,7 @@ except ImportError:
 
 
 @click.group()
-def supabase():
+def supabase() -> None:
     """Supabase database management commands."""
     pass
 
@@ -47,7 +47,7 @@ def supabase():
     "--project-name", default="IGN Scripts Development", help="Supabase project name"
 )
 @click.option("--org-name", default="IGN Scripts", help="Organization name")
-def setup(force: bool, project_name: str, org_name: str):
+def setup(force: bool, project_name: str, org_name: str) -> None:
     """Initialize Supabase database and create configuration files."""
     click.echo("🚀 Setting up Supabase database for IGN Scripts...")
 
@@ -102,7 +102,7 @@ def setup(force: bool, project_name: str, org_name: str):
     default="table",
     help="Output format",
 )
-def status(format: str):
+def status(format: str) -> None:
     """Show Supabase database status and health information."""
     if not create_supabase_manager:
         click.echo("❌ Supabase manager not available.")
@@ -152,7 +152,7 @@ def status(format: str):
 
 @supabase.command()
 @click.option("--name", help="Custom backup name")
-def backup(name: str):
+def backup(name: str) -> None:
     """Create a database backup."""
     if not create_supabase_manager:
         click.echo("❌ Supabase manager not available.")
@@ -178,7 +178,7 @@ def backup(name: str):
 
 @supabase.command()
 @click.option("--keep-days", default=7, help="Number of days to keep backups")
-def cleanup(keep_days: int):
+def cleanup(keep_days: int) -> None:
     """Clean up old backup files."""
     if not create_supabase_manager:
         click.echo("❌ Supabase manager not available.")
@@ -204,7 +204,7 @@ def cleanup(keep_days: int):
 
 
 @supabase.command()
-def backups():
+def backups() -> None:
     """List available database backups."""
     if not create_supabase_manager:
         click.echo("❌ Supabase manager not available.")
@@ -235,7 +235,7 @@ def backups():
 @click.option(
     "--services", default="all", help="Services to start (all, db, api, studio)"
 )
-def start(services: str):
+def start(services: str) -> None:
     """Start Supabase Docker services."""
     click.echo("🚀 Starting Supabase services...")
 
@@ -284,7 +284,7 @@ def start(services: str):
 @click.option(
     "--services", default="all", help="Services to stop (all, db, api, studio)"
 )
-def stop(services: str):
+def stop(services: str) -> None:
     """Stop Supabase Docker services."""
     click.echo("🛑 Stopping Supabase services...")
 
@@ -330,7 +330,7 @@ def stop(services: str):
     default="yaml",
     help="Output format",
 )
-def config(format: str):
+def config(format: str) -> None:
     """Show Supabase configuration summary."""
     if not create_supabase_manager:
         click.echo("❌ Supabase manager not available.")
@@ -388,7 +388,7 @@ def config(format: str):
 
 # Command aliases for convenience
 @supabase.command()
-def init():
+def init() -> None:
     """Alias for setup command."""
     setup.callback(
         force=False, project_name="IGN Scripts Development", org_name="IGN Scripts"
@@ -396,7 +396,7 @@ def init():
 
 
 @supabase.command()
-def health():
+def health() -> None:
     """Alias for status command."""
     status.callback(format="table")
 

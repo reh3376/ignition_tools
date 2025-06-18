@@ -1,4 +1,4 @@
-"""CLI Commands for Automated Code Refactoring System
+"""CLI Commands for Automated Code Refactoring System.
 
 This module provides CLI commands for the refactoring system, integrating
 with the existing IGN Scripts CLI infrastructure.
@@ -23,7 +23,7 @@ from ignition.code_intelligence.refactoring_workflow import RefactoringWorkflow
 
 
 @click.group(name="refactor")
-def refactor_commands():
+def refactor_commands() -> None:
     """Automated code refactoring commands."""
     pass
 
@@ -40,7 +40,7 @@ def refactor_commands():
     default="table",
     help="Output format",
 )
-def detect(directory: str, threshold: int, format: str):
+def detect(directory: str, threshold: int, format: str) -> None:
     """Detect files that exceed size thresholds and need refactoring."""
     detector = LargeFileDetector(line_threshold=threshold)
     engine = RefactoringRecommendationEngine()
@@ -75,7 +75,7 @@ def detect(directory: str, threshold: int, format: str):
     default="summary",
     help="Output format",
 )
-def analyze(file_path: str, format: str):
+def analyze(file_path: str, format: str) -> None:
     """Analyze a specific file for refactoring opportunities."""
     engine = RefactoringRecommendationEngine()
     file_path_obj = Path(file_path)
@@ -103,7 +103,7 @@ def analyze(file_path: str, format: str):
 @click.argument("file_path", type=click.Path(exists=True))
 @click.option("--dry-run", is_flag=True, help="Simulate split without making changes")
 @click.option("--no-git", is_flag=True, help="Don't preserve git history")
-def split(file_path: str, dry_run: bool, no_git: bool):
+def split(file_path: str, dry_run: bool, no_git: bool) -> None:
     """Split a large file into smaller modules."""
     splitter = CodeSplitter(preserve_git_history=not no_git)
     file_path_obj = Path(file_path)
@@ -152,9 +152,9 @@ def split(file_path: str, dry_run: bool, no_git: bool):
 @click.option("--dry-run", is_flag=True, help="Simulate without making changes")
 @click.option("--no-git", is_flag=True, help="Don't preserve git history")
 @click.option("--max-files", default=5, help="Maximum number of files to process")
-def batch_split(directory: str, dry_run: bool, no_git: bool, max_files: int):
+def batch_split(directory: str, dry_run: bool, no_git: bool, max_files: int) -> None:
     """Split multiple large files in batch."""
-    batch_splitter = BatchCodeSplitter(preserve_git_history=not no_git)
+    BatchCodeSplitter(preserve_git_history=not no_git)
 
     try:
         click.echo(
@@ -205,7 +205,7 @@ def batch_split(directory: str, dry_run: bool, no_git: bool, max_files: int):
 @click.option("--directory", "-d", default="src", help="Directory to scan")
 @click.option("--dry-run", is_flag=True, help="Simulate without making changes")
 @click.option("--no-git", is_flag=True, help="Don't use git integration")
-def workflow(files: tuple, directory: str, dry_run: bool, no_git: bool):
+def workflow(files: tuple, directory: str, dry_run: bool, no_git: bool) -> None:
     """Execute a comprehensive refactoring workflow."""
     project_root = Path.cwd()
     workflow_engine = RefactoringWorkflow(project_root, enable_git=not no_git)
@@ -239,10 +239,9 @@ def workflow(files: tuple, directory: str, dry_run: bool, no_git: bool):
             click.echo(click.style(f"  - {op.description}", fg=risk_color))
             click.echo(f"    Risk: {op.risk_level}, Estimated: {op.estimated_time}s")
 
-        if not dry_run:
-            if not click.confirm("\nProceed with refactoring workflow?"):
-                click.echo("Workflow cancelled")
-                return
+        if not dry_run and not click.confirm("\nProceed with refactoring workflow?"):
+            click.echo("Workflow cancelled")
+            return
 
         # Execute workflow
         result = workflow_engine.execute_workflow(operations, dry_run=dry_run)
@@ -275,7 +274,7 @@ def workflow(files: tuple, directory: str, dry_run: bool, no_git: bool):
 
 @refactor_commands.command()
 @click.argument("workflow_id")
-def rollback(workflow_id: str):
+def rollback(workflow_id: str) -> None:
     """Rollback a refactoring workflow."""
     project_root = Path.cwd()
     workflow_engine = RefactoringWorkflow(project_root)
@@ -294,7 +293,9 @@ def rollback(workflow_id: str):
         sys.exit(1)
 
 
-def _display_files_table(files: list[Path], engine: RefactoringRecommendationEngine):
+def _display_files_table(
+    files: list[Path], engine: RefactoringRecommendationEngine
+) -> None:
     """Display files in table format."""
     click.echo(f"\n{'File':<50} {'Lines':<8} {'Complexity':<12} {'Issues':<8}")
     click.echo("-" * 80)
@@ -313,7 +314,9 @@ def _display_files_table(files: list[Path], engine: RefactoringRecommendationEng
             click.echo(f"{file_path!s:<50} {'ERROR':<8} {'ERROR':<12} {'ERROR':<8}")
 
 
-def _display_files_json(files: list[Path], engine: RefactoringRecommendationEngine):
+def _display_files_json(
+    files: list[Path], engine: RefactoringRecommendationEngine
+) -> None:
     """Display files in JSON format."""
     import json
 
@@ -346,7 +349,9 @@ def _display_files_json(files: list[Path], engine: RefactoringRecommendationEngi
     click.echo(json.dumps(data, indent=2))
 
 
-def _display_files_detailed(files: list[Path], engine: RefactoringRecommendationEngine):
+def _display_files_detailed(
+    files: list[Path], engine: RefactoringRecommendationEngine
+) -> None:
     """Display files in detailed format."""
     for i, file_path in enumerate(files, 1):
         click.echo(f"\n{i}. {file_path}")
@@ -379,7 +384,7 @@ def _display_files_detailed(files: list[Path], engine: RefactoringRecommendation
             click.echo(f"   Error: {e!s}")
 
 
-def _display_analysis_summary(recommendation):
+def _display_analysis_summary(recommendation) -> None:
     """Display analysis in summary format."""
     click.echo("\n📊 ANALYSIS SUMMARY")
     click.echo(f"{'=' * 50}")
@@ -401,7 +406,7 @@ def _display_analysis_summary(recommendation):
     click.echo(f"Risk level: {risk}")
 
 
-def _display_analysis_detailed(recommendation):
+def _display_analysis_detailed(recommendation) -> None:
     """Display analysis in detailed format."""
     _display_analysis_summary(recommendation)
 
@@ -434,7 +439,7 @@ def _display_analysis_detailed(recommendation):
         click.echo(f"  Risk level: {impact.get('risk_level', 'unknown')}")
 
 
-def _display_analysis_json(recommendation):
+def _display_analysis_json(recommendation) -> None:
     """Display analysis in JSON format."""
     import json
     from dataclasses import asdict
@@ -458,13 +463,13 @@ def _display_analysis_json(recommendation):
     type=click.Choice(["table", "json", "detailed"]),
     help="Output format",
 )
-def track_evolution(file_path: str, days: int, output_format: str):
+def track_evolution(file_path: str, days: int, output_format: str) -> None:
     """📈 Track code evolution over time for a specific file."""
     try:
         from pathlib import Path
 
-        from ..git_integration import GitIntegration
-        from ..manager import CodeIntelligenceManager
+        from src.ignition.git_integration import GitIntegration
+        from src.ignition.manager import CodeIntelligenceManager
 
         file_path_obj = Path(file_path)
         if not file_path_obj.exists():
@@ -506,12 +511,12 @@ def track_evolution(file_path: str, days: int, output_format: str):
     type=click.Choice(["table", "json"]),
     help="Output format",
 )
-def analyze_branch(source_branch: str, target_branch: str, output_format: str):
+def analyze_branch(source_branch: str, target_branch: str, output_format: str) -> None:
     """🔀 Analyze differences between branches for refactoring impact."""
     try:
         from pathlib import Path
 
-        from ..git_integration import GitIntegration
+        from src.ignition.git_integration import GitIntegration
 
         git_integration = GitIntegration(Path.cwd(), graph_client=None)
 
@@ -545,12 +550,12 @@ def analyze_branch(source_branch: str, target_branch: str, output_format: str):
     type=click.Choice(["table", "json", "detailed"]),
     help="Output format",
 )
-def tracking_report(operation_id: str, days: int, output_format: str):
+def tracking_report(operation_id: str, days: int, output_format: str) -> None:
     """📊 Generate refactoring tracking and impact reports."""
     try:
         from pathlib import Path
 
-        from ..refactoring_tracker import RefactoringTracker
+        from src.ignition.refactoring_tracker import RefactoringTracker
 
         tracker = RefactoringTracker(Path.cwd())
 
@@ -579,12 +584,12 @@ def tracking_report(operation_id: str, days: int, output_format: str):
 @click.option(
     "--output-dir", "-d", default=".", help="Output directory for diagram files"
 )
-def generate_diagram(operation_id: str, output_dir: str):
+def generate_diagram(operation_id: str, output_dir: str) -> None:
     """🎨 Generate architecture diagram for a refactoring operation."""
     try:
         from pathlib import Path
 
-        from ..refactoring_tracker import RefactoringTracker
+        from src.ignition.refactoring_tracker import RefactoringTracker
 
         tracker = RefactoringTracker(Path.cwd())
 
@@ -595,7 +600,7 @@ def generate_diagram(operation_id: str, output_dir: str):
 
         # Load operation data
         operation_data = tracker.operations[operation_id]
-        from ..refactoring_tracker import RefactoringOperation
+        from src.ignition.refactoring_tracker import RefactoringOperation
 
         operation = RefactoringOperation(**operation_data)
 
@@ -637,13 +642,13 @@ def generate_diagram(operation_id: str, output_dir: str):
     type=click.Choice(["table", "json"]),
     help="Output format",
 )
-def complexity_trends(days: int, output_format: str):
+def complexity_trends(days: int, output_format: str) -> None:
     """📈 Show complexity trends across the codebase."""
     try:
         from pathlib import Path
 
-        from ..git_integration import GitIntegration
-        from ..manager import CodeIntelligenceManager
+        from src.ignition.git_integration import GitIntegration
+        from src.ignition.manager import CodeIntelligenceManager
 
         # Initialize components
         git_integration = GitIntegration(Path.cwd(), graph_client=None)
@@ -670,12 +675,12 @@ def complexity_trends(days: int, output_format: str):
 
 
 @refactor_commands.command()
-def statistics():
+def statistics() -> None:
     """📊 Show comprehensive refactoring statistics."""
     try:
         from pathlib import Path
 
-        from ..refactoring_tracker import RefactoringTracker
+        from src.ignition.refactoring_tracker import RefactoringTracker
 
         tracker = RefactoringTracker(Path.cwd())
         stats = tracker.get_refactoring_statistics()
@@ -714,7 +719,7 @@ def statistics():
         click.echo(f"❌ Error getting statistics: {e}", err=True)
 
 
-def _display_evolution_table(evolution):
+def _display_evolution_table(evolution) -> None:
     """Display evolution data in table format."""
     from rich.console import Console
     from rich.table import Table
@@ -754,7 +759,7 @@ def _display_evolution_table(evolution):
         console.print(table)
 
 
-def _display_detailed_evolution(evolution):
+def _display_detailed_evolution(evolution) -> None:
     """Display detailed evolution analysis."""
     from rich.console import Console
     from rich.panel import Panel
@@ -762,7 +767,7 @@ def _display_detailed_evolution(evolution):
     console = Console()
 
     # Generate full report
-    from ..git_integration import GitIntegration
+    from src.ignition.git_integration import GitIntegration
 
     git_integration = GitIntegration(Path.cwd(), graph_client=None)
     report = git_integration.generate_evolution_report(evolution.file_path)
@@ -799,7 +804,7 @@ def _display_detailed_evolution(evolution):
             console.print(f"  • {rec}")
 
 
-def _display_branch_analysis_table(analysis):
+def _display_branch_analysis_table(analysis) -> None:
     """Display branch analysis in table format."""
     from rich.console import Console
     from rich.table import Table
@@ -830,7 +835,7 @@ def _display_branch_analysis_table(analysis):
             console.print(f"  • {conflict_file}")
 
 
-def _display_tracking_report_table(report):
+def _display_tracking_report_table(report) -> None:
     """Display tracking report in table format."""
     from rich.console import Console
 
@@ -864,7 +869,7 @@ def _display_tracking_report_table(report):
             )
 
 
-def _display_detailed_tracking_report(report):
+def _display_detailed_tracking_report(report) -> None:
     """Display detailed tracking report."""
     from rich.console import Console
     from rich.json import JSON
@@ -877,7 +882,7 @@ def _display_detailed_tracking_report(report):
     console.print(JSON.from_data(report))
 
 
-def _display_complexity_trends_table(trends):
+def _display_complexity_trends_table(trends) -> None:
     """Display complexity trends in table format."""
     from rich.console import Console
     from rich.table import Table

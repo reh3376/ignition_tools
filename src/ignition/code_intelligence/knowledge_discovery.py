@@ -1,4 +1,6 @@
-"""Knowledge Base Discovery and Connection System
+from typing import Dict, List
+
+"""Knowledge Base Discovery and Connection System.
 
 This module ensures that every new agent or chat session automatically discovers
 and connects to the long-term persistent memory systems for this codebase.
@@ -48,7 +50,7 @@ class ProjectContext:
 class KnowledgeDiscoverySystem:
     """Discovers and connects to all available knowledge bases."""
 
-    def __init__(self, project_root: Path | None = None):
+    def __init__(self) -> None:
         self.project_root = project_root or Path.cwd()
         self.knowledge_bases = []
         self.project_context = None
@@ -75,7 +77,7 @@ class KnowledgeDiscoverySystem:
 
         return init_info
 
-    def _discover_project_structure(self):
+    def _discover_project_structure(self) -> None:
         """Discover the overall project structure."""
         # Check for key project files
         key_files = [
@@ -96,7 +98,7 @@ class KnowledgeDiscoverySystem:
                 "type": "directory" if full_path.is_dir() else "file",
             }
 
-    def _discover_knowledge_bases(self):
+    def _discover_knowledge_bases(self) -> None:
         """Discover all available knowledge bases."""
         # 1. Neo4j Graph Database
         neo4j_info = self._discover_neo4j()
@@ -355,10 +357,9 @@ class KnowledgeDiscoverySystem:
             ],
         )
 
-    def _build_project_context(self):
+    def _build_project_context(self) -> None:
         """Build complete project context."""
         # Read roadmap for current phase
-        current_phase = "8.1"
         completed_phases = [
             "1.0",
             "2.0",

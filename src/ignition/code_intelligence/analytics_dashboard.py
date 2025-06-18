@@ -1,4 +1,4 @@
-"""Code Intelligence Dashboard - Phase 8.4
+"""Code Intelligence Dashboard - Phase 8.4.
 
 This module provides comprehensive analytics and visualizations for the codebase,
 including health metrics, dependency graphs, complexity trends, and technical debt tracking.
@@ -96,7 +96,7 @@ class TechnicalDebtItem:
 class CodeIntelligenceDashboard:
     """Main dashboard for code intelligence analytics."""
 
-    def __init__(self, code_manager, git_integration=None):
+    def __init__(self, code_manager, git_integration=None) -> None:
         """Initialize the dashboard.
 
         Args:
@@ -261,7 +261,7 @@ class CodeIntelligenceDashboard:
 
         return datetime.now() - self._cache_timestamp < self._cache_duration
 
-    def _cache_metrics(self, cache_key: str, metrics: Any):
+    def _cache_metrics(self, cache_key: str, metrics: Any) -> None:
         """Cache metrics results."""
         self._metrics_cache[cache_key] = metrics
         self._cache_timestamp = datetime.now()

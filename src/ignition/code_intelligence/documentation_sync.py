@@ -1,4 +1,4 @@
-"""Documentation Synchronization System - Phase 8.4
+"""Documentation Synchronization System - Phase 8.4.
 
 This module provides automated documentation updates and synchronization
 with code changes, maintaining consistency between code and documentation.
@@ -56,7 +56,7 @@ class DocumentationUpdate:
 class DocumentationSynchronizer:
     """Main class for documentation synchronization and updates."""
 
-    def __init__(self, code_manager, project_root: Path):
+    def __init__(self, code_manager, project_root: Path) -> None:
         """Initialize the documentation synchronizer.
 
         Args:
@@ -498,11 +498,9 @@ class DocumentationSynchronizer:
 
             # Check for code blocks that might contain the reference
             code_blocks = re.findall(r"```[\s\S]*?```", content)
-            for block in code_blocks:
-                if element_name in block or file_name in block:
-                    return True
-
-            return False
+            return any(
+                element_name in block or file_name in block for block in code_blocks
+            )
 
         except Exception:
             return False
@@ -718,7 +716,7 @@ class DocumentationSynchronizer:
 
                 # Find file references
                 file_refs = re.findall(r"\[([^\]]+)\]\(([^)]+\.py)\)", content)
-                for text, file_path in file_refs:
+                for _text, file_path in file_refs:
                     cross_refs.append(
                         {
                             "doc_file": str(doc_file),

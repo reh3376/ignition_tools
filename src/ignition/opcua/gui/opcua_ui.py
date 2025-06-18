@@ -145,7 +145,9 @@ class OPCUAWebUI:
                 selected_config = st.selectbox(
                     "Load Config", ["None", *list(configs.keys())]
                 )
-                if selected_config != "None" and st.button("Load", use_container_width=True):
+                if selected_config != "None" and st.button(
+                    "Load", use_container_width=True
+                ):
                     self._load_configuration(selected_config)
 
     def _render_connection_page(self):
@@ -578,7 +580,9 @@ class OPCUAWebUI:
                         st.text("-")
 
                 with col4:
-                    if node["type"] == "Variable" and st.button("📊", key=f"monitor_{node['id']}"):
+                    if node["type"] == "Variable" and st.button(
+                        "📊", key=f"monitor_{node['id']}"
+                    ):
                         self._add_monitor(node["id"], 2)
 
     def _add_monitor(self, node_id: str, interval: int):

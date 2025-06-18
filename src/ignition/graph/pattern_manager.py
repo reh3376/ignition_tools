@@ -481,9 +481,9 @@ class PatternManager:
                     "confidence": record["confidence"],
                     "support": record["support"],
                     "relevance": record["relevance"],
-                    "created": record["created"].isoformat()
-                    if record["created"]
-                    else None,
+                    "created": (
+                        record["created"].isoformat() if record["created"] else None
+                    ),
                     "usage_count": record["usage_count"],
                     "pattern_data": pattern_data,
                 }

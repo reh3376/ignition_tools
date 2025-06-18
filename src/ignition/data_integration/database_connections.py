@@ -1,3 +1,5 @@
+from typing import Dict, List
+
 """Database Connection Manager for Ignition Data Integration.
 
 This module provides a unified interface for connecting to various database types
@@ -64,7 +66,7 @@ class DatabaseConfig:
     pool_size: int = 5
     additional_params: dict[str, Any] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.additional_params is None:
             self.additional_params = {}
 
@@ -82,7 +84,7 @@ class ConnectionResult:
     error_message: str | None = None
     metadata: dict[str, Any] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.metadata is None:
             self.metadata = {}
 
@@ -90,7 +92,7 @@ class ConnectionResult:
 class DatabaseConnectionManager:
     """Unified database connection manager for multiple database types."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the database connection manager."""
         self.connections: dict[str, Any] = {}
         self.configs: dict[str, DatabaseConfig] = {}
@@ -602,9 +604,7 @@ class DatabaseConnectionManager:
 
     def list_connections(self) -> list[dict[str, Any]]:
         """List all active connections."""
-        return [
-            self.get_connection_info(conn_id) for conn_id in self.connections.keys()
-        ]
+        return [self.get_connection_info(conn_id) for conn_id in self.connections]
 
     def list_configurations(self) -> list[str]:
         """List all available database configurations."""
@@ -672,7 +672,7 @@ class DatabaseConnectionManager:
             }
 
     @contextmanager
-    def get_connection(self, config_name: str):
+    def get_connection(self, config_name: str) -> None:
         """Context manager for database connections."""
         result = self.connect(config_name)
         if not result.success:

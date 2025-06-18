@@ -55,7 +55,7 @@ class SupabaseConfig:
 class SupabaseManager:
     """Comprehensive Supabase database management system."""
 
-    def __init__(self, config: SupabaseConfig | None = None):
+    def __init__(self, config: SupabaseConfig | None = None) -> None:
         """Initialize Supabase manager with configuration."""
         self.config = config or self._load_default_config()
         self.backup_dir = Path("supabase-data/backups")
@@ -325,23 +325,22 @@ LOGFLARE_URL=http://localhost:4000
                 "connect_timeout": 10,
             }
 
-            with psycopg2.connect(**conn_params) as conn:
-                with conn.cursor() as cursor:
-                    # Test basic query
-                    cursor.execute("SELECT version();")
-                    version = cursor.fetchone()[0]
+            with psycopg2.connect(**conn_params) as conn, conn.cursor() as cursor:
+                # Test basic query
+                cursor.execute("SELECT version();")
+                version = cursor.fetchone()[0]
 
-                    # Test schema existence
-                    cursor.execute(
-                        "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'ignition';"
-                    )
-                    schema_exists = cursor.fetchone() is not None
+                # Test schema existence
+                cursor.execute(
+                    "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'ignition';"
+                )
+                schema_exists = cursor.fetchone() is not None
 
-                    # Test table count
-                    cursor.execute(
-                        "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'ignition';"
-                    )
-                    table_count = cursor.fetchone()[0] if schema_exists else 0
+                # Test table count
+                cursor.execute(
+                    "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'ignition';"
+                )
+                table_count = cursor.fetchone()[0] if schema_exists else 0
 
             return {
                 "status": "success",
@@ -381,17 +380,16 @@ LOGFLARE_URL=http://localhost:4000
                     "password": self.config.db_password,
                 }
 
-                with psycopg2.connect(**conn_params) as conn:
-                    with conn.cursor() as cursor:
-                        # Get database size
-                        cursor.execute(
-                            f"SELECT pg_size_pretty(pg_database_size('{self.config.db_name}'));"
-                        )
-                        db_size = cursor.fetchone()[0]
+                with psycopg2.connect(**conn_params) as conn, conn.cursor() as cursor:
+                    # Get database size
+                    cursor.execute(
+                        f"SELECT pg_size_pretty(pg_database_size('{self.config.db_name}'));"
+                    )
+                    db_size = cursor.fetchone()[0]
 
-                        # Get table information
-                        cursor.execute(
-                            """
+                    # Get table information
+                    cursor.execute(
+                        """
                             SELECT
                                 schemaname,
                                 tablename,
@@ -402,15 +400,15 @@ LOGFLARE_URL=http://localhost:4000
                             WHERE schemaname = 'ignition'
                             ORDER BY tablename;
                         """
-                        )
-                        tables = cursor.fetchall()
+                    )
+                    tables = cursor.fetchall()
 
-                        # Get connection count
-                        cursor.execute(
-                            "SELECT count(*) FROM pg_stat_activity WHERE datname = %s;",
-                            (self.config.db_name,),
-                        )
-                        connection_count = cursor.fetchone()[0]
+                    # Get connection count
+                    cursor.execute(
+                        "SELECT count(*) FROM pg_stat_activity WHERE datname = %s;",
+                        (self.config.db_name,),
+                    )
+                    connection_count = cursor.fetchone()[0]
 
                 return {
                     "status": "healthy",
@@ -473,9 +471,11 @@ LOGFLARE_URL=http://localhost:4000
                 # Compress backup
                 import gzip
 
-                with open(backup_file, "rb") as f_in:
-                    with gzip.open(f"{backup_file}.gz", "wb") as f_out:
-                        f_out.writelines(f_in)
+                with (
+                    open(backup_file, "rb") as f_in,
+                    gzip.open(f"{backup_file}.gz", "wb") as f_out,
+                ):
+                    f_out.writelines(f_in)
 
                 # Remove uncompressed file
                 backup_file.unlink()

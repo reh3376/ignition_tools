@@ -1,4 +1,4 @@
-"""Dataset Management System for AI/ML Model Preparation
+"""Dataset Management System for AI/ML Model Preparation.
 
 This module provides comprehensive dataset creation, curation, and management
 capabilities for preparing industrial data for AI supervised learning models.
@@ -146,7 +146,7 @@ class Dataset:
 class DatasetManager:
     """Manager for dataset creation, curation, and preparation."""
 
-    def __init__(self, storage_path: str = "./data/datasets"):
+    def __init__(self, storage_path: str = "./data/datasets") -> None:
         """Initialize the dataset manager."""
         self.storage_path = Path(storage_path)
         self.storage_path.mkdir(parents=True, exist_ok=True)
@@ -385,7 +385,7 @@ class DatasetManager:
             historian_type = HistorianType(
                 source.connection_config.get("historian_type", "influxdb")
             )
-            generator = HistorianQueryGenerator(historian_type)
+            HistorianQueryGenerator(historian_type)
 
             # Generate sample data for now
             # In production, this would execute actual historian queries
@@ -405,7 +405,7 @@ class DatasetManager:
         from .opc_tag_manager import OPCTagManager
 
         try:
-            manager = OPCTagManager()
+            OPCTagManager()
             tag_paths = (
                 source.query_config.get("tag_paths", []) if source.query_config else []
             )
@@ -739,7 +739,7 @@ class DatasetManager:
         if dataset_id not in self.datasets:
             return False
 
-        dataset = self.datasets[dataset_id]
+        self.datasets[dataset_id]
 
         # Delete files
         files_to_delete = [

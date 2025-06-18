@@ -91,7 +91,7 @@ def create_sample_deployment_executions(learner: DeploymentPatternLearner) -> li
             started_at = datetime.now() - timedelta(
                 days=random.randint(1, 90),
                 hours=random.randint(0, 23),
-                minutes=random.randint(0, 59)
+                minutes=random.randint(0, 59),
             )
 
             if should_succeed:
@@ -105,17 +105,21 @@ def create_sample_deployment_executions(learner: DeploymentPatternLearner) -> li
                 duration = random.randint(30, 600)  # 30 seconds to 10 minutes
                 completed_at = started_at + timedelta(seconds=duration)
                 status = "failed"
-                failure_reasons = random.choice([
-                    ["Database connection timeout", "Validation failed"],
-                    ["Resource conflict detected", "Dependency missing"],
-                    ["Gateway communication error"],
-                    ["Insufficient permissions", "Security validation failed"],
-                    ["Resource lock timeout", "Concurrent deployment detected"],
-                ])
+                failure_reasons = random.choice(
+                    [
+                        ["Database connection timeout", "Validation failed"],
+                        ["Resource conflict detected", "Dependency missing"],
+                        ["Gateway communication error"],
+                        ["Insufficient permissions", "Security validation failed"],
+                        ["Resource lock timeout", "Concurrent deployment detected"],
+                    ]
+                )
                 rollback_triggered = random.choice([True, False])
-                rollback_successful = random.choice([True, False]) if rollback_triggered else None
+                rollback_successful = (
+                    random.choice([True, False]) if rollback_triggered else None
+                )
 
-            execution_name = f"{scenario['name']} - Run {i+1}"
+            execution_name = f"{scenario['name']} - Run {i + 1}"
 
             try:
                 execution_id = learner.record_deployment_execution(
@@ -132,20 +136,32 @@ def create_sample_deployment_executions(learner: DeploymentPatternLearner) -> li
                     failure_reasons=failure_reasons,
                     rollback_triggered=rollback_triggered,
                     rollback_successful=rollback_successful,
-                    user_id=random.choice(["engineer1", "operator1", "admin", "devops1"]),
+                    user_id=random.choice(
+                        ["engineer1", "operator1", "admin", "devops1"]
+                    ),
                     automation_triggered=random.choice([True, False]),
-                    performance_data={
-                        "cpu_usage": random.uniform(20, 80),
-                        "memory_usage": random.uniform(30, 70),
-                        "network_latency": random.uniform(10, 100),
-                    } if should_succeed else None,
-                    lessons_learned=random.choice([
-                        "Database connection pool needs tuning",
-                        "Validation timeout should be increased",
-                        "Resource dependencies need better documentation",
-                        "Rollback procedure worked well",
-                        None,
-                    ]) if not should_succeed else None,
+                    performance_data=(
+                        {
+                            "cpu_usage": random.uniform(20, 80),
+                            "memory_usage": random.uniform(30, 70),
+                            "network_latency": random.uniform(10, 100),
+                        }
+                        if should_succeed
+                        else None
+                    ),
+                    lessons_learned=(
+                        random.choice(
+                            [
+                                "Database connection pool needs tuning",
+                                "Validation timeout should be increased",
+                                "Resource dependencies need better documentation",
+                                "Rollback procedure worked well",
+                                None,
+                            ]
+                        )
+                        if not should_succeed
+                        else None
+                    ),
                 )
                 execution_ids.append(execution_id)
 
@@ -156,7 +172,9 @@ def create_sample_deployment_executions(learner: DeploymentPatternLearner) -> li
     return execution_ids
 
 
-def create_sample_environment_adaptations(learner: DeploymentPatternLearner) -> list[str]:
+def create_sample_environment_adaptations(
+    learner: DeploymentPatternLearner,
+) -> list[str]:
     """Create sample environment adaptations."""
     print("🔄 Creating sample environment adaptations...")
 
@@ -269,7 +287,9 @@ def create_sample_environment_adaptations(learner: DeploymentPatternLearner) -> 
                     "All required fields are present",
                     "Security requirements are met",
                 ],
-                automation_level=random.choice(["manual", "semi_automated", "fully_automated"]),
+                automation_level=random.choice(
+                    ["manual", "semi_automated", "fully_automated"]
+                ),
             )
             adaptation_ids.append(adaptation_id)
 
@@ -451,7 +471,7 @@ def create_sample_deployment_metrics(learner: DeploymentPatternLearner) -> list[
 
     # Generate metrics for the last 30 days
     for day in range(30):
-        measurement_date = datetime.now() - timedelta(days=day)
+        datetime.now() - timedelta(days=day)
 
         for environment in environments:
             for strategy in strategies:
@@ -488,7 +508,9 @@ def create_sample_deployment_metrics(learner: DeploymentPatternLearner) -> list[
                         metric_ids.append(metric_id)
 
                     except Exception as e:
-                        print(f"   ❌ Failed to create metric {metric_def['name']}: {e}")
+                        print(
+                            f"   ❌ Failed to create metric {metric_def['name']}: {e}"
+                        )
 
     print(f"✅ Created {len(metric_ids)} deployment metrics")
     return metric_ids
@@ -522,40 +544,42 @@ def demonstrate_deployment_pattern_learning():
             target_environment="production",
             resource_types=["project", "database"],
             deployment_strategy="blue_green",
-            limit=3
+            limit=3,
         )
         print(f"   Found {len(recommendations)} recommendations")
         for rec in recommendations:
-            print(f"   • {rec['pattern_name']} (confidence: {rec['confidence_score']:.1%})")
+            print(
+                f"   • {rec['pattern_name']} (confidence: {rec['confidence_score']:.1%})"
+            )
 
         # Test environment adaptations
         print("\n2. Testing Environment Adaptations:")
         adaptations = learner.get_environment_adaptations(
-            source_environment="staging",
-            target_environment="production",
-            limit=3
+            source_environment="staging", target_environment="production", limit=3
         )
         print(f"   Found {len(adaptations)} adaptations")
         for adaptation in adaptations:
-            print(f"   • {adaptation['adaptation_name']} (success rate: {adaptation['success_rate']:.1%})")
+            print(
+                f"   • {adaptation['adaptation_name']} (success rate: {adaptation['success_rate']:.1%})"
+            )
 
         # Test rollback scenarios
         print("\n3. Testing Rollback Scenarios:")
         scenarios = learner.get_rollback_scenarios(
-            environment="production",
-            resource_types=["database", "project"],
-            limit=3
+            environment="production", resource_types=["database", "project"], limit=3
         )
         print(f"   Found {len(scenarios)} rollback scenarios")
         for scenario in scenarios:
-            print(f"   • {scenario['scenario_name']} (success rate: {scenario['success_rate']:.1%})")
+            print(
+                f"   • {scenario['scenario_name']} (success rate: {scenario['success_rate']:.1%})"
+            )
 
         # Test deployment analytics
         print("\n4. Testing Deployment Analytics:")
         analytics = learner.get_deployment_analytics(
             environment="production",
             days_back=30,
-            metric_types=["duration", "success_rate"]
+            metric_types=["duration", "success_rate"],
         )
         stats = analytics.get("deployment_statistics", {})
         print(f"   Total deployments: {stats.get('total_deployments', 0)}")

@@ -1,4 +1,6 @@
-"""Git Integration for Code Intelligence System
+from typing import Dict, List
+
+"""Git Integration for Code Intelligence System.
 
 This module provides comprehensive git integration for tracking code evolution,
 linking code changes to commits and branches, and monitoring complexity trends.
@@ -62,7 +64,7 @@ class BranchAnalysis:
 class GitIntegration:
     """Provides git integration for code intelligence tracking."""
 
-    def __init__(self, repository_path: Path, graph_client=None):
+    def __init__(self) -> None:
         self.repository_path = repository_path
         self.graph_client = graph_client
         self._git_available = self._check_git_availability()
@@ -70,7 +72,7 @@ class GitIntegration:
     def _check_git_availability(self) -> bool:
         """Check if git is available and repository is valid."""
         try:
-            result = subprocess.run(
+            subprocess.run(
                 ["git", "rev-parse", "--git-dir"],
                 cwd=self.repository_path,
                 capture_output=True,
@@ -460,7 +462,7 @@ class GitIntegration:
             RETURN ce
             """
 
-            result = self.graph_client.execute_query(
+            self.graph_client.execute_query(
                 cypher,
                 {
                     "file_path": evolution.file_path,

@@ -1,4 +1,6 @@
-"""Intelligent Code Splitting Engine
+from typing import Dict, List
+
+"""Intelligent Code Splitting Engine.
 
 This module implements automated code splitting for large files while preserving:
 - Git blame history through git-mv operations
@@ -8,6 +10,7 @@ This module implements automated code splitting for large files while preserving
 """
 
 import ast
+import contextlib
 import shutil
 import subprocess
 from dataclasses import dataclass
@@ -47,7 +50,7 @@ class CodeExtraction:
 class CodeSplitter:
     """Splits large files into smaller, more maintainable modules."""
 
-    def __init__(self, preserve_git_history: bool = True, max_file_lines: int = 1000):
+    def __init__(self) -> None:
         self.preserve_git_history = preserve_git_history
         self.max_file_lines = max_file_lines
         self.recommendation_engine = RefactoringRecommendationEngine()
@@ -163,7 +166,7 @@ class CodeSplitter:
                 imports_needed.update(class_imports)
 
             elif (
-                isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+                isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef)
                 and node.name in functions_to_extract
             ):
                 start_line = node.lineno - 1
@@ -529,14 +532,12 @@ class CodeSplitter:
         except:
             return file_path.stem
 
-    def _rollback_split(self, original_file: Path, new_files: list[str]):
+    def _rollback_split(self, original_file: Path, new_files: list[str]) -> None:
         """Rollback a failed split operation."""
         # Remove any created new files
         for new_file_path in new_files:
-            try:
+            with contextlib.suppress(Exception):
                 Path(new_file_path).unlink(missing_ok=True)
-            except:
-                pass
 
         # Restore original from backup if it exists
         backup_path = original_file.with_suffix(".py.backup")
@@ -548,7 +549,7 @@ class CodeSplitter:
 class BatchCodeSplitter:
     """Splits multiple files in a coordinated batch operation."""
 
-    def __init__(self, preserve_git_history: bool = True):
+    def __init__(self) -> None:
         self.splitter = CodeSplitter(preserve_git_history=preserve_git_history)
         self.detector = RefactoringRecommendationEngine().detector
 
@@ -583,7 +584,7 @@ class BatchCodeSplitter:
         return results
 
 
-def main():
+def main() -> None:
     """Main function for testing the code splitter."""
     import argparse
 

@@ -1,4 +1,6 @@
-"""Automated Refactoring Workflow
+from typing import Dict, List
+
+"""Automated Refactoring Workflow.
 
 This module implements a comprehensive refactoring workflow that:
 - Ensures behavior preservation through automated testing
@@ -63,7 +65,7 @@ class ValidationResult:
 class RefactoringWorkflow:
     """Orchestrates complex refactoring operations with safety guarantees."""
 
-    def __init__(self, project_root: Path, enable_git: bool = True):
+    def __init__(self) -> None:
         self.project_root = project_root
         self.enable_git = enable_git
         self.code_splitter = CodeSplitter(preserve_git_history=enable_git)
@@ -656,7 +658,7 @@ class RefactoringWorkflow:
             return False
 
 
-def main():
+def main() -> None:
     """Main function for testing the refactoring workflow."""
     import argparse
 

@@ -57,7 +57,7 @@ class ReportData:
 class ReportGenerator:
     """Generator for various types of industrial reports."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the report generator."""
         self.logger = logging.getLogger(__name__)
 
@@ -182,7 +182,7 @@ class ReportGenerator:
     ) -> dict[str, Any]:
         """Generate a trend report for specified tags."""
         try:
-            headers = ["Timestamp"] + tags
+            headers = ["Timestamp", *tags]
             rows = []
 
             # Generate trend data

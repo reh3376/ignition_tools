@@ -1,4 +1,4 @@
-"""Dependency Analyzer - Phase 8.4
+"""Dependency Analyzer - Phase 8.4.
 
 This module analyzes and creates proper dependency relationships between CodeFile nodes
 for accurate dependency graph visualization and analysis.
@@ -25,7 +25,7 @@ class DependencyRelationship:
 class DependencyAnalyzer:
     """Analyzes and creates dependency relationships between code files."""
 
-    def __init__(self, graph_client):
+    def __init__(self, graph_client) -> None:
         """Initialize the dependency analyzer.
 
         Args:

@@ -41,7 +41,7 @@ class CodeEmbeddingGenerator:
 
     def __init__(
         self, model_name: str = "all-MiniLM-L6-v2", cache_dir: str | None = None
-    ):
+    ) -> None:
         """Initialize the embedding generator.
 
         Args:
@@ -61,7 +61,7 @@ class CodeEmbeddingGenerator:
         self.dimensions = 384  # Default for all-MiniLM-L6-v2
         self._initialize_model()
 
-    def _initialize_model(self):
+    def _initialize_model(self) -> None:
         """Initialize the sentence transformer model."""
         if not EMBEDDINGS_AVAILABLE:
             logger.warning(
@@ -174,7 +174,6 @@ class CodeEmbeddingGenerator:
     def _preprocess_code_for_embedding(self, code: str, file_path: str) -> str:
         """Preprocess code content for optimal embedding generation."""
         lines = code.split("\n")
-        processed_lines = []
 
         # Extract key information for embedding
         imports = []
@@ -310,7 +309,7 @@ class CodeEmbeddingGenerator:
             logger.debug(f"Failed to load cached embedding: {e}")
             return None
 
-    def _cache_embedding(self, result: EmbeddingResult):
+    def _cache_embedding(self, result: EmbeddingResult) -> None:
         """Cache embedding result."""
         cache_file = self.cache_dir / f"{result.text_hash}.json"
 
@@ -330,7 +329,7 @@ class CodeEmbeddingGenerator:
         except Exception as e:
             logger.debug(f"Failed to cache embedding: {e}")
 
-    def clear_cache(self):
+    def clear_cache(self) -> None:
         """Clear the embedding cache."""
         try:
             for cache_file in self.cache_dir.glob("*.json"):
@@ -360,7 +359,9 @@ class CodeEmbeddingGenerator:
 class SemanticCodeSearch:
     """Provides semantic search capabilities for code using vector embeddings."""
 
-    def __init__(self, graph_client, embedding_generator: CodeEmbeddingGenerator):
+    def __init__(
+        self, graph_client, embedding_generator: CodeEmbeddingGenerator
+    ) -> None:
         """Initialize semantic search system.
 
         Args:

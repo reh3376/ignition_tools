@@ -1,3 +1,5 @@
+from typing import Dict, List
+
 """Enhanced CLI interface for IGN Scripts with Learning System Integration.
 
 This module provides a rich, interactive command-line interface with:
@@ -34,10 +36,10 @@ try:
 except ImportError:
     # Create dummy classes if prompt_toolkit not available
     class DummyApp:
-        def __init__(self):
+        def __init__(self) -> None:
             pass
 
-        def run(self):
+        def run(self) -> None:
             pass
 
     Application = DummyApp
@@ -69,7 +71,7 @@ logger = logging.getLogger(__name__)
 class LearningSystemCLI:
     """Enhanced CLI with learning system integration."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the learning system CLI."""
         self.console = Console()
         self.client = None
@@ -125,11 +127,8 @@ class LearningSystemCLI:
             if (
                 hasattr(self.tracker, "current_session_id")
                 and not self.tracker.current_session_id
-            ):
-                if hasattr(self.tracker, "start_session"):
-                    self.tracker.start_session(
-                        user_id="cli_user", session_type="cli_usage"
-                    )
+            ) and hasattr(self.tracker, "start_session"):
+                self.tracker.start_session(user_id="cli_user", session_type="cli_usage")
 
             # Track the command usage
             function_name = f"cli.{command}"
@@ -175,7 +174,7 @@ class LearningSystemCLI:
         except Exception:
             return []
 
-    def display_welcome(self):
+    def display_welcome(self) -> None:
         """Display enhanced welcome message with learning system status."""
         title = Text()
         title.append("IGN Scripts", style="bold blue")
@@ -350,7 +349,7 @@ def generate(
         console.print(f"[red]✗[/red] Error generating script: {e}")
 
 
-def show_generation_recommendations(template: str, action_type: str):
+def show_generation_recommendations(template: str, action_type: str) -> None:
     """Show smart recommendations for script generation."""
     if not enhanced_cli.manager:
         return
@@ -404,7 +403,7 @@ def show_generation_recommendations(template: str, action_type: str):
     console.print()
 
 
-def show_followup_recommendations():
+def show_followup_recommendations() -> None:
     """Show recommendations for what to do next."""
     if not enhanced_cli.get_recommendations:
         return
@@ -526,7 +525,7 @@ def list_templates(ctx: click.Context, detailed: bool) -> None:
         console.print(f"[red]✗[/red] Error listing templates: {e}")
 
 
-def show_template_recommendations():
+def show_template_recommendations() -> None:
     """Show template recommendations based on usage patterns."""
     if not enhanced_cli.manager:
         return
@@ -585,7 +584,7 @@ def patterns(ctx: click.Context, days: int, pattern_type: str) -> None:
         console.print(f"[red]✗[/red] Error analyzing patterns: {e}")
 
 
-def display_pattern_overview(stats: dict[str, Any]):
+def display_pattern_overview(stats: dict[str, Any]) -> None:
     """Display overview of all patterns."""
     console.print("[bold cyan]📊 Pattern Analysis Overview[/bold cyan]\n")
 
@@ -613,7 +612,7 @@ def display_pattern_overview(stats: dict[str, Any]):
 
 def display_specific_patterns(
     pattern_type: str, patterns: builtins.list[dict[str, Any]]
-):
+) -> None:
     """Display specific pattern type details."""
     title = f"📊 {pattern_type.replace('_', ' ').title()} Patterns"
     console.print(f"[bold cyan]{title}[/bold cyan]\n")
@@ -802,7 +801,7 @@ if PROMPT_TOOLKIT_AVAILABLE:
     class PatternExplorerApp:
         """Interactive TUI for exploring patterns using prompt_toolkit."""
 
-        def __init__(self):
+        def __init__(self) -> None:
             """Initialize the pattern explorer."""
             self.current_patterns = []
             self.current_view = "menu"
@@ -819,7 +818,7 @@ if PROMPT_TOOLKIT_AVAILABLE:
                 }
             )
 
-        def run(self):
+        def run(self) -> None:
             """Run the interactive pattern explorer."""
             while True:
                 try:
@@ -853,7 +852,7 @@ if PROMPT_TOOLKIT_AVAILABLE:
                 style=self.style,
             ).run()
 
-        def _handle_menu_choice(self, choice: str):
+        def _handle_menu_choice(self, choice: str) -> None:
             """Handle the user's menu choice."""
             if choice == "all_patterns":
                 self._show_all_patterns()
@@ -870,7 +869,7 @@ if PROMPT_TOOLKIT_AVAILABLE:
             elif choice == "export":
                 self._export_patterns()
 
-        def _show_all_patterns(self):
+        def _show_all_patterns(self) -> None:
             """Show all patterns in a formatted view."""
             patterns_text = self._format_patterns_display(
                 [
@@ -901,7 +900,7 @@ if PROMPT_TOOLKIT_AVAILABLE:
                 style=self.style,
             ).run()
 
-        def _show_co_occurrence_patterns(self):
+        def _show_co_occurrence_patterns(self) -> None:
             """Show function co-occurrence patterns."""
             patterns_text = self._format_co_occurrence_display(
                 [
@@ -928,7 +927,7 @@ if PROMPT_TOOLKIT_AVAILABLE:
                 style=self.style,
             ).run()
 
-        def _show_template_patterns(self):
+        def _show_template_patterns(self) -> None:
             """Show template usage patterns."""
             patterns_text = self._format_template_display(
                 [
@@ -953,7 +952,7 @@ if PROMPT_TOOLKIT_AVAILABLE:
                 style=self.style,
             ).run()
 
-        def _show_parameter_patterns(self):
+        def _show_parameter_patterns(self) -> None:
             """Show parameter combination patterns."""
             patterns_text = self._format_parameter_display(
                 [
@@ -978,7 +977,7 @@ if PROMPT_TOOLKIT_AVAILABLE:
                 style=self.style,
             ).run()
 
-        def _show_statistics(self):
+        def _show_statistics(self) -> None:
             """Show system statistics."""
             stats_text = """📈 Learning System Statistics
 
@@ -1004,7 +1003,7 @@ Recent Activity:
                 style=self.style,
             ).run()
 
-        def _search_patterns(self):
+        def _search_patterns(self) -> None:
             """Interactive pattern search."""
             search_term = input_dialog(
                 title="🔍 Search Patterns",
@@ -1036,7 +1035,7 @@ Found 3 matching patterns:
                     style=self.style,
                 ).run()
 
-        def _export_patterns(self):
+        def _export_patterns(self) -> None:
             """Export patterns functionality."""
             format_choice = radiolist_dialog(
                 title="💾 Export Patterns",
@@ -1555,7 +1554,7 @@ def setup(ctx: click.Context) -> None:
 # Add session management for CLI usage tracking
 @main.result_callback()
 @click.pass_context
-def cleanup(ctx: click.Context, result, **kwargs):
+def cleanup(ctx: click.Context, result, **kwargs) -> None:
     """Clean up and end tracking session."""
     if enhanced_cli.tracker and enhanced_cli.tracker.current_session_id:
         enhanced_cli.tracker.end_session()
@@ -1576,7 +1575,7 @@ except ImportError:
         enhanced_cli.track_cli_usage("backup")
 
     @backup.command()
-    def install():
+    def install() -> None:
         """Install backup dependencies."""
         console.print("[yellow]⚠️  Backup dependencies not installed[/yellow]")
         console.print(
@@ -1599,7 +1598,7 @@ except ImportError:
         enhanced_cli.track_cli_usage("opcua")
 
     @opcua.command()
-    def install():
+    def install() -> None:
         """Install OPC-UA dependencies."""
         console.print("[yellow]⚠️  OPC-UA dependencies not installed[/yellow]")
         console.print("\n[bold]To enable OPC-UA functionality, run:[/bold]")
@@ -1608,7 +1607,7 @@ except ImportError:
 
 
 @main.group(name="export")
-def export_group():
+def export_group() -> None:
     """🚀 Export Ignition gateway resources and projects."""
     pass
 
@@ -1796,7 +1795,6 @@ def export_project(
             # Check if learning system has graph_client
             if hasattr(enhanced_cli, "client") and enhanced_cli.client:
                 if hasattr(enhanced_cli.client, "graph_client"):
-                    graph_client = enhanced_cli.client.graph_client  # type: ignore[attr-defined]
                     console.print(
                         "[blue]🧠[/blue] Learning system will track this export"
                     )
@@ -1940,7 +1938,7 @@ def resources(
 
 
 @main.group(name="import")
-def import_group():
+def import_group() -> None:
     """📥 Import Ignition projects and resources."""
     pass
 
@@ -1999,7 +1997,6 @@ def import_project(
             # Check if learning system has graph_client
             if hasattr(enhanced_cli, "client") and enhanced_cli.client:
                 if hasattr(enhanced_cli.client, "graph_client"):
-                    graph_client = enhanced_cli.client.graph_client  # type: ignore[attr-defined]
                     console.print(
                         "[blue]🧠[/blue] Learning system will track this import"
                     )
@@ -2111,7 +2108,7 @@ def import_project(
     help="Expected file type",
 )
 @click.option("--detailed", is_flag=True, help="Show detailed validation results")
-def validate_import(file_path: str, type: str, detailed: bool):
+def validate_import(file_path: str, type: str, detailed: bool) -> None:
     """✅ Validate import file before importing."""
     enhanced_cli.track_cli_usage(
         "import",
@@ -2219,7 +2216,7 @@ def validate_import(file_path: str, type: str, detailed: bool):
 
 # Version Control Intelligence Commands
 @main.group()
-def version():
+def version() -> None:
     """🔄 Version Control Intelligence commands."""
     pass
 
@@ -2227,7 +2224,7 @@ def version():
 @version.command()
 @click.option("--repository", "-r", help="Repository path (default: current directory)")
 @click.option("--detailed", "-d", is_flag=True, help="Show detailed status information")
-def status(repository: str | None, detailed: bool):
+def status(repository: str | None, detailed: bool) -> None:
     """📊 Show version control intelligence status."""
     try:
         from pathlib import Path
@@ -2328,7 +2325,7 @@ def status(repository: str | None, detailed: bool):
 @click.option("--repository", "-r", help="Repository path (default: current directory)")
 def analyze_commit(
     commit_hash: str | None, files: str | None, detailed: bool, repository: str | None
-):
+) -> None:
     """🔍 Analyze the impact of a commit or changes."""
     console.print("\n[bold blue]📊 Commit Impact Analysis[/bold blue]")
 
@@ -2357,7 +2354,7 @@ def analyze_commit(
 @click.option("--repository", "-r", help="Repository path (default: current directory)")
 def predict_conflicts(
     source_branch: str, target_branch: str, detailed: bool, repository: str | None
-):
+) -> None:
     """🔮 Predict merge conflicts between branches."""
     console.print("\n[bold blue]🔮 Merge Conflict Prediction[/bold blue]")
     console.print(f"Source: {source_branch} → Target: {target_branch}")
@@ -2407,14 +2404,14 @@ def plan_release(
 
 # Code Intelligence Commands
 @main.group()
-def code():
+def code() -> None:
     """🧠 Code Intelligence commands for analyzing and searching code."""
     pass
 
 
 @code.command()
 @click.option("--detailed", is_flag=True, help="Show detailed information")
-def code_status(detailed: bool):
+def code_status(detailed: bool) -> None:
     """Show code intelligence system status."""
     try:
         from src.ignition.code_intelligence import CodeIntelligenceManager
@@ -2460,7 +2457,7 @@ def code_status(detailed: bool):
 @code.command()
 @click.argument("file_path", type=click.Path(exists=True))
 @click.option("--detailed", is_flag=True, help="Show detailed analysis")
-def analyze_file(file_path: str, detailed: bool):
+def analyze_file(file_path: str, detailed: bool) -> None:
     """Analyze a specific file and store results."""
     try:
         from pathlib import Path
@@ -2523,7 +2520,7 @@ def analyze_file(file_path: str, detailed: bool):
     help="Type of code elements to search",
 )
 @click.option("--limit", default=10, help="Maximum number of results")
-def search_code(query: str, search_type: str, limit: int):
+def search_code(query: str, search_type: str, limit: int) -> None:
     """Search for code elements by name or content."""
     try:
         from src.ignition.code_intelligence import CodeIntelligenceManager
@@ -2563,7 +2560,7 @@ def search_code(query: str, search_type: str, limit: int):
 
 # Analytics and Optimization commands (Phase 8.4)
 @code.group(name="analytics")
-def analytics():
+def analytics() -> None:
     """📊 Advanced analytics and optimization tools."""
     pass
 
@@ -2591,7 +2588,7 @@ except ImportError as e:
 
 # AI Assistant Enhancement commands
 @code.group(name="ai")
-def ai_assistant():
+def ai_assistant() -> None:
     """🤖 AI Assistant Enhancement commands for context-aware development."""
     pass
 
@@ -2604,7 +2601,7 @@ def ai_assistant():
     default="medium",
     help="Size of context to retrieve",
 )
-def context(file_path: str, context_size: str):
+def context(file_path: str, context_size: str) -> None:
     """Get smart context for a file instead of reading entire file."""
     try:
         from src.ignition.code_intelligence.ai_assistant_enhancement import (
@@ -2666,7 +2663,7 @@ def context(file_path: str, context_size: str):
 @click.argument("file_path")
 @click.argument("query")
 @click.option("--max-snippets", default=5, help="Maximum number of snippets to return")
-def snippets(file_path: str, query: str, max_snippets: int):
+def snippets(file_path: str, query: str, max_snippets: int) -> None:
     """Get relevant code snippets instead of reading entire file."""
     try:
         from src.ignition.code_intelligence.ai_assistant_enhancement import (
@@ -2712,7 +2709,7 @@ def snippets(file_path: str, query: str, max_snippets: int):
 @ai_assistant.command()
 @click.argument("file_path")
 @click.option("--change-description", default="", help="Description of planned changes")
-def impact(file_path: str, change_description: str):
+def impact(file_path: str, change_description: str) -> None:
     """Analyze potential impact of changes to a file."""
     try:
         from src.ignition.code_intelligence.ai_assistant_enhancement import (
@@ -2776,7 +2773,7 @@ def impact(file_path: str, change_description: str):
 @click.argument("file_path")
 @click.argument("element_name")
 @click.option("--limit", default=5, help="Maximum number of suggestions")
-def similar(file_path: str, element_name: str, limit: int):
+def similar(file_path: str, element_name: str, limit: int) -> None:
     """Find similar implementations in the codebase."""
     try:
         from src.ignition.code_intelligence.ai_assistant_enhancement import (
@@ -2839,13 +2836,13 @@ except ImportError as e:
 
 # Add wrapper commands
 @main.group(name="wrappers")
-def wrapper_group():
+def wrapper_group() -> None:
     """🛡️ Enhanced Ignition system function wrappers with error handling."""
     pass
 
 
 @wrapper_group.command()
-def test_all():
+def test_all() -> None:
     """🧪 Test all system function wrappers."""
     console.print("[bold blue]🧪 Testing System Function Wrappers[/bold blue]\n")
 
@@ -2941,7 +2938,7 @@ def test_all():
 
 @wrapper_group.command()
 @click.option("--tag-path", default="[default]TestTag", help="Tag path to test")
-def test_tag(tag_path: str):
+def test_tag(tag_path: str) -> None:
     """🏷️ Test system.tag wrapper."""
     console.print("[bold blue]🏷️ Testing System Tag Wrapper[/bold blue]\n")
 
@@ -2983,7 +2980,7 @@ def test_tag(tag_path: str):
 
 @wrapper_group.command()
 @click.option("--query", default="SELECT 1 as test_value", help="Test SQL query")
-def test_db(query: str):
+def test_db(query: str) -> None:
     """🗄️ Test system.db wrapper."""
     console.print("[bold blue]🗄️ Testing System Database Wrapper[/bold blue]\n")
 
@@ -3010,7 +3007,7 @@ def test_db(query: str):
 
 
 @wrapper_group.command()
-def info():
+def info() -> None:
     """📋 Show information about available system function wrappers."""
     console.print("[bold blue]📋 Ignition System Function Wrappers[/bold blue]\n")
 
@@ -3075,13 +3072,13 @@ def info():
 
 # Data Integration Commands
 @main.group(name="data")
-def data_integration():
+def data_integration() -> None:
     """🔗 Data Integration commands for databases, historians, and OPC tags."""
     pass
 
 
 @data_integration.group()
-def database():
+def database() -> None:
     """🗄️ Database connection and query commands."""
     pass
 
@@ -3090,7 +3087,7 @@ def database():
 @click.option(
     "--config-name", default="neo4j_default", help="Database configuration name"
 )
-def test_connection(config_name: str):
+def test_connection(config_name: str) -> None:
     """Test database connection."""
     try:
         from src.ignition.data_integration.database_connections import (
@@ -3118,7 +3115,7 @@ def test_connection(config_name: str):
 
 
 @database.command()
-def list_configs():
+def list_configs() -> None:
     """List available database configurations."""
     try:
         from src.ignition.data_integration.database_connections import (
@@ -3157,7 +3154,7 @@ def list_configs():
 
 
 @data_integration.group()
-def tags():
+def tags() -> None:
     """🏷️ OPC tag management commands."""
     pass
 
@@ -3165,7 +3162,7 @@ def tags():
 @tags.command()
 @click.option("--path", default="", help="Tag path to browse (default: root)")
 @click.option("--provider", default="default", help="Tag provider name")
-def browse(path: str, provider: str):
+def browse(path: str, provider: str) -> None:
     """Browse OPC tags."""
     try:
         from src.ignition.data_integration.opc_tag_manager import OPCTagManager
@@ -3214,7 +3211,7 @@ def browse(path: str, provider: str):
 
 
 @data_integration.group()
-def reports():
+def reports() -> None:
     """📊 Report generation commands."""
     pass
 
@@ -3229,7 +3226,7 @@ def reports():
     help="Report output format",
 )
 @click.option("--output", help="Output file path")
-def production(hours: int, output_format: str, output: str):
+def production(hours: int, output_format: str, output: str) -> None:
     """Generate production report."""
     try:
         from datetime import datetime, timedelta
@@ -3281,7 +3278,7 @@ def production(hours: int, output_format: str, output: str):
 
 
 @data_integration.command()
-def status():
+def status() -> None:
     """Show data integration system status."""
     console.print("🔗 Data Integration System Status", style="bold blue")
     console.print("=" * 50)
@@ -3339,7 +3336,7 @@ def status():
 
 
 @data_integration.group()
-def dataset():
+def dataset() -> None:
     """🧠 Dataset management for AI/ML model preparation."""
     pass
 
@@ -3365,7 +3362,9 @@ def dataset():
 )
 @click.option("--description", "-d", help="Dataset description")
 @click.option("--tags", help="Comma-separated tags")
-def create_dataset_cmd(name: str, dataset_type: str, description: str, tags: str):
+def create_dataset_cmd(
+    name: str, dataset_type: str, description: str, tags: str
+) -> None:
     """Create a new dataset."""
     try:
         from src.ignition.data_integration.dataset_core import DatasetType
@@ -3409,7 +3408,7 @@ def create_dataset_cmd(name: str, dataset_type: str, description: str, tags: str
 
 
 @dataset.command("list")
-def list_datasets_cmd():
+def list_datasets_cmd() -> None:
     """List all datasets."""
     try:
         from rich.text import Text
@@ -3493,7 +3492,7 @@ def list_datasets_cmd():
 @click.option(
     "--open-browser", is_flag=True, default=True, help="Open browser automatically"
 )
-def buildout(port: int, host: str, open_browser: bool):
+def buildout(port: int, host: str, open_browser: bool) -> None:
     """🚀 Launch interactive dataset buildout UI."""
     try:
         # Check if streamlit is available
@@ -3554,7 +3553,7 @@ def buildout(port: int, host: str, open_browser: bool):
             import time
             import webbrowser
 
-            def open_browser_delayed():
+            def open_browser_delayed() -> None:
                 time.sleep(3)
                 webbrowser.open(f"http://{host}:{port}")
 
@@ -3575,7 +3574,7 @@ def buildout(port: int, host: str, open_browser: bool):
 
 
 @dataset.command()
-def sample():
+def sample() -> None:
     """Create a sample dataset for testing."""
     click.echo("🔬 Creating sample dataset...")
 
@@ -3605,7 +3604,7 @@ try:
 except ImportError:
     # Supabase CLI not available - create placeholder
     @data_integration.group()
-    def supabase():
+    def supabase() -> None:
         """Supabase database management commands (not available)."""
         click.echo("❌ Supabase management not available")
         click.echo("💡 Install dependencies to enable Supabase commands")

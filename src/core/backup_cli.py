@@ -18,25 +18,40 @@ def backup():
 
 
 @backup.command()
-@click.option("--reason", "-r", default="Manual backup", help="Reason for creating backup")
-@click.option("--auto", "-a", is_flag=True, help="Create backup only if significant changes detected")
+@click.option(
+    "--reason", "-r", default="Manual backup", help="Reason for creating backup"
+)
+@click.option(
+    "--auto",
+    "-a",
+    is_flag=True,
+    help="Create backup only if significant changes detected",
+)
 def create(reason: str, auto: bool):
     """📦 Create a full database backup."""
     try:
         manager = Neo4jBackupManager()
 
         if auto:
-            console.print("[bold blue]🔍 Checking for significant changes...[/bold blue]")
+            console.print(
+                "[bold blue]🔍 Checking for significant changes...[/bold blue]"
+            )
             if manager.auto_backup_on_significant_changes():
-                console.print("[green]✅ Auto-backup created due to significant changes[/green]")
+                console.print(
+                    "[green]✅ Auto-backup created due to significant changes[/green]"
+                )
             else:
-                console.print("[yellow]ℹ️ No backup needed - no significant changes detected[/yellow]")
+                console.print(
+                    "[yellow]ℹ️ No backup needed - no significant changes detected[/yellow]"
+                )
         else:
             with console.status("[bold blue]Creating backup..."):
                 success, result = manager.create_full_backup(reason)
 
             if success:
-                console.print(f"[green]✅ Backup created successfully:[/green] {result}")
+                console.print(
+                    f"[green]✅ Backup created successfully:[/green] {result}"
+                )
             else:
                 console.print(f"[red]❌ Backup failed:[/red] {result}")
 
@@ -45,7 +60,11 @@ def create(reason: str, auto: bool):
 
 
 @backup.command()
-@click.option("--file", "-f", help="Specific backup file to restore from (if not specified, uses latest)")
+@click.option(
+    "--file",
+    "-f",
+    help="Specific backup file to restore from (if not specified, uses latest)",
+)
 @click.option("--confirm", "-y", is_flag=True, help="Skip confirmation prompt")
 def restore(file: str, confirm: bool):
     """🔄 Restore database from backup."""
@@ -81,7 +100,9 @@ def restore(file: str, confirm: bool):
 
         # Confirmation
         if not confirm:
-            if not click.confirm("⚠️  This will DELETE all current data and restore from backup. Continue?"):
+            if not click.confirm(
+                "⚠️  This will DELETE all current data and restore from backup. Continue?"
+            ):
                 console.print("[yellow]❌ Restore cancelled[/yellow]")
                 return
 
@@ -111,7 +132,11 @@ def list(detailed: bool):
             return
 
         # Create table
-        table = Table(title="📋 Available Database Backups", show_header=True, header_style="bold blue")
+        table = Table(
+            title="📋 Available Database Backups",
+            show_header=True,
+            header_style="bold blue",
+        )
         table.add_column("Filename", style="cyan", no_wrap=True)
         table.add_column("Created", style="green")
         table.add_column("Reason", style="yellow")
@@ -125,10 +150,16 @@ def list(detailed: bool):
         for backup in backups:
             row = [
                 backup.get("filename", "Unknown"),
-                backup.get("datetime", "Unknown")[:19] if backup.get("datetime") else "Unknown",
-                backup.get("reason", "No reason")[:30] + "..."
-                if len(backup.get("reason", "")) > 30
-                else backup.get("reason", "No reason"),
+                (
+                    backup.get("datetime", "Unknown")[:19]
+                    if backup.get("datetime")
+                    else "Unknown"
+                ),
+                (
+                    backup.get("reason", "No reason")[:30] + "..."
+                    if len(backup.get("reason", "")) > 30
+                    else backup.get("reason", "No reason")
+                ),
             ]
 
             if detailed:
@@ -181,7 +212,11 @@ def info(filename: str):
 
             info_text += f"[bold]{key.replace('_', ' ').title()}:[/bold] {value}\n"
 
-        info_panel = Panel(info_text.strip(), title=f"📄 Backup Information: {filename}", border_style="blue")
+        info_panel = Panel(
+            info_text.strip(),
+            title=f"📄 Backup Information: {filename}",
+            border_style="blue",
+        )
         console.print(info_panel)
 
     except Exception as e:
@@ -189,9 +224,17 @@ def info(filename: str):
 
 
 @backup.command()
-@click.option("--threshold-nodes", default=50, help="Node count threshold for auto-backup")
-@click.option("--threshold-rels", default=100, help="Relationship count threshold for auto-backup")
-@click.option("--threshold-percent", default=0.1, help="Percentage change threshold for auto-backup")
+@click.option(
+    "--threshold-nodes", default=50, help="Node count threshold for auto-backup"
+)
+@click.option(
+    "--threshold-rels", default=100, help="Relationship count threshold for auto-backup"
+)
+@click.option(
+    "--threshold-percent",
+    default=0.1,
+    help="Percentage change threshold for auto-backup",
+)
 def status(threshold_nodes: int, threshold_rels: int, threshold_percent: float):
     """📊 Show database backup status and recommendations."""
     try:
@@ -203,19 +246,19 @@ def status(threshold_nodes: int, threshold_rels: int, threshold_percent: float):
 
         # Create status display
         status_text = f"""[bold]Current Database:[/bold]
-• Nodes: {current_stats.get('node_count', 0):,}
-• Relationships: {current_stats.get('relationship_count', 0):,}
+• Nodes: {current_stats.get("node_count", 0):,}
+• Relationships: {current_stats.get("relationship_count", 0):,}
 
 [bold]Last Backup:[/bold]"""
 
         if last_backup_stats:
             status_text += f"""
-• Nodes: {last_backup_stats.get('node_count', 0):,}
-• Relationships: {last_backup_stats.get('relationship_count', 0):,}
+• Nodes: {last_backup_stats.get("node_count", 0):,}
+• Relationships: {last_backup_stats.get("relationship_count", 0):,}
 
 [bold]Changes Since Last Backup:[/bold]
-• Nodes: {current_stats.get('node_count', 0) - last_backup_stats.get('node_count', 0):+,}
-• Relationships: {current_stats.get('relationship_count', 0) - last_backup_stats.get('relationship_count', 0):+,}"""
+• Nodes: {current_stats.get("node_count", 0) - last_backup_stats.get("node_count", 0):+,}
+• Relationships: {current_stats.get("relationship_count", 0) - last_backup_stats.get("relationship_count", 0):+,}"""
         else:
             status_text += "\n• No previous backup found"
 
@@ -228,7 +271,9 @@ def status(threshold_nodes: int, threshold_rels: int, threshold_percent: float):
         else:
             status_text += "[green]✅ No backup needed[/green]"
 
-        status_panel = Panel(status_text, title="📊 Database Backup Status", border_style="blue")
+        status_panel = Panel(
+            status_text, title="📊 Database Backup Status", border_style="blue"
+        )
         console.print(status_panel)
 
         # Show thresholds
@@ -237,7 +282,9 @@ def status(threshold_nodes: int, threshold_rels: int, threshold_percent: float):
 • Relationships: {threshold_rels:,} new relationships
 • Percentage: {threshold_percent:.1%} increase"""
 
-        threshold_panel = Panel(threshold_text, title="⚙️ Configuration", border_style="dim")
+        threshold_panel = Panel(
+            threshold_text, title="⚙️ Configuration", border_style="dim"
+        )
         console.print(threshold_panel)
 
     except Exception as e:
@@ -248,16 +295,22 @@ def status(threshold_nodes: int, threshold_rels: int, threshold_percent: float):
 def init():
     """🚀 Create initial backup for application distribution."""
     try:
-        console.print("[bold blue]🚀 Creating initial backup for application distribution...[/bold blue]")
+        console.print(
+            "[bold blue]🚀 Creating initial backup for application distribution...[/bold blue]"
+        )
 
         manager = Neo4jBackupManager()
 
         with console.status("[bold blue]Creating initial backup..."):
-            success, result = manager.create_full_backup("Initial backup for application distribution")
+            success, result = manager.create_full_backup(
+                "Initial backup for application distribution"
+            )
 
         if success:
             console.print(f"[green]✅ Initial backup created:[/green] {result}")
-            console.print("[green]This backup will be included with the application for new installations.[/green]")
+            console.print(
+                "[green]This backup will be included with the application for new installations.[/green]"
+            )
         else:
             console.print(f"[red]❌ Failed to create initial backup:[/red] {result}")
 

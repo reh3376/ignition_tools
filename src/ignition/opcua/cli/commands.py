@@ -391,9 +391,7 @@ def _build_tree_display(
         icon = (
             "📊"
             if "Variable" in node_class
-            else "📁"
-            if "Object" in node_class
-            else "🔧"
+            else "📁" if "Object" in node_class else "🔧"
         )
 
         # Add value if it's a variable
@@ -656,9 +654,11 @@ async def _monitor_impl(
                             "node_id": str(node_id),
                             "value": str(value),
                             "quality": str(quality),
-                            "source_timestamp": source_timestamp.isoformat()
-                            if hasattr(source_timestamp, "isoformat")
-                            else str(source_timestamp),
+                            "source_timestamp": (
+                                source_timestamp.isoformat()
+                                if hasattr(source_timestamp, "isoformat")
+                                else str(source_timestamp)
+                            ),
                         }
                     )
                 elif format == "json":

@@ -1,4 +1,4 @@
-"""Dataset Curation UI - Interactive Streamlit Interface
+"""Dataset Curation UI - Interactive Streamlit Interface.
 
 This module provides a comprehensive web-based interface for dataset creation,
 curation, and preparation for AI/ML models using Streamlit.
@@ -90,7 +90,7 @@ st.markdown(
 class DatasetCurationUI:
     """Main UI class for dataset curation."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the UI."""
         self.manager = DatasetManager()
 
@@ -102,7 +102,7 @@ class DatasetCurationUI:
         if "refresh_data" not in st.session_state:
             st.session_state.refresh_data = False
 
-    def run(self):
+    def run(self) -> None:
         """Run the main UI application."""
         # Header
         st.markdown(
@@ -130,7 +130,7 @@ class DatasetCurationUI:
         elif st.session_state.current_page == "Export & Deploy":
             self.render_export_deploy()
 
-    def render_sidebar(self):
+    def render_sidebar(self) -> None:
         """Render the sidebar navigation."""
         with st.sidebar:
             st.markdown("### 📊 Navigation")
@@ -192,7 +192,7 @@ class DatasetCurationUI:
                 if st.session_state.selected_dataset_id:
                     self.delete_dataset_confirmation()
 
-    def render_overview(self):
+    def render_overview(self) -> None:
         """Render the overview page."""
         st.markdown(
             '<div class="section-header">📊 Dataset Overview</div>',
@@ -277,7 +277,7 @@ class DatasetCurationUI:
         with col2:
             self.render_type_chart(datasets)
 
-    def render_create_dataset(self):
+    def render_create_dataset(self) -> None:
         """Render the create dataset page."""
         st.markdown(
             '<div class="section-header">➕ Create New Dataset</div>',
@@ -320,14 +320,14 @@ class DatasetCurationUI:
             col1, col2 = st.columns(2)
 
             with col1:
-                auto_extract = st.checkbox(
+                st.checkbox(
                     "Auto-extract data after creation",
                     value=True,
                     help="Automatically extract data from sources after creating the dataset",
                 )
 
             with col2:
-                validate_immediately = st.checkbox(
+                st.checkbox(
                     "Run quality validation",
                     value=True,
                     help="Run data quality checks immediately after extraction",
@@ -369,7 +369,7 @@ class DatasetCurationUI:
                 except Exception as e:
                     st.error(f"Failed to create dataset: {e}")
 
-    def render_dataset_details(self):
+    def render_dataset_details(self) -> None:
         """Render the dataset details page."""
         if not st.session_state.selected_dataset_id:
             st.warning("Please select a dataset from the sidebar.")
@@ -471,7 +471,7 @@ class DatasetCurationUI:
             if st.button("🗑️ Delete Dataset"):
                 self.delete_dataset_confirmation()
 
-    def render_data_sources(self):
+    def render_data_sources(self) -> None:
         """Render the data sources configuration page."""
         if not st.session_state.selected_dataset_id:
             st.warning("Please select a dataset from the sidebar.")
@@ -530,48 +530,48 @@ class DatasetCurationUI:
             if st.form_submit_button("➕ Add Source", type="primary"):
                 st.success("Source configuration saved! (Demo mode)")
 
-    def render_database_source_config(self):
+    def render_database_source_config(self) -> None:
         """Render database source configuration."""
         st.markdown("#### Database Configuration")
 
         col1, col2 = st.columns(2)
 
         with col1:
-            config_name = st.selectbox(
+            st.selectbox(
                 "Database Configuration",
                 options=["neo4j_default", "postgres_local", "supabase_prod"],
                 help="Select a pre-configured database connection",
             )
 
-            query = st.text_area(
+            st.text_area(
                 "SQL Query",
                 placeholder="SELECT * FROM sensor_data WHERE timestamp > NOW() - INTERVAL '24 hours'",
                 help="SQL query to extract data",
             )
 
         with col2:
-            refresh_interval = st.number_input(
+            st.number_input(
                 "Refresh Interval (minutes)",
                 min_value=1,
                 value=60,
                 help="How often to refresh data from this source",
             )
 
-            limit_rows = st.number_input(
+            st.number_input(
                 "Row Limit",
                 min_value=0,
                 value=10000,
                 help="Maximum number of rows to extract (0 = no limit)",
             )
 
-    def render_file_source_config(self):
+    def render_file_source_config(self) -> None:
         """Render file source configuration."""
         st.markdown("#### File Configuration")
 
         col1, col2 = st.columns(2)
 
         with col1:
-            file_path = st.text_input(
+            st.text_input(
                 "File Path",
                 placeholder="/path/to/data.csv",
                 help="Path to the data file",
@@ -585,90 +585,90 @@ class DatasetCurationUI:
 
         with col2:
             if file_type == "csv":
-                delimiter = st.text_input("Delimiter", value=",")
-                has_header = st.checkbox("Has Header", value=True)
+                st.text_input("Delimiter", value=",")
+                st.checkbox("Has Header", value=True)
             elif file_type == "xlsx":
-                sheet_name = st.text_input("Sheet Name", value="Sheet1")
+                st.text_input("Sheet Name", value="Sheet1")
 
-    def render_historian_source_config(self):
+    def render_historian_source_config(self) -> None:
         """Render historian source configuration."""
         st.markdown("#### Historian Configuration")
 
         col1, col2 = st.columns(2)
 
         with col1:
-            historian_type = st.selectbox(
+            st.selectbox(
                 "Historian Type",
                 options=["influxdb", "timescaledb", "ignition"],
                 help="Type of historian database",
             )
 
-            tag_list = st.text_area(
+            st.text_area(
                 "Tag Names (one per line)",
                 placeholder="Temperature_01\nPressure_02\nFlow_Rate_03",
                 help="List of tags to extract",
             )
 
         with col2:
-            time_range = st.selectbox(
+            st.selectbox(
                 "Time Range",
                 options=["1h", "6h", "24h", "7d", "30d", "custom"],
                 help="Time range for data extraction",
             )
 
-            aggregation = st.selectbox(
+            st.selectbox(
                 "Aggregation",
                 options=["raw", "avg", "min", "max", "sum"],
                 help="Data aggregation method",
             )
 
-    def render_opc_source_config(self):
+    def render_opc_source_config(self) -> None:
         """Render OPC source configuration."""
         st.markdown("#### OPC Configuration")
 
         col1, col2 = st.columns(2)
 
         with col1:
-            server_url = st.text_input(
+            st.text_input(
                 "OPC Server URL",
                 placeholder="opc.tcp://localhost:4840",
                 help="OPC UA server endpoint",
             )
 
-            tag_paths = st.text_area(
+            st.text_area(
                 "Tag Paths (one per line)",
                 placeholder="ns=2;s=PLC1.Temperature\nns=2;s=PLC1.Pressure",
                 help="OPC tag paths to read",
             )
 
         with col2:
-            sampling_rate = st.number_input(
+            st.number_input(
                 "Sampling Rate (seconds)",
                 min_value=1,
                 value=60,
                 help="How often to sample tag values",
             )
 
-            use_subscription = st.checkbox(
+            st.checkbox(
                 "Use Subscription",
                 value=True,
                 help="Use OPC subscriptions for real-time data",
             )
 
-    def render_api_source_config(self):
+    def render_api_source_config(self) -> None:
         """Render API source configuration."""
         st.markdown("#### API Configuration")
 
         col1, col2 = st.columns(2)
 
         with col1:
-            api_url = st.text_input(
+            st.text_input(
                 "API URL",
                 placeholder="https://api.example.com/data",
                 help="REST API endpoint",
             )
 
-            method = st.selectbox(
+            st.selectbox(
                 "HTTP Method", options=["GET", "POST"], help="HTTP method to use"
             )
 
@@ -680,11 +680,11 @@ class DatasetCurationUI:
             )
 
             if auth_type != "none":
-                auth_value = st.text_input(
+                st.text_input(
                     "Auth Value", type="password", help="Authentication credential"
                 )
 
-    def render_feature_engineering(self):
+    def render_feature_engineering(self) -> None:
         """Render the feature engineering page."""
         if not st.session_state.selected_dataset_id:
             st.warning("Please select a dataset from the sidebar.")
@@ -763,7 +763,7 @@ class DatasetCurationUI:
                     help="Transformation to apply to this feature",
                 )
 
-                missing_strategy = st.selectbox(
+                st.selectbox(
                     "Missing Value Strategy",
                     options=["drop", "fill_mean", "fill_median", "fill_mode", "custom"],
                     help="How to handle missing values",
@@ -796,7 +796,7 @@ class DatasetCurationUI:
                 else:
                     st.error("Please fill in all required fields!")
 
-    def render_data_quality(self):
+    def render_data_quality(self) -> None:
         """Render the data quality page."""
         if not st.session_state.selected_dataset_id:
             st.warning("Please select a dataset from the sidebar.")
@@ -886,7 +886,7 @@ class DatasetCurationUI:
             else:
                 st.success("No recommendations needed!")
 
-    def render_export_deploy(self):
+    def render_export_deploy(self) -> None:
         """Render the export and deployment page."""
         if not st.session_state.selected_dataset_id:
             st.warning("Please select a dataset from the sidebar.")
@@ -928,7 +928,7 @@ class DatasetCurationUI:
             )
 
             if export_split != "full":
-                test_size = st.slider(
+                st.slider(
                     "Test Set Size (%)",
                     min_value=10,
                     max_value=50,
@@ -985,7 +985,7 @@ class DatasetCurationUI:
             if st.button("⏰ Schedule Data Refresh"):
                 st.info("Data refresh scheduling would be configured here!")
 
-    def process_dataset_action(self, dataset_id: str):
+    def process_dataset_action(self, dataset_id: str) -> None:
         """Process a dataset and show progress."""
         try:
             with st.spinner("Processing dataset..."):
@@ -1005,7 +1005,7 @@ class DatasetCurationUI:
         except Exception as e:
             st.error(f"Processing failed: {e}")
 
-    def show_quality_report(self, report):
+    def show_quality_report(self, report) -> None:
         """Show detailed quality report."""
         with st.expander("📊 Detailed Quality Report", expanded=True):
             st.json(
@@ -1023,7 +1023,7 @@ class DatasetCurationUI:
                 }
             )
 
-    def delete_dataset_confirmation(self):
+    def delete_dataset_confirmation(self) -> None:
         """Show dataset deletion confirmation."""
         if st.session_state.selected_dataset_id:
             dataset = self.manager.get_dataset(st.session_state.selected_dataset_id)
@@ -1072,7 +1072,7 @@ class DatasetCurationUI:
         }
         return colors.get(quality, "#6c757d")
 
-    def render_status_chart(self, datasets: list[dict[str, Any]]):
+    def render_status_chart(self, datasets: list[dict[str, Any]]) -> None:
         """Render dataset status distribution chart."""
         st.markdown("#### Dataset Status Distribution")
 
@@ -1090,7 +1090,7 @@ class DatasetCurationUI:
             fig.update_layout(height=300)
             st.plotly_chart(fig, use_container_width=True)
 
-    def render_type_chart(self, datasets: list[dict[str, Any]]):
+    def render_type_chart(self, datasets: list[dict[str, Any]]) -> None:
         """Render dataset type distribution chart."""
         st.markdown("#### Dataset Type Distribution")
 
@@ -1108,7 +1108,7 @@ class DatasetCurationUI:
             fig.update_layout(height=300)
             st.plotly_chart(fig, use_container_width=True)
 
-    def render_quality_radar_chart(self, report):
+    def render_quality_radar_chart(self, report) -> None:
         """Render quality metrics radar chart."""
         st.markdown("### 🎯 Quality Metrics Radar")
 
@@ -1136,7 +1136,7 @@ class DatasetCurationUI:
         )
 
         fig.update_layout(
-            polar=dict(radialaxis=dict(visible=True, range=[0, 100])),
+            polar={"radialaxis": {"visible": True, "range": [0, 100]}},
             showlegend=True,
             height=400,
         )
@@ -1144,7 +1144,7 @@ class DatasetCurationUI:
         st.plotly_chart(fig, use_container_width=True)
 
 
-def main():
+def main() -> None:
     """Main function to run the Streamlit app."""
     try:
         ui = DatasetCurationUI()

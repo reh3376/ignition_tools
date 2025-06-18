@@ -12,14 +12,14 @@ console = Console()
 
 
 @click.group()
-def data_integration():
+def data_integration() -> None:
     """🔗 Data Integration commands for databases, historians, and OPC tags."""
     pass
 
 
 # Database Commands
 @data_integration.group()
-def database():
+def database() -> None:
     """🗄️ Database connection and query commands."""
     pass
 
@@ -28,7 +28,7 @@ def database():
 @click.option(
     "--config-name", default="neo4j_default", help="Database configuration name"
 )
-def test_connection(config_name: str):
+def test_connection(config_name: str) -> None:
     """Test database connection."""
     try:
         from .database_connections import DatabaseConnectionManager
@@ -54,7 +54,7 @@ def test_connection(config_name: str):
 
 
 @database.command()
-def list_configs():
+def list_configs() -> None:
     """List available database configurations."""
     try:
         from .database_connections import DatabaseConnectionManager
@@ -94,7 +94,7 @@ def list_configs():
 @click.option("--config-name", required=True, help="Database configuration name")
 @click.option("--query", required=True, help="SQL query to execute")
 @click.option("--limit", default=10, help="Limit number of results")
-def query(config_name: str, query: str, limit: int):
+def query(config_name: str, query: str, limit: int) -> None:
     """Execute a database query."""
     try:
         from .database_connections import DatabaseConnectionManager
@@ -116,7 +116,7 @@ def query(config_name: str, query: str, limit: int):
             )
 
             # Add columns from first result
-            for key in results[0].keys():
+            for key in results[0]:
                 table.add_column(str(key), style="cyan")
 
             # Add rows
@@ -136,7 +136,7 @@ def query(config_name: str, query: str, limit: int):
 
 # Historian Commands
 @data_integration.group()
-def historian():
+def historian() -> None:
     """📈 Historian and time series database commands."""
     pass
 
@@ -157,7 +157,7 @@ def historian():
     default="table",
     help="Output format",
 )
-def query_raw(historian_type: str, tags: str, hours: int, output_format: str):
+def query_raw(historian_type: str, tags: str, hours: int, output_format: str) -> None:
     """Query raw historical data."""
     try:
         from .historian_queries import HistorianQueryGenerator, HistorianType, TagFilter
@@ -277,7 +277,7 @@ def query_aggregated(
 
 # OPC Tag Commands
 @data_integration.group()
-def tags():
+def tags() -> None:
     """🏷️ OPC tag management commands."""
     pass
 
@@ -285,7 +285,7 @@ def tags():
 @tags.command()
 @click.option("--path", default="", help="Tag path to browse (default: root)")
 @click.option("--provider", default="default", help="Tag provider name")
-def browse(path: str, provider: str):
+def browse(path: str, provider: str) -> None:
     """Browse OPC tags."""
     try:
         from .opc_tag_manager import OPCTagManager
@@ -338,7 +338,7 @@ def browse(path: str, provider: str):
     "--tag-paths", required=True, help="Comma-separated list of tag paths to read"
 )
 @click.option("--provider", default="default", help="Tag provider name")
-def read(tag_paths: str, provider: str):
+def read(tag_paths: str, provider: str) -> None:
     """Read OPC tag values."""
     try:
         from .opc_tag_manager import OPCTagManager
@@ -427,7 +427,7 @@ def create(
 
 # Report Commands
 @data_integration.group()
-def reports():
+def reports() -> None:
     """📊 Report generation commands."""
     pass
 
@@ -442,7 +442,7 @@ def reports():
     help="Report output format",
 )
 @click.option("--output", help="Output file path")
-def production(hours: int, output_format: str, output: str | None):
+def production(hours: int, output_format: str, output: str | None) -> None:
     """Generate production report."""
     try:
         from .report_generator import ReportFormat, ReportGenerator
@@ -498,7 +498,7 @@ def production(hours: int, output_format: str, output: str | None):
     help="Report output format",
 )
 @click.option("--output", help="Output file path")
-def alarms(hours: int, output_format: str, output: str | None):
+def alarms(hours: int, output_format: str, output: str | None) -> None:
     """Generate alarm report."""
     try:
         from .report_generator import ReportFormat, ReportGenerator
@@ -542,7 +542,7 @@ def alarms(hours: int, output_format: str, output: str | None):
 
 
 @data_integration.command()
-def status():
+def status() -> None:
     """Show data integration system status."""
     console.print("🔗 Data Integration System Status", style="bold blue")
     console.print("=" * 50)

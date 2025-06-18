@@ -49,9 +49,8 @@ class Neo4jBackupManager:
             print(f"Creating Neo4j backup: {backup_filename}")
 
             # Connect to database if not already connected
-            if not self.client.is_connected:
-                if not self.client.connect():
-                    return False, "Failed to connect to Neo4j database"
+            if not self.client.is_connected and not self.client.connect():
+                return False, "Failed to connect to Neo4j database"
 
             # Extract all data from the database
             backup_data = self._extract_database_data()
@@ -125,9 +124,8 @@ class Neo4jBackupManager:
             )
 
             # Connect to database
-            if not self.client.is_connected:
-                if not self.client.connect():
-                    return False, "Failed to connect to Neo4j database"
+            if not self.client.is_connected and not self.client.connect():
+                return False, "Failed to connect to Neo4j database"
 
             # Clear existing data (with confirmation in production)
             self._clear_database()
@@ -502,7 +500,7 @@ class Neo4jBackupManager:
                 print(f"❌ Failed to remove old backup {backup_file.name}: {e}")
 
     def selective_restore_from_backup(
-        self, backup_file: str | None = None, preserve_labels: list[str] = None
+        self, backup_file: str | None = None, preserve_labels: list[str] | None = None
     ) -> tuple[bool, str]:
         """Restore database from backup while preserving specified node types.
 
@@ -543,9 +541,8 @@ class Neo4jBackupManager:
             )
 
             # Connect to database
-            if not self.client.is_connected:
-                if not self.client.connect():
-                    return False, "Failed to connect to Neo4j database"
+            if not self.client.is_connected and not self.client.connect():
+                return False, "Failed to connect to Neo4j database"
 
             # Get current statistics before restore
             current_stats = self._get_database_statistics()

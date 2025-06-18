@@ -1,4 +1,4 @@
-"""Core Dataset Management Classes and Enums
+"""Core Dataset Management Classes and Enums.
 
 This module provides the foundational classes and enumerations for the
 dataset management system used in AI/ML model preparation.

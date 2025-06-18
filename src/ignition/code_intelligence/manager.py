@@ -10,9 +10,9 @@ logger = logging.getLogger(__name__)
 class CodeIntelligenceManager:
     """Main manager for code intelligence system."""
 
-    def __init__(self, graph_client, embedder=None):
+    def __init__(self, graph_client, embedder=None) -> None:
         """Initialize the code intelligence manager.
-        
+
         Args:
             graph_client: Neo4j graph client
             embedder: Optional sentence transformer for embeddings
@@ -30,7 +30,7 @@ class CodeIntelligenceManager:
         # Initialize schema
         self._initialize_schema()
 
-    def _initialize_schema(self):
+    def _initialize_schema(self) -> None:
         """Initialize the Neo4j schema for code intelligence."""
         try:
             self.schema.create_schema()
@@ -53,13 +53,15 @@ class CodeIntelligenceManager:
             logger.error(f"Failed to analyze and store file {file_path}: {e}")
             return False
 
-    def analyze_and_store_directory(self, directory_path: Path, recursive: bool = True) -> dict[str, Any]:
+    def analyze_and_store_directory(
+        self, directory_path: Path, recursive: bool = True
+    ) -> dict[str, Any]:
         """Analyze all files in a directory and store results."""
         results = {
             "files_processed": 0,
             "files_successful": 0,
             "files_failed": 0,
-            "errors": []
+            "errors": [],
         }
 
         try:
@@ -78,9 +80,11 @@ class CodeIntelligenceManager:
                     results["files_failed"] += 1
                     results["errors"].append(str(e))
 
-            logger.info(f"Processed {results['files_processed']} files, "
-                       f"{results['files_successful']} successful, "
-                       f"{results['files_failed']} failed")
+            logger.info(
+                f"Processed {results['files_processed']} files, "
+                f"{results['files_successful']} successful, "
+                f"{results['files_failed']} failed"
+            )
 
         except Exception as e:
             logger.error(f"Failed to analyze directory {directory_path}: {e}")
@@ -116,7 +120,7 @@ class CodeIntelligenceManager:
             logger.error(f"Failed to store analysis: {e}")
             return False
 
-    def _store_file_node(self, file_info):
+    def _store_file_node(self, file_info) -> None:
         """Store a file node in Neo4j."""
         cypher = """
         MERGE (f:CodeFile {path: $path})
@@ -138,12 +142,12 @@ class CodeIntelligenceManager:
             "last_modified": file_info.last_modified.isoformat(),
             "content_hash": file_info.content_hash,
             "language": file_info.language,
-            "size_bytes": file_info.size_bytes
+            "size_bytes": file_info.size_bytes,
         }
 
         self.client.execute_query(cypher, params)
 
-    def _store_class_node(self, class_info):
+    def _store_class_node(self, class_info) -> None:
         """Store a class node in Neo4j."""
         cypher = """
         MERGE (c:Class {name: $name, file_path: $file_path})
@@ -164,12 +168,12 @@ class CodeIntelligenceManager:
             "methods_count": class_info.methods_count,
             "complexity": class_info.complexity,
             "docstring": class_info.docstring,
-            "inheritance": class_info.inheritance
+            "inheritance": class_info.inheritance,
         }
 
         self.client.execute_query(cypher, params)
 
-    def _store_method_node(self, method_info):
+    def _store_method_node(self, method_info) -> None:
         """Store a method node in Neo4j."""
         cypher = """
         MERGE (m:Method {name: $name, file_path: $file_path, start_line: $start_line})
@@ -193,12 +197,12 @@ class CodeIntelligenceManager:
             "complexity": method_info.complexity,
             "return_type": method_info.return_type,
             "docstring": method_info.docstring,
-            "is_async": method_info.is_async
+            "is_async": method_info.is_async,
         }
 
         self.client.execute_query(cypher, params)
 
-    def _store_import_node(self, import_info):
+    def _store_import_node(self, import_info) -> None:
         """Store an import node in Neo4j."""
         cypher = """
         MERGE (i:Import {module: $module, file_path: $file_path, line_number: $line_number})
@@ -214,12 +218,12 @@ class CodeIntelligenceManager:
             "from_module": import_info.from_module,
             "file_path": import_info.file_path,
             "line_number": import_info.line_number,
-            "is_local": import_info.is_local
+            "is_local": import_info.is_local,
         }
 
         self.client.execute_query(cypher, params)
 
-    def _create_relationships(self, analysis: dict[str, Any]):
+    def _create_relationships(self, analysis: dict[str, Any]) -> None:
         """Create relationships between nodes."""
         file_path = analysis["file"].path
 
@@ -230,10 +234,9 @@ class CodeIntelligenceManager:
             MATCH (c:Class {name: $class_name, file_path: $file_path})
             MERGE (f)-[:CONTAINS]->(c)
             """
-            self.client.execute_query(cypher, {
-                "file_path": file_path,
-                "class_name": class_info.name
-            })
+            self.client.execute_query(
+                cypher, {"file_path": file_path, "class_name": class_info.name}
+            )
 
         # Class HAS_METHOD Method relationships
         for method_info in analysis["methods"]:
@@ -243,12 +246,15 @@ class CodeIntelligenceManager:
                 MATCH (m:Method {name: $method_name, file_path: $file_path, start_line: $start_line})
                 MERGE (c)-[:HAS_METHOD]->(m)
                 """
-                self.client.execute_query(cypher, {
-                    "class_name": method_info.class_name,
-                    "method_name": method_info.name,
-                    "file_path": file_path,
-                    "start_line": method_info.start_line
-                })
+                self.client.execute_query(
+                    cypher,
+                    {
+                        "class_name": method_info.class_name,
+                        "method_name": method_info.name,
+                        "file_path": file_path,
+                        "start_line": method_info.start_line,
+                    },
+                )
             else:
                 # File-level function
                 cypher = """
@@ -256,11 +262,14 @@ class CodeIntelligenceManager:
                 MATCH (m:Method {name: $method_name, file_path: $file_path, start_line: $start_line})
                 MERGE (f)-[:CONTAINS]->(m)
                 """
-                self.client.execute_query(cypher, {
-                    "file_path": file_path,
-                    "method_name": method_info.name,
-                    "start_line": method_info.start_line
-                })
+                self.client.execute_query(
+                    cypher,
+                    {
+                        "file_path": file_path,
+                        "method_name": method_info.name,
+                        "start_line": method_info.start_line,
+                    },
+                )
 
         # File IMPORTS relationships
         for import_info in analysis["imports"]:
@@ -269,11 +278,14 @@ class CodeIntelligenceManager:
             MATCH (i:Import {module: $module, file_path: $file_path, line_number: $line_number})
             MERGE (f)-[:IMPORTS]->(i)
             """
-            self.client.execute_query(cypher, {
-                "file_path": file_path,
-                "module": import_info.module,
-                "line_number": import_info.line_number
-            })
+            self.client.execute_query(
+                cypher,
+                {
+                    "file_path": file_path,
+                    "module": import_info.module,
+                    "line_number": import_info.line_number,
+                },
+            )
 
     def get_file_context(self, file_path: str) -> dict[str, Any]:
         """Get comprehensive context for a file."""
@@ -304,10 +316,12 @@ class CodeIntelligenceManager:
             "class_methods": [dict(m) for m in data["class_methods"] if m],
             "file_methods": [dict(m) for m in data["file_methods"] if m],
             "imports": [dict(i) for i in data["imports"] if i],
-            "dependents": [path for path in data["dependents"] if path]
+            "dependents": [path for path in data["dependents"] if path],
         }
 
-    def find_similar_files(self, file_path: str, limit: int = 10) -> list[dict[str, Any]]:
+    def find_similar_files(
+        self, file_path: str, limit: int = 10
+    ) -> list[dict[str, Any]]:
         """Find files similar to the given file based on structure."""
         # Get the target file's characteristics
         context = self.get_file_context(file_path)
@@ -345,7 +359,7 @@ class CodeIntelligenceManager:
             "target_complexity": target_complexity,
             "target_classes": target_classes,
             "target_methods": target_methods,
-            "limit": limit
+            "limit": limit,
         }
 
         return self.client.execute_query(cypher, params)
@@ -356,7 +370,7 @@ class CodeIntelligenceManager:
 
         # Basic counts
         counts_cypher = """
-        MATCH (f:CodeFile) 
+        MATCH (f:CodeFile)
         OPTIONAL MATCH (f)-[:CONTAINS]->(c:Class)
         OPTIONAL MATCH (f)-[:CONTAINS]->(m:Method)
         OPTIONAL MATCH (f)-[:IMPORTS]->(i:Import)
@@ -450,13 +464,8 @@ class CodeIntelligenceManager:
                relationships(path) as relationships
         """
 
-        dependencies = self.client.execute_query(cypher, {
-            "path": file_path,
-            "depth": depth
-        })
+        dependencies = self.client.execute_query(
+            cypher, {"path": file_path, "depth": depth}
+        )
 
-        return {
-            "center_file": file_path,
-            "dependencies": dependencies,
-            "depth": depth
-        }
+        return {"center_file": file_path, "dependencies": dependencies, "depth": depth}

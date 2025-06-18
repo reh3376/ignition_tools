@@ -20,7 +20,8 @@ console = Console()
 def _initialize_workflow_systems():
     """Initialize the workflow integration systems."""
     try:
-        from ..graph.client import IgnitionGraphClient
+        from src.ignition.graph.client import IgnitionGraphClient
+
         from .ai_assistant_enhancement import AIAssistantEnhancement
         from .analytics_dashboard import CodeIntelligenceDashboard
         from .manager import CodeIntelligenceManager
@@ -42,7 +43,7 @@ def _initialize_workflow_systems():
 
 
 @click.group(name="workflow")
-def workflow_group():
+def workflow_group() -> None:
     """🔄 Development workflow integration commands."""
     pass
 

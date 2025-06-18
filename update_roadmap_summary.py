@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Script to add Major Project Goals Summary to the roadmap.md file"""
+"""Script to add Major Project Goals Summary to the roadmap.md file."""
 
 
 def add_goals_summary():

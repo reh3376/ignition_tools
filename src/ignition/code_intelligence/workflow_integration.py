@@ -1,4 +1,4 @@
-"""Development Workflow Integration for Code Intelligence
+"""Development Workflow Integration for Code Intelligence.
 
 This module provides integration with development workflows including:
 - Git hooks for automatic code analysis

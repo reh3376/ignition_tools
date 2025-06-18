@@ -17,7 +17,7 @@ console = Console()
 
 
 @click.group(name="wrappers")
-def wrapper_group():
+def wrapper_group() -> None:
     """🛡️ Enhanced Ignition system function wrappers with error handling."""
     pass
 
@@ -106,7 +106,7 @@ def test_tag_wrapper(
 @wrapper_group.command()
 @click.option("--query", default="SELECT 1 as test_value", help="Test SQL query")
 @click.option("--database", default="", help="Database name")
-def test_db_wrapper(query: str, database: str):
+def test_db_wrapper(query: str, database: str) -> None:
     """🗄️ Test the system.db wrapper functionality."""
     console.print("[bold blue]🗄️ Testing System Database Wrapper[/bold blue]\n")
 
@@ -143,7 +143,7 @@ def test_db_wrapper(query: str, database: str):
 @click.option(
     "--box-type", default="message", type=click.Choice(["message", "error", "warning"])
 )
-def test_gui_wrapper(message: str, title: str, box_type: str):
+def test_gui_wrapper(message: str, title: str, box_type: str) -> None:
     """🖥️ Test the system.gui wrapper functionality."""
     console.print("[bold blue]🖥️ Testing System GUI Wrapper[/bold blue]\n")
 
@@ -174,7 +174,7 @@ def test_gui_wrapper(message: str, title: str, box_type: str):
 
 @wrapper_group.command()
 @click.option("--window-path", default="TestWindow", help="Window path to test")
-def test_nav_wrapper(window_path: str):
+def test_nav_wrapper(window_path: str) -> None:
     """🧭 Test the system.nav wrapper functionality."""
     console.print("[bold blue]🧭 Testing System Navigation Wrapper[/bold blue]\n")
 
@@ -219,7 +219,7 @@ def test_nav_wrapper(window_path: str):
 
 
 @wrapper_group.command()
-def test_alarm_wrapper():
+def test_alarm_wrapper() -> None:
     """🚨 Test the system.alarm wrapper functionality."""
     console.print("[bold blue]🚨 Testing System Alarm Wrapper[/bold blue]\n")
 
@@ -251,7 +251,7 @@ def test_alarm_wrapper():
 @click.option(
     "--logger-name", default="test.wrapper.logger", help="Logger name to test"
 )
-def test_util_wrapper(logger_name: str):
+def test_util_wrapper(logger_name: str) -> None:
     """🔧 Test the system.util wrapper functionality."""
     console.print("[bold blue]🔧 Testing System Utility Wrapper[/bold blue]\n")
 
@@ -280,7 +280,7 @@ def test_util_wrapper(logger_name: str):
 
 
 @wrapper_group.command()
-def test_all_wrappers():
+def test_all_wrappers() -> None:
     """🧪 Run comprehensive tests on all system function wrappers."""
     console.print("[bold blue]🧪 Running Comprehensive Wrapper Tests[/bold blue]\n")
 
@@ -360,7 +360,7 @@ def test_all_wrappers():
 
 
 @wrapper_group.command()
-def show_wrapper_info():
+def show_wrapper_info() -> None:
     """📋 Show information about available system function wrappers."""
     console.print("[bold blue]📋 Ignition System Function Wrappers[/bold blue]\n")
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Example: New Agent Initialization
+"""Example: New Agent Initialization.
 
 This script demonstrates how new agents or chat sessions should initialize
 to automatically discover and connect to all available knowledge bases.
@@ -96,7 +96,7 @@ def main():
         try:
             from ignition.code_intelligence.git_integration import GitIntegration
 
-            git_integration = GitIntegration(Path.cwd(), graph_client=None)
+            GitIntegration(Path.cwd(), graph_client=None)
             print("✅ Git History Integration: Available")
 
             # Example: Get recent commits
@@ -204,7 +204,7 @@ def demonstrate_context_usage(context):
     # Show connection instructions
     if context["connection_instructions"]:
         print("\nConnection Instructions Available:")
-        for system, instructions in context["connection_instructions"].items():
+        for system, _instructions in context["connection_instructions"].items():
             print(f"  • {system.title()}: Ready")
 
     # Show available tools

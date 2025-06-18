@@ -97,7 +97,7 @@ class BrowseResult:
 class OPCTagManager:
     """Manager for OPC tag operations in Ignition."""
 
-    def __init__(self, provider_name: str = "default"):
+    def __init__(self, provider_name: str = "default") -> None:
         """Initialize the OPC tag manager."""
         self.provider_name = provider_name
         self.logger = logging.getLogger(f"{__name__}.{provider_name}")

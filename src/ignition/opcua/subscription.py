@@ -284,15 +284,17 @@ class SubscriptionManager:
                         event_data = {
                             "event_type": str(event.EventType),
                             "source_node": str(event.SourceNode),
-                            "message": str(event.Message.Text)
-                            if hasattr(event, "Message")
-                            else "",
-                            "severity": event.Severity
-                            if hasattr(event, "Severity")
-                            else 0,
-                            "time": event.Time
-                            if hasattr(event, "Time")
-                            else datetime.now(),
+                            "message": (
+                                str(event.Message.Text)
+                                if hasattr(event, "Message")
+                                else ""
+                            ),
+                            "severity": (
+                                event.Severity if hasattr(event, "Severity") else 0
+                            ),
+                            "time": (
+                                event.Time if hasattr(event, "Time") else datetime.now()
+                            ),
                         }
                         self.callback(event_data)
                     except Exception as e:

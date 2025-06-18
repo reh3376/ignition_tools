@@ -75,13 +75,10 @@ class MCPConfigManager:
 
         # Replace the load_mcp_docker_configs method
         start_marker = "    def load_mcp_docker_configs(self) -> Dict:"
-        end_marker = "        return configs"
 
         start_idx = content.find(start_marker)
         if start_idx != -1:
             # Find the end of the method
-            method_start = start_idx
-            brace_count = 0
             in_method = False
             end_idx = start_idx
 

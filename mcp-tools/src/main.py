@@ -19,7 +19,7 @@ logger = structlog.get_logger()
 app = FastAPI(
     title="MCP Tools Service",
     description="Machine Control Program Tools Service for IGN Scripts",
-    version="1.0.0"
+    version="1.0.0",
 )
 
 # Add CORS middleware
@@ -31,12 +31,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Health check response model
 class HealthResponse(BaseModel):
     """Health check response model."""
+
     status: str
     version: str
     details: dict[str, Any]
+
 
 @app.get("/health", response_model=HealthResponse)
 async def health_check() -> HealthResponse:
@@ -50,9 +53,10 @@ async def health_check() -> HealthResponse:
         version="1.0.0",
         details={
             "service": "mcp-tools",
-            "environment": os.getenv("ENVIRONMENT", "development")
-        }
+            "environment": os.getenv("ENVIRONMENT", "development"),
+        },
     )
+
 
 @app.get("/")
 async def root() -> dict[str, str]:
@@ -63,11 +67,8 @@ async def root() -> dict[str, str]:
     """
     return {"message": "Welcome to MCP Tools Service"}
 
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8082,
-        reload=True
-    )
+
+    uvicorn.run("main:app", host="0.0.0.0", port=8082, reload=True)

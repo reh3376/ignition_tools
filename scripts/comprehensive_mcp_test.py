@@ -235,7 +235,7 @@ class MCPTestSuite:
         try:
             # Extract image name from args
             image_name = None
-            for i, arg in enumerate(args):
+            for _i, arg in enumerate(args):
                 if arg.startswith("ghcr.io/") or ":" in arg:
                     image_name = arg
                     break
@@ -295,10 +295,11 @@ class MCPTestSuite:
                 missing_vars.append(var)
 
         # Check for alternative GitHub token
-        if "GITHUB_PERSONAL_ACCESS_TOKEN" in missing_vars:
-            if env_vars.get("GITHUB_TOKEN"):
-                missing_vars.remove("GITHUB_PERSONAL_ACCESS_TOKEN")
-                present_vars.append("GITHUB_TOKEN (alternative)")
+        if "GITHUB_PERSONAL_ACCESS_TOKEN" in missing_vars and env_vars.get(
+            "GITHUB_TOKEN"
+        ):
+            missing_vars.remove("GITHUB_PERSONAL_ACCESS_TOKEN")
+            present_vars.append("GITHUB_TOKEN (alternative)")
 
         return {
             "all_present": len(missing_vars) == 0,

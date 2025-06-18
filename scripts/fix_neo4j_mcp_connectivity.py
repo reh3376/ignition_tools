@@ -61,15 +61,15 @@ class Neo4jMCPConnectivityFixer:
 
             return {
                 "name": container_name,
-                "network": list(container_info["NetworkSettings"]["Networks"].keys())[
-                    0
-                ],
-                "ip_address": list(
-                    container_info["NetworkSettings"]["Networks"].values()
-                )[0]["IPAddress"],
-                "aliases": list(container_info["NetworkSettings"]["Networks"].values())[
-                    0
-                ]["Aliases"],
+                "network": next(
+                    iter(container_info["NetworkSettings"]["Networks"].keys())
+                ),
+                "ip_address": next(
+                    iter(container_info["NetworkSettings"]["Networks"].values())
+                )["IPAddress"],
+                "aliases": next(
+                    iter(container_info["NetworkSettings"]["Networks"].values())
+                )["Aliases"],
                 "env": container_info["Config"]["Env"],
             }
 
@@ -216,7 +216,7 @@ class Neo4jMCPConnectivityFixer:
 
             # Start the container
             env_vars = {**dict(os.environ), **env}
-            result = subprocess.run(cmd, env=env_vars, capture_output=True, text=True)
+            subprocess.run(cmd, env=env_vars, capture_output=True, text=True)
 
             # Wait a moment for startup
             time.sleep(3)

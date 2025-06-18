@@ -1,4 +1,4 @@
-"""CLI Commands for AI Assistant Enhancement - Phase 8.3
+"""CLI Commands for AI Assistant Enhancement - Phase 8.3.
 
 Provides command-line interface for context-aware development and change impact analysis.
 """
@@ -11,17 +11,18 @@ console = Console()
 
 
 @click.group()
-def ai():
+def ai() -> None:
     """AI Assistant Enhancement commands for context-aware development."""
     pass
 
 
 @ai.command()
 @click.argument("file_path")
-def context(file_path: str):
+def context(file_path: str) -> None:
     """Get smart context for a file."""
     try:
-        from ..graph.client import IgnitionGraphClient
+        from src.ignition.graph.client import IgnitionGraphClient
+
         from .ai_assistant_enhancement import AIAssistantEnhancement
         from .manager import CodeIntelligenceManager
 
@@ -60,10 +61,11 @@ def context(file_path: str):
 @ai.command()
 @click.argument("file_path")
 @click.argument("query")
-def snippets(file_path: str, query: str):
+def snippets(file_path: str, query: str) -> None:
     """Get relevant code snippets."""
     try:
-        from ..graph.client import IgnitionGraphClient
+        from src.ignition.graph.client import IgnitionGraphClient
+
         from .ai_assistant_enhancement import AIAssistantEnhancement
         from .manager import CodeIntelligenceManager
 
@@ -93,10 +95,11 @@ def snippets(file_path: str, query: str):
 
 @ai.command()
 @click.argument("file_path")
-def impact(file_path: str):
+def impact(file_path: str) -> None:
     """Analyze change impact."""
     try:
-        from ..graph.client import IgnitionGraphClient
+        from src.ignition.graph.client import IgnitionGraphClient
+
         from .ai_assistant_enhancement import AIAssistantEnhancement
         from .manager import CodeIntelligenceManager
 
