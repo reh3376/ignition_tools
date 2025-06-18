@@ -18,8 +18,13 @@ This is the modular implementation that aggregates functions from specialized mo
 
 from typing import Any
 
-from utility_modules.general_utilities import get_general_utilities_functions
-from utility_modules.logging_operations import get_logging_operations_functions
+try:
+    from .utility_modules.general_utilities import get_general_utilities_functions
+    from .utility_modules.logging_operations import get_logging_operations_functions
+except ImportError:
+    # Fallback for direct execution
+    from utility_modules.general_utilities import get_general_utilities_functions
+    from utility_modules.logging_operations import get_logging_operations_functions
 
 
 def get_utility_system_functions() -> list[dict[str, Any]]:
