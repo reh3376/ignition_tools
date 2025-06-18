@@ -572,7 +572,8 @@ def render_gateways_page() -> None:
 
                 if not configs:
                     st.info(
-                        "🔧 No gateways configured. Add gateways using the Configuration tab or by setting up your .env file."
+                        "🔧 No gateways configured. Add gateways using the "
+                        "Configuration tab or by setting up your .env file."
                     )
 
                     with st.expander("Quick Setup Instructions"):
@@ -691,18 +692,21 @@ def render_gateways_page() -> None:
                                                                 == "healthy"
                                                             ):
                                                                 st.success(
-                                                                    f"✅ {check_name.replace('_', ' ').title()}: {details}"
+                                                                    f"✅ {check_name.replace('_', ' ').title()}: "
+                                                                    f"{details}"
                                                                 )
                                                             elif (
                                                                 check_status
                                                                 == "warning"
                                                             ):
                                                                 st.warning(
-                                                                    f"⚠️ {check_name.replace('_', ' ').title()}: {details}"
+                                                                    f"⚠️ {check_name.replace('_', ' ').title()}: "
+                                                                    f"{details}"
                                                                 )
                                                             else:
                                                                 st.error(
-                                                                    f"❌ {check_name.replace('_', ' ').title()}: {details}"
+                                                                    f"❌ {check_name.replace('_', ' ').title()}: "
+                                                                    f"{details}"
                                                                 )
                                             except Exception as e:
                                                 st.error(
@@ -726,10 +730,15 @@ def render_gateways_page() -> None:
                 if not configs:
                     st.info("No gateways configured. Please set up gateways first.")
                 else:
+
+                    def _format_gateway_option(x):
+                        config = manager.get_config(x)
+                        return f"{x} ({config.base_url if config else 'Error'})"
+
                     selected_gateway = st.selectbox(
                         "Select gateway to test:",
                         options=configs,
-                        format_func=lambda x: f"{x} ({manager.get_config(x).base_url if manager.get_config(x) else 'Error'})",
+                        format_func=_format_gateway_option,
                     )
 
                     if st.button("🔌 Test Connection", use_container_width=True):
@@ -910,10 +919,15 @@ def render_gateways_page() -> None:
                                 except Exception as e:
                                     st.error(f"❌ Health check failed: {e!s}")
                     else:
+
+                        def _format_health_gateway_option(x):
+                            config = manager.get_config(x)
+                            return f"{x} ({config.base_url if config else 'Error'})"
+
                         selected_gateway = st.selectbox(
                             "Select gateway for health check:",
                             options=configs,
-                            format_func=lambda x: f"{x} ({manager.get_config(x).base_url if manager.get_config(x) else 'Error'})",
+                            format_func=_format_health_gateway_option,
                         )
 
                         if st.button("🏥 Check Health", use_container_width=True):
