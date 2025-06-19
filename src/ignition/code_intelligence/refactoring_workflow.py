@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 """Automated Refactoring Workflow.
 
 This module implements a comprehensive refactoring workflow that:
@@ -65,15 +63,17 @@ class ValidationResult:
 class RefactoringWorkflow:
     """Orchestrates complex refactoring operations with safety guarantees."""
 
-    def __init__(self) -> None:
-        self.project_root = project_root
+    def __init__(
+        self, project_root: Path | None = None, enable_git: bool = True
+    ) -> None:
+        self.project_root = project_root or Path.cwd()
         self.enable_git = enable_git
         self.code_splitter = CodeSplitter(preserve_git_history=enable_git)
         self.recommendation_engine = RefactoringRecommendationEngine()
 
         # Workflow state
-        self.active_workflows: dict[str, dict] = {}
-        self.backup_dir = project_root / ".refactoring_backups"
+        self.active_workflows: dict[str, dict[str, Any]] = {}
+        self.backup_dir = self.project_root / ".refactoring_backups"
         self.backup_dir.mkdir(exist_ok=True)
 
     def plan_refactoring_workflow(
@@ -156,7 +156,9 @@ class RefactoringWorkflow:
                 rollback_available=True,
             )
 
-    def _execute_workflow_operations(self, workflow_state: dict) -> RefactoringResult:
+    def _execute_workflow_operations(
+        self, workflow_state: dict[str, Any]
+    ) -> RefactoringResult:
         """Execute the actual workflow operations."""
         operations = workflow_state["operations"]
         workflow_id = workflow_state["id"]
@@ -314,7 +316,9 @@ class RefactoringWorkflow:
             message="Post-operation validation passed",
         )
 
-    def _validate_final_workflow(self, workflow_state: dict) -> ValidationResult:
+    def _validate_final_workflow(
+        self, workflow_state: dict[str, Any]
+    ) -> ValidationResult:
         """Perform final validation of the entire workflow."""
         details: dict[str, Any] = {
             "operations_completed": len(workflow_state["completed_operations"]),

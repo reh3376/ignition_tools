@@ -8,6 +8,7 @@ import sys
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parents[2]))
@@ -28,7 +29,7 @@ class RefactoringRecommendation:
     suggested_splits: list["SplitRecommendation"]
     public_surface_size: int
     private_helpers_count: int
-    impact_analysis: dict[str, any]
+    impact_analysis: dict[str, Any]
 
 
 @dataclass
@@ -158,7 +159,7 @@ class SingleResponsibilityAnalyzer:
 
         return violations
 
-    def _categorize_classes(self, classes: list) -> dict[str, list[str]]:
+    def _categorize_classes(self, classes: list[Any]) -> dict[str, list[str]]:
         """Categorize classes by their apparent purpose."""
         categories = defaultdict(list)
 
@@ -186,7 +187,7 @@ class SingleResponsibilityAnalyzer:
 
         return dict(categories)
 
-    def _categorize_imports(self, imports: list) -> dict[str, list[str]]:
+    def _categorize_imports(self, imports: list[Any]) -> dict[str, list[str]]:
         """Categorize imports by their purpose."""
         categories = defaultdict(list)
 
@@ -350,7 +351,7 @@ class RefactoringRecommendationEngine:
 
         return private_count
 
-    def _analyze_impact(self, file_path: Path, analysis) -> dict[str, any]:
+    def _analyze_impact(self, file_path: Path, analysis) -> dict[str, Any]:
         """Analyze the impact of refactoring this file."""
         impact = {
             "dependent_files": [],
@@ -390,7 +391,9 @@ class RefactoringRecommendationEngine:
 
         return impact
 
-    def _estimate_category_lines(self, classes: list, class_names: list[str]) -> int:
+    def _estimate_category_lines(
+        self, classes: list[Any], class_names: list[str]
+    ) -> int:
         """Estimate lines of code for a category of classes."""
         total_lines = 0
         for class_info in classes:

@@ -211,7 +211,7 @@ class CodeAnalyzer:
         for node in ast.walk(tree):
             if isinstance(node, ast.ClassDef):
                 class_stack.append(node.name)
-            elif isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef):
+            elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 # Calculate method complexity
                 complexity_calc = ComplexityCalculator()
                 complexity_calc.visit(node)

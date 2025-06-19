@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 """Knowledge Base Discovery and Connection System.
 
 This module ensures that every new agent or chat session automatically discovers
@@ -50,7 +48,7 @@ class ProjectContext:
 class KnowledgeDiscoverySystem:
     """Discovers and connects to all available knowledge bases."""
 
-    def __init__(self) -> None:
+    def __init__(self, project_root: Path | None = None) -> None:
         self.project_root = project_root or Path.cwd()
         self.knowledge_bases = []
         self.project_context = None

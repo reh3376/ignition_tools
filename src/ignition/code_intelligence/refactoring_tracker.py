@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 """Refactoring Documentation & Tracking System.
 
 This module provides comprehensive tracking and documentation for refactoring operations,

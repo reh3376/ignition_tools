@@ -166,7 +166,7 @@ class CodeSplitter:
                 imports_needed.update(class_imports)
 
             elif (
-                isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef)
+                isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
                 and node.name in functions_to_extract
             ):
                 start_line = node.lineno - 1
