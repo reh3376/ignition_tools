@@ -4,7 +4,11 @@ from pathlib import Path
 from typing import Any
 
 from ignition.modules.core import AbstractIgnitionModule
-from ignition.modules.core.abstract_module import ModuleContext, ModuleMetadata, ModuleScope
+from ignition.modules.core.abstract_module import (
+    ModuleContext,
+    ModuleMetadata,
+    ModuleScope,
+)
 
 
 class BasicExampleModule(AbstractIgnitionModule):
