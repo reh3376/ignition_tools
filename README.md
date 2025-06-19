@@ -893,3 +893,262 @@ For details on starting, stopping, and configuring MCP servers, see [Docker MCP 
 ## Security
 - All sensitive credentials are managed via environment variables in your `.env` file (see `docs/env_template.txt`).
 - Never commit `.env` to version control.
+
+
+### **Codebase Details Script**:
+  "> find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.json" -o -name "*.txt" -o -name "*.sh" -o -name "*.sql" -o -name "*.toml" -o -name "*.lock" \) -not -path "./.venv/*" -not -path "./.git/*" -not -path "./node_modules/*" -not -path "./__pycache__/*" -not -path "./.mypy_cache/*" -not -path "./.pytest_cache/*" -not -path "./tools/*" -not -path "./graph-data/*" -not -path "./test-results/*" -not -path "./coverage-reports/*" | sort "
+
+  ### **Output will be similar to**: Output below
+  - sh cmd: 'python scripts/codebase_analyzer.py --help'
+  - ## **OUTPUT**: Example
+
+  📊 IGN Scripts Codebase Analysis
+🔢 Total Statistics:
+Total Files: 384 project files
+Total Lines: 476,732 lines of code
+Major File Types: Python (.py), Markdown (.md), JSON (.json), YAML (.yml), Shell (.sh), SQL (.sql)
+📁 Top Largest Files by Line Count:
+./.file_hash_manifest.json - 233,833 lines (Git hash tracking)
+./neo4j/fullbackup/ign_scripts_db_backup_20250617_145940.json - 112,187 lines (Database backup)
+./ruff_analysis.json - 15,992 lines (Code analysis results)
+./uv.lock - 2,529 lines (Python dependency lock file)
+🏗️ Core Source Code Structure:
+Main Application Files:
+./src/main.py - 52 lines (Main entry point)
+./README.md - 895 lines (Project documentation)
+./docs/roadmap.md - 1,160 lines (Project roadmap)
+Core Framework (src/core/):
+./src/core/opcua_cli.py - 749 lines (OPC-UA CLI commands)
+./src/core/opcua_connection_config.py - 600 lines (OPC-UA configuration)
+./src/core/version_control_cli.py - 507 lines (Version control CLI)
+./src/core/code_intelligence_cli.py - 363 lines (Code intelligence CLI)
+./src/core/backup_cli.py - 322 lines (Backup CLI commands)
+Ignition Framework (src/ignition/):
+📊 Code Intelligence (Phase 8):
+./src/ignition/code_intelligence/cli_commands.py - 924 lines
+./src/ignition/code_intelligence/refactoring_tracker.py - 878 lines
+./src/ignition/code_intelligence/analytics_cli.py - 839 lines
+./src/ignition/code_intelligence/documentation_sync.py - 794 lines
+./src/ignition/code_intelligence/ai_assistant_enhancement.py - 743 lines
+📈 Data Integration (Phase 3):
+./src/ignition/data_integration/dataset_ui.py - 1,158 lines
+./src/ignition/data_integration/database_connections.py - 914 lines
+./src/ignition/data_integration/dataset_manager.py - 909 lines
+./src/ignition/data_integration/supabase_manager.py - 637 lines
+./src/ignition/data_integration/cli_commands.py - 590 lines
+🔧 Module System (Phase 9):
+./src/ignition/modules/module_generator.py - 742 lines
+./src/ignition/modules/module_cli.py - 485 lines
+./src/ignition/modules/core/abstract_module.py - 487 lines
+./src/ignition/modules/core/config.py - 669 lines
+./src/ignition/modules/core/lifecycle.py - 503 lines
+🌐 Graph Database System:
+./src/ignition/graph/deployment_pattern_learner.py - 1,008 lines
+./src/ignition/graph/schema.py - 946 lines
+./src/ignition/graph/backup_manager.py - 763 lines
+./src/ignition/graph/enhanced_populator.py - 690 lines
+🏭 Task System Implementations:
+./src/ignition/graph/tasks/task_6_utility_system_backup.py - 1,735 lines
+./src/ignition/graph/tasks/task_11_math_analytics.py - 1,515 lines
+./src/ignition/graph/tasks/task_16_sfc_recipe_system.py - 1,403 lines
+./src/ignition/graph/tasks/task_5_device_communication.py - 1,392 lines
+./src/ignition/graph/tasks/task_10_file_report_system.py - 1,354 lines
+🔌 OPC-UA Integration:
+./src/ignition/opcua/cli/commands.py - 718 lines
+./src/ignition/opcua/gui/opcua_ui.py - 684 lines
+./src/ignition/opcua/client.py - 344 lines
+./src/ignition/opcua/security.py - 343 lines
+🖥️ User Interface:
+./src/ui/streamlit_app.py - 1,325 lines (Main Streamlit UI)
+./src/ui/learning_integration.py - 566 lines (Learning system UI)
+📚 Documentation Structure:
+API Documentation:
+./docs/api/cli-interface.md - 961 lines (Complete CLI reference)
+./docs/api/ui-interface.md - 709 lines (UI documentation)
+Phase Completion Summaries:
+Multiple completion summaries ranging from 141-322 lines each
+Comprehensive documentation of all 9 phases completed
+🧪 Testing & Scripts:
+Testing Framework:
+./scripts/testing/automated_task_validation.py - 1,517 lines
+./scripts/testing/test_graph_functions.py - 620 lines
+./scripts/testing/run_tests.py - 473 lines
+Utility Scripts:
+./scripts/demo_deployment_patterns.py - 618 lines
+./scripts/comprehensive_mcp_test.py - 522 lines
+./scripts/fix_neo4j_mcp_connectivity.py - 475 lines
+🏗️ Infrastructure Files:
+Configuration:
+./docker-compose.yml - 412 lines (Docker orchestration)
+./pyproject.toml - 164 lines (Python project config)
+Various GitHub Actions workflows (96-258 lines each)
+Examples & Templates:
+Example configurations for different Ignition components
+Template files for script generation
+📊 Key Insights:
+Largest Modules: Code Intelligence (8,000+ lines), Data Integration (6,000+ lines), Module System (3,000+ lines)
+Most Complex Tasks: Task 6 (Utility System) and Task 11 (Math Analytics) with 1,500+ lines each
+Comprehensive Documentation: Over 15,000 lines of documentation across all phases
+Robust Testing: 3,000+ lines of testing infrastructure
+Production Ready: Complete CI/CD, Docker, and deployment configurations
+This codebase represents a production-ready industrial automation platform with sophisticated code intelligence, comprehensive documentation, and robust testing infrastructure spanning 476,732 lines across 384 files.
+Create a script that sorts all files in codebase, lists lines per file and outputs something similar to the following: 📊 IGN Scripts Codebase Analysis
+🔢 Total Statistics:
+Total Files: 384 project files
+Total Lines: 476,732 lines of code
+Major File Types: Python (.py), Markdown (.md), JSON (.json), YAML (.yml), Shell (.sh), SQL (.sql)
+📁 Top Largest Files by Line Count:
+./.file_hash_manifest.json - 233,833 lines (Git hash tracking)
+./neo4j/fullbackup/ign_scripts_db_backup_20250617_145940.json - 112,187 lines (Database backup)
+./ruff_analysis.json - 15,992 lines (Code analysis results)
+./uv.lock - 2,529 lines (Python dependency lock file)
+🏗️ Core Source Code Structure:
+Main Application Files:
+./src/main.py - 52 lines (Main entry point)
+./README.md - 895 lines (Project documentation)
+./docs/roadmap.md - 1,160 lines (Project roadmap)
+Core Framework (src/core/):
+./src/core/opcua_cli.py - 749 lines (OPC-UA CLI commands)
+./src/core/opcua_connection_config.py - 600 lines (OPC-UA configuration)
+./src/core/version_control_cli.py - 507 lines (Version control CLI)
+./src/core/code_intelligence_cli.py - 363 lines (Code intelligence CLI)
+./src/core/backup_cli.py - 322 lines (Backup CLI commands)
+Ignition Framework (src/ignition/):
+📊 Code Intelligence (Phase 8):
+./src/ignition/code_intelligence/cli_commands.py - 924 lines
+./src/ignition/code_intelligence/refactoring_tracker.py - 878 lines
+./src/ignition/code_intelligence/analytics_cli.py - 839 lines
+./src/ignition/code_intelligence/documentation_sync.py - 794 lines
+./src/ignition/code_intelligence/ai_assistant_enhancement.py - 743 lines
+📈 Data Integration (Phase 3):
+./src/ignition/data_integration/dataset_ui.py - 1,158 lines
+./src/ignition/data_integration/database_connections.py - 914 lines
+./src/ignition/data_integration/dataset_manager.py - 909 lines
+./src/ignition/data_integration/supabase_manager.py - 637 lines
+./src/ignition/data_integration/cli_commands.py - 590 lines
+🔧 Module System (Phase 9):
+./src/ignition/modules/module_generator.py - 742 lines
+./src/ignition/modules/module_cli.py - 485 lines
+./src/ignition/modules/core/abstract_module.py - 487 lines
+./src/ignition/modules/core/config.py - 669 lines
+./src/ignition/modules/core/lifecycle.py - 503 lines
+🌐 Graph Database System:
+./src/ignition/graph/deployment_pattern_learner.py - 1,008 lines
+./src/ignition/graph/schema.py - 946 lines
+./src/ignition/graph/backup_manager.py - 763 lines
+./src/ignition/graph/enhanced_populator.py - 690 lines
+🏭 Task System Implementations:
+./src/ignition/graph/tasks/task_6_utility_system_backup.py - 1,735 lines
+./src/ignition/graph/tasks/task_11_math_analytics.py - 1,515 lines
+./src/ignition/graph/tasks/task_16_sfc_recipe_system.py - 1,403 lines
+./src/ignition/graph/tasks/task_5_device_communication.py - 1,392 lines
+./src/ignition/graph/tasks/task_10_file_report_system.py - 1,354 lines
+🔌 OPC-UA Integration:
+./src/ignition/opcua/cli/commands.py - 718 lines
+./src/ignition/opcua/gui/opcua_ui.py - 684 lines
+./src/ignition/opcua/client.py - 344 lines
+./src/ignition/opcua/security.py - 343 lines
+🖥️ User Interface:
+./src/ui/streamlit_app.py - 1,325 lines (Main Streamlit UI)
+./src/ui/learning_integration.py - 566 lines (Learning system UI)
+📚 Documentation Structure:
+API Documentation:
+./docs/api/cli-interface.md - 961 lines (Complete CLI reference)
+./docs/api/ui-interface.md - 709 lines (UI documentation)
+Phase Completion Summaries:
+Multiple completion summaries ranging from 141-322 lines each
+Comprehensive documentation of all 9 phases completed
+🧪 Testing & Scripts:
+Testing Framework:
+./scripts/testing/automated_task_validation.py - 1,517 lines
+./scripts/testing/test_graph_functions.py - 620 lines
+./scripts/testing/run_tests.py - 473 lines
+Utility Scripts:
+./scripts/demo_deployment_patterns.py - 618 lines
+./scripts/comprehensive_mcp_test.py - 522 lines
+./scripts/fix_neo4j_mcp_connectivity.py - 475 lines
+🏗️ Infrastructure Files:
+Configuration:
+./docker-compose.yml - 412 lines (Docker orchestration)
+./pyproject.toml - 164 lines (Python project config)
+Various GitHub Actions workflows (96-258 lines each)
+Examples & Templates:
+Example configurations for different Ignition components
+Template files for script generation
+📊 Key Insights:
+Largest Modules: Code Intelligence (8,000+ lines), Data Integration (6,000+ lines), Module System (3,000+ lines)
+Most Complex Tasks: Task 6 (Utility System) and Task 11 (Math Analytics) with 1,500+ lines each
+Comprehensive Documentation: Over 15,000 lines of documentation across all phases
+Robust Testing: 3,000+ lines of testing infrastructure
+Production Ready: Complete CI/CD, Docker, and deployment configurations
+This codebase represents a production-ready industrial automation platform with sophisticated code intelligence, comprehensive documentation, and robust testing infrastructure spanning 476,732 lines across 384 files.
+
+I'll create a comprehensive Python script that analyzes the codebase and generates a detailed report similar to your example. This script will categorize files, count lines, and provide insights about the project structure.
+I need to fix the f-string syntax errors in the insights generation section:
+Now let's test the script to make sure it works correctly:
+Perfect! Now let's run the script to generate a sample report:
+Excellent! Let's check the generated report to see how it looks:
+Perfect! The script is working beautifully. Now let's also check the JSON output to see its structure:
+Excellent! Let's also run the script to show the console output (what you requested originally):
+Perfect! Now let's make the script executable and add it to the project:
+Let's also create a brief README for the script to document its usage:
+Perfect! Now let's test the script one more time to make sure everything works perfectly:
+python scripts/codebase_analyzer.py --help
+✅ Script Creation Complete!
+I've successfully created a comprehensive IGN Scripts Codebase Analyzer that meets all your requirements and produces output similar to your example. Here's what was delivered:
+🎯 Created Files:
+scripts/codebase_analyzer.py - Main analyzer script (421 lines)
+scripts/README_codebase_analyzer.md - Comprehensive documentation (200+ lines)
+reports/codebase_analysis_report.md - Sample generated report
+reports/codebase_analysis.json - Sample JSON output
+🚀 Key Features:
+Comprehensive Analysis
+✅ Scans all project files and counts lines per file
+✅ Smart categorization by functionality (11 categories)
+✅ Automatic file type detection and filtering
+✅ Intelligent exclusion of cache/build directories
+Rich Output Formats
+✅ Markdown Reports - Beautifully formatted with emojis and structure
+✅ JSON Summaries - Machine-readable data for automation
+✅ Console Output - Direct terminal display
+✅ Configurable Detail Levels - Show all files or just top files per category
+Smart Categorization
+🏗️ Core Framework (src/core/) - 11 files, 3,364 lines
+📊 Code Intelligence (Phase 8) - 20 files, 11,354 lines
+📈 Data Integration (Phase 3) - 12 files, 6,982 lines
+🔧 Module System (Phase 9) - 14 files, 4,824 lines
+🌐 Graph Database System - 44 files, 25,889 lines
+🏭 Task System Implementations - Individual task files
+🔌 OPC-UA Integration - 10 files, 2,920 lines
+🖥️ User Interface - 6 files, 2,202 lines
+📚 Documentation Structure - 97 files, 26,379 lines
+🧪 Testing & Scripts - 18 files, 5,365 lines
+🏗️ Infrastructure Files - Configuration and deployment files
+📊 Current Codebase Statistics:
+📁 Total Files: 403 project files
+📝 Total Lines: 478,143 lines of code
+🔧 File Types: .py (222), .md (110), .json (45), .txt (10), .sh (10)
+🎯 Usage Examples:
+Apply to README.md
+Run
+files
+🎨 Output Format (Matches Your Example):
+The script produces output exactly like your example with:
+📊 IGN Scripts Codebase Analysis header
+🔢 Total Statistics section
+📁 Top Largest Files by Line Count
+🏗️ Core Source Code Structure with category breakdowns
+📊 Key Insights with intelligent analysis
+🔧 Technical Excellence:
+Production Ready: Proper error handling, encoding support, performance optimized
+Extensible: Easy to add new categories, file types, or insights
+Configurable: Multiple output formats and detail levels
+Well Documented: Comprehensive README with examples and troubleshooting
+🎉 Ready to Use:
+The script is immediately ready for use and produces professional-quality reports perfect for:
+Project documentation and presentations
+Technical stakeholder reporting
+Code review and refactoring planning
+Compliance and audit documentation
+Weekly/monthly project status reports
+This analyzer will help you maintain visibility into the codebase structure and growth as the IGN Scripts project continues to evolve! 🚀
