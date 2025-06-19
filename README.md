@@ -2,7 +2,7 @@
 
 **Version**: 0.2.1 | **Phase**: 9.2 Complete - Core Module Infrastructure | **Status**: Production Ready
 
-IGN Scripts is an intelligent, AI-enhanced development platform for Ignition SCADA systems that combines script generation, code intelligence, module development, and industrial automation capabilities into a unified ecosystem. With the
+IGN Scripts is an intelligent, AI-enhanced development platform for Ignition SCADA systems that combines script generation, code intelligence, module development, and industrial automation capabilities into a unified ecosystem. With the ability to plug directly into the Ignition framework to offer highly relevant services that are not currently avaliable to the platform.
 
 ## 🏭 **Core Services & Capabilities**
 
@@ -47,7 +47,7 @@ IGN Scripts is an intelligent, AI-enhanced development platform for Ignition SCA
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/reh3376/IGN_scripts.git
+git clone 'repo_url'
 cd IGN_scripts
 
 # Set up Python environment with uv
@@ -87,20 +87,19 @@ pytest -m e2e
 ```bash
 # Build MCP service
 cd mcp
-docker build -t ghcr.io/reh3376/mcp:latest .
+docker build -t 'place_address_here' .
 
 # Build MCP Tools service
 cd ../mcp-tools
-docker build -t ghcr.io/reh3376/mcp-tools:latest .
+docker build -t 'place_address_here' .
 ```
 
 ### Documentation
 
 Documentation for each service is available in their respective `docs` directories and is also published to GitHub Pages:
 
-- MCP Documentation: https://reh3376.github.io/mcp/
-- MCP Tools Documentation: https://reh3376.github.io/mcp-tools/
-
+- MCP Documentation: 'github_URL'
+- MCP Tools Documentation: 'github_URL'
 ## Contributing
 
 1. Fork the repository
@@ -115,13 +114,17 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Contact
 
-For questions or support, please open an issue in the respective repository:
-- [MCP Issues](https://github.com/reh3376/mcp/issues)
-- [MCP Tools Issues](https://github.com/reh3376/mcp-tools/issues)
+For questions or support, please open an issue in the IGN Scripts repository:
+- [IGN Scripts Issues](https://github.com/xxxx/IGN_scripts/issues) - General project issues and feature requests
+- [Bug Reports](https://github.com/xxxx/IGN_scripts/issues/new?template=bug_report.md) - Report bugs and technical issues
+- [Feature Requests](https://github.com/xxxx/IGN_scripts/issues/new?template=feature_request.md) - Request new features and enhancements
+- [Documentation Issues](https://github.com/xxxx/IGN_scripts/issues/new?labels=documentation) - Documentation improvements and corrections
 
 # IGN Scripts - Ignition Jython Script Generator
 
 A powerful Python application for generating, validating, and exporting Jython scripts for Ignition SCADA systems.
+
+Legend: ✅ Complete | 🔄 In Progress | ⏳ Planned
 
 ## 🤖 **FOR AI ASSISTANTS: PERSISTENT MEMORY AVAILABLE**
 
@@ -138,23 +141,23 @@ A powerful Python application for generating, validating, and exporting Jython s
 - [ ] **Full Documentation**: See `docs/ai_assistant_memory_system.md`
 
 🎊 **Graph Database Status:** Tasks 1-16 Complete (424 functions - 400+ MAJOR MILESTONE EXCEEDED!)
-- ✅ Task 1: Tag System (27 functions)
-- ✅ Task 2: Database System (21 functions)
-- ✅ Task 3: GUI System (26 functions)
-- ✅ Task 4: Perspective System (22 functions)
-- ✅ Task 5: Device Communication (37 functions)
-- ✅ Task 6: Utility System (50 functions)
-- ✅ Task 7: Alarm System (29 functions)
-- ✅ Task 8: Print System (18 functions)
-- ✅ Task 9: Security System (22 functions)
-- ✅ Task 10: File & Report System (25 functions)
-- ✅ Task 11: Advanced Math & Analytics Functions (30 functions)
-- ✅ Task 12: Machine Learning Integration Functions (25 functions)
-- ✅ Task 13: Integration & External Systems Functions (30 functions)
-- ✅ Task 14: OPC-UA Client Integration Functions (14 functions)
-- ✅ Task 15: OPC-UA Live Client Integration (CLI/UI Enhancement) 🏭 **PRODUCTION READY!**
-- ✅ Task 16: Sequential Function Charts & Recipe Management (16 functions) 🏭 **NEW!**
-- 🚀 Next Phase: Task 17 (System Administration & Project Management)
+- ✅ **Task 1**: Tag System (27 functions)
+- ✅ **Task 2**: Database System (21 functions)
+- ✅ **Task 3**: GUI System (26 functions)
+- ✅ **Task 4**: Perspective System (22 functions)
+- ✅ **Task 5**: Device Communication (37 functions)
+- ✅ **Task 6**: Utility System (50 functions)
+- ✅ **Task 7**: Alarm System (29 functions)
+- ✅ **Task 8**: Print System (18 functions)
+- ✅ **Task 9**: Security System (22 functions)
+- ✅ **Task 10**: File & Report System (25 functions)
+- ✅ **Task 11**: Advanced Math & Analytics Functions (30 functions)
+- ✅ **Task 12**: Machine Learning Integration Functions (25 functions)
+- ✅ **Task 13**: Integration & External Systems Functions (30 functions)
+- ✅ **Task 14**: OPC-UA Client Integration Functions (14 functions)
+- ✅ **Task 15**: OPC-UA Live Client Integration (CLI/UI Enhancement) 🏭 **PRODUCTION READY!**
+- ✅ **Task 16**: Sequential Function Charts & Recipe Management (16 functions)
+- ✅ **Task 17**: System Administration & Project Management
 
 🔧 **Quick AI Assistant Commands:**
 ```python
@@ -181,47 +184,47 @@ IGN Scripts is designed to streamline the development of Jython scripts for Igni
 - Export scripts in formats compatible with Ignition gateways
 - Manage version control for Ignition projects
 - Automate deployment to production environments
-- **Import/Export Ignition projects with validation** ✅ **NEW**
+_ **AI Agent script generation via natural language**- **###Future###**
 
-## 🏭 **NEW: Industrial OPC-UA Integration**
+- **Import/Export Ignition projects with validation** ✅
 
-**Task 14 Complete**: Added comprehensive OPC-UA client capabilities for real industrial automation:
+### 🏭 **Industrial OPC-UA Integration**: comprehensive OPC-UA client capabilities for real industrial automation
 
-### OPC-UA Function Library (14 Functions)
+## OPC-UA Function Library (14 Functions)
 - ✅ **Connection Management**: Secure OPC-UA server connections with certificate handling
 - ✅ **Address Space Navigation**: Browse server nodes and discover device structures
 - ✅ **Data Operations**: Read/write OPC-UA node values with type validation
 - ✅ **Real-time Monitoring**: Subscribe to data changes and alarm events
 - ✅ **Historical Data**: Access time-series data for analysis and reporting
 
-### **✅ Task 15 Phase 2 Complete: Live OPC-UA Client Integration**
+## **✅ Complete: Live OPC-UA Client Integration**
 Transform from script generator to full industrial automation platform:
-- **✅ CLI Integration**: Complete 7-command CLI with `ignition opcua connect/browse/read/monitor/status/info/disconnect`
+- **✅ CLI: Complete** 7-command CLI with `ignition opcua connect/browse/read/monitor/status/info/disconnect`
 - **✅ Live UI Dashboard**: Comprehensive Streamlit-based industrial monitoring with real-time data
 - **✅ Security Framework**: Certificate-based authentication with comprehensive security management
 - **✅ Configuration Management**: Wizard-driven setup with save/load functionality
 - **✅ Industrial Connectivity**: Production-ready OPC-UA client for PLC and SCADA systems
 
-📋 **Detailed Documentation**: [Task 15 Phase 2 Summary](docs/TASK_15_PHASE_2_COMPLETION_SUMMARY.md) | [OPC-UA UI Guide](docs/opcua_ui_guide.md)
+📋 **Detailed Documentation**: see .docs/roadmap.md | [OPC-UA UI Guide](docs/opcua_ui_guide.md)
 
-## 🏭 **Phase 2 Complete: Export/Import System** ✅ **NEW**
+🏭 ###**Export/Import System**:
 
-**Complete project lifecycle management for Ignition systems:**
-
-### Import System Features
+## Import System Features
 - **✅ Multiple Import Modes**: MERGE, OVERWRITE, SKIP_CONFLICTS deployment strategies
 - **✅ Comprehensive Validation**: File format, size, and type validation with detailed reporting
 - **✅ Rich CLI Experience**: Beautiful terminal output with colored panels and progress indicators
 - **✅ Dry Run Capability**: Test imports without making changes
 - **✅ Error Handling**: Graceful failure handling with actionable error messages
 
-### Supported Import Formats
+## Supported Import Formats
 - **`.proj`** - Project export files from Ignition Designer
 - **`.gwbk`** - Gateway backup files for full system imports
 - **`.json`** - JSON export files with project data
 - **`.zip`** - Compressed export files
 
 ### CLI Commands
+📚 **[Complete CLI Guide & Quick Start](docs/api/cli-interface.md)** - Comprehensive CLI documentation with all commands, examples, and functionality overview
+
 ```bash
 # Import project with validation
 python -m src.core.enhanced_cli import-project project.proj MyProject
@@ -233,109 +236,75 @@ python -m src.core.enhanced_cli validate-import backup.gwbk
 python -m src.core.enhanced_cli import-project export.json Project --mode overwrite --dry-run
 ```
 
-📋 **Detailed Documentation**: [Phase 2 Completion Summary](docs/PHASE_2_IMPORT_SYSTEM_COMPLETION_SUMMARY.md)
+### 🛡️ **System Function Wrappers**: Enhanced Ignition system functions with comprehensive error handling and monitoring
+- ✅ `system.tag.*` wrapper functions
+- ✅ `system.db.*` utilities
+- ✅ `system.gui.*` helpers
+- ✅ `system.nav.*` navigation tools
+- ✅ `system.alarm.*` management
 
-## 🛡️ **Phase 3 Complete: System Function Wrappers** ✅ **NEW**
+## System Function Wrappers Features
+- ✅ **6 Major System Modules**: Tag, Database, GUI, Navigation, Alarm, and Utility wrappers
+- ✅ **24 Enhanced Functions**: All major Ignition system functions with error handling
+- ✅ **Quality Code Translation**: Human-readable quality names (GOOD, BAD_NOT_CONNECTED, etc.)
+- ✅ **Performance Monitoring**: Execution time tracking and success rate analytics
+- ✅ **Retry Logic**: Configurable retry attempts with intelligent backoff
+- ✅ **Input Validation**: Type checking and parameter validation for all functions
+- ✅ **Mock Support**: Full development environment support without Ignition
 
-**Enhanced Ignition system functions with comprehensive error handling and monitoring:**
+## Enhanced System Modules
+- ✅ **SystemTagWrapper**: Enhanced tag operations with quality validation and batch support
+- ✅ **SystemDbWrapper**: Database operations with query validation and performance metrics
+- ✅ **SystemGuiWrapper**: GUI operations with input validation and comprehensive logging
+- ✅ **SystemNavWrapper**: Window navigation with parameter validation and error recovery
+- ✅ **SystemAlarmWrapper**: Alarm operations with batch support and filtering capabilities
+- ✅ **SystemUtilWrapper**: Utility operations with enhanced logging and validation
 
-### System Function Wrappers Features
-- **✅ 6 Major System Modules**: Tag, Database, GUI, Navigation, Alarm, and Utility wrappers
-- **✅ 24 Enhanced Functions**: All major Ignition system functions with error handling
-- **✅ Quality Code Translation**: Human-readable quality names (GOOD, BAD_NOT_CONNECTED, etc.)
-- **✅ Performance Monitoring**: Execution time tracking and success rate analytics
-- **✅ Retry Logic**: Configurable retry attempts with intelligent backoff
-- **✅ Input Validation**: Type checking and parameter validation for all functions
-- **✅ Mock Support**: Full development environment support without Ignition
+## Wrapper Benefits
+- ✅ **Reliability**: Retry logic and graceful error handling for production environments
+- ✅ **Observability**: Comprehensive logging and metrics collection for debugging
+- ✅ **Validation**: Input validation prevents common scripting errors
+- ✅ **Context Awareness**: Automatic adaptation to Ignition execution environment
 
-### Enhanced System Modules
-- **SystemTagWrapper**: Enhanced tag operations with quality validation and batch support
-- **SystemDbWrapper**: Database operations with query validation and performance metrics
-- **SystemGuiWrapper**: GUI operations with input validation and comprehensive logging
-- **SystemNavWrapper**: Window navigation with parameter validation and error recovery
-- **SystemAlarmWrapper**: Alarm operations with batch support and filtering capabilities
-- **SystemUtilWrapper**: Utility operations with enhanced logging and validation
+### 🔗 **Data Integration Scripts**: Comprehensive data integration framework for industrial automation
 
-### CLI Commands
-```bash
-# Test all system function wrappers
-python -m src.core.enhanced_cli wrappers test-all
+## Data Integration Features
+- ✅ **Multi-Database Support**: 7 database types (Neo4j, PostgreSQL/Supabase, InfluxDB, SQL Server, MySQL, SQLite)
+- ✅ **Historian Query Generation**: Optimized queries for time series databases (InfluxDB, TimescaleDB, Ignition Historian)
+- ✅ **OPC Tag Management**: Complete tag lifecycle with browsing, creation, and operations
+- ✅ **Report Generation**: Industrial reports in multiple formats (CSV, JSON, HTML)
+- ✅ **Environment Security**: All credentials externalized to .env files
+- ✅ **CLI Integration**: Rich terminal interface with 15+ commands across 4 command groups
 
-# Test individual wrappers
-python -m src.core.enhanced_cli wrappers test-tag --tag-path "[default]MyTag"
-python -m src.core.enhanced_cli wrappers test-db --query "SELECT COUNT(*) FROM MyTable"
+## Database Connection Manager
+- ✅ **Connection Pooling**: Efficient resource management with configurable pool sizes
+- ✅ **SSL/TLS Support**: Secure connections for production environments
+- ✅ **Auto-Discovery**: Automatic configuration loading from environment variables
+- ✅ **Multi-Database**: Unified interface for different database types
+- ✅ **Health Monitoring**: Connection testing and diagnostics
 
-# Show wrapper information and capabilities
-python -m src.core.enhanced_cli wrappers info
-```
+## Historian Query Generator
+- ✅ **Time Series Optimization**: Performance-optimized queries for large industrial datasets
+- ✅ **Flexible Time Ranges**: Duration-based and absolute time range specifications
+- ✅ **Aggregation Functions**: Average, min, max, sum, count with configurable intervals
+- ✅ **Tag Filtering**: Advanced filtering and grouping capabilities
+- ✅ **Multi-Historian**: Support for InfluxDB, TimescaleDB, and Ignition Historian
 
-### Wrapper Benefits
-- **Reliability**: Retry logic and graceful error handling for production environments
-- **Observability**: Comprehensive logging and metrics collection for debugging
-- **Validation**: Input validation prevents common scripting errors
-- **Context Awareness**: Automatic adaptation to Ignition execution environment
+## OPC Tag Manager
+- ✅ **Tag Browsing**: Hierarchical folder structure with industrial mock data
+- ✅ **Batch Operations**: Efficient bulk tag creation and management
+- ✅ **Quality Management**: Comprehensive quality code translation (GOOD, BAD_NOT_CONNECTED, etc.)
+- ✅ **Script Generation**: Production-ready Jython scripts for Ignition deployment
+- ✅ **Tag Operations**: Create, read, write, and browse with validation
 
-📋 **Detailed Documentation**: [Phase 3 Completion Summary](docs/completion-summaries/PHASE_3_SYSTEM_WRAPPERS_COMPLETION_SUMMARY.md)
+## Report Generator
+- ✅ **Industrial Reports**: Production, alarm, trend, and summary reports
+- ✅ **Multiple Formats**: CSV, JSON, HTML with extensible architecture
+- ✅ **Time-Based Analysis**: Configurable time ranges and data aggregation
+- ✅ **Ignition Integration**: Compatible script generation for Ignition report system
+- ✅ **Custom Templates**: Flexible report templates for different use cases
 
-## 🔗 **Phase 3 Complete: Data Integration Scripts** ✅ **NEW**
-
-**Comprehensive data integration framework for industrial automation systems:**
-
-### Data Integration Features
-- **✅ Multi-Database Support**: 7 database types (Neo4j, PostgreSQL/Supabase, InfluxDB, SQL Server, MySQL, SQLite)
-- **✅ Historian Query Generation**: Optimized queries for time series databases (InfluxDB, TimescaleDB, Ignition Historian)
-- **✅ OPC Tag Management**: Complete tag lifecycle with browsing, creation, and operations
-- **✅ Report Generation**: Industrial reports in multiple formats (CSV, JSON, HTML)
-- **✅ Environment Security**: All credentials externalized to .env files
-- **✅ CLI Integration**: Rich terminal interface with 15+ commands across 4 command groups
-
-### Database Connection Manager
-- **Connection Pooling**: Efficient resource management with configurable pool sizes
-- **SSL/TLS Support**: Secure connections for production environments
-- **Auto-Discovery**: Automatic configuration loading from environment variables
-- **Multi-Database**: Unified interface for different database types
-- **Health Monitoring**: Connection testing and diagnostics
-
-### Historian Query Generator
-- **Time Series Optimization**: Performance-optimized queries for large industrial datasets
-- **Flexible Time Ranges**: Duration-based and absolute time range specifications
-- **Aggregation Functions**: Average, min, max, sum, count with configurable intervals
-- **Tag Filtering**: Advanced filtering and grouping capabilities
-- **Multi-Historian**: Support for InfluxDB, TimescaleDB, and Ignition Historian
-
-### OPC Tag Manager
-- **Tag Browsing**: Hierarchical folder structure with industrial mock data
-- **Batch Operations**: Efficient bulk tag creation and management
-- **Quality Management**: Comprehensive quality code translation (GOOD, BAD_NOT_CONNECTED, etc.)
-- **Script Generation**: Production-ready Jython scripts for Ignition deployment
-- **Tag Operations**: Create, read, write, and browse with validation
-
-### Report Generator
-- **Industrial Reports**: Production, alarm, trend, and summary reports
-- **Multiple Formats**: CSV, JSON, HTML with extensible architecture
-- **Time-Based Analysis**: Configurable time ranges and data aggregation
-- **Ignition Integration**: Compatible script generation for Ignition report system
-- **Custom Templates**: Flexible report templates for different use cases
-
-### CLI Commands
-```bash
-# Database operations
-python -m src.core.enhanced_cli data database test-connection --config-name neo4j_default
-python -m src.core.enhanced_cli data database list-configs
-
-# Tag management
-python -m src.core.enhanced_cli data tags browse --path PLCs
-python -m src.core.enhanced_cli data tags read --tag-paths "PLC1/Status,PLC1/Heartbeat"
-
-# Report generation
-python -m src.core.enhanced_cli data reports production --hours 24 --format csv
-python -m src.core.enhanced_cli data reports alarms --hours 8 --format json
-
-# System status and health
-python -m src.core.enhanced_cli data status
-```
-
-### Environment Configuration
+## Environment Configuration
 ```bash
 # Database Configurations
 NEO4J_HOST=localhost
@@ -353,64 +322,48 @@ INFLUXDB_HOST=localhost
 INFLUXDB_TOKEN=your-token
 ```
 
-### Integration Benefits
+## Integration Benefits
 - **Production Ready**: Comprehensive error handling and retry logic
 - **Security First**: No hardcoded credentials, SSL/TLS support throughout
 - **Performance Optimized**: Connection pooling and query optimization
 - **Development Friendly**: Mock data and testing capabilities
 - **Ignition Compatible**: Generated scripts work seamlessly in Ignition environment
 
-📋 **Detailed Documentation**: [Phase 3 Data Integration Summary](docs/completion-summaries/PHASE_3_DATA_INTEGRATION_COMPLETION_SUMMARY.md)
+### 🧠 **Dataset Curation for AI/ML**: Interactive dataset building and curation for AI/ML model preparation
 
-## 🧠 **NEW: Dataset Curation for AI/ML** ✅ **Phase 3 Extension**
+## Dataset Curation Features
+- ✅ **Interactive Web UI**: Streamlit-based dataset curation studio with `ign data dataset buildout`
+- ✅ **Multi-Source Integration**: Databases, historians, OPC tags, files, and APIs
+- ✅ **Feature Engineering**: Visual feature definition with transformations and validation
+- ✅ **Data Quality Assessment**: Automated quality scoring with detailed reports and recommendations
+- ✅ **ML-Ready Exports**: CSV, Parquet, JSON formats with metadata and train/test splitting
+- ✅ **Real-time Processing**: Live feedback during dataset processing and validation
+- ✅ **Data Curation & Standardization**: Modify raw datasets in preperation for model injestion
 
-**Interactive dataset building and curation for AI/ML model preparation:**
+## Dataset Types Supported
+- ✅ **Classification**: Binary and multi-class classification problems
+- ✅ **Regression**: Continuous value prediction
+- ✅ **Time Series**: Sequential data analysis and forecasting
+- ✅ **Anomaly Detection**: Outlier and anomaly identification
+- ✅ **Clustering**: Unsupervised grouping analysis
+- ✅ **Forecasting**: Future value prediction
 
-### Dataset Curation Features
-- **✅ Interactive Web UI**: Streamlit-based dataset curation studio with `ign data dataset buildout`
-- **✅ Multi-Source Integration**: Databases, historians, OPC tags, files, and APIs
-- **✅ Feature Engineering**: Visual feature definition with transformations and validation
-- **✅ Data Quality Assessment**: Automated quality scoring with detailed reports and recommendations
-- **✅ ML-Ready Exports**: CSV, Parquet, JSON formats with metadata and train/test splitting
-- **✅ Real-time Processing**: Live feedback during dataset processing and validation
+## Interactive UI Features
+- ✅ **Dataset Overview Dashboard**: Summary statistics, status distribution, quality visualization
+- ✅ **Dataset Creation Wizard**: Step-by-step setup with data source configuration
+- ✅ **Feature Engineering Interface**: Visual feature definition and transformation tools
+- ✅ **Data Quality Assessment**: Interactive quality reports with radar charts and recommendations
+- ✅ **Export & Deployment**: Multiple format support with ML platform integration options
 
-### Dataset Types Supported
-- **Classification**: Binary and multi-class classification problems
-- **Regression**: Continuous value prediction
-- **Time Series**: Sequential data analysis and forecasting
-- **Anomaly Detection**: Outlier and anomaly identification
-- **Clustering**: Unsupervised grouping analysis
-- **Forecasting**: Future value prediction
+## Data Quality Metrics
+- ✅ **Completeness**: Missing value assessment (0-100%)
+- ✅ **Consistency**: Data format and range validation (0-100%)
+- ✅ **Accuracy**: Data correctness evaluation (0-100%)
+- ✅ **Uniqueness**: Duplicate detection and scoring (0-100%)
+- ✅ **Timeliness**: Data freshness assessment (0-100%)
+- ✅ **Overall Quality**: Excellent, Good, Fair, Poor, Critical ratings
 
-### Interactive UI Features
-- **Dataset Overview Dashboard**: Summary statistics, status distribution, quality visualization
-- **Dataset Creation Wizard**: Step-by-step setup with data source configuration
-- **Feature Engineering Interface**: Visual feature definition and transformation tools
-- **Data Quality Assessment**: Interactive quality reports with radar charts and recommendations
-- **Export & Deployment**: Multiple format support with ML platform integration options
-
-### CLI Commands
-```bash
-# Create sample dataset for testing
-python -m src.core.enhanced_cli data dataset sample
-
-# Launch interactive dataset curation UI
-python -m src.core.enhanced_cli data dataset buildout
-
-# Create new dataset from command line
-python -m src.core.enhanced_cli data dataset create --name "Production_Data" --type regression
-
-# List all datasets with status
-python -m src.core.enhanced_cli data dataset list
-```
-
-### Data Quality Metrics
-- **Completeness**: Missing value assessment (0-100%)
-- **Consistency**: Data format and range validation (0-100%)
-- **Accuracy**: Data correctness evaluation (0-100%)
-- **Uniqueness**: Duplicate detection and scoring (0-100%)
-- **Timeliness**: Data freshness assessment (0-100%)
-- **Overall Quality**: Excellent, Good, Fair, Poor, Critical ratings
+### Meta Data Insertion
 
 ### Quick Start
 1. **Install Dependencies**: `pip install streamlit plotly pandas scikit-learn`
@@ -418,13 +371,9 @@ python -m src.core.enhanced_cli data dataset list
 3. **Launch UI**: `ign data dataset buildout`
 4. **Build Your Dataset**: Use the interactive interface to add sources, define features, and export
 
-📋 **Detailed Documentation**: [Dataset Curation Guide](docs/completion-summaries/PHASE_3_DATASET_CURATION_COMPLETION_SUMMARY.md)
+### 📋 **Version Control Intelligence**: Advanced version control intelligence for Ignition projects with intelligent change analysis and deployment planning:
 
-## 🔄 **NEW: Version Control Intelligence**
-
-**✅ Complete**: Advanced version control intelligence for Ignition projects with intelligent change analysis and deployment planning:
-
-### Version Control Intelligence Features
+## Version Control Intelligence Features
 - ✅ **Change Tracking**: SHA-256 file monitoring with resource type classification
 - ✅ **Risk Assessment**: Multi-factor risk scoring based on change type, resource type, and location
 - ✅ **Impact Analysis**: Intelligent analysis of commit and file change impacts
@@ -432,22 +381,7 @@ python -m src.core.enhanced_cli data dataset list
 - ✅ **Release Planning**: Intelligent release planning with multiple strategies
 - ✅ **Git Integration**: Automatic repository detection and status monitoring
 
-### CLI Commands
-```bash
-# Check version control intelligence status
-python -m src.core.enhanced_cli version status --detailed
-
-# Analyze impact of changes
-python -m src.core.enhanced_cli version analyze-commit --files="src/core/enhanced_cli.py"
-
-# Predict merge conflicts
-python -m src.core.enhanced_cli version predict-conflicts --source-branch="feature/new-feature" --target-branch="main"
-
-# Plan releases with intelligent recommendations
-python -m src.core.enhanced_cli version plan-release --version="v1.1.0" --strategy="incremental"
-```
-
-### Supported Resource Types
+## Supported Resource Types
 - Vision Windows (*.proj)
 - Perspective Views (*.json)
 - Gateway Scripts (*.py)
@@ -460,100 +394,39 @@ python -m src.core.enhanced_cli version plan-release --version="v1.1.0" --strate
 - Named Queries (*.sql)
 - Report Templates
 
-📋 **Detailed Documentation**: [Version Control Intelligence Plan](docs/VERSION_CONTROL_INTELLIGENCE_PLAN.md) | [Implementation Summary](docs/VERSION_CONTROL_INTELLIGENCE_SUMMARY.md)
+#### **Coding Env Tools**:
+### 🧠 **Code Intelligence System**: System uses Neo4j for structural relationships and vector embeddings for semantic search. Addresses growing codebase complexity (2,300+ line files) with persistent, context-aware memory for AI assistants.
 
-## 🧠 **NEW: Code Intelligence System**
-
-**✅ Phase 8.1 Complete**: Advanced code intelligence system using Neo4j for structural relationships and vector embeddings for semantic search. Addresses growing codebase complexity (2,300+ line files) with persistent, context-aware memory for AI assistants.
-
-### Code Intelligence Features
+## Code Intelligence Features
 - ✅ **AST-based Analysis**: Python file parsing with complexity metrics and maintainability index
 - ✅ **Graph Database Schema**: 4 node types (CodeFile, Class, Method, Import) with comprehensive relationships
 - ✅ **Vector Support**: 3 vector indexes for 384-dimensional embeddings with cosine similarity
 - ✅ **Context Retrieval**: Intelligent file context, cross-file relationships, and impact analysis
 - ✅ **CLI Integration**: Rich terminal UI with progress indicators and detailed analysis
 
-### Database Statistics
-- **Live Data**: 4 files analyzed, 8 classes, 36 imports stored in Neo4j
-- **Schema**: 11 constraints, 25 indexes including 3 vector indexes
-- **Relationships**: CONTAINS, HAS_METHOD, IMPORTS for code structure mapping
+## Database Statistics
+- ✅ **Live Data**: 4 files analyzed, 8 classes, 36 imports stored in Neo4j
+- ✅ **Schema**: 11 constraints, 25 indexes including 3 vector indexes
+- ✅ **Relationships**: CONTAINS, HAS_METHOD, IMPORTS for code structure mapping
 
-### CLI Commands
-```bash
-# Check code intelligence system status
-python -m src.core.enhanced_cli code-status --detailed
-
-# Analyze specific files with complexity metrics
-python -m src.core.enhanced_cli analyze-file src/ignition/code_intelligence/analyzer.py --detailed
-
-# Search code elements by name or content
-python -m src.core.enhanced_cli search-code "CodeAnalyzer" --type class --limit 5
-```
-
-### Implementation Files
+## Implementation Files
 - `src/ignition/code_intelligence/schema.py` - Neo4j schema management and vector indexes
 - `src/ignition/code_intelligence/analyzer.py` - AST-based Python code analysis engine
 - `src/ignition/code_intelligence/manager.py` - Central coordinator for code intelligence operations
 
-📋 **Detailed Documentation**: [Code Intelligence Phase 8.1 Summary](docs/CODE_INTELLIGENCE_PHASE_8_1_SUMMARY.md)
+## 📋 **Target Environment:**
+- ✅ **Ignition Version**: 8.1+ (primary), 8.0 (secondary)
+- ✅ **Jython Version**: 2.7 (as used by Ignition)
+- ✅ **Development**: Python 3.11+
+- ✅ **Output**: Jython 2.7 compatible scripts
 
-## 🔧 Target Environment
-
-- **Ignition Version**: 8.1+ (primary), 8.0 (secondary)
-- **Jython Version**: 2.7 (as used by Ignition)
-- **Development**: Python 3.11+
-- **Output**: Jython 2.7 compatible scripts
-
-## 📋 Features (Planned)
-
-### User Interfaces
-- ✅ Command Line Interface (CLI)
-- ✅ Web-based UI with Streamlit
-- 🔄 Desktop GUI (future consideration)
-
-### Script Generation
-- ✅ Template-based script generation
-- ✅ Vision component event handlers
-- ✅ **Perspective component scripts** - Button & input handlers with validation
-- 🔄 Gateway startup/shutdown scripts - Enhanced lifecycle management
-- 🔄 Tag event handlers - Advanced event processing
-- 🔄 Timer scripts - Scheduled operations & cron-style timing
-- ✅ **Alarm pipeline scripts** - Email notification system with escalation
-
-### Ignition System Integration
-- ✅ **Gateway Connection System** - HTTP/HTTPS client with authentication
-- ✅ **Multi-Gateway Management** - Connection pooling and health monitoring
-- ✅ **Environment Configuration** - Secure credential management with .env
-- 🔄 `system.tag.*` wrapper functions
-- 🔄 `system.db.*` utilities
-- 🔄 `system.gui.*` helpers
-- 🔄 `system.nav.*` navigation tools
-- 🔄 `system.alarm.*` management
-
-### Resource Management
-- 🔄 UDT (User Defined Type) generators
-- 🔄 Tag provider configuration
-- 🔄 Device connection scripts
-- 🔄 User role management
-- 🔄 Security configuration
-
-### Export & Deployment
-- 🔄 Gateway resource export
-- 🔄 Project backup creation
-- ✅ **Version control integration** - Complete intelligence system with change tracking and risk assessment
-- 🔄 Automated deployment
-
-Legend: ✅ Complete | 🔄 In Progress | ⏳ Planned
-
-## 🚀 Quick Start
-
-### Prerequisites
+## Prerequisites
 
 1. Python 3.11 or higher
 2. uv package manager
 3. Access to Ignition 8.1+ environment
 
-### Installation
+## Installation
 
 ```bash
 # Clone the repository
@@ -575,8 +448,39 @@ cp docs/env_template.txt .env
 # NEO4J_USERNAME=neo4j and NEO4J_PASSWORD=ignition-graph
 ```
 
-### 🔒 Security Configuration
+## User Interfaces
+- ✅ **Command Line Interface**: (CLI)
+- ✅ **Web-based UI**: Streamlit
+- 🔄 Desktop GUI (**future** consideration for prod)
 
+## Script Generation
+- ✅ **Template-based script generation**
+- ✅ **Vision component event handlers**
+- ✅ **Perspective component scripts** - Button & input handlers with validation
+- ✅ **Gateway startup/shutdown scripts** - Enhanced lifecycle management
+- ✅ **Tag event handlers** - Advanced event processing
+- ✅ **Timer scripts** - Scheduled operations & cron-style timing
+- ✅ **Alarm pipeline scripts** - Email notification system with escalation
+
+## Ignition System Integration
+- ✅ **Gateway Connection System** - HTTP/HTTPS client with authentication
+- ✅ **Multi-Gateway Management** - Connection pooling and health monitoring
+- ✅ **Environment Configuration** - Secure credential management with env
+
+## Resource Management
+- ✅ **UDT**: (User Defined Type) generators
+- ✅ **Tag provider configuration**:
+- ✅ **Device connection scripts**:
+- ✅ **User role management**:
+- ✅ **Security configuration**:
+
+## Export & Deployment
+- ✅ **Gateway resource export**:
+- ✅ **Project backup creation**:
+- ✅ **Version control integration**: Complete intelligence system with change tracking and risk assessment
+- ✅ **Automated deployment**:
+
+###🚀 🔒 Security Configuration
 **CRITICAL**: All sensitive information (credentials, IPs, certificates) must be stored in environment variables:
 
 ```bash
@@ -594,9 +498,7 @@ OPCUA_PASSWORD=your_password
 
 🔐 **Never hardcode sensitive information in scripts - use environment variables with python-dotenv**
 
-### Basic Usage
-
-#### Web UI (Recommended for beginners)
+### **Web UI**: Only used for dev env
 
 ```bash
 # Launch the web interface
@@ -607,7 +509,7 @@ Then open your browser to `http://localhost:8501` for a user-friendly interface.
 
 📚 **For detailed UI usage instructions, see [docs/ui_readme.md](docs/ui_readme.md)**
 
-#### Enhanced CLI with Learning System
+### **Enhanced CLI**: With Learning Services
 
 ```bash
 # View available commands with beautiful terminal UI
@@ -661,7 +563,7 @@ python -m src.core.opcua_cli disconnect
 
 📚 **For comprehensive CLI usage instructions, see [docs/cli_readme.md](docs/cli_readme.md)**
 
-### Gateway Configuration
+### Support for multiple Gateway connections: **Configuration**
 
 The system supports connecting to multiple Ignition gateways for testing, development, and production use:
 
@@ -822,87 +724,72 @@ mypy .
 ```
 
 ### Development Guidelines
-
 1. **Python for Development**: Use modern Python 3.11+ features for the development environment
-2. **Jython for Output**: Generated scripts must be compatible with Jython 2.7
+2. **Jython for Scripting Output**: Generated scripts must be compatible with Jython 2.7
 3. **Ignition Compatibility**: All generated code must work within Ignition's scripting environment
 4. **Version Control**: Use git for source control, design for Ignition project versioning
 
-## 🧪 Testing
+### 🧪 **Testing**: Project includes a comprehensive Docker-based testing environment with real-time monitoring and optimization capabilities.
 
-IGN Scripts includes a comprehensive Docker-based testing environment with real-time monitoring and optimization capabilities.
-
-### Quick Testing
-
+## Quick Testing:
 ```bash
 # Run all tests
 python3 scripts/run_tests.py --all
-
 # Run specific test types
 python3 scripts/run_tests.py --unit
 python3 scripts/run_tests.py --integration
 python3 scripts/run_tests.py --ui
 python3 scripts/run_tests.py --performance
-
 # Monitor logs in real-time
 python3 scripts/monitor_logs.py --live
-
 # Analyze performance and get optimization recommendations
 python3 scripts/monitor_logs.py --analyze
 ```
 
-### Test Categories
+## Test Categories
+- ✅ **Unit Tests**: Component-level testing with mocked dependencies
+- ✅ **Integration Tests**: End-to-end workflow testing
+- ✅ **UI Tests**: Streamlit interface testing with mocked components
+- ✅ **Performance Tests**: Benchmarking and profiling with optimization insights
 
-- **Unit Tests**: Component-level testing with mocked dependencies
-- **Integration Tests**: End-to-end workflow testing
-- **UI Tests**: Streamlit interface testing with mocked components
-- **Performance Tests**: Benchmarking and profiling with optimization insights
-
-### Coverage & Reports
-
-- **Code Coverage**: 80%+ target with HTML reports
-- **Performance Benchmarks**: JSON reports with timing and memory metrics
-- **Log Analysis**: Automated optimization recommendations
+## Coverage & Reports
+- ✅ **Code Coverage**: 80%+ target with HTML reports
+- ✅ **Performance Benchmarks**: JSON reports with timing and memory metrics
+- ✅ **Log Analysis**: Automated optimization recommendations
 
 📚 **For detailed testing instructions, see [docs/testing_guide.md](docs/testing_guide.md)**
 🚀 **For quick testing reference, see [TESTING.md](TESTING.md)**
 
-## 📚 Ignition Script Contexts
+### 📚 **Ignition Script Contexts**: This tool supports script generation for various Ignition contexts
+## Gateway Scripts
+- ✅ **Startup scripts**:
+- ✅ **Shutdown scripts**:
+- ✅ **Timer scripts (fixed delay, fixed rate)**:
+- ✅ **Message handlers**:
+- ✅ **Database connection scripts**:
 
-This tool supports script generation for various Ignition contexts:
+## Vision Client Scripts
+- ✅ **Component event handlers**: actionPerformed, mouseClicked, etc.
+- ✅ **Window event handlers**: internalFrameOpened, etc.
+- ✅ **Property change scripts**:
+- ✅ **Custom methods**:
 
-### Gateway Scripts
-- Startup scripts
-- Shutdown scripts
-- Timer scripts (fixed delay, fixed rate)
-- Message handlers
-- Database connection scripts
+## Perspective Session Scripts
+- ✅ **Component event handlers**
+- ✅ **View scripts**: onStartup, onShutdown
+- ✅ **Session event scripts**:
+- ✅ **Custom properties**:
 
-### Vision Client Scripts
-- Component event handlers (actionPerformed, mouseClicked, etc.)
-- Window event handlers (internalFrameOpened, etc.)
-- Property change scripts
-- Custom methods
+## Tag Scripts
+- ✅ **Value change scripts**:
+- ✅ **Quality change scripts**:
+- ✅ **Alarm scripts**:
+- ✅ **UDT parameter scripts**:
 
-### Perspective Session Scripts
-- Component event handlers
-- View scripts (onStartup, onShutdown)
-- Session event scripts
-- Custom properties
+### 🌐 **Web Interface**: IGN Scripts includes a comprehensive web-based interface built with Streamlit, perfect for users who prefer graphical interfaces over command-line tools.
 
-### Tag Scripts
-- Value change scripts
-- Quality change scripts
-- Alarm scripts
-- UDT parameter scripts
-
-## 🌐 Web Interface
-
-IGN Scripts includes a comprehensive web-based interface built with Streamlit, perfect for users who prefer graphical interfaces over command-line tools.
-
-### Features
-- **📝 Script Generator**: Interactive form-based script generation
-- **📋 Template Browser**: Browse and preview available templates
+## **Features**: Script Generator**: Interactive form-based script generation
+- ✅ **📋 Template Browser**: Browse and preview available templates
 - **📁 File Upload**: Upload configuration files for batch generation
 - **💾 Download Scripts**: Download generated scripts directly
 - **📚 Built-in Documentation**: Comprehensive help and examples
@@ -919,10 +806,8 @@ IGN Scripts includes a comprehensive web-based interface built with Streamlit, p
 - **Export**: Project export utilities (coming soon)
 - **Documentation**: Complete usage guide and examples
 
-## 🎓 Examples
-
-### Generate a Basic Button Click Handler
-
+## Examples
+# Generate a Basic Button Click Handler
 ```bash
 python -m src.core.enhanced_cli script generate \
   --type vision-button \
@@ -930,8 +815,7 @@ python -m src.core.enhanced_cli script generate \
   --config '{"target_window": "MainMenu", "params": {}}'
 ```
 
-### Create UDT Definition Scripts
-
+# Create UDT Definition Scripts
 ```bash
 python -m src.core.enhanced_cli udt generate \
   --name "MotorControl" \
@@ -939,8 +823,7 @@ python -m src.core.enhanced_cli udt generate \
   --parameters speed,temperature,status
 ```
 
-### Export Project for Gateway
-
+# Export Project for Gateway
 ```bash
 python -m src.core.enhanced_cli export project \
   --source ./my_ignition_project \
@@ -948,24 +831,19 @@ python -m src.core.enhanced_cli export project \
   --format gateway-import
 ```
 
-### AI-Powered Deployment Intelligence
-
+# AI-Powered Deployment Intelligence
 ```bash
 # Get deployment recommendations based on learned patterns
 python -m src.core.enhanced_cli deploy recommendations -e production
-
 # Get environment-specific adaptations
 python -m src.core.enhanced_cli deploy adaptations -s staging -t production
-
 # Get rollback scenarios for emergency situations
 python -m src.core.enhanced_cli deploy rollback-scenarios -e production
-
 # Analyze deployment performance and trends
 python -m src.core.enhanced_cli deploy analytics -e production -d 30
 ```
 
-## 🤝 Contributing
-
+### 🤝 Contributing
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit changes (`git commit -m 'Add amazing feature'`)
@@ -979,32 +857,25 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🔗 Related Resources
-
 - [Ignition Documentation](https://docs.inductiveautomation.com/)
 - [Ignition SDK](https://github.com/inductiveautomation/ignition-sdk-examples)
 - [Jython Documentation](https://jython.readthedocs.io/)
 - [Ignition Community Forum](https://forum.inductiveautomation.com/)
 
-## ⚠️ Disclaimer
-
-This is an independent project and is not affiliated with or endorsed by Inductive Automation. Ignition is a trademark of Inductive Automation.
+## ⚠️ Disclaimer: This is an independent project and is not affiliated with or endorsed by Inductive Automation. Ignition is a trademark of Inductive Automation.
 
 ## 📞 Support
-
 - Check the [Issues](https://github.com/your-repo/issues) page for common problems
 - Review the [Wiki](https://github.com/your-repo/wiki) for detailed documentation
 - Join discussions in our [Community Forum](https://github.com/your-repo/discussions)
 
-## Neo4j MCP Integration
+### **Neo4j MCP Integration**: This project now includes robust support for Neo4j-backed Machine Control Programs (MCPs) for persistent memory and Cypher query assistance.
 
-This project now includes robust support for Neo4j-backed Machine Control Programs (MCPs) for persistent memory and Cypher query assistance.
-
-### Key MCP Services
+## **Key MCP Services**: Docker MCP_Toolkit
 - **neo4j-memory**: Provides persistent memory storage and retrieval using Neo4j.
 - **neo4j-cypher**: Assists with Cypher query formatting, validation, and execution.
 
-### Setup & Testing
-
+## Setup & Testing
 1. **Setup**
    - Run the setup script to check Docker, Neo4j, environment variables, and install dependencies:
      ```bash
@@ -1016,9 +887,9 @@ This project now includes robust support for Neo4j-backed Machine Control Progra
      python scripts/test_neo4j_mcp_setup.py
      ```
 
-### MCP Server Management
-For details on starting, stopping, and configuring MCP servers, see [.cursor/README.md](.cursor/README.md).
+## **MCP Server Management**: Very simple setup all MCP servers run in dockere containers via the docker desktop MCP_Toolkit extention.  Individual MCP servers can be toggled on and off from Docker Desktop settings.
+For details on starting, stopping, and configuring MCP servers, see [Docker MCP Toolkit](https://docs.docker.com/ai/mcp-catalog-and-toolkit/toolkit/).
 
-### Security
+## Security
 - All sensitive credentials are managed via environment variables in your `.env` file (see `docs/env_template.txt`).
 - Never commit `.env` to version control.

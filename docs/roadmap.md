@@ -143,6 +143,11 @@ This comprehensive platform delivers advanced industrial automation capabilities
 - [x] Integrate Streamlit UI for export/import management
 - [x] Create IgnitionProjectImporter with validation
 
+**📋 Phase Completion Summaries**:
+- [Phase 2 Import System Completion Summary](PHASE_2_IMPORT_SYSTEM_COMPLETION_SUMMARY.md)
+- [Task 15 Phase 2 Completion Summary](completion-summaries/TASK_15_PHASE_2_COMPLETION_SUMMARY.md)
+
+
 ---
 
 ## Phase 3: Core Script Generation Engine ✅ **COMPLETED** - 2025-01-28
@@ -185,7 +190,7 @@ This comprehensive platform delivers advanced industrial automation capabilities
 
 ## Phase 3.5: Graph Database Knowledge System & Relational DB Setup ✅ **COMPLETED** - 2025-06-18
 
-### Neo4j Graph Database Infrastructure
+### 3.5.1 Neo4j Graph Database Infrastructure
 - [x] Set up Neo4j 5.15-community in Docker container
 - [x] Configure persistent volumes (data, logs, import, plugins)
 - [x] Create Docker Compose setup for development environment
@@ -193,7 +198,7 @@ This comprehensive platform delivers advanced industrial automation capabilities
 - [x] Design graph schema (Contexts, Functions, Scripts, Templates, Parameters)
 - [x] Import all 400+ Ignition system functions into graph
 
-### Supabase Relational Database Infrastructure
+### 3.5.2 Supabase Relational Database Infrastructure
 - [x] Set up Supabase PostgreSQL-based stack (6 services)
 - [x] Configure persistent volumes and data directories
 - [x] Create Docker Compose multi-container setup
@@ -201,7 +206,7 @@ This comprehensive platform delivers advanced industrial automation capabilities
 - [x] Set up automated backup and recovery (SupabaseManager)
 - [x] Design relational schema with UUID-based primary keys
 
-### Database Integration & Management
+### 3.5.3 Database Integration & Management
 - [x] Create comprehensive CLI commands (20+ commands across both systems)
 - [x] Implement health monitoring and status checking
 - [x] Build backup management with retention policies
@@ -250,10 +255,6 @@ This comprehensive platform delivers advanced industrial automation capabilities
 - [x] Deployment Center with status tracking and history
 
 **Key Features**: Multiple export formats (.gwbk, .proj, .json, .xml), smart format detection, graph intelligence integration
-
-**📋 Phase Completion Summaries**:
-- [Phase 2 Import System Completion Summary](PHASE_2_IMPORT_SYSTEM_COMPLETION_SUMMARY.md)
-- [Task 15 Phase 2 Completion Summary](completion-summaries/TASK_15_PHASE_2_COMPLETION_SUMMARY.md)
 
 ---
 
