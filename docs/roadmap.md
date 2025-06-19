@@ -17,17 +17,17 @@ This repository contains tools for generating Jython scripts for Ignition SCADA 
 ### 🤖 **AI & Machine Learning Platform**
 8. **Process Control Loop Analysis** - AI-supervised evaluation of control loop performance
 9. **Variable Relationship Analysis** - Understanding complex process variable interactions
-10. **Process SME Chatbots** - Specialized LLMs for process understanding and reporting
+10. **Process SME Agent** - Specialized Ignition expertise LLM with Neo4j knowledge graph fine-tuning, adaptive learning, and Docker-based deployment for comprehensive development support
 11. **Predictive Analytics** - ML models for process optimization and maintenance
 12. **AI-Powered Decision Support** - Data-driven insights for informed decision-making
 
 ### ⚙️ **Advanced Process Control**
-13. **MPC Fitting & Training** - Development of Models and training
-14. **MPC Analysis & Optimization** - Iterative improvement process to optimize model performance
-15. **MPC Model Implementation** - Model Predictive Control with do-mpc integration
-16. **Production MPC Management** - Real-time oversight and configuration of control loops
-17. **Process Optimization** - Advanced control algorithms for performance enhancement
-18. **Real-Time Monitoring** - Comprehensive KPI tracking and constraint management
+13. **MPC Instantiation, Fitting & Training** - Ignition Module-based model development with do-mpc integration and automated training pipelines
+14. **MPC Analysis & Optimization** - Iterative model improvement with performance analytics, constraint monitoring, and automated tuning recommendations
+15. **MPC Model Implementation** - Production-ready Model Predictive Control execution within Ignition Gateway runtime environment
+16. **Production MPC Management** - External monitoring, oversight, and configuration management through IGN Scripts application integration
+17. **Process Optimization** - Advanced control algorithms with real-time performance enhancement and adaptive optimization strategies
+18. **Real-Time Monitoring** - Comprehensive KPI tracking, constraint management, and predictive analytics with enterprise-grade dashboards
 
 ### 🏢 **Enterprise Integration & Infrastructure**
 19. **Organizational Software Integration** - Seamless connection with enterprise systems
@@ -82,8 +82,9 @@ This comprehensive platform delivers advanced industrial automation capabilities
 9. [Phase 8: Neo4j Code Memory & Vector Intelligence System](#phase-8-neo4j-code-memory--vector-intelligence-system) ✅ **COMPLETED**
 10. [Phase 9: Ignition Module Development & SDK Integration](#phase-9-ignition-module-development--sdk-integration) ✅ **Phase 9.1 COMPLETED** / 🚧 **Phase 9.2-9.8 PLANNED**
 11. [Phase 10: Enterprise Integration & Deployment](#phase-10-enterprise-integration--deployment) 📋 **FUTURE**
-12. [Phase 11: Advanced AI & Process Control Platform](#phase-11-advanced-ai--process-control-platform) 🚀 **FUTURE**
-13. [Phase 12: Production Deployment & Frontend Development](#phase-12-production-deployment--frontend-development) 🏭 **FUTURE**
+12. [Phase 11: Process SME Agent & AI Enhancement Platform](#phase-11-process-sme-agent--ai-enhancement-platform) 🤖 **FUTURE**
+13. [Phase 11.5: MPC Framework & Advanced Process Control](#phase-115-mpc-framework--advanced-process-control) ⚙️ **FUTURE**
+14. [Phase 12: Production Deployment & Frontend Development](#phase-12-production-deployment--frontend-development) 🏭 **FUTURE**
 
 ---
 
@@ -422,6 +423,13 @@ Implement a comprehensive Ignition Module development framework using the offici
   - [ ] Create code quality analysis within Designer
   - [ ] Build refactoring suggestions for existing scripts
 
+#### **MPC Module Foundation**
+- [ ] **Prepare MPC module scaffolding for Phase 11.5**
+  - [ ] Create basic MPC module structure and interfaces
+  - [ ] Build foundational Gateway and Designer hooks
+  - [ ] Implement module configuration framework
+  - [ ] Create integration points for future do-mpc integration
+
 ### **Phase 9.4: Data Integration Module** 🔗 **Week 7-8**
 
 #### **Database Connection Module**
@@ -576,161 +584,225 @@ Focus on enterprise-grade deployment, scalability, security, and integration wit
 
 ---
 
-## Phase 11: Advanced AI & Process Control Platform 🚀 **FUTURE**
+## Phase 11: Process SME Agent & AI Enhancement Platform 🤖 **FUTURE**
 
 ### **Overview**
-Implement cutting-edge AI capabilities, advanced process control systems, and enterprise-grade infrastructure based on the Helper Module framework. This phase transforms the platform into a comprehensive industrial AI and process optimization solution.
+Develop a comprehensive Ignition Subject Matter Expert (SME) Agent using an 8B parameter LLM fine-tuned with our extensive Neo4j knowledge graph and vector embeddings. This phase creates an intelligent assistant that understands all aspects of Ignition development, deployment, and functionality, with adaptive learning capabilities to continuously expand its expertise.
 
-### **Phase 11.1: 8B Parameter AI SME Enhancement** 🤖 **Week 1-4**
+### **Phase 11.1: SME Agent Infrastructure & LLM Setup** 🧠 **Week 1-4**
 
-#### **Advanced LLM Integration**
-- [ ] **8B Parameter Model Implementation**
-  - [ ] Set up 8B parameter LLM infrastructure (Llama2/Mistral-8B)
-  - [ ] Implement LoRA fine-tuning pipeline for Ignition domain expertise
-  - [ ] Create quantization for on-premises inference optimization
-  - [ ] Build model deployment pipeline with GPU acceleration
+#### **8B Parameter LLM Infrastructure**
+- [ ] **Advanced LLM Integration**
+  - [ ] Set up 8B parameter LLM infrastructure (Llama3.1-8B or Mistral-8B)
+  - [ ] Configure Docker-based deployment with GPU acceleration support
+  - [ ] Implement quantization for optimized on-premises inference
+  - [ ] Create model versioning and rollback capabilities
 
-#### **Enhanced Knowledge Base Integration**
-- [ ] **Neo4j + Qdrant Vector Database**
-  - [ ] Integrate Qdrant vector database for enhanced semantic search
-  - [ ] Create hybrid search combining Neo4j graph and vector similarity
-  - [ ] Implement HNSW autotune for nightly vector optimization
-  - [ ] Build knowledge graph expansion with process domain expertise
+#### **Neo4j Knowledge Graph Fine-Tuning Pipeline**
+- [ ] **Knowledge Graph Integration**
+  - [ ] Extract structured knowledge from existing 10,389+ Neo4j nodes
+  - [ ] Create fine-tuning datasets from Ignition system functions and relationships
+  - [ ] Build automated knowledge graph expansion pipeline
+  - [ ] Implement incremental learning from new Ignition discoveries
 
-#### **AI SME Chat Interface**
-- [ ] **Production-Ready Chat System**
-  - [ ] Create FastAPI `/chat` endpoint with streaming responses
-  - [ ] Build Perspective panel integration for in-Designer chat
-  - [ ] Implement conversation memory and context management
-  - [ ] Create specialized process SME chatbots for different domains
+#### **Vector Embedding Enhancement**
+- [ ] **Advanced Semantic Understanding**
+  - [ ] Enhance existing 384D vector embeddings with domain-specific knowledge
+  - [ ] Implement hybrid search combining graph traversal and vector similarity
+  - [ ] Create specialized embeddings for code patterns, best practices, and troubleshooting
+  - [ ] Build context-aware retrieval augmented generation (RAG) system
 
-### **Phase 11.2: MPC Operations Framework** ⚙️ **Week 5-8**
+### **Phase 11.2: SME Agent Core Capabilities** 💡 **Week 5-8**
 
-#### **MPC Model Factory**
-- [ ] **do-mpc Integration with PyTorch**
-  - [ ] Create MPC model factory CLI (`ign mpc init`)
-  - [ ] Implement YAML-based model configuration system
-  - [ ] Build PyTorch + do-mpc integration for advanced control
-  - [ ] Create model validation and testing framework
+#### **Comprehensive Ignition Expertise**
+- [ ] **Multi-Domain Knowledge Base**
+  - [ ] Gateway scripting expertise (startup, shutdown, tag events, timers)
+  - [ ] Designer development knowledge (Vision, Perspective, UDTs, templates)
+  - [ ] Client application understanding (session management, navigation, security)
+  - [ ] System function mastery (all 424+ implemented functions with context)
 
-#### **Gateway MPC Executor**
-- [ ] **Production MPC Implementation**
-  - [ ] Build Java-based MPC executor for Gateway integration
-  - [ ] Implement safe PID fallback mechanisms
-  - [ ] Create real-time constraint monitoring and alerting
-  - [ ] Build MPC performance optimization and tuning
+#### **Adaptive Learning System**
+- [ ] **Continuous Knowledge Expansion**
+  - [ ] Implement conversation learning and knowledge retention
+  - [ ] Create feedback loops for accuracy improvement
+  - [ ] Build automated knowledge validation and verification
+  - [ ] Develop domain expertise scoring and confidence metrics
 
-#### **MPC Monitoring & Management**
-- [ ] **Comprehensive MPC Operations**
-  - [ ] Create MPC monitoring UI with real-time dashboards
-  - [ ] Implement constraint violation alerts and notifications
-  - [ ] Build MPC model versioning and deployment system
-  - [ ] Create performance analytics and optimization recommendations
+#### **Context-Aware Assistance**
+- [ ] **Intelligent Development Support**
+  - [ ] Project analysis and architecture recommendations
+  - [ ] Code review and optimization suggestions
+  - [ ] Best practice enforcement and security validation
+  - [ ] Performance optimization and troubleshooting guidance
 
-### **Phase 11.3: Advanced Data Hub & Loop Intelligence** 📊 **Week 9-12**
+### **Phase 11.3: SME Agent Integration & Interfaces** 🔌 **Week 9-12**
 
-#### **Secure Data Connectors**
-- [ ] **Enterprise Security Integration**
-  - [ ] Integrate HashiCorp Vault for credential management
-  - [ ] Implement mTLS communication between all services
-  - [ ] Create secure API gateway for external integrations
-  - [ ] Build comprehensive audit logging and compliance reporting
+#### **Multi-Interface Deployment**
+- [ ] **Comprehensive Access Methods**
+  - [ ] FastAPI chat endpoint with streaming responses
+  - [ ] CLI integration (`ign sme ask`, `ign sme analyze`, `ign sme review`)
+  - [ ] Streamlit web interface with conversation history
+  - [ ] Future Perspective panel integration for in-Designer assistance
 
-#### **Enhanced Dataset Curation**
-- [ ] **Advanced Data Processing**
-  - [ ] Create dataset curation wizard with advanced profiling
-  - [ ] Implement 5-metric data quality scoring system
-  - [ ] Build automated feature engineering and selection
-  - [ ] Create ML pipeline with automated model training
+#### **Development Workflow Integration**
+- [ ] **IDE and Development Tool Support**
+  - [ ] Git integration for commit analysis and recommendations
+  - [ ] Code intelligence integration with existing refactoring tools
+  - [ ] Project health assessment and improvement suggestions
+  - [ ] Automated documentation generation and updates
 
-#### **Loop Intelligence & KPI Engine**
-- [ ] **Process Control Analytics**
-  - [ ] Build CO oscillation detection and analysis
-  - [ ] Implement variance analysis and control loop tuning
-  - [ ] Create process variable relationship mapping
-  - [ ] Build KPI scoring and performance optimization
+#### **Real-Time Knowledge Updates**
+- [ ] **Dynamic Learning Pipeline**
+  - [ ] Monitor new Ignition releases and feature updates
+  - [ ] Integrate community knowledge and best practices
+  - [ ] Update knowledge base from successful project patterns
+  - [ ] Implement knowledge graph relationship discovery
 
-### **Phase 11.4: Docker Operations & DevOps** 🐳 **Week 13-16**
+### **Phase 11.4: Advanced SME Agent Features** ⚡ **Week 13-16**
 
-#### **One-Command Development Stack**
-- [ ] **Automated Development Environment**
-  - [ ] Create `make dev-up` for complete stack deployment
-  - [ ] Implement automatic service discovery and configuration
-  - [ ] Build side-car container management system
-  - [ ] Create development environment health monitoring
+#### **Specialized Domain Expertise**
+- [ ] **Deep Technical Knowledge**
+  - [ ] Database integration patterns and optimization
+  - [ ] OPC-UA communication and troubleshooting
+  - [ ] Alarm management and notification strategies
+  - [ ] Security implementation and compliance validation
 
-#### **Production Kubernetes Deployment**
-- [ ] **Enterprise Container Orchestration**
-  - [ ] Create production Helm charts for Kubernetes deployment
-  - [ ] Implement automatic scaling and load balancing
-  - [ ] Build service mesh integration with Istio
-  - [ ] Create disaster recovery and backup automation
+#### **Proactive Development Assistance**
+- [ ] **Intelligent Recommendations**
+  - [ ] Architecture pattern suggestions based on project requirements
+  - [ ] Component selection and configuration optimization
+  - [ ] Performance bottleneck identification and resolution
+  - [ ] Maintenance and monitoring strategy development
 
-#### **Security & Performance Optimization**
-- [ ] **Enterprise-Grade Operations**
-  - [ ] Implement Trivy security scanning pipeline
-  - [ ] Create cosign signing for all container images
-  - [ ] Build SBOM generation and vulnerability tracking
-  - [ ] Implement Prometheus monitoring and Grafana dashboards
-
-### **Phase 11.5: HMI Plus & Advanced Visualization** 🎨 **Week 17-20**
-
-#### **High-Density Visualization Components**
-- [ ] **Advanced HMI Components**
-  - [ ] Create high-density plot components for Perspective
-  - [ ] Build real-time data streaming visualization
-  - [ ] Implement advanced alarm overview dashboard
-  - [ ] Create interactive process flow diagrams
-
-#### **AI-Powered HMI Generation**
-- [ ] **Intelligent HMI Creation**
-  - [ ] Build AI-powered HMI wizard for automatic screen generation
-  - [ ] Create context-aware component recommendations
-  - [ ] Implement intelligent layout optimization
-  - [ ] Build template generation from process descriptions
-
-#### **Energy & Process KPI Pack**
-- [ ] **Specialized Industrial Analytics**
-  - [ ] Create steam, natural gas, and electricity KPI tracking
-  - [ ] Build throughput vs energy consumption analytics
-  - [ ] Implement process efficiency optimization recommendations
-  - [ ] Create regulatory compliance reporting dashboards
-
-### **Phase 11.6: Performance & Production Optimization** ⚡ **Week 21-24**
-
-#### **Performance Enhancement**
-- [ ] **System Optimization**
-  - [ ] Pre-compile Java helper classes for Jython performance
-  - [ ] Implement ExecutorService integration (`system.helper.submit`)
-  - [ ] Create connection pooling and resource management
-  - [ ] Build caching layers for frequent operations
-
-#### **CI/CD Pipeline Enhancement**
-- [ ] **Advanced Development Workflow**
-  - [ ] Create comprehensive CI/CD pipeline with security scanning
-  - [ ] Implement automated performance benchmarking
-  - [ ] Build regression testing and quality gates
-  - [ ] Create automated deployment and rollback mechanisms
-
-#### **Monitoring & Analytics**
-- [ ] **Production Monitoring**
-  - [ ] Implement comprehensive application performance monitoring
-  - [ ] Create business intelligence dashboards
-  - [ ] Build predictive maintenance analytics
-  - [ ] Create user behavior analytics and optimization
+#### **Enterprise Integration Support**
+- [ ] **Production Deployment Expertise**
+  - [ ] Gateway clustering and high availability configuration
+  - [ ] Backup and disaster recovery planning
+  - [ ] Scalability assessment and optimization
+  - [ ] Compliance and regulatory requirement validation
 
 **Key Deliverables for Phase 11**:
-- 8B parameter AI SME with specialized industrial knowledge
-- Production-grade MPC operations framework
-- Advanced data hub with secure enterprise integrations
-- Complete Docker/Kubernetes infrastructure automation
-- AI-powered HMI generation and advanced visualization
-- Enterprise-grade performance optimization and monitoring
+- Production-ready 8B parameter Ignition SME Agent
+- Comprehensive knowledge graph fine-tuning pipeline
+- Multi-interface deployment (API, CLI, Web, Future Designer integration)
+- Adaptive learning system with continuous knowledge expansion
+- Deep Ignition expertise across all development domains
+- Enterprise-grade Docker deployment with GPU optimization
 
-**Estimated Timeline**: 24 weeks (6 months)
-**Dependencies**: Completed Phase 9 & 10, Enterprise infrastructure
-**Success Metrics**: AI SME adoption, MPC deployment success, performance benchmarks, user satisfaction
+**Estimated Timeline**: 16 weeks (4 months)
+**Dependencies**: Completed Phase 9 & 10, GPU infrastructure for LLM
+**Success Metrics**: SME Agent accuracy, user adoption, development productivity improvement, knowledge base expansion rate
 
+---
+
+## Phase 11.5: MPC Framework & Advanced Process Control ⚙️ **FUTURE**
+
+### **Overview**
+Implement a comprehensive Model Predictive Control (MPC) framework as an Ignition Module with external monitoring and management capabilities. This phase delivers production-ready MPC functionality with do-mpc integration, real-time execution within Ignition Gateway, and comprehensive oversight through the IGN Scripts application.
+
+### **Phase 11.5.1: MPC Module Infrastructure & Model Development** 🏗️ **Week 1-4**
+
+#### **Ignition MPC Module Foundation**
+- [ ] **Module Architecture Design**
+  - [ ] Create MPC module using Phase 9 SDK framework
+  - [ ] Design Gateway Hook for real-time MPC execution
+  - [ ] Build Designer Hook for model configuration and testing
+  - [ ] Implement module lifecycle management and configuration persistence
+
+#### **MPC Model Factory & Training Pipeline**
+- [ ] **do-mpc Integration Framework**
+  - [ ] Integrate do-mpc library for advanced model predictive control
+  - [ ] Create YAML-based model configuration system
+  - [ ] Build automated model fitting and training pipelines
+  - [ ] Implement model validation and performance testing framework
+
+#### **Model Development Tools**
+- [ ] **Designer Integration**
+  - [ ] Create visual MPC model builder within Designer
+  - [ ] Build constraint definition and tuning interfaces
+  - [ ] Implement model testing and simulation tools
+  - [ ] Create model import/export and versioning system
+
+### **Phase 11.5.2: Gateway MPC Execution & Safety Systems** ⚙️ **Week 5-8**
+
+#### **Real-Time MPC Execution Engine**
+- [ ] **Gateway Runtime Integration**
+  - [ ] Build Java-based MPC executor for Gateway environment
+  - [ ] Implement real-time constraint monitoring and violation detection
+  - [ ] Create optimization solver integration with performance tuning
+  - [ ] Build MPC cycle timing and execution scheduling
+
+#### **Safety and Fallback Mechanisms**
+- [ ] **Production Safety Framework**
+  - [ ] Implement automatic PID fallback on MPC failure
+  - [ ] Create constraint violation emergency responses
+  - [ ] Build system health monitoring and diagnostics
+  - [ ] Implement fail-safe modes and manual override capabilities
+
+#### **Performance Optimization**
+- [ ] **Real-Time Optimization**
+  - [ ] Create adaptive model tuning based on performance metrics
+  - [ ] Implement constraint prioritization and relaxation strategies
+  - [ ] Build prediction horizon optimization
+  - [ ] Create solver performance monitoring and optimization
+
+### **Phase 11.5.3: MPC Analysis & Optimization Framework** 📊 **Week 9-12**
+
+#### **Performance Analytics Engine**
+- [ ] **MPC Performance Monitoring**
+  - [ ] Build comprehensive MPC performance metrics and KPIs
+  - [ ] Create constraint violation analysis and trending
+  - [ ] Implement model accuracy assessment and drift detection
+  - [ ] Build optimization effectiveness measurement and reporting
+
+#### **Automated Tuning & Improvement**
+- [ ] **Iterative Optimization System**
+  - [ ] Create automated model parameter tuning algorithms
+  - [ ] Implement constraint weight optimization based on performance
+  - [ ] Build adaptive prediction horizon adjustment
+  - [ ] Create model retraining triggers and automation
+
+#### **Advanced Analytics Integration**
+- [ ] **Process Intelligence**
+  - [ ] Integrate with existing Neo4j process knowledge
+  - [ ] Create process variable relationship analysis for MPC
+  - [ ] Build disturbance detection and model adaptation
+  - [ ] Implement predictive maintenance integration
+
+### **Phase 11.5.4: External Management & Monitoring System** 🖥️ **Week 13-16**
+
+#### **IGN Scripts MPC Management Interface**
+- [ ] **Comprehensive MPC Oversight**
+  - [ ] Create MPC monitoring dashboard with real-time metrics
+  - [ ] Build model deployment and versioning management
+  - [ ] Implement configuration management and backup/restore
+  - [ ] Create MPC system health monitoring and alerting
+
+#### **Enterprise Integration & Reporting**
+- [ ] **Production Management Tools**
+  - [ ] Build comprehensive MPC reporting and analytics
+  - [ ] Create regulatory compliance documentation and validation
+  - [ ] Implement audit logging and change tracking
+  - [ ] Build integration with enterprise systems and databases
+
+#### **Advanced Visualization & Control**
+- [ ] **Real-Time Monitoring Interface**
+  - [ ] Create high-density MPC performance visualization
+  - [ ] Build constraint monitoring and violation alerting
+  - [ ] Implement model performance trending and analysis
+  - [ ] Create operator interface for MPC oversight and control
+
+**Key Deliverables for Phase 11.5**:
+- Production-ready MPC Ignition Module with Designer and Gateway integration
+- Comprehensive do-mpc integration with automated model development
+- Real-time MPC execution with safety systems and fallback mechanisms
+- Advanced analytics and optimization framework with automated tuning
+- External monitoring and management system through IGN Scripts application
+- Enterprise-grade reporting, compliance, and audit capabilities
+
+**Estimated Timeline**: 16 weeks (4 months)
+**Dependencies**: Completed Phase 9 (Module SDK), Phase 11 (SME Agent), Enterprise infrastructure
+**Success Metrics**: MPC deployment success, control performance improvement, system reliability, user adoption
 
 ---
 
@@ -948,6 +1020,12 @@ Finalize the IGN Scripts platform for production deployment with a comprehensive
 - **Documentation**: 25+ detailed guides, completion summaries, and API documentation
 - **Security**: Production-ready with comprehensive environment variable framework and automated validation
 
+### **Future Phases (11-12)**
+- **Process SME Agent**: 8B parameter LLM with Neo4j fine-tuning and adaptive learning
+- **MPC Framework**: Production-ready Model Predictive Control as Ignition Module
+- **Advanced Process Control**: Real-time optimization with safety systems and analytics
+- **Enterprise AI Platform**: Multi-domain SME agents with specialized expertise
+
 ### **Technical Architecture**
 - **Languages**: Python 3.8+, Jython 2.7, Java 11+ (for modules)
 - **Databases**: Neo4j 5.15, PostgreSQL/Supabase, InfluxDB, SQL Server, MySQL
@@ -969,6 +1047,12 @@ Finalize the IGN Scripts platform for production deployment with a comprehensive
 - ✅ **Professional documentation suite**
 - ✅ **Enterprise-grade architecture foundation**
 
+### **Planned Advanced Capabilities**
+- 🚀 **Ignition SME Agent** with 8B parameter LLM and adaptive learning
+- 🚀 **MPC Framework** with real-time optimization and safety systems
+- 🚀 **Advanced Process Control** with automated tuning and analytics
+- 🚀 **Multi-domain expertise** with specialized SME agents for various engineering disciplines
+
 ---
 
 ## Contributing & Development
@@ -984,6 +1068,8 @@ Finalize the IGN Scripts platform for production deployment with a comprehensive
 2. Leverage `ign code ai context <file>` for intelligent development
 3. Run `ign refactor detect` for code quality maintenance
 4. Use git automation for automatic context processing
+5. Future: `ign sme ask <question>` for Ignition expertise assistance
+6. Future: `ign mpc init <project>` for MPC model development
 
 ### **Documentation**
 - **Main Documentation**: `docs/index.md`
