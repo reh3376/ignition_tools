@@ -1,58 +1,62 @@
-# IGN Scripts
+# IGN Scripts - Comprehensive Ignition SCADA Development Platform
 
-This repository contains the IGN Scripts project, which consists of two main services:
+**Version**: 0.2.1 | **Phase**: 9.2 Complete - Core Module Infrastructure | **Status**: Production Ready
 
-1. MCP (Machine Control Protocol) - A service for managing and monitoring machine status and metrics
-2. MCP Tools - A service providing testing and analysis tools for the MCP service
+IGN Scripts is an intelligent, AI-enhanced development platform for Ignition SCADA systems that combines script generation, code intelligence, module development, and industrial automation capabilities into a unified ecosystem. With the
 
-## Project Structure
+## 🏭 **Core Services & Capabilities**
 
+### **1. 🤖 AI-Enhanced Code Intelligence System** ✅ **Phase 8 Complete**
+- **Neo4j Graph Database**: 10,389+ nodes with comprehensive Ignition function knowledge
+- **Vector Embeddings**: 384-dimensional semantic search and code analysis
+- **Automated Refactoring**: Intelligent code splitting and AST-based analysis
+- **AI Assistant Enhancement**: Context-aware development assistance
+
+### **2. 🔧 Ignition Module Development Framework** ✅ **Phase 9.2 Complete**
+- **Core Module Infrastructure**: AbstractIgnitionModule base class with lifecycle management
+- **Configuration Management**: JSON-based persistence with validation and backup
+- **Diagnostics Framework**: Multi-handler logging with health monitoring
+- **Module SDK Integration**: Complete development environment for custom Ignition modules
+
+### **3. 📝 Intelligent Script Generation Engine** ✅ **Phase 3 Complete**
+- **424+ Ignition Functions**: Complete function library (106% of target - MILESTONE EXCEEDED!)
+- **Template System**: Jinja2-based templates for all Ignition contexts
+- **Multi-Context Support**: Gateway, Vision, Perspective, Tag, and Alarm scripts
+- **Validation Framework**: Syntax and compatibility checking
+
+### **4. 🏭 Industrial OPC-UA Integration** ✅ **Phase 7 Complete**
+- **Live OPC-UA Client**: Real-time industrial device connectivity
+- **Security Framework**: Certificate-based authentication
+- **Monitoring Dashboard**: Comprehensive Streamlit-based industrial UI
+- **Data Operations**: Read/write with subscription and historical data access
+
+### **5. 📊 Advanced Analytics & Workflow Integration** ✅ **Phase 8 Complete**
+- **Technical Debt Analysis**: Comprehensive code quality assessment
+- **Performance Insights**: Automated optimization recommendations
+- **Git Integration**: Intelligent version control with evolution tracking
+- **Workflow Automation**: Pre-commit hooks and quality gates
+
+## 🚀 **Quick Start**
+
+### Prerequisites
+- **Python**: 3.11+ (development) / Jython 2.7 (output compatibility)
+- **Docker**: For Neo4j database and testing environments
+- **Git**: Version control and project management
+- **uv**: Modern Python package manager
+
+### Installation
+```bash
+# Clone the repository
+git clone https://github.com/reh3376/IGN_scripts.git
+cd IGN_scripts
+
+# Set up Python environment with uv
+uv venv && source .venv/bin/activate  # Unix/macOS
+# or .venv\Scripts\activate           # Windows
+
+# Install dependencies
+uv pip install -r requirements.txt
 ```
-IGN_scripts/
-├── mcp/                 # MCP service
-│   ├── src/            # Source code
-│   ├── tests/          # Test files
-│   ├── docs/           # Documentation
-│   └── Dockerfile      # Docker configuration
-├── mcp-tools/          # MCP Tools service
-│   ├── src/            # Source code
-│   ├── tests/          # Test files
-│   ├── docs/           # Documentation
-│   └── Dockerfile      # Docker configuration
-└── scripts/            # Utility scripts
-```
-
-## Prerequisites
-
-- Python 3.11 or higher
-- Docker
-- GitHub CLI (gh)
-- uv (Python package manager)
-
-## Setup Instructions
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/reh3376/IGN_scripts.git
-   cd IGN_scripts
-   ```
-
-2. Set up the Python environment:
-   ```bash
-   # Install uv if not already installed
-   if ! command -v uv &> /dev/null; then pip install uv; fi
-
-   # Create and activate virtual environment
-   uv venv
-   source .venv/bin/activate  # On Unix-like systems
-   # or
-   .venv\Scripts\activate     # On Windows
-   ```
-
-3. Install dependencies:
-   ```bash
-   uv pip install -r requirements.txt
-   ```
 
 4. Set up GitHub repositories:
    ```bash
@@ -694,31 +698,74 @@ IGN_LOCAL_DEV_PASSWORD=password
 
 ```
 IGN_scripts/
-├── src/
-│   ├── core/           # Core application logic
-│   ├── ui/             # User interfaces
-│   │   └── streamlit_app.py  # Web UI with Streamlit
-│   ├── ignition/       # Ignition-specific modules
-│   │   ├── templates/  # Jython script templates
-│   │   ├── generators/ # Script generation utilities
-│   │   ├── exporters/  # Gateway export tools
-│   │   ├── validators/ # Script validation
-│   │   ├── graph/      # Neo4j graph database integration
-│   │   └── version_control/ # Version control intelligence system
-│   ├── api/           # External integrations
-│   └── models/        # Data models
-├── templates/         # Script templates
-│   ├── gateway/       # Gateway script templates
-│   ├── vision/        # Vision component templates
-│   ├── perspective/   # Perspective script templates
-│   ├── tags/          # Tag-related templates
-│   └── alarms/        # Alarm system templates
-├── tests/             # Test suite
-├── scripts/           # Standalone utilities
-│   └── run_ui.py      # Launch script for web UI
-├── examples/          # Example configurations
-├── docs/              # Documentation
-└── config/            # Configuration files
+├── src/                    # Core application source code
+│   ├── ignition/          # Ignition SCADA integration modules
+│   │   ├── code_intelligence/    # AI-enhanced code analysis (Phase 8)
+│   │   │   ├── ai_assistant_enhancement.py  # AI assistant with context loading
+│   │   │   ├── automated_refactoring.py     # Intelligent code refactoring
+│   │   │   ├── vector_embeddings.py         # 384D semantic search
+│   │   │   └── workflow/                    # Workflow integration
+│   │   ├── modules/           # Ignition Module Development (Phase 9)
+│   │   │   ├── core/         # Core module infrastructure (Phase 9.2)
+│   │   │   │   ├── abstract_module.py       # AbstractIgnitionModule base class
+│   │   │   │   ├── lifecycle.py             # Module lifecycle management
+│   │   │   │   ├── config.py                # Configuration persistence
+│   │   │   │   └── logging.py               # Diagnostics framework
+│   │   │   ├── examples/     # Working module examples
+│   │   │   ├── cli/          # Module CLI commands (19+ commands)
+│   │   │   └── sdk_manager.py               # Module SDK integration
+│   │   ├── graph/            # Neo4j Graph Database (10,389+ nodes)
+│   │   │   ├── client.py     # Graph database client
+│   │   │   ├── analytics/    # Advanced analytics engine
+│   │   │   └── tasks/        # Function population tasks (424+ functions)
+│   │   ├── opcua/            # Industrial OPC-UA Integration
+│   │   │   ├── client.py     # Live OPC-UA client
+│   │   │   ├── browser.py    # Address space navigation
+│   │   │   └── gui/          # Industrial monitoring UI
+│   │   ├── data_integration/ # Multi-database integration (7+ DB types)
+│   │   ├── generators/       # Script generation engine
+│   │   ├── exporters/        # Gateway export tools
+│   │   ├── importers/        # Project import system
+│   │   ├── validators/       # Script validation framework
+│   │   ├── version_control/  # Git intelligence system
+│   │   └── wrappers/         # System integration wrappers
+│   ├── core/              # Core application logic
+│   │   ├── cli/           # Enhanced CLI system (19+ commands)
+│   │   └── backup_cli.py  # Database backup management
+│   ├── ui/                # User interfaces
+│   │   ├── app.py         # Streamlit web application
+│   │   └── pages/         # Multi-page UI components
+│   ├── api/               # External API integrations
+│   └── models/            # Data models and schemas
+├── templates/             # Jinja2 script templates
+│   ├── gateway/          # Gateway script templates
+│   ├── vision/           # Vision component templates
+│   ├── perspective/      # Perspective script templates
+│   ├── data_integration/ # Database integration templates
+│   └── alarms/           # Alarm system templates
+├── tests/                 # Comprehensive test suite
+│   ├── test_cli.py       # CLI testing
+│   ├── test_ui.py        # UI testing
+│   └── test_performance.py # Performance benchmarks
+├── scripts/               # Utility scripts and automation
+│   ├── testing/          # Automated testing utilities
+│   ├── utilities/        # Development utilities
+│   └── setup_*.py        # Environment setup scripts
+├── examples/              # Example configurations and demos
+│   ├── gateway/          # Gateway script examples
+│   ├── perspective/      # Perspective examples
+│   └── new_agent_initialization.py # AI agent setup
+├── docs/                  # Comprehensive documentation
+│   ├── completion-summaries/     # Phase completion documentation
+│   ├── api/              # API documentation
+│   ├── development/      # Development guides
+│   ├── deployment/       # Deployment patterns
+│   ├── security/         # Security guidelines
+│   └── roadmap.md        # Project roadmap and progress
+├── neo4j/                 # Neo4j database configuration
+├── mcp/                   # MCP server integration
+├── config/                # Configuration files and examples
+└── docker-compose.yml     # Development environment setup
 ```
 
 ## 📚 Documentation
