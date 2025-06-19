@@ -106,7 +106,7 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE SCHEMA IF NOT EXISTS ignition;
 CREATE SCHEMA IF NOT EXISTS auth;
 
--- Set search path
+-- set search path
 SET search_path TO ignition, public;
 
 -- ============================================================================
@@ -504,7 +504,7 @@ LOGFLARE_URL=http://localhost:4000
             }
 
     def list_backups(self) -> list[dict[str, Any]]:
-        """List available backups."""
+        """list available backups."""
         backups = []
 
         for backup_file in self.backup_dir.glob("*.sql.gz"):

@@ -90,7 +90,7 @@ class RecipeManager:
             version: Specific recipe version to load
 
         Returns:
-            Dict containing recipe data or None if not found
+            dict containing recipe data or None if not found
         """
         try:
             self.logger.info(f"Loading recipe: {recipe_name} v{version}")
@@ -284,7 +284,7 @@ class RecipeManager:
             include_details: Include detailed execution information
 
         Returns:
-            Dict containing execution status or None if not found
+            dict containing execution status or None if not found
         """
         try:
             if execution_id not in self.active_executions:
@@ -335,7 +335,7 @@ class RecipeManager:
             include_details: Include detailed execution data
 
         Returns:
-            List of execution history records
+            list of execution history records
         """
         try:
             history = []

@@ -122,7 +122,7 @@ def restore(file: str, confirm: bool):
 @backup.command()
 @click.option("--detailed", "-d", is_flag=True, help="Show detailed backup information")
 def list(detailed: bool):
-    """📋 List all available database backups."""
+    """📋 list all available database backups."""
     try:
         manager = Neo4jBackupManager()
         backups = manager.list_backups()

@@ -21,7 +21,7 @@ def get_print_system_functions() -> list[dict[str, Any]]:
     """Get comprehensive print system functions for Task 8.
 
     Returns:
-        List[Dict[str, Any]]: List of print function definitions
+        list[dict[str, Any]]: list of print function definitions
     """
     functions = []
 
@@ -641,7 +641,7 @@ def get_print_system_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of available printers with their properties",
+                    "description": "list of available printers with their properties",
                 },
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Print Configuration",
@@ -678,7 +678,7 @@ def get_print_system_functions() -> list[dict[str, Any]]:
             },
             {
                 "name": "system.print.setDefaultPrinter",
-                "description": "Set the default printer for the system or current session",
+                "description": "set the default printer for the system or current session",
                 "parameters": [
                     {
                         "name": "printerName",
@@ -822,7 +822,7 @@ def get_task_8_metadata() -> dict[str, Any]:
     """Get metadata about Task 8: Print System Expansion.
 
     Returns:
-        Dict containing task metadata
+        dict containing task metadata
     """
     return {
         "task_number": 8,

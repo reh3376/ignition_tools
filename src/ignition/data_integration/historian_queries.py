@@ -1,4 +1,4 @@
-"""Historian Query Generator for Time Series Data.
+"""Historian Query collections.abc.Generator for Time Series Data.
 
 This module provides query generation capabilities for various historian/time series databases
 commonly used in industrial automation environments.
@@ -127,7 +127,7 @@ class QueryOptions:
 
 
 class HistorianQueryGenerator:
-    """Generator for historian database queries."""
+    """collections.abc.Generator for historian database queries."""
 
     def __init__(self, historian_type: HistorianType) -> None:
         """Initialize the query generator."""

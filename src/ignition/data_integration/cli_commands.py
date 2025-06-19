@@ -55,7 +55,7 @@ def test_connection(config_name: str) -> None:
 
 @database.command()
 def list_configs() -> None:
-    """List available database configurations."""
+    """list available database configurations."""
     try:
         from .database_connections import DatabaseConnectionManager
 

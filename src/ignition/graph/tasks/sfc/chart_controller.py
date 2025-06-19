@@ -210,7 +210,7 @@ class SFCChartController:
             chart_path: Path to the SFC chart
 
         Returns:
-            Dict containing chart status information
+            dict containing chart status information
         """
         try:
             if chart_path not in self.active_charts:
@@ -254,7 +254,7 @@ class SFCChartController:
             chart_path: Path to the SFC chart
 
         Returns:
-            List of step execution history
+            list of step execution history
         """
         try:
             if chart_path in self.active_charts:

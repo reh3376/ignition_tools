@@ -24,7 +24,7 @@ def template() -> None:
 )
 @click.pass_context
 def list(ctx: click.Context, detailed: bool) -> None:
-    """📋 List available script templates with usage statistics."""
+    """📋 list available script templates with usage statistics."""
     enhanced_cli.track_cli_usage("template", "list", {"detailed": detailed})
 
     try:

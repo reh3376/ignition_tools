@@ -45,7 +45,7 @@ GUI_SYSTEM_FUNCTIONS = [
 desktop_info = system.gui.desktop("getInfo")
 print("Desktop size:", desktop_info["size"])
 
-# Set desktop properties
+# set desktop properties
 system.gui.desktop("setProperty", {
     "background_color": "#F0F0F0",
     "allow_resize": True
@@ -125,7 +125,7 @@ if color:
             },
             {
                 "name": "options",
-                "type": "List",
+                "type": "list",
                 "description": "Custom button options",
                 "optional": True,
             },
@@ -324,7 +324,7 @@ except:
         "subcategory": "Window Management",
         "description": "Get list of all available window names in the project",
         "parameters": [],
-        "returns": {"type": "List[String]", "description": "List of window names"},
+        "returns": {"type": "list[String]", "description": "list of window names"},
         "scope": ["Vision Client"],
         "code_example": """# Get all window names
 window_names = system.gui.getWindowNames()
@@ -568,8 +568,8 @@ else:
         "description": "Get information about available screens/monitors",
         "parameters": [],
         "returns": {
-            "type": "List[Screen]",
-            "description": "List of screen information objects",
+            "type": "list[Screen]",
+            "description": "list of screen information objects",
         },
         "scope": ["Vision Client"],
         "code_example": """# Get all screens
@@ -600,7 +600,7 @@ if len(screens) > 1:
         "name": "system.gui.setScreenIndex",
         "category": "GUI Management",
         "subcategory": "Screen Management",
-        "description": "Set the active screen index for window operations",
+        "description": "set the active screen index for window operations",
         "parameters": [
             {
                 "name": "screenIndex",
@@ -613,7 +613,7 @@ if len(screens) > 1:
             "description": "True if screen index set successfully",
         },
         "scope": ["Vision Client"],
-        "code_example": """# Set primary screen
+        "code_example": """# set primary screen
 system.gui.setScreenIndex(0)
 
 # Switch to secondary screen
@@ -814,7 +814,7 @@ component_at_center = system.gui.getComponentAt(
         "name": "system.gui.setClipboard",
         "category": "GUI Operations",
         "subcategory": "System Integration",
-        "description": "Set text content to the system clipboard",
+        "description": "set text content to the system clipboard",
         "parameters": [
             {
                 "name": "text",
@@ -931,7 +931,7 @@ def onTextFieldBlur(event):
         "name": "system.gui.setCursor",
         "category": "GUI Operations",
         "subcategory": "Mouse Operations",
-        "description": "Set the mouse cursor type for a component or globally",
+        "description": "set the mouse cursor type for a component or globally",
         "parameters": [
             {
                 "name": "cursorType",
@@ -947,13 +947,13 @@ def onTextFieldBlur(event):
         ],
         "returns": {"type": "None", "description": "No return value"},
         "scope": ["Vision Client"],
-        "code_example": """# Set wait cursor globally
+        "code_example": """# set wait cursor globally
 system.gui.setCursor("wait")
 
-# Set hand cursor for button
+# set hand cursor for button
 system.gui.setCursor("hand", button_component)
 
-# Set crosshair for drawing area
+# set crosshair for drawing area
 system.gui.setCursor("crosshair", drawing_panel)
 
 # Reset to default
@@ -1122,7 +1122,7 @@ def get_gui_system_functions() -> list[dict[str, Any]]:
     """Get all GUI system function definitions.
 
     Returns:
-        List[Dict[str, Any]]: List of GUI system function definitions
+        list[dict[str, Any]]: list of GUI system function definitions
     """
     return GUI_SYSTEM_FUNCTIONS
 
@@ -1134,7 +1134,7 @@ def get_function_by_name(function_name: str) -> dict[str, Any] | None:
         function_name (str): Name of the function to retrieve
 
     Returns:
-        Optional[Dict[str, Any]]: Function definition if found, None otherwise
+        dict[str, Any] | None: Function definition if found, None otherwise
     """
     for func in GUI_SYSTEM_FUNCTIONS:
         if func["name"] == function_name:
@@ -1149,7 +1149,7 @@ def get_functions_by_category(category: str) -> list[dict[str, Any]]:
         category (str): Category to filter by
 
     Returns:
-        List[Dict[str, Any]]: List of functions in the category
+        list[dict[str, Any]]: list of functions in the category
     """
     return [func for func in GUI_SYSTEM_FUNCTIONS if func["category"] == category]
 
@@ -1161,7 +1161,7 @@ def get_functions_by_subcategory(subcategory: str) -> list[dict[str, Any]]:
         subcategory (str): Subcategory to filter by
 
     Returns:
-        List[Dict[str, Any]]: List of functions in the subcategory
+        list[dict[str, Any]]: list of functions in the subcategory
     """
     return [func for func in GUI_SYSTEM_FUNCTIONS if func["subcategory"] == subcategory]
 

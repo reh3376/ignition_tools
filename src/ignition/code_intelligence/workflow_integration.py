@@ -79,7 +79,7 @@ class DevelopmentWorkflowIntegrator:
         self.project_root = Path.cwd()
 
     def setup_git_hooks(self) -> bool:
-        """Set up git hooks for automatic code analysis."""
+        """set up git hooks for automatic code analysis."""
         if not self.config.enable_git_hooks:
             return False
 
@@ -120,7 +120,7 @@ class DevelopmentWorkflowIntegrator:
 echo "🧠 Running code intelligence checks..."
 
 # Get list of staged Python files
-STAGED_FILES=$(git diff --cached --name-only --diff-filter=Union[ACM, grep] -E '\\.py$')
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\\.py$')
 
 if [ -z "$STAGED_FILES" ]; then
     echo "✅ No Python files to check"

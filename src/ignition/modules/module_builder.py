@@ -133,7 +133,7 @@ class ModuleBuilder:
         """Build all projects in the workspace.
 
         Returns:
-            List of build results
+            list of build results
         """
         projects = self.sdk_manager.list_projects()
         results = []
@@ -347,7 +347,7 @@ class ModuleBuilder:
         """Display a summary of build results.
 
         Args:
-            results: List of build results
+            results: list of build results
         """
         if not results:
             console.print("No build results to display")
@@ -390,7 +390,7 @@ class ModuleBuilder:
             stderr: Standard error output
 
         Returns:
-            List of error messages
+            list of error messages
         """
         errors = []
         lines = stderr.split("\n")
@@ -409,7 +409,7 @@ class ModuleBuilder:
             stdout: Standard output
 
         Returns:
-            List of warning messages
+            list of warning messages
         """
         warnings = []
         lines = stdout.split("\n")

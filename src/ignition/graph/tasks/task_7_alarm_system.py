@@ -21,7 +21,7 @@ def get_alarm_system_functions() -> list[dict[str, Any]]:
     """Get comprehensive alarm system functions for Task 7.
 
     Returns:
-        List[Dict[str, Any]]: List of alarm function definitions
+        list[dict[str, Any]]: list of alarm function definitions
     """
     functions = []
 
@@ -63,25 +63,25 @@ def get_alarm_system_functions() -> list[dict[str, Any]]:
                     {
                         "name": "state",
                         "type": "list",
-                        "description": "List of alarm states to include",
+                        "description": "list of alarm states to include",
                         "required": False,
                     },
                     {
                         "name": "path",
                         "type": "list",
-                        "description": "List of alarm paths to filter",
+                        "description": "list of alarm paths to filter",
                         "required": False,
                     },
                     {
                         "name": "source",
                         "type": "list",
-                        "description": "List of alarm sources to include",
+                        "description": "list of alarm sources to include",
                         "required": False,
                     },
                     {
                         "name": "displaypath",
                         "type": "list",
-                        "description": "List of display paths to filter",
+                        "description": "list of display paths to filter",
                         "required": False,
                     },
                     {
@@ -228,13 +228,13 @@ def get_alarm_system_functions() -> list[dict[str, Any]]:
                     {
                         "name": "state",
                         "type": "list",
-                        "description": "List of alarm states to count",
+                        "description": "list of alarm states to count",
                         "required": False,
                     },
                     {
                         "name": "path",
                         "type": "list",
-                        "description": "List of alarm paths to include",
+                        "description": "list of alarm paths to include",
                         "required": False,
                     },
                 ],
@@ -257,7 +257,7 @@ def get_alarm_system_functions() -> list[dict[str, Any]]:
                 "parameters": [],
                 "returns": {
                     "type": "list",
-                    "description": "List of alarm journal names",
+                    "description": "list of alarm journal names",
                 },
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Alarm Operations",
@@ -382,31 +382,31 @@ def get_alarm_system_functions() -> list[dict[str, Any]]:
                     {
                         "name": "priority",
                         "type": "list",
-                        "description": "List of priorities to include",
+                        "description": "list of priorities to include",
                         "required": False,
                     },
                     {
                         "name": "state",
                         "type": "list",
-                        "description": "List of alarm states to query",
+                        "description": "list of alarm states to query",
                         "required": False,
                     },
                     {
                         "name": "path",
                         "type": "list",
-                        "description": "List of alarm paths to include",
+                        "description": "list of alarm paths to include",
                         "required": False,
                     },
                     {
                         "name": "source",
                         "type": "list",
-                        "description": "List of alarm sources",
+                        "description": "list of alarm sources",
                         "required": False,
                     },
                     {
                         "name": "displaypath",
                         "type": "list",
-                        "description": "List of display paths to filter",
+                        "description": "list of display paths to filter",
                         "required": False,
                     },
                     {
@@ -455,7 +455,7 @@ def get_alarm_system_functions() -> list[dict[str, Any]]:
                     {
                         "name": "alarmIds",
                         "type": "list",
-                        "description": "List of alarm IDs to acknowledge",
+                        "description": "list of alarm IDs to acknowledge",
                         "required": True,
                     },
                     {
@@ -473,7 +473,7 @@ def get_alarm_system_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of successfully acknowledged alarm IDs",
+                    "description": "list of successfully acknowledged alarm IDs",
                 },
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Alarm Operations",
@@ -491,7 +491,7 @@ def get_alarm_system_functions() -> list[dict[str, Any]]:
                     {
                         "name": "alarmIds",
                         "type": "list",
-                        "description": "List of alarm IDs to cancel",
+                        "description": "list of alarm IDs to cancel",
                         "required": True,
                     },
                     {
@@ -509,7 +509,7 @@ def get_alarm_system_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of successfully canceled alarm IDs",
+                    "description": "list of successfully canceled alarm IDs",
                 },
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Alarm Operations",
@@ -527,7 +527,7 @@ def get_alarm_system_functions() -> list[dict[str, Any]]:
                     {
                         "name": "alarmPaths",
                         "type": "list",
-                        "description": "List of alarm paths to shelve",
+                        "description": "list of alarm paths to shelve",
                         "required": True,
                     },
                     {
@@ -551,7 +551,7 @@ def get_alarm_system_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of successfully shelved alarm paths",
+                    "description": "list of successfully shelved alarm paths",
                 },
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Alarm Operations",
@@ -569,7 +569,7 @@ def get_alarm_system_functions() -> list[dict[str, Any]]:
                     {
                         "name": "alarmPaths",
                         "type": "list",
-                        "description": "List of alarm paths to unshelve",
+                        "description": "list of alarm paths to unshelve",
                         "required": True,
                     },
                     {
@@ -587,7 +587,7 @@ def get_alarm_system_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of successfully unshelved alarm paths",
+                    "description": "list of successfully unshelved alarm paths",
                 },
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Alarm Operations",
@@ -709,7 +709,7 @@ def get_alarm_system_functions() -> list[dict[str, Any]]:
                 "name": "system.alarm.getAlarmStates",
                 "description": "Retrieve list of available alarm states in the system",
                 "parameters": [],
-                "returns": {"type": "list", "description": "List of alarm state names"},
+                "returns": {"type": "list", "description": "list of alarm state names"},
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Alarm Operations",
                 "patterns": [
@@ -741,7 +741,7 @@ def get_alarm_system_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of alarm pipeline names",
+                    "description": "list of alarm pipeline names",
                 },
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Alarm Operations",
@@ -909,7 +909,7 @@ def get_alarm_system_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of alarm display paths",
+                    "description": "list of alarm display paths",
                 },
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Alarm Operations",
@@ -1195,7 +1195,7 @@ def get_alarm_system_functions() -> list[dict[str, Any]]:
                         "default": False,
                     }
                 ],
-                "returns": {"type": "list", "description": "List of roster names"},
+                "returns": {"type": "list", "description": "list of roster names"},
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Alarm Operations",
                 "patterns": [

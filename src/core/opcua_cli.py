@@ -37,7 +37,7 @@ current_config: OPCUAConnectionConfig | None = None
 @click.option(
     "--log-level",
     default="INFO",
-    help="Set logging level (DEBUG, INFO, WARNING, ERROR)",
+    help="set logging level (DEBUG, INFO, WARNING, ERROR)",
 )
 @click.pass_context
 def opcua(ctx, verbose, log_level):
@@ -459,7 +459,7 @@ def config_wizard():
 
 @config_group.command("list")
 def config_list():
-    """List all saved OPC-UA configurations."""
+    """list all saved OPC-UA configurations."""
     list_configs()
 
 

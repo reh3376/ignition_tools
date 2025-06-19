@@ -113,8 +113,8 @@ class TypeAnnotationFixer:
             # Check if we need to add typing imports
             needs_typing = False
             needs_any = "Any" in content and "from typing import" not in content
-            needs_dict = "Dict[" in content or "dict[" in content
-            needs_list = "List[" in content or "list[" in content
+            needs_dict = "dict[" in content or "dict[" in content
+            needs_list = "list[" in content or "list[" in content
             needs_optional = "Optional[" in content
 
             if needs_any or needs_dict or needs_list or needs_optional:
@@ -137,9 +137,9 @@ class TypeAnnotationFixer:
                 if needs_any:
                     typing_imports.append("Any")
                 if needs_dict:
-                    typing_imports.append("Dict")
+                    typing_imports.append("dict")
                 if needs_list:
-                    typing_imports.append("List")
+                    typing_imports.append("list")
                 if needs_optional:
                     typing_imports.append("Optional")
 

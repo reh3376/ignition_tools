@@ -205,7 +205,7 @@ def cleanup(keep_days: int) -> None:
 
 @supabase.command()
 def backups() -> None:
-    """List available database backups."""
+    """list available database backups."""
     if not create_supabase_manager:
         click.echo("❌ Supabase manager not available.")
         return

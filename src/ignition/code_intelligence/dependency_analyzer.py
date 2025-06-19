@@ -199,10 +199,10 @@ class DependencyAnalyzer:
 
         Args:
             file_imports: Dictionary of file imports
-            module_mapping: Mapping of module names to file paths
+            module_mapping: collections.abc.Mapping of module names to file paths
 
         Returns:
-            List of dependency relationships
+            list of dependency relationships
         """
         dependencies = []
 
@@ -297,7 +297,7 @@ class DependencyAnalyzer:
         """Create DEPENDS_ON relationships in the graph.
 
         Args:
-            dependencies: List of dependency relationships to create
+            dependencies: list of dependency relationships to create
 
         Returns:
             Number of relationships created
@@ -351,7 +351,7 @@ class DependencyAnalyzer:
         """Detect circular dependencies in the codebase.
 
         Returns:
-            List of circular dependency chains
+            list of circular dependency chains
         """
         try:
             # Find cycles using Neo4j's path finding

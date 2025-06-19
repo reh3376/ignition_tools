@@ -132,7 +132,7 @@ else:
                 "best_practices": [
                     "Validate chart path before starting",
                     "Check for conflicting chart executions",
-                    "Set appropriate initial variables",
+                    "set appropriate initial variables",
                     "Monitor start operation status",
                 ],
             },
@@ -554,7 +554,7 @@ if recipe_id:
 """,
             additional_info={
                 "template_structure": {
-                    "ingredients": "List of recipe ingredients with amounts and tolerances",
+                    "ingredients": "list of recipe ingredients with amounts and tolerances",
                     "steps": "Sequential recipe steps with parameters",
                     "quality_parameters": "Quality control parameters and limits",
                     "equipment_requirements": "Required equipment specifications",
@@ -961,7 +961,7 @@ else:
         """Create SFC/Recipe integration and validation functions."""
         integration_functions = {}
 
-        # 12. SFC Set Recipe Data Function
+        # 12. SFC set Recipe Data Function
         integration_functions["sfc_set_recipe_data"] = self._create_function(
             name="sfc.setRecipeData",
             description="Bind recipe data to an SFC chart for execution",
@@ -1148,8 +1148,8 @@ else:
                 },
                 "return_fields": [
                     "valid: Boolean validation result",
-                    "errors: List of validation errors",
-                    "warnings: List of validation warnings",
+                    "errors: list of validation errors",
+                    "warnings: list of validation warnings",
                     "recommendations: Suggested improvements",
                 ],
             },

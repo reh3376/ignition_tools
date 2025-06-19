@@ -14,7 +14,7 @@ def get_task_4_perspective_functions() -> list[dict[str, Any]]:
     """Returns all Task 4 Perspective system functions with comprehensive metadata.
 
     Returns:
-        List of function dictionaries with complete specifications
+        list of function dictionaries with complete specifications
     """
     functions = [
         # Session Management Functions (6 functions)
@@ -113,7 +113,7 @@ if 'userPreferences' in props:
             "returns": {"type": "None", "description": "No return value"},
             "scope": ["Perspective Session"],
             "tags": ["session", "properties", "set", "perspective"],
-            "code_example": """# Set session properties
+            "code_example": """# set session properties
 system.perspective.setSessionProps({
     'theme': 'dark',
     'language': 'es',
@@ -704,7 +704,7 @@ system.perspective.alterFilter(table, complex_filter)""",
                 {
                     "name": "sorts",
                     "type": "PyList",
-                    "description": "List of sort configurations",
+                    "description": "list of sort configurations",
                     "required": True,
                 },
                 {

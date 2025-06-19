@@ -22,7 +22,7 @@ def get_security_system_functions() -> list[dict[str, Any]]:
     """Get comprehensive security system functions for Task 9.
 
     Returns:
-        List[Dict[str, Any]]: List of security function definitions
+        list[dict[str, Any]]: list of security function definitions
     """
     functions = []
 
@@ -110,7 +110,7 @@ def get_security_system_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of user roles with permissions and inheritance details",
+                    "description": "list of user roles with permissions and inheritance details",
                 },
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Security Authentication",
@@ -482,7 +482,7 @@ def get_security_system_functions() -> list[dict[str, Any]]:
                     {
                         "name": "permissions",
                         "type": "list",
-                        "description": "List of permissions to grant to role",
+                        "description": "list of permissions to grant to role",
                         "required": True,
                     },
                     {
@@ -1081,7 +1081,7 @@ def get_task_9_metadata() -> dict[str, Any]:
     """Get metadata about Task 9: Security System Expansion.
 
     Returns:
-        Dict containing task metadata
+        dict containing task metadata
     """
     return {
         "task_number": 9,

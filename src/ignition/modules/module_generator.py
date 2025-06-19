@@ -1,4 +1,4 @@
-"""Intelligent Module Generator using Code Intelligence."""
+"""Intelligent Module collections.abc.Generator using Code Intelligence."""
 
 from dataclasses import dataclass
 from pathlib import Path
@@ -41,7 +41,7 @@ class GeneratedModule:
 
 
 class ModuleGenerator:
-    """Generator for intelligent Ignition modules using code intelligence."""
+    """collections.abc.Generator for intelligent Ignition modules using code intelligence."""
 
     def __init__(
         self,
@@ -289,7 +289,7 @@ class ModuleGenerator:
             analysis: Intelligence analysis results
 
         Returns:
-            List of generated file paths
+            list of generated file paths
         """
         generated_files = []
 
@@ -364,7 +364,7 @@ class ModuleGenerator:
         """Generate function implementations based on intelligence.
 
         Args:
-            functions: List of function names to implement
+            functions: list of function names to implement
             analysis: Intelligence analysis
 
         Returns:
@@ -457,7 +457,7 @@ class ModuleGenerator:
                 console.print(f"  • {func_name}: {len(insights)} context items")
 
     def list_templates(self) -> dict[str, ModuleTemplate]:
-        """List available module templates.
+        """list available module templates.
 
         Returns:
             Dictionary of available templates
@@ -701,7 +701,7 @@ public class DatabaseManager {
         try (Connection conn = context.getDatabaseManager().getConnection("default")) {
             try (PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-                // Set parameters
+                // set parameters
                 for (int i = 0; i < params.length; i++) {
                     stmt.setObject(i + 1, params[i]);
                 }

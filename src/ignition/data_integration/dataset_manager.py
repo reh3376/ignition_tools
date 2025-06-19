@@ -707,7 +707,7 @@ class DatasetManager:
         return str(export_path)
 
     def list_datasets(self) -> list[dict[str, Any]]:
-        """List all datasets with summary information."""
+        """list all datasets with summary information."""
         datasets_info = []
         for dataset in self.datasets.values():
             info = {

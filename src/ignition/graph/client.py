@@ -102,7 +102,7 @@ class IgnitionGraphClient:
             parameters: Query parameters
 
         Returns:
-            List of result records as dictionaries
+            list of result records as dictionaries
         """
         if parameters is None:
             parameters = {}
@@ -193,7 +193,7 @@ class IgnitionGraphClient:
             return False
 
     def setup_schema(self) -> bool:
-        """Set up database constraints and indexes.
+        """set up database constraints and indexes.
 
         Returns:
             True if successful, False otherwise

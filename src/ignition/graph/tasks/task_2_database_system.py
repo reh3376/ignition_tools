@@ -145,7 +145,7 @@ system.db.setDatasourceConnectURL("MainDB", url)""",
         "subcategory": "Datasource Information",
         "description": "Get a list of all configured datasource names",
         "parameters": [],
-        "returns": {"type": "List[String]", "description": "List of datasource names"},
+        "returns": {"type": "list[String]", "description": "list of datasource names"},
         "scope": ["Gateway", "Vision Client", "Perspective Session"],
         "code_example": """# Get all datasources
 datasources = system.db.getDatasourceNames()
@@ -579,7 +579,7 @@ updated_count = update_product_prices(updates)""",
                 "type": "String",
                 "description": "SQL query with parameter placeholders",
             },
-            {"name": "args", "type": "List", "description": "Query parameter values"},
+            {"name": "args", "type": "list", "description": "Query parameter values"},
             {
                 "name": "database",
                 "type": "String",
@@ -649,7 +649,7 @@ products = get_filtered_products({
                 "type": "String",
                 "description": "SQL update query with parameter placeholders",
             },
-            {"name": "args", "type": "List", "description": "Query parameter values"},
+            {"name": "args", "type": "list", "description": "Query parameter values"},
             {
                 "name": "database",
                 "type": "String",
@@ -798,7 +798,7 @@ def database_health_check(databases):
                 "type": "String",
                 "description": "SQL query with parameter placeholders",
             },
-            {"name": "args", "type": "List", "description": "Query parameter values"},
+            {"name": "args", "type": "list", "description": "Query parameter values"},
             {
                 "name": "database",
                 "type": "String",
@@ -1013,7 +1013,7 @@ def get_database_system_functions() -> list[dict[str, Any]]:
     """Get all database system function definitions.
 
     Returns:
-        List[Dict[str, Any]]: List of database system function definitions
+        list[dict[str, Any]]: list of database system function definitions
     """
     return DATABASE_SYSTEM_FUNCTIONS
 
@@ -1025,7 +1025,7 @@ def get_function_by_name(function_name: str) -> dict[str, Any] | None:
         function_name (str): Name of the function to retrieve
 
     Returns:
-        Optional[Dict[str, Any]]: Function definition if found, None otherwise
+        dict[str, Any] | None: Function definition if found, None otherwise
     """
     for func in DATABASE_SYSTEM_FUNCTIONS:
         if func["name"] == function_name:
@@ -1040,7 +1040,7 @@ def get_functions_by_category(category: str) -> list[dict[str, Any]]:
         category (str): Category to filter by
 
     Returns:
-        List[Dict[str, Any]]: List of functions in the category
+        list[dict[str, Any]]: list of functions in the category
     """
     return [func for func in DATABASE_SYSTEM_FUNCTIONS if func["category"] == category]
 
@@ -1052,7 +1052,7 @@ def get_functions_by_subcategory(subcategory: str) -> list[dict[str, Any]]:
         subcategory (str): Subcategory to filter by
 
     Returns:
-        List[Dict[str, Any]]: List of functions in the subcategory
+        list[dict[str, Any]]: list of functions in the subcategory
     """
     return [
         func for func in DATABASE_SYSTEM_FUNCTIONS if func["subcategory"] == subcategory

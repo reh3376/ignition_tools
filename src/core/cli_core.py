@@ -178,7 +178,7 @@ class LearningSystemCLI:
         welcome_panel = Panel.fit(
             f"{title}\n"
             f"[dim]Intelligent Ignition Script Generation & Learning System[/dim]\n\n"
-            f"🔧 Script Generator: [green]Ready[/green]\n"
+            f"🔧 Script collections.abc.Generator: [green]Ready[/green]\n"
             f"📊 Learning System: [{'green' if self.client and self.client.is_connected else 'yellow'}]{ls_status}[/]",
             title="🚀 Welcome",
             border_style="blue",

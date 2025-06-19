@@ -1,4 +1,4 @@
-"""Report Generator for Ignition Data Integration."""
+"""Report collections.abc.Generator for Ignition Data Integration."""
 
 import csv
 import json
@@ -55,7 +55,7 @@ class ReportData:
 
 
 class ReportGenerator:
-    """Generator for various types of industrial reports."""
+    """collections.abc.Generator for various types of industrial reports."""
 
     def __init__(self) -> None:
         """Initialize the report generator."""

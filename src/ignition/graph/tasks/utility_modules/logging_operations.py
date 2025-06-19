@@ -16,7 +16,7 @@ def get_logging_operations_functions() -> list[dict[str, Any]]:
     """Get logging operations functions.
 
     Returns:
-        List[Dict[str, Any]]: List of logging operation function definitions
+        list[dict[str, Any]]: list of logging operation function definitions
     """
     return [
         {
@@ -51,7 +51,7 @@ def get_logging_operations_functions() -> list[dict[str, Any]]:
         },
         {
             "name": "system.util.setLoggerLevel",
-            "description": "Set logging level for specified logger",
+            "description": "set logging level for specified logger",
             "parameters": [
                 {
                     "name": "loggerName",

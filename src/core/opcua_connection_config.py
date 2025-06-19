@@ -396,7 +396,7 @@ class OPCUAConnectionWizard:
                             mode=3 if config.security_mode == "SignAndEncrypt" else 2,
                         )
 
-                # Set authentication
+                # set authentication
                 if config.username:
                     client.set_user(config.username)
                     client.set_password(config.password)
@@ -502,7 +502,7 @@ class OPCUAConfigManager:
         self.config_dir.mkdir(parents=True, exist_ok=True)
 
     def list_configurations(self) -> list[OPCUAConnectionConfig]:
-        """List all saved configurations."""
+        """list all saved configurations."""
         configs = []
         for config_file in self.config_dir.glob("*.json"):
             try:
@@ -583,7 +583,7 @@ async def interactive_setup() -> OPCUAConnectionConfig:
 
 
 def list_configs() -> None:
-    """List all saved configurations."""
+    """list all saved configurations."""
     manager = OPCUAConfigManager()
     manager.display_configurations()
 

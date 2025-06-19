@@ -96,7 +96,7 @@ def status() -> None:
 @module_group.command()
 @click.option("--force", is_flag=True, help="Force setup even if already exists")
 def setup(force: bool) -> None:
-    """Set up the module development environment."""
+    """set up the module development environment."""
     sdk_manager, _, _ = _initialize_module_systems()
     if not sdk_manager:
         return
@@ -113,7 +113,7 @@ def setup(force: bool) -> None:
         console.print("❌ Git not found. Please install Git first.")
         return
 
-    # Set up workspace
+    # set up workspace
     console.print("📁 Setting up workspace...")
     if not sdk_manager.setup_workspace():
         console.print("❌ Failed to set up workspace")
@@ -351,12 +351,12 @@ def validate(module_file: str) -> None:
 
 @module_group.command()
 def list() -> None:
-    """List module projects and templates."""
+    """list module projects and templates."""
     sdk_manager, generator, _ = _initialize_module_systems()
     if not sdk_manager or not generator:
         return
 
-    # List projects
+    # list projects
     projects = sdk_manager.list_projects()
     if projects:
         console.print("📦 Module Projects:")
@@ -368,7 +368,7 @@ def list() -> None:
     else:
         console.print("📦 No module projects found")
 
-    # List templates
+    # list templates
     templates = generator.list_templates()
     console.print(f"\n🎨 Available Templates ({len(templates)}):")
     for name, template in templates.items():

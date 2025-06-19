@@ -606,7 +606,7 @@ class DatasetCurationUI:
             st.text_area(
                 "Tag Names (one per line)",
                 placeholder="Temperature_01\nPressure_02\nFlow_Rate_03",
-                help="List of tags to extract",
+                help="list of tags to extract",
             )
 
         with col2:
@@ -929,7 +929,7 @@ class DatasetCurationUI:
 
             if export_split != "full":
                 st.slider(
-                    "Test Set Size (%)",
+                    "Test set Size (%)",
                     min_value=10,
                     max_value=50,
                     value=20,

@@ -38,7 +38,7 @@ def main():
         for category, count in result["task_16_summary"]["categories"].items():
             print(f"  - {category}: {count} functions")
 
-        # List created functions
+        # list created functions
         print("\n📋 Created Functions:")
         for func_key, func_data in result["functions"].items():
             print(f"  ✓ {func_data.get('name', func_key)}")

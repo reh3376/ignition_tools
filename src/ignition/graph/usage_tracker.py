@@ -444,7 +444,7 @@ class UsageTracker:
             event_type: Filter by event type
 
         Returns:
-            List of recent usage events
+            list of recent usage events
         """
         query = """
         MATCH (e:UsageEvent)

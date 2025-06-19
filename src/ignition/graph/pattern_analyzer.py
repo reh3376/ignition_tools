@@ -84,7 +84,7 @@ class PatternAnalyzer:
             days_back: Number of days to analyze
 
         Returns:
-            List of co-occurrence patterns with confidence scores
+            list of co-occurrence patterns with confidence scores
         """
         # Get sessions with multiple function usages
         query = """
@@ -170,7 +170,7 @@ class PatternAnalyzer:
             days_back: Number of days to analyze
 
         Returns:
-            List of template usage patterns
+            list of template usage patterns
         """
         query = """
         MATCH (e:UsageEvent)
@@ -224,7 +224,7 @@ class PatternAnalyzer:
             days_back: Number of days to analyze
 
         Returns:
-            List of parameter combination patterns
+            list of parameter combination patterns
         """
         query = """
         MATCH (e:UsageEvent)
@@ -308,7 +308,7 @@ class PatternAnalyzer:
             days_back: Number of days to analyze
 
         Returns:
-            List of sequential usage patterns
+            list of sequential usage patterns
         """
         query = """
         MATCH (s:UserSession)
@@ -394,7 +394,7 @@ class PatternAnalyzer:
         """Analyze parameter patterns for a specific template.
 
         Args:
-            parameter_list: List of JSON parameter strings
+            parameter_list: list of JSON parameter strings
 
         Returns:
             Dictionary of parameter analysis results
@@ -549,7 +549,7 @@ class PatternAnalyzer:
             limit: Maximum number of patterns to return
 
         Returns:
-            List of pattern dictionaries
+            list of pattern dictionaries
         """
         query = """
         MATCH (p:PatternAnalysis {pattern_type: $pattern_type})
@@ -584,7 +584,7 @@ class PatternAnalyzer:
             limit: Maximum number of recommendations
 
         Returns:
-            List of recommended functions with confidence scores
+            list of recommended functions with confidence scores
         """
         patterns = self.get_patterns_by_type("function_co_occurrence")
         recommendations = []

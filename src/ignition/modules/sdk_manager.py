@@ -105,7 +105,7 @@ class IgnitionSDKManager:
         return prerequisites
 
     def setup_workspace(self) -> bool:
-        """Set up the SDK workspace directory.
+        """set up the SDK workspace directory.
 
         Returns:
             True if successful, False otherwise
@@ -170,7 +170,7 @@ class IgnitionSDKManager:
         """
         generator_path = self.tools_path / "generator"
         if not generator_path.exists():
-            console.print("❌ Generator directory not found in module tools")
+            console.print("❌ collections.abc.Generator directory not found in module tools")
             return False
 
         try:
@@ -294,10 +294,10 @@ class IgnitionSDKManager:
             return False
 
     def list_projects(self) -> list[Path]:
-        """List existing module projects in the workspace.
+        """list existing module projects in the workspace.
 
         Returns:
-            List of project directory paths
+            list of project directory paths
         """
         if not self.workspace_path.exists():
             return []
@@ -422,7 +422,7 @@ class IgnitionSDKManager:
             build_dir = generator_path / "build"
             status["tools_built"] = build_dir.exists() and any(build_dir.iterdir())
 
-        # List projects
+        # list projects
         status["projects"] = [self.get_project_info(p) for p in self.list_projects()]
 
         return status

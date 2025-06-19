@@ -170,7 +170,7 @@ class EnhancedIgnitionGraphPopulator:
         return [
             {
                 "name": "system.device.listDevices",
-                "description": "List all configured device connections",
+                "description": "list all configured device connections",
                 "category": "device",
                 "contexts": ["Gateway"],
                 "scope": "gateway",

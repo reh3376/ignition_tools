@@ -39,7 +39,7 @@ class Neo4jBackupManager:
             reason: Reason for creating the backup (for metadata)
 
         Returns:
-            Tuple of (success, backup_file_path or error_message)
+            tuple of (success, backup_file_path or error_message)
         """
         try:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -96,7 +96,7 @@ class Neo4jBackupManager:
             backup_file: Specific backup file to restore from. If None, uses most recent.
 
         Returns:
-            Tuple of (success, message)
+            tuple of (success, message)
         """
         try:
             # Determine backup file to use
@@ -171,10 +171,10 @@ class Neo4jBackupManager:
             return False
 
     def list_backups(self) -> list[dict[str, Any]]:
-        """List all available backups with metadata.
+        """list all available backups with metadata.
 
         Returns:
-            List of backup information dictionaries
+            list of backup information dictionaries
         """
         backups = []
 
@@ -506,10 +506,10 @@ class Neo4jBackupManager:
 
         Args:
             backup_file: Specific backup file to restore from. If None, uses most recent.
-            preserve_labels: List of node labels to preserve (not overwrite)
+            preserve_labels: list of node labels to preserve (not overwrite)
 
         Returns:
-            Tuple of (success, message)
+            tuple of (success, message)
         """
         try:
             if preserve_labels is None:

@@ -31,7 +31,7 @@ def get_utility_system_functions() -> list[dict[str, Any]]:
     """Get comprehensive utility system functions for Task 6.
 
     Returns:
-        List[Dict[str, Any]]: List of utility function definitions
+        list[dict[str, Any]]: list of utility function definitions
     """
     functions = []
 

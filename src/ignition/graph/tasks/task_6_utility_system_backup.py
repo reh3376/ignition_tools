@@ -21,7 +21,7 @@ def get_utility_system_functions() -> list[dict[str, Any]]:
     """Get comprehensive utility system functions for Task 6.
 
     Returns:
-        List[Dict[str, Any]]: List of utility function definitions
+        list[dict[str, Any]]: list of utility function definitions
     """
     functions = []
 
@@ -140,7 +140,7 @@ def get_utility_system_functions() -> list[dict[str, Any]]:
             },
             {
                 "name": "system.util.setLocale",
-                "description": "Set system locale configuration",
+                "description": "set system locale configuration",
                 "parameters": [
                     {
                         "name": "locale",
@@ -207,7 +207,7 @@ def get_utility_system_functions() -> list[dict[str, Any]]:
             },
             {
                 "name": "system.util.setTimezone",
-                "description": "Set system timezone configuration",
+                "description": "set system timezone configuration",
                 "parameters": [
                     {
                         "name": "timezone",
@@ -334,7 +334,7 @@ def get_utility_system_functions() -> list[dict[str, Any]]:
             },
             {
                 "name": "system.util.setLoggerLevel",
-                "description": "Set logging level for specified logger",
+                "description": "set logging level for specified logger",
                 "parameters": [
                     {
                         "name": "loggerName",
@@ -534,7 +534,7 @@ def get_utility_system_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of user roles and permissions",
+                    "description": "list of user roles and permissions",
                 },
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Security Operations",
@@ -815,7 +815,7 @@ def get_utility_system_functions() -> list[dict[str, Any]]:
             },
             {
                 "name": "system.util.setProperty",
-                "description": "Set system property value",
+                "description": "set system property value",
                 "parameters": [
                     {
                         "name": "propertyName",
@@ -955,7 +955,7 @@ def get_utility_system_functions() -> list[dict[str, Any]]:
             },
             {
                 "name": "system.util.listFiles",
-                "description": "List files in directory with filtering options",
+                "description": "list files in directory with filtering options",
                 "parameters": [
                     {
                         "name": "directory",
@@ -979,7 +979,7 @@ def get_utility_system_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of file information dictionaries",
+                    "description": "list of file information dictionaries",
                 },
                 "scope": ["Gateway"],
                 "category": "File Operations",
@@ -1215,7 +1215,7 @@ def get_utility_system_functions() -> list[dict[str, Any]]:
                     {
                         "name": "to",
                         "type": "list",
-                        "description": "List of recipient email addresses",
+                        "description": "list of recipient email addresses",
                         "required": True,
                     },
                     {
@@ -1233,7 +1233,7 @@ def get_utility_system_functions() -> list[dict[str, Any]]:
                     {
                         "name": "attachments",
                         "type": "list",
-                        "description": "List of file paths to attach",
+                        "description": "list of file paths to attach",
                         "required": False,
                     },
                 ],
@@ -1508,7 +1508,7 @@ def get_utility_system_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of scheduled task information",
+                    "description": "list of scheduled task information",
                 },
                 "scope": ["Gateway"],
                 "category": "Task Scheduling",
@@ -1630,7 +1630,7 @@ def get_utility_system_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of system events with timestamps and details",
+                    "description": "list of system events with timestamps and details",
                 },
                 "scope": ["Gateway"],
                 "category": "Event Management",

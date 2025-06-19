@@ -1,4 +1,3 @@
-from typing import Dict, List
 
 """Database Connection Manager for Ignition Data Integration.
 
@@ -603,11 +602,11 @@ class DatabaseConnectionManager:
         }
 
     def list_connections(self) -> list[dict[str, Any]]:
-        """List all active connections."""
+        """list all active connections."""
         return [self.get_connection_info(conn_id) for conn_id in self.connections]
 
     def list_configurations(self) -> list[str]:
-        """List all available database configurations."""
+        """list all available database configurations."""
         return list(self.configs.keys())
 
     def get_config_info(self, config_name: str) -> dict[str, Any] | None:

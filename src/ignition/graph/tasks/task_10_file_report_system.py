@@ -21,7 +21,7 @@ def get_file_report_system_functions() -> list[dict[str, Any]]:
     """Get comprehensive file and report system functions for Task 10.
 
     Returns:
-        List[Dict[str, Any]]: List of file and report function definitions
+        list[dict[str, Any]]: list of file and report function definitions
     """
     functions = []
 
@@ -136,7 +136,7 @@ def get_file_report_system_functions() -> list[dict[str, Any]]:
             },
             {
                 "name": "system.file.listDirectoryContents",
-                "description": "List directory contents with filtering and metadata",
+                "description": "list directory contents with filtering and metadata",
                 "parameters": [
                     {
                         "name": "directoryPath",
@@ -174,7 +174,7 @@ def get_file_report_system_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of files with metadata and directory structure",
+                    "description": "list of files with metadata and directory structure",
                 },
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "File Operations",
@@ -338,7 +338,7 @@ def get_file_report_system_functions() -> list[dict[str, Any]]:
                     {
                         "name": "sourceItems",
                         "type": "list",
-                        "description": "List of files/directories to compress",
+                        "description": "list of files/directories to compress",
                         "required": True,
                     },
                     {
@@ -516,7 +516,7 @@ def get_file_report_system_functions() -> list[dict[str, Any]]:
                     {
                         "name": "distributionList",
                         "type": "list",
-                        "description": "List of recipients for report distribution",
+                        "description": "list of recipients for report distribution",
                         "required": False,
                         "default": "[]",
                     },
@@ -600,7 +600,7 @@ def get_file_report_system_functions() -> list[dict[str, Any]]:
                     {
                         "name": "tagPaths",
                         "type": "list",
-                        "description": "List of tag paths for trend analysis",
+                        "description": "list of tag paths for trend analysis",
                         "required": True,
                     },
                     {
@@ -774,7 +774,7 @@ def get_file_report_system_functions() -> list[dict[str, Any]]:
                     {
                         "name": "recipients",
                         "type": "list",
-                        "description": "List of recipients with contact information",
+                        "description": "list of recipients with contact information",
                         "required": True,
                     },
                     {
@@ -1211,7 +1211,7 @@ def get_file_report_system_functions() -> list[dict[str, Any]]:
                     {
                         "name": "sourceFiles",
                         "type": "list",
-                        "description": "List of source data files to merge",
+                        "description": "list of source data files to merge",
                         "required": True,
                     },
                     {
@@ -1309,7 +1309,7 @@ def get_task_10_metadata() -> dict[str, Any]:
     """Get metadata about Task 10: File & Report System Expansion.
 
     Returns:
-        Dict containing task metadata
+        dict containing task metadata
     """
     return {
         "task_number": 10,

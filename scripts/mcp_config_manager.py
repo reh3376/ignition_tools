@@ -74,7 +74,7 @@ class MCPConfigManager:
             config_code += f"        configs['{config_name}'] = {json.dumps(config_data, indent=8)[1:-1].replace('        ', '            ')}\n\n"
 
         # Replace the load_mcp_docker_configs method
-        start_marker = "    def load_mcp_docker_configs(self) -> Dict:"
+        start_marker = "    def load_mcp_docker_configs(self) -> dict:"
 
         start_idx = content.find(start_marker)
         if start_idx != -1:
@@ -96,7 +96,7 @@ class MCPConfigManager:
                         break
 
             # Replace the method
-            new_method = f"""    def load_mcp_docker_configs(self) -> Dict:
+            new_method = f"""    def load_mcp_docker_configs(self) -> dict:
         \"\"\"Load MCP Docker configurations.\"\"\"
 {config_code.rstrip()}
 

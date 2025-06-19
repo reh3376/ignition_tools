@@ -76,7 +76,7 @@ def setup(
     debt_threshold: float,
     file_size_threshold: int,
 ) -> None:
-    """Set up development workflow integration."""
+    """set up development workflow integration."""
     console.print("🔄 Setting up development workflow integration...")
 
     client, manager, dashboard, integrator = _initialize_workflow_systems()
@@ -93,7 +93,7 @@ def setup(
     )
     integrator.config = config
 
-    # Set up git hooks if enabled
+    # set up git hooks if enabled
     if enable_hooks:
         with Progress(
             SpinnerColumn(),
@@ -407,9 +407,9 @@ def review(files: tuple[str], output_format: str) -> None:
 
 
 @workflow_group.command()
-@click.option("--complexity-threshold", type=float, help="Set complexity threshold")
-@click.option("--debt-threshold", type=float, help="Set technical debt threshold")
-@click.option("--file-size-threshold", type=int, help="Set file size threshold")
+@click.option("--complexity-threshold", type=float, help="set complexity threshold")
+@click.option("--debt-threshold", type=float, help="set technical debt threshold")
+@click.option("--file-size-threshold", type=int, help="set file size threshold")
 @click.option("--show", is_flag=True, help="Show current configuration")
 @click.option("--export", type=click.Path(), help="Export configuration to file")
 @click.option(

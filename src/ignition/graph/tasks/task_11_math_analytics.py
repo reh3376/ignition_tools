@@ -22,7 +22,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
     """Get comprehensive math and analytics functions for Task 11.
 
     Returns:
-        List[Dict[str, Any]]: List of math and analytics function definitions
+        list[dict[str, Any]]: list of math and analytics function definitions
     """
     functions = []
 
@@ -677,7 +677,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
                     {
                         "name": "datasets",
                         "type": "list",
-                        "description": "List of datasets to correlate",
+                        "description": "list of datasets to correlate",
                         "required": True,
                     },
                     {

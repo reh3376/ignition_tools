@@ -382,7 +382,7 @@ class SemanticCodeSearch:
             limit: Maximum number of results
 
         Returns:
-            List of similar code elements with scores
+            list of similar code elements with scores
         """
         # Generate query embedding
         query_embedding = self.embedder.generate_embedding(query)
@@ -416,7 +416,7 @@ class SemanticCodeSearch:
             limit: Maximum number of results
 
         Returns:
-            List of similar files with scores
+            list of similar files with scores
         """
         # Get the file's embedding from the database
         cypher = """
@@ -538,7 +538,7 @@ class SemanticCodeSearch:
             file_types: Optional list of file extensions to search
 
         Returns:
-            List of matching code elements
+            list of matching code elements
         """
         # Generate embedding for pattern description
         pattern_embedding = self.embedder.generate_embedding(pattern_description)
@@ -600,7 +600,7 @@ def get_embedding_system(
         model_name: Sentence transformer model name
 
     Returns:
-        Tuple of (embedding_generator, semantic_search) or (None, None) if unavailable
+        tuple of (embedding_generator, semantic_search) or (None, None) if unavailable
     """
     if not EMBEDDINGS_AVAILABLE:
         logger.error(

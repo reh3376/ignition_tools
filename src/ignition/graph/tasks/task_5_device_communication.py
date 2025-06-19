@@ -22,7 +22,7 @@ def get_device_communication_functions() -> list[dict[str, Any]]:
     """Get comprehensive device communication functions for Task 5.
 
     Returns:
-        List[Dict[str, Any]]: List of device communication function definitions
+        list[dict[str, Any]]: list of device communication function definitions
     """
     functions = []
 
@@ -45,13 +45,13 @@ def get_device_communication_functions() -> list[dict[str, Any]]:
                     {
                         "name": "itemPaths",
                         "type": "list",
-                        "description": "List of OPC item paths to write",
+                        "description": "list of OPC item paths to write",
                         "required": True,
                     },
                     {
                         "name": "values",
                         "type": "list",
-                        "description": "List of values to write",
+                        "description": "list of values to write",
                         "required": True,
                     },
                     {
@@ -71,7 +71,7 @@ def get_device_communication_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of write operation results",
+                    "description": "list of write operation results",
                 },
                 "scope": ["Gateway"],
                 "category": "Device Communication",
@@ -95,7 +95,7 @@ def get_device_communication_functions() -> list[dict[str, Any]]:
                     {
                         "name": "itemPaths",
                         "type": "list",
-                        "description": "List of OPC item paths to read",
+                        "description": "list of OPC item paths to read",
                         "required": True,
                     },
                     {
@@ -115,7 +115,7 @@ def get_device_communication_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of read results with value, quality, and timestamp",
+                    "description": "list of read results with value, quality, and timestamp",
                 },
                 "scope": ["Gateway"],
                 "category": "Device Communication",
@@ -153,7 +153,7 @@ def get_device_communication_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of available OPC items and groups",
+                    "description": "list of available OPC items and groups",
                 },
                 "scope": ["Gateway"],
                 "category": "Device Communication",
@@ -251,7 +251,7 @@ def get_device_communication_functions() -> list[dict[str, Any]]:
                     {
                         "name": "itemPaths",
                         "type": "list",
-                        "description": "List of OPC item paths to subscribe to",
+                        "description": "list of OPC item paths to subscribe to",
                         "required": True,
                     },
                     {
@@ -326,7 +326,7 @@ def get_device_communication_functions() -> list[dict[str, Any]]:
                     {
                         "name": "nodeIds",
                         "type": "list",
-                        "description": "List of OPC-UA node IDs to read",
+                        "description": "list of OPC-UA node IDs to read",
                         "required": True,
                     },
                     {
@@ -346,7 +346,7 @@ def get_device_communication_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of read results with value, status, timestamps, and metadata",
+                    "description": "list of read results with value, status, timestamps, and metadata",
                 },
                 "scope": ["Gateway"],
                 "category": "Device Communication",
@@ -370,25 +370,25 @@ def get_device_communication_functions() -> list[dict[str, Any]]:
                     {
                         "name": "nodeIds",
                         "type": "list",
-                        "description": "List of OPC-UA node IDs to write",
+                        "description": "list of OPC-UA node IDs to write",
                         "required": True,
                     },
                     {
                         "name": "values",
                         "type": "list",
-                        "description": "List of values to write",
+                        "description": "list of values to write",
                         "required": True,
                     },
                     {
                         "name": "dataTypes",
                         "type": "list",
-                        "description": "List of data types for each value",
+                        "description": "list of data types for each value",
                         "required": False,
                     },
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of write operation results with status codes",
+                    "description": "list of write operation results with status codes",
                 },
                 "scope": ["Gateway"],
                 "category": "Device Communication",
@@ -440,7 +440,7 @@ def get_device_communication_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of browse results with node information and references",
+                    "description": "list of browse results with node information and references",
                 },
                 "scope": ["Gateway"],
                 "category": "Device Communication",
@@ -577,7 +577,7 @@ def get_device_communication_functions() -> list[dict[str, Any]]:
                     {
                         "name": "inputArguments",
                         "type": "list",
-                        "description": "List of input arguments for the method",
+                        "description": "list of input arguments for the method",
                         "required": False,
                         "default": [],
                     },
@@ -607,7 +607,7 @@ def get_device_communication_functions() -> list[dict[str, Any]]:
                     {
                         "name": "nodeIds",
                         "type": "list",
-                        "description": "List of node IDs to monitor",
+                        "description": "list of node IDs to monitor",
                         "required": True,
                     },
                     {
@@ -932,7 +932,7 @@ def get_device_communication_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of device information including names, types, and status",
+                    "description": "list of device information including names, types, and status",
                 },
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Device Communication",
@@ -1169,7 +1169,7 @@ def get_device_communication_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of discovered BACnet devices with instance IDs and network information",
+                    "description": "list of discovered BACnet devices with instance IDs and network information",
                 },
                 "scope": ["Gateway"],
                 "category": "Device Communication",
@@ -1198,7 +1198,7 @@ def get_device_communication_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "list",
-                    "description": "List of BACnet objects available on the device",
+                    "description": "list of BACnet objects available on the device",
                 },
                 "scope": ["Gateway"],
                 "category": "Device Communication",
@@ -1342,7 +1342,7 @@ def get_device_communication_functions() -> list[dict[str, Any]]:
                     {
                         "name": "eventClasses",
                         "type": "list",
-                        "description": "List of event classes to read (1, 2, 3)",
+                        "description": "list of event classes to read (1, 2, 3)",
                         "required": False,
                         "default": [1, 2, 3],
                     },

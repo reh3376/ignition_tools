@@ -36,7 +36,7 @@ def main():
     # Create backup manager
     backup_manager = Neo4jBackupManager(client)
 
-    # List available backups
+    # list available backups
     print("\n📋 Available backups:")
     backups = backup_manager.list_backups()
 

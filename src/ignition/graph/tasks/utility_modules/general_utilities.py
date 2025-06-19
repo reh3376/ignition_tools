@@ -17,7 +17,7 @@ def get_general_utilities_functions() -> list[dict[str, Any]]:
     """Get general utility functions.
 
     Returns:
-        List[Dict[str, Any]]: List of general utility function definitions
+        list[dict[str, Any]]: list of general utility function definitions
     """
     return [
         {
@@ -129,7 +129,7 @@ def get_general_utilities_functions() -> list[dict[str, Any]]:
         },
         {
             "name": "system.util.setLocale",
-            "description": "Set system locale configuration",
+            "description": "set system locale configuration",
             "parameters": [
                 {
                     "name": "locale",
@@ -190,7 +190,7 @@ def get_general_utilities_functions() -> list[dict[str, Any]]:
         },
         {
             "name": "system.util.setTimezone",
-            "description": "Set system timezone configuration",
+            "description": "set system timezone configuration",
             "parameters": [
                 {
                     "name": "timezone",

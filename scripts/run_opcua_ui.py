@@ -72,7 +72,7 @@ def setup_environment():
     for directory in directories:
         Path(directory).mkdir(parents=True, exist_ok=True)
 
-    # Set default environment variables if not present
+    # set default environment variables if not present
     defaults = {
         "OPCUA_SERVER_URL": "opc.tcp://localhost:4840",
         "OPCUA_USERNAME": "admin",
@@ -92,7 +92,7 @@ def setup_environment():
             env_updated = True
 
     if env_updated:
-        print("🔧 Set default environment variables")
+        print("🔧 set default environment variables")
 
 
 def launch_ui():

@@ -90,12 +90,12 @@ class DeploymentPatternLearner:
             target_environment: Target environment name
             gateway_host: Target gateway host
             deployment_strategy: Strategy used (blue_green, rolling, etc.)
-            resources_deployed: List of resources that were deployed
+            resources_deployed: list of resources that were deployed
             configuration_used: Configuration parameters used
             status: Final status of deployment
             started_at: When deployment started
             completed_at: When deployment completed (if finished)
-            failure_reasons: List of failure reasons if failed
+            failure_reasons: list of failure reasons if failed
             rollback_triggered: Whether rollback was triggered
             rollback_successful: Whether rollback was successful (if triggered)
             user_id: User who initiated deployment
@@ -327,7 +327,7 @@ class DeploymentPatternLearner:
             limit: Maximum number of recommendations
 
         Returns:
-            List of deployment recommendations with confidence scores
+            list of deployment recommendations with confidence scores
         """
         # Build query conditions
         conditions = ["dp.is_active = true"]
@@ -428,7 +428,7 @@ class DeploymentPatternLearner:
             limit: Maximum number of adaptations
 
         Returns:
-            List of applicable environment adaptations
+            list of applicable environment adaptations
         """
         conditions = [
             "ea.is_active = true",
@@ -511,7 +511,7 @@ class DeploymentPatternLearner:
             limit: Maximum number of scenarios
 
         Returns:
-            List of applicable rollback scenarios
+            list of applicable rollback scenarios
         """
         conditions = [
             "rs.is_active = true",

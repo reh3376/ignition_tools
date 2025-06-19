@@ -161,7 +161,7 @@ class IgnitionWrapperBase(ABC):
             self.config.context = self._detect_context()
 
     def _setup_logger(self) -> logging.Logger:
-        """Set up logger for the wrapper."""
+        """set up logger for the wrapper."""
         logger_name = f"ignition.wrapper.{self.__class__.__name__}"
         logger = logging.getLogger(logger_name)
 
@@ -241,7 +241,7 @@ class IgnitionWrapperBase(ABC):
         """Get list of wrapped function names.
 
         Returns:
-            List of function names wrapped by this class
+            list of function names wrapped by this class
         """
         pass
 
@@ -321,7 +321,7 @@ def validate_tag_paths(tag_paths: str | list[str]) -> list[str]:
         tag_paths: Single tag path or list of tag paths
 
     Returns:
-        List of validated tag paths
+        list of validated tag paths
 
     Raises:
         WrapperError: If tag paths are invalid

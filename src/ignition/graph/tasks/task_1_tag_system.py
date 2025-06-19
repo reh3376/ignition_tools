@@ -20,7 +20,7 @@ def get_tag_system_extended() -> list[dict[str, Any]]:
     advanced browsing, and tag management functions.
 
     Returns:
-        List of tag system function definitions
+        list of tag system function definitions
     """
     return [
         # Tag Configuration Functions

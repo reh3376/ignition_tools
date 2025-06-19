@@ -46,7 +46,7 @@ class PatternManager:
             min_support: Minimum support threshold
 
         Returns:
-            List of pattern dictionaries
+            list of pattern dictionaries
         """
         query = """
         MATCH (p:PatternAnalysis {pattern_type: $pattern_type})
@@ -100,7 +100,7 @@ class PatternManager:
             entity_type: Type of entity ("function" or "template")
 
         Returns:
-            List of patterns involving the entity
+            list of patterns involving the entity
         """
         if entity_type == "function":
             query = """

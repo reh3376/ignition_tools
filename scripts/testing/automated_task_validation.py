@@ -995,8 +995,8 @@ class TaskValidator:
                     f"   ❌ Pattern coverage: {active_patterns}/8 patterns active (Expected: ≥6)"
                 )
 
-            # Test 4: Scope Mapping Validation
-            print("\n🎯 Test 4: Scope Mapping Validation")
+            # Test 4: Scope collections.abc.Mapping Validation
+            print("\n🎯 Test 4: Scope collections.abc.Mapping Validation")
 
             scope_query = """
             MATCH (f:Function)-[:AVAILABLE_IN]->(s:Scope)

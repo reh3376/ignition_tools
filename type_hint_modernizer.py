@@ -6,13 +6,13 @@ Converts old typing syntax to modern built-in syntax.
 import ast
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional, Union, List, Dict
 
 
 class TypeHintModernizer:
     """Modernizes type hints to Python 3.11+ syntax."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.conversions = {
             # Basic collections
             "List": "list",
@@ -113,7 +113,7 @@ class TypeHintModernizer:
         """Convert Optional[X] to X | None."""
 
         # Handle nested Optional patterns
-        def replace_optional(match):
+        def replace_optional(match: Any) -> str:
             inner_type = match.group(1)
             # Handle nested brackets properly
             bracket_count = 0
@@ -141,7 +141,7 @@ class TypeHintModernizer:
     def _convert_union(self, content: str) -> str:
         """Convert Union[X, Y, ...] to X | Y | ..."""
 
-        def replace_union(match):
+        def replace_union(match: Any) -> str:
             union_content = match.group(1)
             # Split by comma, but respect nested brackets
             types = []
@@ -228,13 +228,13 @@ class TypeHintModernizer:
             return False
 
     def scan_directory(
-        self, directory: Path, extensions: list[str] | None = None
-    ) -> list[Path]:
+        self, directory: Path, extensions: Optional[List[str]] = None
+    ) -> List[Path]:
         """Scan directory for Python files to modernize."""
         if extensions is None:
             extensions = [".py"]
 
-        files = []
+        files: List[Path] = []
         for ext in extensions:
             files.extend(directory.rglob(f"*{ext}"))
 
@@ -251,8 +251,8 @@ class TypeHintModernizer:
         return sorted(filtered_files)
 
     def modernize_project(
-        self, base_path: Path | None = None, target_dirs: list[str] | None = None
-    ) -> dict[str, Any]:
+        self, base_path: Optional[Path] = None, target_dirs: Optional[List[str]] = None
+    ) -> Dict[str, Any]:
         """Modernize type hints across the entire project."""
         if base_path is None:
             base_path = Path.cwd()
@@ -296,7 +296,7 @@ class TypeHintModernizer:
                         if not self._validate_syntax(content):
                             results["failed_files"] += 1
                             dir_results["failed"] += 1
-                    except:
+                    except Exception:
                         results["failed_files"] += 1
                         dir_results["failed"] += 1
 
@@ -308,7 +308,7 @@ class TypeHintModernizer:
         return results
 
 
-def main():
+def main() -> None:
     """Main entry point."""
     modernizer = TypeHintModernizer()
 

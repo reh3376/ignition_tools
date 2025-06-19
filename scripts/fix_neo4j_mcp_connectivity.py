@@ -183,7 +183,7 @@ class Neo4jMCPConnectivityFixer:
             # Build Docker command
             cmd = [server_config["command"]] + server_config["args"]
 
-            # Set up environment variables
+            # set up environment variables
             env = {}
             if "env" in server_config:
                 # Load .env file for variable substitution

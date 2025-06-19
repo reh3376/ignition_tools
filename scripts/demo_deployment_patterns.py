@@ -213,7 +213,7 @@ def create_sample_environment_adaptations(
             ],
         },
         {
-            "name": "Tag Provider Security Mapping",
+            "name": "Tag Provider Security collections.abc.Mapping",
             "source": "staging",
             "target": "production",
             "type": "security_adjustment",

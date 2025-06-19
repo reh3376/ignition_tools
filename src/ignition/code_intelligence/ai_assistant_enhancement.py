@@ -149,7 +149,7 @@ class AIAssistantEnhancement:
             max_snippets: Maximum number of snippets to return
 
         Returns:
-            List of relevant code snippets with context
+            list of relevant code snippets with context
         """
         try:
             # Get file context
@@ -212,7 +212,7 @@ class AIAssistantEnhancement:
             element_name: Name of class/method to find similar implementations for
 
         Returns:
-            List of similar implementations with usage patterns
+            list of similar implementations with usage patterns
         """
         try:
             suggestions = []
@@ -331,7 +331,7 @@ class AIAssistantEnhancement:
             file_path: File to analyze for refactoring opportunities
 
         Returns:
-            List of refactoring suggestions with priorities
+            list of refactoring suggestions with priorities
         """
         try:
             context = self.code_manager.get_file_context(file_path)
