@@ -6,6 +6,7 @@ import click
 from rich.console import Console
 from rich.table import Table
 
+from .cli.core_commands import core_group
 from .module_builder import ModuleBuilder
 from .module_generator import ModuleGenerator
 from .sdk_manager import IgnitionSDKManager
@@ -30,6 +31,10 @@ def _initialize_module_systems():
 def module_group() -> None:
     """Ignition Module development commands."""
     pass
+
+
+# Add core framework commands as subgroup
+module_group.add_command(core_group)
 
 
 @module_group.command()
@@ -96,7 +101,7 @@ def status() -> None:
 @module_group.command()
 @click.option("--force", is_flag=True, help="Force setup even if already exists")
 def setup(force: bool) -> None:
-    """set up the module development environment."""
+    """Set up the module development environment."""
     sdk_manager, _, _ = _initialize_module_systems()
     if not sdk_manager:
         return
@@ -351,7 +356,7 @@ def validate(module_file: str) -> None:
 
 @module_group.command()
 def list() -> None:
-    """list module projects and templates."""
+    """List module projects and templates."""
     sdk_manager, generator, _ = _initialize_module_systems()
     if not sdk_manager or not generator:
         return
