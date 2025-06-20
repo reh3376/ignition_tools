@@ -7,16 +7,25 @@ capabilities for preparing industrial data for AI supervised learning models.
 import json
 import logging
 import uuid
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict
 from datetime import datetime
-from enum import Enum
 from pathlib import Path
 from typing import Any
 
 import numpy as np
 import pandas as pd
 from dotenv import load_dotenv
-from .dataset_manager_models import DataQuality, DataQualityReport, DataSource, Dataset, DatasetSchema, DatasetType, FeatureDefinition, ProcessingStatus
+
+from .dataset_manager_models import (
+    DataQuality,
+    DataQualityReport,
+    Dataset,
+    DatasetSchema,
+    DatasetType,
+    DataSource,
+    FeatureDefinition,
+    ProcessingStatus,
+)
 
 # Load environment variables
 load_dotenv()
@@ -588,7 +597,7 @@ class DatasetManager:
         return str(export_path)
 
     def list_datasets(self) -> list[dict[str, Any]]:
-        """list all datasets with summary information."""
+        """List all datasets with summary information."""
         datasets_info = []
         for dataset in self.datasets.values():
             info = {

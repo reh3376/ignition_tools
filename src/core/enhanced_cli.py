@@ -18,6 +18,7 @@ from .cli_template_commands import template
 # Import refactor commands
 try:
     from src.ignition.code_intelligence.cli_commands import refactor_commands
+
     main.add_command(refactor_commands)
 except ImportError as e:
     print(f"Refactor commands not available: {e}")

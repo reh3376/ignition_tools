@@ -1,15 +1,14 @@
-"""
-Dataset Manager Models
+"""Dataset Manager Models
 
 Extracted from large file for better maintainability.
 This module contains related functionality that was grouped together.
 """
 
-from dataclasses import dataclass
-from dataclasses import field
+from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from typing import Any
+
 
 class ProcessingStatus(Enum):
     """Dataset processing status."""
@@ -21,6 +20,7 @@ class ProcessingStatus(Enum):
     DEPLOYED = "deployed"
     ARCHIVED = "archived"
 
+
 class DatasetType(Enum):
     """Types of datasets for different ML use cases."""
 
@@ -31,6 +31,7 @@ class DatasetType(Enum):
     CLUSTERING = "clustering"
     FORECASTING = "forecasting"
 
+
 class DataQuality(Enum):
     """Data quality assessment levels."""
 
@@ -39,6 +40,7 @@ class DataQuality(Enum):
     FAIR = "fair"
     POOR = "poor"
     CRITICAL = "critical"
+
 
 @dataclass
 class FeatureDefinition:
@@ -57,6 +59,7 @@ class FeatureDefinition:
     validation_rules: list[dict[str, Any]] = field(default_factory=list)
     description: str | None = None
 
+
 @dataclass
 class DataSource:
     """Configuration for a data source."""
@@ -68,6 +71,7 @@ class DataSource:
     refresh_interval: int | None = None  # minutes
     last_updated: datetime | None = None
     active: bool = True
+
 
 @dataclass
 class DatasetSchema:
@@ -85,6 +89,7 @@ class DatasetSchema:
     description: str | None = None
     tags: list[str] = field(default_factory=list)
 
+
 @dataclass
 class DataQualityReport:
     """Data quality assessment report."""
@@ -100,6 +105,7 @@ class DataQualityReport:
     issues: list[dict[str, Any]] = field(default_factory=list)
     recommendations: list[str] = field(default_factory=list)
     generated_at: datetime = field(default_factory=datetime.now)
+
 
 @dataclass
 class Dataset:

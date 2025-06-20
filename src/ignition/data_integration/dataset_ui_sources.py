@@ -167,4 +167,4 @@ class DatasetUISourceConfigurators:
             if auth_type != "none":
                 st.text_input(
                     "Auth Value", type="password", help="Authentication credential"
-                ) 
+                )

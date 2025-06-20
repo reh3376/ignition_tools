@@ -10,8 +10,6 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
 import streamlit as st
 
 # Add the project root to the path so we can import our modules
@@ -29,8 +27,10 @@ try:
         ProcessingStatus,
     )
     from src.ignition.data_integration.dataset_manager import DatasetManager
+    from src.ignition.data_integration.dataset_ui_sources import (
+        DatasetUISourceConfigurators,
+    )
     from src.ignition.data_integration.dataset_ui_utils import DatasetUIUtils
-    from src.ignition.data_integration.dataset_ui_sources import DatasetUISourceConfigurators
 except ImportError as e:
     st.error(f"Failed to import required modules: {e}")
     st.stop()
