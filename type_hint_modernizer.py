@@ -6,7 +6,7 @@ Converts old typing syntax to modern built-in syntax.
 import ast
 import re
 from pathlib import Path
-from typing import Any, Optional, Union, List, Dict
+from typing import Any
 
 
 class TypeHintModernizer:
@@ -228,13 +228,13 @@ class TypeHintModernizer:
             return False
 
     def scan_directory(
-        self, directory: Path, extensions: Optional[List[str]] = None
-    ) -> List[Path]:
+        self, directory: Path, extensions: list[str] | None = None
+    ) -> list[Path]:
         """Scan directory for Python files to modernize."""
         if extensions is None:
             extensions = [".py"]
 
-        files: List[Path] = []
+        files: list[Path] = []
         for ext in extensions:
             files.extend(directory.rglob(f"*{ext}"))
 
@@ -251,8 +251,8 @@ class TypeHintModernizer:
         return sorted(filtered_files)
 
     def modernize_project(
-        self, base_path: Optional[Path] = None, target_dirs: Optional[List[str]] = None
-    ) -> Dict[str, Any]:
+        self, base_path: Path | None = None, target_dirs: list[str] | None = None
+    ) -> dict[str, Any]:
         """Modernize type hints across the entire project."""
         if base_path is None:
             base_path = Path.cwd()

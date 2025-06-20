@@ -37,9 +37,7 @@ app.add_middleware(
 
 # Exception handlers
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(
-    request: Request, exc: RequestValidationError
-):  # noqa: ARG001
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Handle validation errors and return 400 status code."""
     return JSONResponse(
         status_code=400,

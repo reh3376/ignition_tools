@@ -89,7 +89,7 @@ def create(
 
 @dataset.command()
 def list() -> None:
-    """list all datasets."""
+    """List all datasets."""
     try:
         manager = DatasetManager()
         datasets = manager.list_datasets()

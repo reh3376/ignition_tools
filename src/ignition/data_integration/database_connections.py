@@ -1,4 +1,3 @@
-
 """Database Connection Manager for Ignition Data Integration.
 
 This module provides a unified interface for connecting to various database types
@@ -602,11 +601,11 @@ class DatabaseConnectionManager:
         }
 
     def list_connections(self) -> list[dict[str, Any]]:
-        """list all active connections."""
+        """List all active connections."""
         return [self.get_connection_info(conn_id) for conn_id in self.connections]
 
     def list_configurations(self) -> list[str]:
-        """list all available database configurations."""
+        """List all available database configurations."""
         return list(self.configs.keys())
 
     def get_config_info(self, config_name: str) -> dict[str, Any] | None:

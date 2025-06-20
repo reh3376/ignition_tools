@@ -504,7 +504,7 @@ LOGFLARE_URL=http://localhost:4000
             }
 
     def list_backups(self) -> list[dict[str, Any]]:
-        """list available backups."""
+        """List available backups."""
         backups = []
 
         for backup_file in self.backup_dir.glob("*.sql.gz"):

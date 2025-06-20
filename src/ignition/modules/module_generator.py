@@ -457,7 +457,7 @@ class ModuleGenerator:
                 console.print(f"  • {func_name}: {len(insights)} context items")
 
     def list_templates(self) -> dict[str, ModuleTemplate]:
-        """list available module templates.
+        """List available module templates.
 
         Returns:
             Dictionary of available templates

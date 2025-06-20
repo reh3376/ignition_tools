@@ -161,7 +161,7 @@ class IgnitionWrapperBase(ABC):
             self.config.context = self._detect_context()
 
     def _setup_logger(self) -> logging.Logger:
-        """set up logger for the wrapper."""
+        """Set up logger for the wrapper."""
         logger_name = f"ignition.wrapper.{self.__class__.__name__}"
         logger = logging.getLogger(logger_name)
 

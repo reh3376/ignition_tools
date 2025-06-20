@@ -459,7 +459,7 @@ def config_wizard():
 
 @config_group.command("list")
 def config_list():
-    """list all saved OPC-UA configurations."""
+    """List all saved OPC-UA configurations."""
     list_configs()
 
 

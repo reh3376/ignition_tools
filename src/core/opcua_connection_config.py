@@ -502,7 +502,7 @@ class OPCUAConfigManager:
         self.config_dir.mkdir(parents=True, exist_ok=True)
 
     def list_configurations(self) -> list[OPCUAConnectionConfig]:
-        """list all saved configurations."""
+        """List all saved configurations."""
         configs = []
         for config_file in self.config_dir.glob("*.json"):
             try:
@@ -583,7 +583,7 @@ async def interactive_setup() -> OPCUAConnectionConfig:
 
 
 def list_configs() -> None:
-    """list all saved configurations."""
+    """List all saved configurations."""
     manager = OPCUAConfigManager()
     manager.display_configurations()
 

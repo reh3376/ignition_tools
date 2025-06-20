@@ -79,7 +79,7 @@ class DevelopmentWorkflowIntegrator:
         self.project_root = Path.cwd()
 
     def setup_git_hooks(self) -> bool:
-        """set up git hooks for automatic code analysis."""
+        """Set up git hooks for automatic code analysis."""
         if not self.config.enable_git_hooks:
             return False
 

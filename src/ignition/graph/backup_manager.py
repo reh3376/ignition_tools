@@ -171,7 +171,7 @@ class Neo4jBackupManager:
             return False
 
     def list_backups(self) -> list[dict[str, Any]]:
-        """list all available backups with metadata.
+        """List all available backups with metadata.
 
         Returns:
             list of backup information dictionaries

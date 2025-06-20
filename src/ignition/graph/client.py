@@ -193,7 +193,7 @@ class IgnitionGraphClient:
             return False
 
     def setup_schema(self) -> bool:
-        """set up database constraints and indexes.
+        """Set up database constraints and indexes.
 
         Returns:
             True if successful, False otherwise

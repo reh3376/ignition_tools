@@ -76,7 +76,7 @@ def setup(
     debt_threshold: float,
     file_size_threshold: int,
 ) -> None:
-    """set up development workflow integration."""
+    """Set up development workflow integration."""
     console.print("🔄 Setting up development workflow integration...")
 
     client, manager, dashboard, integrator = _initialize_workflow_systems()
