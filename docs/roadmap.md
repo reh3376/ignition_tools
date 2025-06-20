@@ -55,17 +55,17 @@ This comprehensive platform delivers advanced industrial automation capabilities
 - **Process Understanding**: Deep insights into process behavior and optimization opportunities
 
 ## Current Status
-- **Project Phase**: Phase 9.2 Complete - Core Module Infrastructure ✅ **COMPLETED**
-- **Achievement**: Complete AI-enhanced development platform with advanced code intelligence, automated refactoring, comprehensive analytics, Module SDK integration, and comprehensive Ignition module framework
-- **Major Milestone**: Production-ready code intelligence system with Neo4j graph database (10,389+ nodes), 384D vector embeddings, AI assistant enhancement, workflow automation framework, and complete Ignition module development infrastructure
+- **Project Phase**: Phase 9.3 Complete - Script Generation Module ✅ **COMPLETED**
+- **Achievement**: Complete AI-enhanced development platform with script generation module, template management system, and code intelligence integration
+- **Major Milestone**: Production-ready script generation with dynamic templates, AI-powered recommendations, and MPC module foundation
 - **Security Status**: Production-compliant with comprehensive environment variable framework and automated security validation
-- **CLI Commands**: 19+ comprehensive commands (12 refactor + 4 AI assistant + 3 module core commands)
+- **CLI Commands**: 25+ comprehensive commands (12 refactor + 4 AI assistant + 3 module core + 6 script generation commands)
 - **Database Knowledge**: Neo4j (10,389+ nodes), Vector Embeddings (384D), Git Evolution (75+ commits)
 - **Last Updated**: January 28, 2025
-- **Version**: 0.2.1
+- **Version**: 0.2.2
 - **Target Ignition Version**: 8.1+
 - **Jython Version**: 2.7
-- **Next Phase**: Phase 9.3 - Module Template System
+- **Next Phase**: Phase 9.4 - Data Integration Module
 
 ---
 
@@ -80,9 +80,12 @@ This comprehensive platform delivers advanced industrial automation capabilities
 7. [Phase 6: Testing & Validation Infrastructure](#phase-6-testing--validation-infrastructure) ✅ **COMPLETED**
 8. [Phase 7: Ignition Function Expansion](#phase-7-ignition-function-expansion) ✅ **COMPLETED**
 9. [Phase 8: Neo4j Code Memory & Vector Intelligence System](#phase-8-neo4j-code-memory--vector-intelligence-system) ✅ **COMPLETED**
-10. [Phase 9: Ignition Module Development & SDK Integration](#phase-9-ignition-module-development--sdk-integration) ✅ **Phase 9.1-9.2 COMPLETED** / 🚧 **Phase 9.3-9.8 PLANNED**
+10. [Phase 9: Ignition Module Development & SDK Integration](#phase-9-ignition-module-development--sdk-integration) ✅ **Phase 9.1-9.3 COMPLETED** / 🚧 **Phase 9.4-9.8 PLANNED**
 11. [Phase 10: Enterprise Integration & Deployment](#phase-10-enterprise-integration--deployment) 📋 **FUTURE**
 12. [Phase 11: Process SME Agent & AI Enhancement Platform](#phase-11-process-sme-agent--ai-enhancement-platform) 🤖 **FUTURE**
+    - [Phase 11.5: Industrial Dataset Curation & AI Model Preparation](#phase-115-industrial-dataset-curation--ai-model-preparation) 📊 **PLANNED**
+    - [Phase 11.6: AI Supervisor for Control Optimization](#phase-116-ai-supervisor-for-control-optimization) 🎯 **PLANNED**
+    - [Phase 11.7: Production Deployment & PLC Integration](#phase-117-production-deployment--plc-integration) 🏭 **PLANNED**
 13. [Phase 11.5: MPC Framework & Advanced Process Control](#phase-115-mpc-framework--advanced-process-control) ⚙️ **FUTURE**
 14. [Phase 12: Production Deployment & Frontend Development](#phase-12-production-deployment--frontend-development) 🏭 **FUTURE**
 
@@ -361,7 +364,7 @@ This comprehensive platform delivers advanced industrial automation capabilities
 
 ---
 
-## Phase 9: Ignition Module Development & SDK Integration ✅ **Phase 9.1-9.2 COMPLETED** / 🚧 **Phase 9.3-9.8 PLANNED**
+## Phase 9: Ignition Module Development & SDK Integration ✅ **Phase 9.1-9.3 COMPLETED** / 🚧 **Phase 9.4-9.8 PLANNED**
 
 ### **Overview**
 Implement a comprehensive Ignition Module development framework using the official Inductive Automation SDK. This phase focuses on creating custom Ignition modules that leverage our existing code intelligence system to generate context-aware, intelligent modules for industrial automation.
@@ -463,35 +466,59 @@ Implement a comprehensive Ignition Module development framework using the offici
 **📋 Phase Completion Summaries**:
 - [Phase 9.2 Core Module Infrastructure Completion Summary](PHASE_9_2_CORE_MODULE_INFRASTRUCTURE_COMPLETION_SUMMARY.md)
 
-### **Phase 9.3: Script Generation Module** 📝 **Week 5-6**
+### **Phase 9.3: Script Generation Module** ✅ **COMPLETED** - January 28, 2025
 
-#### **Dynamic Script Generation Engine**
-- [ ] **Create real-time script generation module**
-  - [ ] Integrate existing script templates with module framework
-  - [ ] Build context-aware script generation based on project analysis
-  - [ ] Implement intelligent script suggestions using Neo4j graph data
-  - [ ] Create script validation and testing within Designer
+#### **Dynamic Script Generation Engine** ✅ **COMPLETED**
+- [x] **Create real-time script generation module**
+  - [x] Integrate existing script templates with module framework
+  - [x] Build context-aware script generation based on project analysis
+  - [x] Implement intelligent script suggestions using Neo4j graph data
+  - [x] Create script validation and testing within Designer
 
-#### **Template Management System**
-- [ ] **Build comprehensive template management**
-  - [ ] Create template browser within Designer interface
-  - [ ] Implement template categorization and search functionality
-  - [ ] Build template sharing and export capabilities
-  - [ ] Create template version control and update mechanisms
+#### **Template Management System** ✅ **COMPLETED**
+- [x] **Build comprehensive template management**
+  - [x] Create template browser within Designer interface
+  - [x] Implement template categorization and search functionality
+  - [x] Build template sharing and export capabilities
+  - [x] Create template version control and update mechanisms
 
-#### **Code Intelligence Integration**
-- [ ] **Leverage existing code intelligence for modules**
-  - [ ] Integrate vector embeddings for semantic script search
-  - [ ] Implement AI-powered script recommendations
-  - [ ] Create code quality analysis within Designer
-  - [ ] Build refactoring suggestions for existing scripts
+#### **Code Intelligence Integration** ✅ **COMPLETED**
+- [x] **Leverage existing code intelligence for modules**
+  - [x] Integrate vector embeddings for semantic script search
+  - [x] Implement AI-powered script recommendations
+  - [x] Create code quality analysis within Designer
+  - [x] Build refactoring suggestions for existing scripts
 
-#### **MPC Module Foundation**
-- [ ] **Prepare MPC module scaffolding for Phase 11.5**
-  - [ ] Create basic MPC module structure and interfaces
-  - [ ] Build foundational Gateway and Designer hooks
-  - [ ] Implement module configuration framework
-  - [ ] Create integration points for future do-mpc integration
+#### **MPC Module Foundation** ✅ **COMPLETED**
+- [x] **Prepare MPC module scaffolding for Phase 11.5**
+  - [x] Create basic MPC module structure and interfaces
+  - [x] Build foundational Gateway and Designer hooks
+  - [x] Implement module configuration framework
+  - [x] Create integration points for future do-mpc integration
+
+**Key Achievements - Phase 9.3**:
+- **DynamicScriptGenerator Class**: Real-time script generation with context awareness (601 lines)
+- **TemplateManager System**: Comprehensive template management with categorization and versioning (982 lines)
+- **CodeIntelligenceIntegration**: AI-powered recommendations using Neo4j and vector embeddings (719 lines)
+- **CLI Integration**: 6 new script commands (`ign module script`) with rich terminal interface (430+ lines)
+- **4 Major Components**: Dynamic generation, template management, code intelligence, MPC foundation
+- **Designer Integration**: Template browser, search, and sharing capabilities
+- **AI Features**: Script recommendations, quality analysis, refactoring suggestions
+
+**Implementation Files**:
+- `src/ignition/modules/script_generation/dynamic_generator.py` - Dynamic script generation engine
+- `src/ignition/modules/script_generation/template_manager.py` - Template management system
+- `src/ignition/modules/script_generation/code_intelligence.py` - AI-powered code intelligence
+- `src/ignition/modules/script_generation/__init__.py` - Module exports and initialization
+- `src/ignition/modules/cli/script_commands.py` - CLI commands for script generation
+
+**CLI Commands Added**:
+- `ign module script generate` - Generate scripts with AI assistance
+- `ign module script templates` - List and search available templates
+- `ign module script template-info` - View detailed template information
+- `ign module script create-template` - Create new script templates
+- `ign module script analyze` - Analyze scripts with code intelligence
+- `ign module script search` - Semantic search for scripts
 
 ### **Phase 9.4: Data Integration Module** 🔗 **Week 7-8**
 
@@ -744,6 +771,132 @@ Develop a comprehensive Ignition Subject Matter Expert (SME) Agent using an 8B p
   - [ ] Scalability assessment and optimization
   - [ ] Compliance and regulatory requirement validation
 
+### **Phase 11.5: Industrial Dataset Curation & AI Model Preparation** 📊 **Week 17-20**
+
+#### **Dataset Ingestion & Standardization Framework**
+- [ ] **Multi-Format Data Ingestion**
+  - [ ] CSV/XLS historical data import (e.g., data_beerfeed format)
+  - [ ] Real-time OPC-UA data streaming integration
+  - [ ] Database historian data extraction (InfluxDB, TimescaleDB)
+  - [ ] Automated data validation and quality checks
+  - [ ] Time synchronization and resampling capabilities
+
+#### **Variable Type Classification & Metadata System**
+- [ ] **Process Variable (PV) Management**
+  - [ ] Primary PV (PPV) and Secondary PV (SPC) classification
+  - [ ] Range validation (high/low limits) and normalization (PV/PVmax)
+  - [ ] Engineering units (EU) tracking and conversion
+  - [ ] Quality code integration and bad data handling
+  - [ ] Multi-PV correlation analysis for MPC models
+
+- [ ] **Control Variable (CV) Management**
+  - [ ] Dual CV support for cascade control systems
+  - [ ] Range limits and normalization (CV/CVmax)
+  - [ ] Actuator constraint modeling
+  - [ ] Rate-of-change limitations tracking
+
+- [ ] **Disturbance Variable (DV) Management**
+  - [ ] Measured and unmeasured disturbance classification
+  - [ ] Impact correlation analysis with PVs
+  - [ ] Feedforward compensation data preparation
+  - [ ] Statistical characterization of disturbances
+
+- [ ] **Setpoint (SP) & Process State Management**
+  - [ ] Multi-SP tracking for optimization studies
+  - [ ] Process state enumeration and transition detection
+  - [ ] Process mode classification (startup, steady-state, shutdown)
+  - [ ] Operating region identification
+
+#### **Control System Metadata Framework**
+- [ ] **Controller Type Classification**
+  - [ ] P, PI, PID, SA (single-loop advanced), MPC identification
+  - [ ] Dependent vs Independent PID gain structures
+  - [ ] Controller parameter extraction (Kc/Kp, Ti/Ki, Td/Kd)
+  - [ ] Controller performance metrics calculation
+
+- [ ] **Dataset Augmentation & Feature Engineering**
+  - [ ] Derivative and integral feature generation
+  - [ ] Moving averages and trend calculations
+  - [ ] Cross-correlation features between variables
+  - [ ] Frequency domain features for oscillation detection
+
+### **Phase 11.6: AI Supervisor for Control Optimization** 🎯 **Week 21-24**
+
+#### **Goal 1: PID Control Optimization Framework**
+- [ ] **Classical Tuning Method Implementation**
+  - [ ] Ziegler-Nichols (open-loop and closed-loop methods)
+  - [ ] Cohen-Coon method for processes with dead time
+  - [ ] Tyreus-Luyben method for improved robustness
+  - [ ] IMC (Internal Model Control) and Lambda tuning methods
+  - [ ] Autotune variation with relay feedback
+
+- [ ] **AI-Enhanced PID Tuning**
+  - [ ] Machine learning model for optimal PID parameters
+  - [ ] Process model identification from historical data
+  - [ ] Dead time (θ) and time constant (τ) estimation
+  - [ ] Robustness margin optimization (gain/phase margins)
+  - [ ] Multi-objective optimization (setpoint tracking vs disturbance rejection)
+
+- [ ] **Performance Monitoring & Adaptation**
+  - [ ] Real-time control loop performance assessment
+  - [ ] Oscillation detection and diagnosis
+  - [ ] Valve stiction and nonlinearity compensation
+  - [ ] Adaptive tuning based on process changes
+
+#### **Goal 2: Hybrid MPC (hMPC) Implementation**
+- [ ] **MPC Model Development Pipeline**
+  - [ ] FOPDT (First Order Plus Dead Time) model identification
+  - [ ] State-space model generation from data
+  - [ ] Multi-variable model with interaction analysis
+  - [ ] Model validation and uncertainty quantification
+
+- [ ] **Constraint Management System**
+  - [ ] Hard constraints on CVs (actuator limits)
+  - [ ] Soft constraints on PVs (operating ranges)
+  - [ ] Rate-of-change constraints for smooth control
+  - [ ] Economic optimization objectives integration
+
+- [ ] **Predictive Control Algorithm**
+  - [ ] Prediction horizon optimization
+  - [ ] Control horizon tuning for computational efficiency
+  - [ ] Weight tuning for multi-objective control
+  - [ ] Disturbance model integration and feedforward
+
+### **Phase 11.7: Production Deployment & PLC Integration** 🏭 **Week 25-28**
+
+#### **OPC-UA Control Interface**
+- [ ] **Real-Time Data Exchange**
+  - [ ] High-speed OPC-UA client for PLC communication
+  - [ ] Buffered data acquisition with timestamp synchronization
+  - [ ] Control signal writing with safety interlocks
+  - [ ] Redundant communication paths for reliability
+
+- [ ] **Control Mode Management**
+  - [ ] Manual/Auto/Cascade mode switching logic
+  - [ ] Bumpless transfer between control modes
+  - [ ] Safety override and emergency shutdown integration
+  - [ ] Operator notification and approval workflows
+
+#### **Dynamic Parameter Adjustment**
+- [ ] **Adaptive Control Framework**
+  - [ ] Real-time parameter updates to PLCs
+  - [ ] Gain scheduling based on operating conditions
+  - [ ] Model updating with recursive identification
+  - [ ] Performance degradation detection and alerting
+
+- [ ] **Production Safety Systems**
+  - [ ] Control action rate limiting
+  - [ ] Constraint violation prediction and prevention
+  - [ ] Fail-safe mode with fallback to PID
+  - [ ] Audit trail for all control changes
+
+#### **Deployment Architecture**
+- [ ] **Edge Computing Integration**
+  - [ ] Local model execution for low latency
+  - [ ] Cloud-based model training and updates
+  - [ ] Data buffering for network interruptions
+  - [ ] Redundant controller architecture
+
 **Key Deliverables for Phase 11**:
 - Production-ready 8B parameter Ignition SME Agent
 - Comprehensive knowledge graph fine-tuning pipeline
@@ -751,10 +904,17 @@ Develop a comprehensive Ignition Subject Matter Expert (SME) Agent using an 8B p
 - Adaptive learning system with continuous knowledge expansion
 - Deep Ignition expertise across all development domains
 - Enterprise-grade Docker deployment with GPU optimization
+- **Industrial dataset curation system with 11 variable types**
+- **AI supervisor for PID and hMPC optimization**
+- **Real-time PLC integration via OPC-UA**
+- **Production-ready control optimization platform**
 
-**Estimated Timeline**: 16 weeks (4 months)
-**Dependencies**: Completed Phase 9 & 10, GPU infrastructure for LLM
-**Success Metrics**: SME Agent accuracy, user adoption, development productivity improvement, knowledge base expansion rate
+**Estimated Timeline**: 28 weeks (7 months) - Extended from 16 weeks
+**Dependencies**: Completed Phase 9 & 10, GPU infrastructure for LLM, OPC-UA infrastructure
+**Success Metrics**: SME Agent accuracy, user adoption, development productivity improvement, knowledge base expansion rate, control loop performance improvement, successful PLC deployments
+
+**📋 Framework Documentation**:
+- [Phase 11.5-11.7 Dataset Curation & AI Control Optimization Framework](PHASE_11_5_DATASET_CURATION_FRAMEWORK.md) - Comprehensive implementation guide
 
 ---
 

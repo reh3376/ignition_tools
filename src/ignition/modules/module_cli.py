@@ -7,6 +7,7 @@ from rich.console import Console
 from rich.table import Table
 
 from .cli.core_commands import core_group
+from .cli.script_commands import script_group
 from .module_builder import ModuleBuilder
 from .module_generator import ModuleGenerator
 from .sdk_manager import IgnitionSDKManager
@@ -35,6 +36,9 @@ def module_group() -> None:
 
 # Add core framework commands as subgroup
 module_group.add_command(core_group)
+
+# Add script generation commands as subgroup
+module_group.add_command(script_group)
 
 
 @module_group.command()
