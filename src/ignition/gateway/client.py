@@ -398,9 +398,7 @@ class IgnitionGatewayClient:
             "export_time": "2025-01-28T12:00:00Z",
         }
 
-    def import_project(
-        self, import_path: str, import_options: dict[str, Any]
-    ) -> dict[str, Any]:
+    def import_project(self, import_path: str, import_options: dict[str, Any]) -> dict[str, Any]:
         """Import a project using gateway APIs.
 
         Args:
@@ -448,9 +446,7 @@ class IgnitionGatewayClient:
             "includes": ["projects", "tags", "databases", "devices", "security"],
         }
 
-    def restore_gateway_backup(
-        self, backup_path: str, restore_options: dict[str, Any]
-    ) -> dict[str, Any]:
+    def restore_gateway_backup(self, backup_path: str, restore_options: dict[str, Any]) -> dict[str, Any]:
         """Restore a gateway backup using gateway APIs.
 
         Args:

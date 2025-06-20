@@ -67,11 +67,7 @@ class MCPNeo4jVerifier:
 
             # Check for Neo4j MCP servers
             servers = config.get("mcpServers", {})
-            neo4j_servers = {
-                name: server
-                for name, server in servers.items()
-                if "neo4j" in name.lower()
-            }
+            neo4j_servers = {name: server for name, server in servers.items() if "neo4j" in name.lower()}
 
             validation_results = {}
             for name, server in neo4j_servers.items():
@@ -108,9 +104,7 @@ class MCPNeo4jVerifier:
                 if network_idx + 1 < len(args):
                     network = args[network_idx + 1]
                     if network != "ign_scripts_default":
-                        issues.append(
-                            f"Network should be 'ign_scripts_default', found '{network}'"
-                        )
+                        issues.append(f"Network should be 'ign_scripts_default', found '{network}'")
                 else:
                     issues.append("--network flag present but no network specified")
             except ValueError:
@@ -125,12 +119,8 @@ class MCPNeo4jVerifier:
         for env_var in required_env:
             if env_var not in env:
                 issues.append(f"Missing environment variable: {env_var}")
-            elif env_var == "NEO4J_URL" and "bolt://neo4j:7687" not in str(
-                env[env_var]
-            ):
-                issues.append(
-                    "NEO4J_URL should use 'bolt://neo4j:7687' for Docker network"
-                )
+            elif env_var == "NEO4J_URL" and "bolt://neo4j:7687" not in str(env[env_var]):
+                issues.append("NEO4J_URL should use 'bolt://neo4j:7687' for Docker network")
 
         return {
             "issues": issues,
@@ -196,13 +186,9 @@ class MCPNeo4jVerifier:
                 results[container_name] = {
                     "launchable": True,
                     "exit_code": result.returncode,
-                    "output": result.stdout[:200]
-                    + ("..." if len(result.stdout) > 200 else ""),
+                    "output": result.stdout[:200] + ("..." if len(result.stdout) > 200 else ""),
                     "error": (
-                        result.stderr[:200]
-                        + ("..." if len(result.stderr) > 200 else "")
-                        if result.stderr
-                        else None
+                        result.stderr[:200] + ("..." if len(result.stderr) > 200 else "") if result.stderr else None
                     ),
                 }
 
@@ -257,9 +243,7 @@ class MCPNeo4jVerifier:
                 for rec in validation["recommendations"]:
                     print(f"      💡 {rec}")
         else:
-            print(
-                f"❌ Configuration invalid: {mcp_config.get('error', 'Unknown error')}"
-            )
+            print(f"❌ Configuration invalid: {mcp_config.get('error', 'Unknown error')}")
 
         # Check 3: Network Connectivity
         print("\n🔗 Network Connectivity")
@@ -310,9 +294,7 @@ class MCPNeo4jVerifier:
             print("🎉 All checks passed! Neo4j MCP authentication is fully fixed.")
             success_rate = "100%"
         else:
-            print(
-                f"⚠️ {passed_checks}/{total_checks} checks passed. Some issues remain."
-            )
+            print(f"⚠️ {passed_checks}/{total_checks} checks passed. Some issues remain.")
             success_rate = f"{passed_checks}/{total_checks} ({passed_checks / total_checks * 100:.1f}%)"
 
         return {

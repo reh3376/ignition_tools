@@ -118,9 +118,7 @@ try:
             machine = machine_storage[machine_id]
             return {
                 "machine_id": machine_id,
-                "metrics": [
-                    {"timestamp": "2024-01-01T00:00:00Z", **machine["metrics"]}
-                ],
+                "metrics": [{"timestamp": "2024-01-01T00:00:00Z", **machine["metrics"]}],
             }
 
         client = TestClient(dummy_app)

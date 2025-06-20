@@ -200,10 +200,7 @@ async def create_test(test_data: TestCreate) -> TestResponse:
     """
     try:
         # Validate parameters
-        if (
-            not isinstance(test_data.parameters.duration, int)
-            or test_data.parameters.duration <= 0
-        ):
+        if not isinstance(test_data.parameters.duration, int) or test_data.parameters.duration <= 0:
             raise HTTPException(
                 status_code=400,
                 detail=ErrorResponse(
@@ -284,9 +281,7 @@ async def list_tests() -> TestListResponse:
 
 
 @app.post("/api/tests/{test_id}/run", response_model=TestRunResponse)
-async def run_test(
-    test_id: str, run_request: TestRunRequest | None = None
-) -> TestRunResponse:
+async def run_test(test_id: str, run_request: TestRunRequest | None = None) -> TestRunResponse:
     """Run a specific test.
 
     Args:

@@ -97,17 +97,13 @@ class DocumentationSynchronizer:
                         # Analyze each documentation file
                         source_files = self._find_source_dependencies(doc_file)
                         sync_status = self._check_sync_status(doc_file, source_files)
-                        priority = self._calculate_update_priority(
-                            doc_file, sync_status
-                        )
+                        priority = self._calculate_update_priority(doc_file, sync_status)
 
                         doc_item = DocumentationItem(
                             doc_path=str(doc_file.relative_to(self.project_root)),
                             doc_type=doc_type,
                             source_files=source_files,
-                            last_updated=datetime.fromtimestamp(
-                                doc_file.stat().st_mtime
-                            ),
+                            last_updated=datetime.fromtimestamp(doc_file.stat().st_mtime),
                             sync_status=sync_status,
                             update_priority=priority,
                         )
@@ -119,9 +115,7 @@ class DocumentationSynchronizer:
             logger.error(f"Failed to analyze documentation sync status: {e}")
             return []
 
-    def detect_code_changes_affecting_docs(
-        self, since_hours: int = 24
-    ) -> list[CodeChange]:
+    def detect_code_changes_affecting_docs(self, since_hours: int = 24) -> list[CodeChange]:
         """Detect code changes that affect documentation.
 
         Args:
@@ -146,9 +140,7 @@ class DocumentationSynchronizer:
             logger.error(f"Failed to detect code changes: {e}")
             return []
 
-    def generate_documentation_updates(
-        self, code_changes: list[CodeChange]
-    ) -> list[DocumentationUpdate]:
+    def generate_documentation_updates(self, code_changes: list[CodeChange]) -> list[DocumentationUpdate]:
         """Generate required documentation updates based on code changes.
 
         Args:
@@ -317,9 +309,7 @@ class DocumentationSynchronizer:
             dependencies.extend(file_refs)
 
             # Look for function/class references
-            code_refs = re.findall(
-                r"`([A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*)`", content
-            )
+            code_refs = re.findall(r"`([A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*)`", content)
             for ref in code_refs:
                 # Find source file containing this reference
                 source_file = self._find_source_file_for_reference(ref)
@@ -468,26 +458,20 @@ class DocumentationSynchronizer:
         file_name = Path(change.file_path).stem
 
         # Search in API documentation
-        api_docs = list(self.docs_root.glob("**/api/*.md")) + list(
-            self.docs_root.glob("**/reference/*.md")
-        )
+        api_docs = list(self.docs_root.glob("**/api/*.md")) + list(self.docs_root.glob("**/reference/*.md"))
         for doc_file in api_docs:
             if self._doc_references_code(doc_file, element_name, file_name):
                 affected_docs.append(str(doc_file.relative_to(self.project_root)))
 
         # Search in examples and guides
-        example_docs = list(self.docs_root.glob("**/examples/*.md")) + list(
-            self.docs_root.glob("**/guides/*.md")
-        )
+        example_docs = list(self.docs_root.glob("**/examples/*.md")) + list(self.docs_root.glob("**/guides/*.md"))
         for doc_file in example_docs:
             if self._doc_references_code(doc_file, element_name, file_name):
                 affected_docs.append(str(doc_file.relative_to(self.project_root)))
 
         return affected_docs
 
-    def _doc_references_code(
-        self, doc_file: Path, element_name: str, file_name: str
-    ) -> bool:
+    def _doc_references_code(self, doc_file: Path, element_name: str, file_name: str) -> bool:
         """Check if a documentation file references specific code."""
         try:
             content = doc_file.read_text(encoding="utf-8")
@@ -498,16 +482,12 @@ class DocumentationSynchronizer:
 
             # Check for code blocks that might contain the reference
             code_blocks = re.findall(r"```[\s\S]*?```", content)
-            return any(
-                element_name in block or file_name in block for block in code_blocks
-            )
+            return any(element_name in block or file_name in block for block in code_blocks)
 
         except Exception:
             return False
 
-    def _generate_update_for_doc(
-        self, doc_path: str, change: CodeChange
-    ) -> DocumentationUpdate | None:
+    def _generate_update_for_doc(self, doc_path: str, change: CodeChange) -> DocumentationUpdate | None:
         """Generate a documentation update for a specific change."""
         try:
             # Determine update type
@@ -564,9 +544,7 @@ class DocumentationSynchronizer:
 
         return min(1.0, max(0.0, confidence))
 
-    def _deduplicate_updates(
-        self, updates: list[DocumentationUpdate]
-    ) -> list[DocumentationUpdate]:
+    def _deduplicate_updates(self, updates: list[DocumentationUpdate]) -> list[DocumentationUpdate]:
         """Remove duplicate documentation updates."""
         seen = set()
         unique_updates = []
@@ -602,9 +580,7 @@ class DocumentationSynchronizer:
                     }
 
                     for item in node.body:
-                        if isinstance(
-                            item, ast.FunctionDef
-                        ) and not item.name.startswith("_"):
+                        if isinstance(item, ast.FunctionDef) and not item.name.startswith("_"):
                             method_info = {
                                 "name": item.name,
                                 "signature": self._extract_function_signature(item),
@@ -614,9 +590,7 @@ class DocumentationSynchronizer:
 
                     api_info["classes"].append(class_info)
 
-                elif isinstance(node, ast.FunctionDef) and not node.name.startswith(
-                    "_"
-                ):
+                elif isinstance(node, ast.FunctionDef) and not node.name.startswith("_"):
                     func_info = {
                         "name": node.name,
                         "signature": self._extract_function_signature(node),
@@ -702,9 +676,7 @@ class DocumentationSynchronizer:
                 content = doc_file.read_text(encoding="utf-8")
 
                 # Find function/class references
-                refs = re.findall(
-                    r"`([A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*)`", content
-                )
+                refs = re.findall(r"`([A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*)`", content)
                 for ref in refs:
                     cross_refs.append(
                         {
@@ -782,9 +754,7 @@ class DocumentationSynchronizer:
         # Simple implementation - would use code intelligence system
         return None
 
-    def _format_changelog_entry(
-        self, change: CodeChange, include_migration: bool = False
-    ) -> str:
+    def _format_changelog_entry(self, change: CodeChange, include_migration: bool = False) -> str:
         """Format a changelog entry for a code change."""
         entry = f"{change.element_name}: {change.description}"
 

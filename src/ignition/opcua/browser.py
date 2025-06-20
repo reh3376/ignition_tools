@@ -24,9 +24,7 @@ class AddressSpaceBrowser:
         """
         self.client = client
 
-    async def browse_tree(
-        self, node_id: str = "i=85", max_depth: int = 3
-    ) -> dict[str, Any]:
+    async def browse_tree(self, node_id: str = "i=85", max_depth: int = 3) -> dict[str, Any]:
         """Browse OPC-UA address space starting from specified node.
 
         Args:
@@ -45,9 +43,7 @@ class AddressSpaceBrowser:
             logger.error("Error browsing tree from %s: %s", node_id, e)
             raise
 
-    async def _browse_node_recursive(
-        self, node: Node, max_depth: int, current_depth: int
-    ) -> dict[str, Any]:
+    async def _browse_node_recursive(self, node: Node, max_depth: int, current_depth: int) -> dict[str, Any]:
         """Recursively browse a node and its children.
 
         Args:
@@ -69,9 +65,7 @@ class AddressSpaceBrowser:
 
                 for child in children:
                     try:
-                        child_info = await self._browse_node_recursive(
-                            child, max_depth, current_depth + 1
-                        )
+                        child_info = await self._browse_node_recursive(child, max_depth, current_depth + 1)
                         node_info["children"].append(child_info)
                     except Exception as e:
                         logger.warning("Error browsing child node: %s", e)
@@ -152,9 +146,7 @@ class AddressSpaceBrowser:
         except Exception:
             return False
 
-    async def find_nodes_by_browse_name(
-        self, browse_name: str, start_node: str = "i=85"
-    ) -> list[dict[str, Any]]:
+    async def find_nodes_by_browse_name(self, browse_name: str, start_node: str = "i=85") -> list[dict[str, Any]]:
         """Find nodes by browse name starting from specified node.
 
         Args:
@@ -206,9 +198,7 @@ class AddressSpaceBrowser:
             children = await node.get_children()
             for child in children:
                 try:
-                    await self._search_by_browse_name(
-                        child, target_name, matches, current_depth + 1, max_depth
-                    )
+                    await self._search_by_browse_name(child, target_name, matches, current_depth + 1, max_depth)
                 except Exception as e:
                     logger.debug("Error searching child node: %s", e)
                     continue
@@ -253,9 +243,7 @@ class AddressSpaceBrowser:
             logger.error("Error getting node path for %s: %s", node_id, e)
             return []
 
-    async def get_variable_nodes(
-        self, start_node: str = "i=85"
-    ) -> list[dict[str, Any]]:
+    async def get_variable_nodes(self, start_node: str = "i=85") -> list[dict[str, Any]]:
         """Get all variable nodes from specified starting point.
 
         Args:
@@ -303,9 +291,7 @@ class AddressSpaceBrowser:
             children = await node.get_children()
             for child in children:
                 try:
-                    await self._collect_variable_nodes(
-                        child, variables, current_depth + 1, max_depth
-                    )
+                    await self._collect_variable_nodes(child, variables, current_depth + 1, max_depth)
                 except Exception as e:
                     logger.debug("Error processing child variable: %s", e)
                     continue

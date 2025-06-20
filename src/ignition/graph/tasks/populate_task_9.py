@@ -70,9 +70,7 @@ def populate_task_9_security_system():
             missing_fields = [field for field in required_fields if field not in func]
 
             if missing_fields:
-                print(
-                    f"❌ Function {func.get('name', 'UNKNOWN')} missing fields: {missing_fields}"
-                )
+                print(f"❌ Function {func.get('name', 'UNKNOWN')} missing fields: {missing_fields}")
                 continue
 
             # Count metrics
@@ -81,9 +79,7 @@ def populate_task_9_security_system():
             categories.add(func["category"])
             scopes.update(func["scope"])
 
-            print(
-                f"✅ {func['name']} - {len(func['parameters'])} params, {len(func['patterns'])} patterns"
-            )
+            print(f"✅ {func['name']} - {len(func['parameters'])} params, {len(func['patterns'])} patterns")
 
         print("\n📊 Function Metrics:")
         print(f"   • Total Functions: {len(security_functions)}")
@@ -99,9 +95,7 @@ def populate_task_9_security_system():
 
         for i, func_data in enumerate(security_functions, 1):
             try:
-                print(
-                    f"   [{i:2d}/{len(security_functions)}] Loading {func_data['name']}..."
-                )
+                print(f"   [{i:2d}/{len(security_functions)}] Loading {func_data['name']}...")
 
                 # Clean parameters to handle Neo4j constraints
                 cleaned_parameters = []
@@ -110,9 +104,7 @@ def populate_task_9_security_system():
                     # Convert empty dict defaults to string representation
                     if "default" in cleaned_param and cleaned_param["default"] == {}:
                         cleaned_param["default"] = "{}"
-                    elif "default" in cleaned_param and isinstance(
-                        cleaned_param["default"], dict
-                    ):
+                    elif "default" in cleaned_param and isinstance(cleaned_param["default"], dict):
                         cleaned_param["default"] = str(cleaned_param["default"])
                     cleaned_parameters.append(cleaned_param)
 
@@ -179,9 +171,7 @@ def populate_task_9_security_system():
         print("\n📈 Loading Results:")
         print(f"   • Successful: {successful_loads}")
         print(f"   • Failed: {failed_loads}")
-        print(
-            f"   • Success Rate: {(successful_loads / len(security_functions) * 100):.1f}%"
-        )
+        print(f"   • Success Rate: {(successful_loads / len(security_functions) * 100):.1f}%")
 
         # Validate database state
         print("\n🔍 Validating database state...")
@@ -197,9 +187,7 @@ def populate_task_9_security_system():
         task9_functions = result[0]["task9_count"] if result else 0
 
         # Count relationships
-        result = client.execute_query(
-            "MATCH ()-[r]->() RETURN count(r) as total_relationships"
-        )
+        result = client.execute_query("MATCH ()-[r]->() RETURN count(r) as total_relationships")
         total_relationships = result[0]["total_relationships"] if result else 0
 
         # Count security-specific relationships
@@ -218,17 +206,13 @@ def populate_task_9_security_system():
         print(f"   • Task 9 Relationships: {task9_relationships}")
 
         # Expected relationships calculation
-        expected_relationships = (
-            total_parameters + total_patterns + len(scopes) * len(security_functions)
-        )
+        expected_relationships = total_parameters + total_patterns + len(scopes) * len(security_functions)
         print(f"   • Expected Task 9 Relationships: ~{expected_relationships}")
 
         if task9_functions == len(security_functions):
             print("✅ All security functions loaded successfully!")
         else:
-            print(
-                f"⚠️  Expected {len(security_functions)} functions, found {task9_functions}"
-            )
+            print(f"⚠️  Expected {len(security_functions)} functions, found {task9_functions}")
 
         print("\n🎉 Task 9: Security System Expansion Population Complete!")
         print(f"   • Successfully loaded {task9_functions} security functions")
@@ -246,7 +230,7 @@ def populate_task_9_security_system():
         try:
             client.close()
             print("📪 Database connection closed.")
-        except:
+        except Exception:
             pass
 
 

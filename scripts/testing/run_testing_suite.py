@@ -25,9 +25,7 @@ def run_command(command: str, description: str) -> bool:
     print("-" * 50)
 
     try:
-        result = subprocess.run(
-            command, shell=True, cwd=project_root, capture_output=False, text=True
-        )
+        result = subprocess.run(command, shell=True, cwd=project_root, capture_output=False, text=True)
         success = result.returncode == 0
 
         if success:
@@ -43,16 +41,12 @@ def run_command(command: str, description: str) -> bool:
 
 def health_check() -> bool:
     """Run health check."""
-    return run_command(
-        "python scripts/testing/periodic_health_check.py", "Health Check"
-    )
+    return run_command("python scripts/testing/periodic_health_check.py", "Health Check")
 
 
 def full_test_suite() -> bool:
     """Run full comprehensive test suite."""
-    return run_command(
-        "python scripts/testing/test_graph_functions.py", "Full Test Suite"
-    )
+    return run_command("python scripts/testing/test_graph_functions.py", "Full Test Suite")
 
 
 def task_validation(task_id: int) -> bool:
@@ -65,9 +59,7 @@ def task_validation(task_id: int) -> bool:
 
 def progress_check() -> bool:
     """Run progress completion check."""
-    return run_command(
-        "python scripts/utilities/get_completion_stats.py", "Progress Statistics"
-    )
+    return run_command("python scripts/utilities/get_completion_stats.py", "Progress Statistics")
 
 
 def print_banner():
@@ -154,9 +146,7 @@ def main():
             else:
                 overall_success = False
 
-        print(
-            f"\n📋 **Comprehensive Testing Summary**: {passed_tests}/{len(tests)} passed"
-        )
+        print(f"\n📋 **Comprehensive Testing Summary**: {passed_tests}/{len(tests)} passed")
 
     elif mode == "dev":
         print("\n⚡ **DEVELOPMENT MODE**")
@@ -171,9 +161,7 @@ def main():
             else:
                 overall_success = False
 
-        print(
-            f"\n📋 **Development Testing Summary**: {passed_tests}/{len(tests)} passed"
-        )
+        print(f"\n📋 **Development Testing Summary**: {passed_tests}/{len(tests)} passed")
 
     else:
         print(f"Error: Unknown mode '{mode}'")

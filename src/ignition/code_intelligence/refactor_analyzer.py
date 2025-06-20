@@ -48,9 +48,7 @@ class SplitRecommendation:
 class LargeFileDetector:
     """Detects and analyzes files that exceed size thresholds."""
 
-    def __init__(
-        self, line_threshold: int = 950, complexity_threshold: float = 50.0
-    ) -> None:
+    def __init__(self, line_threshold: int = 950, complexity_threshold: float = 50.0) -> None:
         self.line_threshold = line_threshold
         self.complexity_threshold = complexity_threshold
         self.analyzer = CodeAnalyzer()
@@ -63,9 +61,7 @@ class LargeFileDetector:
             if self._is_oversized(py_file):
                 oversized_files.append(py_file)
 
-        return sorted(
-            oversized_files, key=lambda f: self._count_physical_lines(f), reverse=True
-        )
+        return sorted(oversized_files, key=lambda f: self._count_physical_lines(f), reverse=True)
 
     def _is_oversized(self, file_path: Path) -> bool:
         """Check if a file exceeds the line threshold."""
@@ -131,23 +127,17 @@ class SingleResponsibilityAnalyzer:
             # Check for multiple unrelated class hierarchies
             class_purposes = self._categorize_classes(analysis["classes"])
             if len(class_purposes) > 1:
-                violations.append(
-                    f"Multiple unrelated class hierarchies: {', '.join(class_purposes.keys())}"
-                )
+                violations.append(f"Multiple unrelated class hierarchies: {', '.join(class_purposes.keys())}")
 
             # Check for mixed concerns in imports
             import_categories = self._categorize_imports(analysis["imports"])
             if len(import_categories) > 3:  # Allow some mixing, but not too much
-                violations.append(
-                    f"Mixed import concerns: {', '.join(import_categories.keys())}"
-                )
+                violations.append(f"Mixed import concerns: {', '.join(import_categories.keys())}")
 
             # Check for excessive method count in single class
             for class_info in analysis["classes"]:
                 if class_info.methods_count > 20:
-                    violations.append(
-                        f"Class '{class_info.name}' has too many methods ({class_info.methods_count})"
-                    )
+                    violations.append(f"Class '{class_info.name}' has too many methods ({class_info.methods_count})")
 
             # Check for file-level complexity
             file_complexity = analysis["file"].complexity
@@ -168,17 +158,11 @@ class SingleResponsibilityAnalyzer:
 
             if any(keyword in name for keyword in ["cli", "command", "interface"]):
                 categories["CLI/Interface"].append(class_info.name)
-            elif any(
-                keyword in name for keyword in ["client", "connection", "gateway"]
-            ):
+            elif any(keyword in name for keyword in ["client", "connection", "gateway"]):
                 categories["Network/Client"].append(class_info.name)
-            elif any(
-                keyword in name for keyword in ["analyzer", "parser", "processor"]
-            ):
+            elif any(keyword in name for keyword in ["analyzer", "parser", "processor"]):
                 categories["Analysis/Processing"].append(class_info.name)
-            elif any(
-                keyword in name for keyword in ["manager", "controller", "handler"]
-            ):
+            elif any(keyword in name for keyword in ["manager", "controller", "handler"]):
                 categories["Management/Control"].append(class_info.name)
             elif any(keyword in name for keyword in ["model", "data", "schema"]):
                 categories["Data/Model"].append(class_info.name)
@@ -193,40 +177,22 @@ class SingleResponsibilityAnalyzer:
 
         for import_info in imports:
             module = import_info.module.lower() if import_info.module else ""
-            from_module = (
-                import_info.from_module.lower() if import_info.from_module else ""
-            )
+            from_module = import_info.from_module.lower() if import_info.from_module else ""
 
             # Use the from_module if available, otherwise use module
             module_to_check = from_module if from_module else module
 
-            if any(
-                keyword in module_to_check
-                for keyword in ["os", "sys", "pathlib", "subprocess"]
-            ):
+            if any(keyword in module_to_check for keyword in ["os", "sys", "pathlib", "subprocess"]):
                 categories["System"].append(module_to_check)
-            elif any(
-                keyword in module_to_check
-                for keyword in ["click", "argparse", "rich", "prompt"]
-            ):
+            elif any(keyword in module_to_check for keyword in ["click", "argparse", "rich", "prompt"]):
                 categories["CLI"].append(module_to_check)
-            elif any(
-                keyword in module_to_check
-                for keyword in ["requests", "urllib", "http", "socket"]
-            ):
+            elif any(keyword in module_to_check for keyword in ["requests", "urllib", "http", "socket"]):
                 categories["Network"].append(module_to_check)
-            elif any(
-                keyword in module_to_check for keyword in ["json", "yaml", "csv", "xml"]
-            ):
+            elif any(keyword in module_to_check for keyword in ["json", "yaml", "csv", "xml"]):
                 categories["Data"].append(module_to_check)
-            elif any(
-                keyword in module_to_check
-                for keyword in ["neo4j", "sqlite", "postgres", "mysql"]
-            ):
+            elif any(keyword in module_to_check for keyword in ["neo4j", "sqlite", "postgres", "mysql"]):
                 categories["Database"].append(module_to_check)
-            elif module_to_check.startswith("src.") or module_to_check.startswith(
-                "ignition."
-            ):
+            elif module_to_check.startswith("src.") or module_to_check.startswith("ignition."):
                 categories["Internal"].append(module_to_check)
             else:
                 categories["External"].append(module_to_check)
@@ -261,9 +227,7 @@ class RefactoringRecommendationEngine:
         violations = self.sr_analyzer.analyze_file(file_path)
 
         # Generate split recommendations
-        split_recommendations = self._generate_split_recommendations(
-            file_path, analysis
-        )
+        split_recommendations = self._generate_split_recommendations(file_path, analysis)
 
         # Calculate public surface size
         public_surface_size = self._calculate_public_surface_size(analysis)
@@ -287,9 +251,7 @@ class RefactoringRecommendationEngine:
             impact_analysis=impact_analysis,
         )
 
-    def _generate_split_recommendations(
-        self, file_path: Path, analysis
-    ) -> list[SplitRecommendation]:
+    def _generate_split_recommendations(self, file_path: Path, analysis) -> list[SplitRecommendation]:
         """Generate recommendations for splitting the file."""
         recommendations = []
 
@@ -299,9 +261,7 @@ class RefactoringRecommendationEngine:
         for category, class_names in class_categories.items():
             if len(class_names) > 1 and category != "Other":
                 # Estimate lines for this category
-                estimated_lines = self._estimate_category_lines(
-                    analysis["classes"], class_names
-                )
+                estimated_lines = self._estimate_category_lines(analysis["classes"], class_names)
 
                 if estimated_lines > 100:  # Only recommend if substantial
                     module_name = self._suggest_module_name(file_path, category)
@@ -312,9 +272,7 @@ class RefactoringRecommendationEngine:
                             classes_to_move=class_names,
                             functions_to_move=[],  # TODO: Analyze functions
                             estimated_lines=estimated_lines,
-                            dependencies=self._analyze_dependencies(
-                                analysis, class_names
-                            ),
+                            dependencies=self._analyze_dependencies(analysis, class_names),
                             reason=f"Extract {category.lower()} functionality",
                             confidence_score=0.8 if len(class_names) > 2 else 0.6,
                         )
@@ -344,9 +302,7 @@ class RefactoringRecommendationEngine:
 
         # Count private methods
         for method_info in analysis["methods"]:
-            if method_info.name.startswith("_") and not method_info.name.startswith(
-                "__"
-            ):
+            if method_info.name.startswith("_") and not method_info.name.startswith("__"):
                 private_count += 1
 
         return private_count
@@ -391,9 +347,7 @@ class RefactoringRecommendationEngine:
 
         return impact
 
-    def _estimate_category_lines(
-        self, classes: list[Any], class_names: list[str]
-    ) -> int:
+    def _estimate_category_lines(self, classes: list[Any], class_names: list[str]) -> int:
         """Estimate lines of code for a category of classes."""
         total_lines = 0
         for class_info in classes:
@@ -458,9 +412,7 @@ def main() -> None:
     src_dir = Path("src")
     oversized_files = detector.scan_directory(src_dir)
 
-    print(
-        f"Found {len(oversized_files)} files exceeding {detector.line_threshold} lines:"
-    )
+    print(f"Found {len(oversized_files)} files exceeding {detector.line_threshold} lines:")
 
     for file_path in oversized_files[:5]:  # Analyze top 5
         print(f"\n{'=' * 60}")

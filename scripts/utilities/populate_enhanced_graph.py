@@ -20,9 +20,7 @@ from ignition.graph.client import IgnitionGraphClient
 from ignition.graph.enhanced_populator import EnhancedIgnitionGraphPopulator
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -37,9 +35,7 @@ def main():
         logger.info("Connecting to Neo4j database...")
         if not client.connect():
             logger.error("❌ Failed to connect to Neo4j database")
-            logger.info(
-                "💡 Make sure Neo4j is running: python scripts/utilities/start_graph_db.py"
-            )
+            logger.info("💡 Make sure Neo4j is running: python scripts/utilities/start_graph_db.py")
             return False
 
         logger.info("✅ Connected to Neo4j successfully")
@@ -50,11 +46,7 @@ def main():
             logger.warning(f"⚠️ Database already contains {stats['total_nodes']} nodes")
 
             # Prompt user for confirmation
-            response = (
-                input("Do you want to clear existing data and reload? (y/N): ")
-                .strip()
-                .lower()
-            )
+            response = input("Do you want to clear existing data and reload? (y/N): ").strip().lower()
             clear_first = response in ["y", "yes"]
         else:
             clear_first = False
@@ -73,9 +65,7 @@ def main():
             logger.info("✅ Enhanced database population completed successfully!")
             logger.info("📊 Final Statistics:")
             logger.info(f"   • Total Nodes: {final_stats['total_nodes']}")
-            logger.info(
-                f"   • Total Relationships: {final_stats['total_relationships']}"
-            )
+            logger.info(f"   • Total Relationships: {final_stats['total_relationships']}")
 
             # Breakdown by node type
             if "node_counts" in final_stats:

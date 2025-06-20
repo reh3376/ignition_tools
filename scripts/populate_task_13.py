@@ -49,9 +49,7 @@ def create_function_node(func_data: dict[str, Any]) -> GraphNode:
     )
 
 
-def create_relationships(
-    function_node: GraphNode, func_data: dict[str, Any]
-) -> list[GraphRelationship]:
+def create_relationships(function_node: GraphNode, func_data: dict[str, Any]) -> list[GraphRelationship]:
     """Create relationships for a function node."""
     relationships = []
 
@@ -133,9 +131,7 @@ def populate_task_13():
                     if client.create_relationship(relationship):
                         total_relationships += 1
 
-                print(
-                    f"   ✅ Successfully created function with {len(relationships)} relationships"
-                )
+                print(f"   ✅ Successfully created function with {len(relationships)} relationships")
             else:
                 print(f"   ❌ Failed to create function: {func_data['name']}")
 
@@ -163,9 +159,7 @@ def populate_task_13():
 
     # Summary
     print("\n🎉 Task 13 Population Complete!")
-    print(
-        f"   ✅ Successfully created: {successful_functions}/{total_functions} functions"
-    )
+    print(f"   ✅ Successfully created: {successful_functions}/{total_functions} functions")
     print(f"   🔗 Total relationships: {total_relationships}")
     print(f"   📈 Success rate: {(successful_functions / total_functions) * 100:.1f}%")
 
@@ -222,9 +216,7 @@ def verify_task_13_functions():
         print(f"   🎯 All {len(test_functions)} sample functions verified!")
         return True
     else:
-        print(
-            f"   ⚠️  Only {len(verification_results)}/{len(test_functions)} functions verified"
-        )
+        print(f"   ⚠️  Only {len(verification_results)}/{len(test_functions)} functions verified")
         return False
 
 
@@ -291,12 +283,8 @@ if __name__ == "__main__":
         print("\n🎊 Task 13 Successfully Completed!")
         print("   • 30 integration & external systems functions added")
         print(f"   • Database now contains {total_functions} total functions")
-        print(
-            "   • Integration capabilities: REST APIs, Network Protocols, Message Queuing"
-        )
-        print(
-            "   • Enterprise features: ESB, Workflow Orchestration, Distributed Caching"
-        )
+        print("   • Integration capabilities: REST APIs, Network Protocols, Message Queuing")
+        print("   • Enterprise features: ESB, Workflow Orchestration, Distributed Caching")
         print("   • 🎯 TARGET ACHIEVED: 400+ function milestone reached!")
 
     else:

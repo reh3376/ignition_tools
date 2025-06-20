@@ -39,9 +39,7 @@ class KafkaAdapter(BaseDataAdapter):
         """Test Kafka cluster connection."""
         return self._connected
 
-    async def read_data(
-        self, query: dict[str, Any] | None = None
-    ) -> list[dict[str, Any]]:
+    async def read_data(self, query: dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """Read data from Kafka topics."""
         # TODO: Implement actual Kafka consumer
         return [
@@ -63,9 +61,7 @@ class KafkaAdapter(BaseDataAdapter):
         self.logger.info(f"Produced {len(data)} messages to Kafka")
         return True
 
-    async def stream_data(
-        self, callback: callable, query: dict[str, Any] | None = None
-    ) -> None:
+    async def stream_data(self, callback: callable, query: dict[str, Any] | None = None) -> None:
         """Stream data from Kafka topics."""
         # TODO: Implement actual Kafka streaming consumer
         pass

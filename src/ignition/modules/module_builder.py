@@ -76,9 +76,7 @@ class ModuleBuilder:
                 progress.add_task(f"Building {project_path.name}...", total=None)
 
                 # Use gradlew wrapper
-                gradlew_cmd = (
-                    "./gradlew" if project_path.name != "nt" else "gradlew.bat"
-                )
+                gradlew_cmd = "./gradlew" if project_path.name != "nt" else "gradlew.bat"
 
                 # Build command
                 build_cmd = [gradlew_cmd]
@@ -111,15 +109,11 @@ class ModuleBuilder:
 
                     # Parse warnings from output
                     if "warning" in build_result.stdout.lower():
-                        result.warnings.extend(
-                            self._parse_warnings(build_result.stdout)
-                        )
+                        result.warnings.extend(self._parse_warnings(build_result.stdout))
 
                 else:
                     result.success = False
-                    result.errors.append(
-                        f"Build failed with exit code {build_result.returncode}"
-                    )
+                    result.errors.append(f"Build failed with exit code {build_result.returncode}")
                     result.errors.extend(self._parse_errors(build_result.stderr))
 
         except subprocess.TimeoutExpired:
@@ -183,18 +177,14 @@ class ModuleBuilder:
                 console.print(f"🧹 Cleaned {project_path.name}")
                 return True
             else:
-                console.print(
-                    f"❌ Failed to clean {project_path.name}: {result.stderr}"
-                )
+                console.print(f"❌ Failed to clean {project_path.name}: {result.stderr}")
                 return False
 
         except Exception as e:
             console.print(f"❌ Error cleaning {project_path.name}: {e}")
             return False
 
-    def package_module(
-        self, project_path: Path, output_dir: Path | None = None
-    ) -> Path | None:
+    def package_module(self, project_path: Path, output_dir: Path | None = None) -> Path | None:
         """Package a module for distribution.
 
         Args:
@@ -280,9 +270,7 @@ class ModuleBuilder:
                     validation["warnings"].append("No JAR files found")
 
                 # Overall validation
-                validation["valid"] = (
-                    validation["is_zip"] and validation["contains_manifest"]
-                )
+                validation["valid"] = validation["is_zip"] and validation["contains_manifest"]
 
         except zipfile.BadZipFile:
             validation["errors"].append("File is not a valid ZIP archive")
@@ -379,9 +367,7 @@ class ModuleBuilder:
         console.print(table)
 
         # Summary stats
-        console.print(
-            f"\n📊 Summary: {successful}/{len(results)} successful, {total_time:.1f}s total"
-        )
+        console.print(f"\n📊 Summary: {successful}/{len(results)} successful, {total_time:.1f}s total")
 
     def _parse_errors(self, stderr: str) -> list[str]:
         """Parse errors from build output.

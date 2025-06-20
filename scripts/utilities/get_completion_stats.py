@@ -31,15 +31,11 @@ def main():
 
         if not client.connect():
             logger.error("❌ Failed to connect to Neo4j database")
-            logger.info(
-                "💡 Make sure Neo4j is running: python scripts/utilities/start_graph_db.py"
-            )
+            logger.info("💡 Make sure Neo4j is running: python scripts/utilities/start_graph_db.py")
             return False
 
         # Get total function count first
-        total_result = client.execute_query(
-            "MATCH (f:Function) RETURN count(f) as total"
-        )
+        total_result = client.execute_query("MATCH (f:Function) RETURN count(f) as total")
         total_functions = total_result[0]["total"]
 
         # Get function count by category
@@ -67,9 +63,7 @@ def main():
         # Calculate completion percentage
         target_functions = 400
         completion_percentage = (total_functions / target_functions) * 100
-        print(
-            f"   • Completion: {completion_percentage:.1f}% ({total_functions}/{target_functions})"
-        )
+        print(f"   • Completion: {completion_percentage:.1f}% ({total_functions}/{target_functions})")
 
         # Remaining functions
         remaining = target_functions - total_functions

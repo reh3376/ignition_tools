@@ -62,9 +62,7 @@ def populate_task_11_functions():
 
         # Validate function count
         if len(functions) != metadata["total_functions"]:
-            print(
-                f"❌ Function count mismatch! Expected {metadata['total_functions']}, got {len(functions)}"
-            )
+            print(f"❌ Function count mismatch! Expected {metadata['total_functions']}, got {len(functions)}")
             return False
 
         print(f"✅ Function count validated: {len(functions)} functions")
@@ -93,15 +91,11 @@ def populate_task_11_functions():
 
         # Process each category
         for category, category_functions in categories.items():
-            print(
-                f"\n🔧 Processing {category} ({len(category_functions)} functions)..."
-            )
+            print(f"\n🔧 Processing {category} ({len(category_functions)} functions)...")
 
             for i, function in enumerate(category_functions, 1):
                 try:
-                    print(
-                        f"   [{i:2d}/{len(category_functions)}] Adding {function['name']}..."
-                    )
+                    print(f"   [{i:2d}/{len(category_functions)}] Adding {function['name']}...")
 
                     # Create function node
                     func_node = GraphNode(NodeType.FUNCTION, function)
@@ -166,30 +160,20 @@ def populate_task_11_functions():
         updated_stats = client.get_database_stats()
         updated_functions = updated_stats.get("total_nodes", 0)
         updated_relationships = updated_stats.get("total_relationships", 0)
-        print(
-            f"   • Total Functions: {updated_functions} (+{updated_functions - current_functions})"
-        )
-        print(
-            f"   • Total Relationships: {updated_relationships} (+{updated_relationships - current_relationships})"
-        )
+        print(f"   • Total Functions: {updated_functions} (+{updated_functions - current_functions})")
+        print(f"   • Total Relationships: {updated_relationships} (+{updated_relationships - current_relationships})")
 
         # Calculate completion progress
         target_functions = 400  # Estimated total target
         completion_percentage = (updated_functions / target_functions) * 100
-        print(
-            f"   • Overall Progress: {updated_functions}/{target_functions}+ ({completion_percentage:.1f}% complete)"
-        )
+        print(f"   • Overall Progress: {updated_functions}/{target_functions}+ ({completion_percentage:.1f}% complete)")
 
         if success_count == len(functions):
             print("\n🎉 Task 11 completed successfully!")
-            print(
-                f"   All {success_count} math and analytics functions added to database."
-            )
+            print(f"   All {success_count} math and analytics functions added to database.")
             return True
         else:
-            print(
-                f"\n⚠️  Task 11 completed with {len(functions) - success_count} failures."
-            )
+            print(f"\n⚠️  Task 11 completed with {len(functions) - success_count} failures.")
             return False
 
     except Exception as e:

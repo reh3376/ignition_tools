@@ -21,6 +21,7 @@ Security Features:
 
 import logging
 import os
+import sqlite3
 import time
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -167,12 +168,8 @@ class DatabaseConnectionManager:
         if os.getenv("INFLUXDB_HOST") or os.getenv("HISTORIAN_HOST"):
             self.configs["historian_default"] = DatabaseConfig(
                 db_type=DatabaseType.INFLUXDB,
-                host=os.getenv(
-                    "INFLUXDB_HOST", os.getenv("HISTORIAN_HOST", "localhost")
-                ),
-                port=int(
-                    os.getenv("INFLUXDB_PORT", os.getenv("HISTORIAN_PORT", "8086"))
-                ),
+                host=os.getenv("INFLUXDB_HOST", os.getenv("HISTORIAN_HOST", "localhost")),
+                port=int(os.getenv("INFLUXDB_PORT", os.getenv("HISTORIAN_PORT", "8086"))),
                 database=os.getenv("INFLUXDB_DATABASE", "historian"),
                 username=os.getenv("INFLUXDB_USERNAME", "admin"),
                 password=os.getenv("INFLUXDB_PASSWORD", ""),
@@ -217,9 +214,7 @@ class DatabaseConnectionManager:
                 "created_at": time.time(),
             }
 
-            logger.info(
-                f"Successfully connected to {config.db_type.value} database: {config.host}"
-            )
+            logger.info(f"Successfully connected to {config.db_type.value} database: {config.host}")
 
             return ConnectionResult(
                 success=True,
@@ -288,9 +283,7 @@ class DatabaseConnectionManager:
             return driver
 
         except ImportError:
-            raise ImportError(
-                "Neo4j driver not installed. Install with: pip install neo4j"
-            )
+            raise ImportError("Neo4j driver not installed. Install with: pip install neo4j") from None
 
     def _create_postgresql_connection(self, config: DatabaseConfig) -> Any:
         """Create PostgreSQL/Supabase connection."""
@@ -311,16 +304,12 @@ class DatabaseConnectionManager:
                 connection_params["sslmode"] = "require"
 
             # Create connection pool
-            connection_pool = psycopg2.pool.ThreadedConnectionPool(
-                1, config.pool_size, **connection_params
-            )
+            connection_pool = psycopg2.pool.ThreadedConnectionPool(1, config.pool_size, **connection_params)
 
             return connection_pool
 
         except ImportError:
-            raise ImportError(
-                "PostgreSQL driver not installed. Install with: pip install psycopg2-binary"
-            )
+            raise ImportError("PostgreSQL driver not installed. Install with: pip install psycopg2-binary") from None
 
     def _create_sqlserver_connection(self, config: DatabaseConfig) -> Any:
         """Create SQL Server connection."""
@@ -343,9 +332,7 @@ class DatabaseConnectionManager:
             return connection
 
         except ImportError:
-            raise ImportError(
-                "SQL Server driver not installed. Install with: pip install pyodbc"
-            )
+            raise ImportError("SQL Server driver not installed. Install with: pip install pyodbc") from None
 
     def _create_mysql_connection(self, config: DatabaseConfig) -> Any:
         """Create MySQL connection."""
@@ -371,9 +358,7 @@ class DatabaseConnectionManager:
             return connection_pool
 
         except ImportError:
-            raise ImportError(
-                "MySQL driver not installed. Install with: pip install mysql-connector-python"
-            )
+            raise ImportError("MySQL driver not installed. Install with: pip install mysql-connector-python") from None
 
     def _create_sqlite_connection(self, config: DatabaseConfig) -> Any:
         """Create SQLite connection."""
@@ -382,9 +367,7 @@ class DatabaseConnectionManager:
         # For SQLite, the 'host' parameter is treated as the file path
         db_path = config.host if config.host != "localhost" else config.database
 
-        connection = sqlite3.connect(
-            db_path, timeout=config.connection_timeout, check_same_thread=False
-        )
+        connection = sqlite3.connect(db_path, timeout=config.connection_timeout, check_same_thread=False)
 
         return connection
 
@@ -410,9 +393,7 @@ class DatabaseConnectionManager:
             return client
 
         except ImportError:
-            raise ImportError(
-                "InfluxDB client not installed. Install with: pip install influxdb-client"
-            )
+            raise ImportError("InfluxDB client not installed. Install with: pip install influxdb-client") from None
 
     def execute_query(
         self, connection_id: str, query: str, params: dict[str, Any] | None = None
@@ -490,9 +471,7 @@ class DatabaseConnectionManager:
         finally:
             cursor.close()
 
-    def _execute_mysql_query(
-        self, pool: Any, query: str, params: dict[str, Any] | None = None
-    ) -> list[dict[str, Any]]:
+    def _execute_mysql_query(self, pool: Any, query: str, params: dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """Execute MySQL query."""
         connection = pool.get_connection()
         try:
@@ -555,10 +534,7 @@ class DatabaseConnectionManager:
             elif config.db_type == DatabaseType.MYSQL:
                 # MySQL connection pool doesn't need explicit closing
                 pass
-            elif (
-                config.db_type == DatabaseType.SQLITE
-                or config.db_type == DatabaseType.INFLUXDB
-            ):
+            elif config.db_type == DatabaseType.SQLITE or config.db_type == DatabaseType.INFLUXDB:
                 connection.close()
 
             del self.connections[connection_id]
@@ -681,9 +657,7 @@ class DatabaseConnectionManager:
         finally:
             self.disconnect(result.connection_id)
 
-    def generate_connection_script(
-        self, config_name: str, script_type: str = "jython"
-    ) -> str:
+    def generate_connection_script(self, config_name: str, script_type: str = "jython") -> str:
         """Generate Ignition-compatible connection script."""
         if config_name not in self.configs:
             raise ValueError(f"Configuration '{config_name}' not found")

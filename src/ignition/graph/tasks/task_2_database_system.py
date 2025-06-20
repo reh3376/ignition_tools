@@ -1054,9 +1054,7 @@ def get_functions_by_subcategory(subcategory: str) -> list[dict[str, Any]]:
     Returns:
         list[dict[str, Any]]: list of functions in the subcategory
     """
-    return [
-        func for func in DATABASE_SYSTEM_FUNCTIONS if func["subcategory"] == subcategory
-    ]
+    return [func for func in DATABASE_SYSTEM_FUNCTIONS if func["subcategory"] == subcategory]
 
 
 if __name__ == "__main__":

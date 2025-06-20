@@ -63,9 +63,7 @@ class ValidationResult:
 class RefactoringWorkflow:
     """Orchestrates complex refactoring operations with safety guarantees."""
 
-    def __init__(
-        self, project_root: Path | None = None, enable_git: bool = True
-    ) -> None:
+    def __init__(self, project_root: Path | None = None, enable_git: bool = True) -> None:
         self.project_root = project_root or Path.cwd()
         self.enable_git = enable_git
         self.code_splitter = CodeSplitter(preserve_git_history=enable_git)
@@ -76,9 +74,7 @@ class RefactoringWorkflow:
         self.backup_dir = self.project_root / ".refactoring_backups"
         self.backup_dir.mkdir(exist_ok=True)
 
-    def plan_refactoring_workflow(
-        self, target_files: list[Path]
-    ) -> list[RefactoringOperation]:
+    def plan_refactoring_workflow(self, target_files: list[Path]) -> list[RefactoringOperation]:
         """Plan a comprehensive refactoring workflow for multiple files."""
         operations = []
         operation_counter = 0
@@ -113,9 +109,7 @@ class RefactoringWorkflow:
 
         return operations
 
-    def execute_workflow(
-        self, operations: list[RefactoringOperation], dry_run: bool = False
-    ) -> RefactoringResult:
+    def execute_workflow(self, operations: list[RefactoringOperation], dry_run: bool = False) -> RefactoringResult:
         """Execute a refactoring workflow with comprehensive validation."""
         workflow_id = f"refactor_{int(time.time())}"
 
@@ -156,9 +150,7 @@ class RefactoringWorkflow:
                 rollback_available=True,
             )
 
-    def _execute_workflow_operations(
-        self, workflow_state: dict[str, Any]
-    ) -> RefactoringResult:
+    def _execute_workflow_operations(self, workflow_state: dict[str, Any]) -> RefactoringResult:
         """Execute the actual workflow operations."""
         operations = workflow_state["operations"]
         workflow_id = workflow_state["id"]
@@ -179,21 +171,13 @@ class RefactoringWorkflow:
             if operation_result.success:
                 print("✅ Operation completed successfully")
                 workflow_state["completed_operations"].append(operation.operation_id)
-                workflow_state["modified_files"].extend(
-                    operation_result.files_modified or []
-                )
-                workflow_state["created_files"].extend(
-                    operation_result.files_created or []
-                )
+                workflow_state["modified_files"].extend(operation_result.files_modified or [])
+                workflow_state["created_files"].extend(operation_result.files_created or [])
 
                 # Post-operation validation
-                post_validation = self._validate_post_operation(
-                    operation, operation_result
-                )
+                post_validation = self._validate_post_operation(operation, operation_result)
                 if not post_validation.success:
-                    print(
-                        f"⚠️  Post-operation validation failed: {post_validation.message}"
-                    )
+                    print(f"⚠️  Post-operation validation failed: {post_validation.message}")
                     # Continue but log the issue
 
             else:
@@ -208,9 +192,7 @@ class RefactoringWorkflow:
         # Final workflow validation
         final_validation = self._validate_final_workflow(workflow_state)
 
-        success = (
-            len(workflow_state["failed_operations"]) == 0 and final_validation.success
-        )
+        success = len(workflow_state["failed_operations"]) == 0 and final_validation.success
 
         return RefactoringResult(
             workflow_id=workflow_id,
@@ -233,9 +215,7 @@ class RefactoringWorkflow:
         # Add more operation types as needed
         else:
             return SplitResult(
-                original_file=(
-                    operation.target_files[0] if operation.target_files else ""
-                ),
+                original_file=(operation.target_files[0] if operation.target_files else ""),
                 new_files=[],
                 moved_classes=[],
                 moved_functions=[],
@@ -245,9 +225,7 @@ class RefactoringWorkflow:
                 error_message=f"Unknown operation type: {operation.operation_type}",
             )
 
-    def _validate_pre_operation(
-        self, operation: RefactoringOperation
-    ) -> ValidationResult:
+    def _validate_pre_operation(self, operation: RefactoringOperation) -> ValidationResult:
         """Validate conditions before executing an operation."""
         # Check that target files exist
         for file_path_str in operation.target_files:
@@ -280,9 +258,7 @@ class RefactoringWorkflow:
             message="Pre-operation validation passed",
         )
 
-    def _validate_post_operation(
-        self, operation: RefactoringOperation, result: Any
-    ) -> ValidationResult:
+    def _validate_post_operation(self, operation: RefactoringOperation, result: Any) -> ValidationResult:
         """Validate the result after executing an operation."""
         if not result.success:
             return ValidationResult(
@@ -316,9 +292,7 @@ class RefactoringWorkflow:
             message="Post-operation validation passed",
         )
 
-    def _validate_final_workflow(
-        self, workflow_state: dict[str, Any]
-    ) -> ValidationResult:
+    def _validate_final_workflow(self, workflow_state: dict[str, Any]) -> ValidationResult:
         """Perform final validation of the entire workflow."""
         details: dict[str, Any] = {
             "operations_completed": len(workflow_state["completed_operations"]),
@@ -556,14 +530,10 @@ class RefactoringWorkflow:
         base_time = 60  # 1 minute base
 
         # Add time based on file size
-        base_time += (
-            recommendation.physical_lines // 100 * 30
-        )  # 30 seconds per 100 lines
+        base_time += recommendation.physical_lines // 100 * 30  # 30 seconds per 100 lines
 
         # Add time based on complexity
-        base_time += (
-            int(recommendation.complexity_score) * 5
-        )  # 5 seconds per complexity point
+        base_time += int(recommendation.complexity_score) * 5  # 5 seconds per complexity point
 
         # Add time based on number of dependents
         dependent_count = len(recommendation.impact_analysis.get("dependent_files", []))
@@ -602,9 +572,7 @@ class RefactoringWorkflow:
             print(f"Warning: Could not create backup: {e!s}")
             return str(backup_path)
 
-    def _simulate_workflow(
-        self, workflow_id: str, operations: list[RefactoringOperation]
-    ) -> RefactoringResult:
+    def _simulate_workflow(self, workflow_id: str, operations: list[RefactoringOperation]) -> RefactoringResult:
         """Simulate a workflow execution without making changes."""
         simulated_results = []
 
@@ -668,15 +636,9 @@ def main() -> None:
 
     parser = argparse.ArgumentParser(description="Execute refactoring workflow")
     parser.add_argument("--files", nargs="+", help="Specific files to refactor")
-    parser.add_argument(
-        "--directory", type=str, default="src", help="Directory to scan for files"
-    )
-    parser.add_argument(
-        "--dry-run", action="store_true", help="Simulate without making changes"
-    )
-    parser.add_argument(
-        "--no-git", action="store_true", help="Don't use git integration"
-    )
+    parser.add_argument("--directory", type=str, default="src", help="Directory to scan for files")
+    parser.add_argument("--dry-run", action="store_true", help="Simulate without making changes")
+    parser.add_argument("--no-git", action="store_true", help="Don't use git integration")
 
     args = parser.parse_args()
 
@@ -688,9 +650,7 @@ def main() -> None:
     else:
         # Find large files automatically
         detector = RefactoringRecommendationEngine().detector
-        target_files = detector.scan_directory(Path(args.directory))[
-            :5
-        ]  # Limit to top 5
+        target_files = detector.scan_directory(Path(args.directory))[:5]  # Limit to top 5
 
     if not target_files:
         print("No files found that need refactoring")
@@ -705,9 +665,7 @@ def main() -> None:
 
     print(f"\nPlanned {len(operations)} refactoring operations:")
     for op in operations:
-        print(
-            f"  - {op.description} (Risk: {op.risk_level}, Est: {op.estimated_time}s)"
-        )
+        print(f"  - {op.description} (Risk: {op.risk_level}, Est: {op.estimated_time}s)")
 
     # Execute workflow
     result = workflow.execute_workflow(operations, dry_run=args.dry_run)

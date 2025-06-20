@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Knowledge Graph Query Tool
+"""Knowledge Graph Query Tool.
 
 Interactive script to explore what's actually stored in your Neo4j knowledge graph.
 Useful for debugging hallucination detection and understanding graph contents.
@@ -15,7 +15,7 @@ from neo4j import AsyncGraphDatabase
 
 
 class KnowledgeGraphQuerier:
-    """Interactive tool to query the knowledge graph"""
+    """Interactive tool to query the knowledge graph."""
 
     def __init__(self, neo4j_uri: str, neo4j_user: str, neo4j_password: str):
         self.neo4j_uri = neo4j_uri
@@ -24,19 +24,17 @@ class KnowledgeGraphQuerier:
         self.driver = None
 
     async def initialize(self):
-        """Initialize Neo4j connection"""
-        self.driver = AsyncGraphDatabase.driver(
-            self.neo4j_uri, auth=(self.neo4j_user, self.neo4j_password)
-        )
+        """Initialize Neo4j connection."""
+        self.driver = AsyncGraphDatabase.driver(self.neo4j_uri, auth=(self.neo4j_user, self.neo4j_password))
         print("🔗 Connected to Neo4j knowledge graph")
 
     async def close(self):
-        """Close Neo4j connection"""
+        """Close Neo4j connection."""
         if self.driver:
             await self.driver.close()
 
     async def list_repositories(self):
-        """List all repositories in the knowledge graph"""
+        """List all repositories in the knowledge graph."""
         print("\n📚 Repositories in Knowledge Graph:")
         print("=" * 50)
 
@@ -57,7 +55,7 @@ class KnowledgeGraphQuerier:
         return repos
 
     async def explore_repository(self, repo_name: str):
-        """Get overview of a specific repository"""
+        """Get overview of a specific repository."""
         print(f"\n🔍 Exploring Repository: {repo_name}")
         print("=" * 60)
 
@@ -90,8 +88,8 @@ class KnowledgeGraphQuerier:
             print(f"🏗️  Classes: {class_count}")
             print(f"⚙️  Functions: {function_count}")
 
-    async def list_classes(self, repo_name: str = None, limit: int = 20):
-        """List classes in the knowledge graph"""
+    async def list_classes(self, repo_name: str | None = None, limit: int = 20):
+        """List classes in the knowledge graph."""
         title = f"Classes in {repo_name}" if repo_name else "All Classes"
         print(f"\n🏗️  {title} (limit {limit}):")
         print("=" * 50)
@@ -116,9 +114,7 @@ class KnowledgeGraphQuerier:
 
             classes = []
             async for record in result:
-                classes.append(
-                    {"name": record["name"], "full_name": record["full_name"]}
-                )
+                classes.append({"name": record["name"], "full_name": record["full_name"]})
 
             if classes:
                 for i, cls in enumerate(classes, 1):
@@ -129,7 +125,7 @@ class KnowledgeGraphQuerier:
         return classes
 
     async def explore_class(self, class_name: str):
-        """Get detailed information about a specific class"""
+        """Get detailed information about a specific class."""
         print(f"\n🔍 Exploring Class: {class_name}")
         print("=" * 60)
 
@@ -180,9 +176,7 @@ class KnowledgeGraphQuerier:
                     # Use detailed params if available, fall back to simple params
                     params_to_show = method["params_detailed"] or method["params_list"]
                     params = ", ".join(params_to_show) if params_to_show else ""
-                    print(
-                        f"{i:2d}. {method['name']}({params}) -> {method['return_type']}"
-                    )
+                    print(f"{i:2d}. {method['name']}({params}) -> {method['return_type']}")
             else:
                 print("\n⚙️  No methods found.")
 
@@ -197,9 +191,7 @@ class KnowledgeGraphQuerier:
 
             attributes = []
             async for record in result:
-                attributes.append(
-                    {"name": record["name"], "type": record["type"] or "Any"}
-                )
+                attributes.append({"name": record["name"], "type": record["type"] or "Any"})
 
             if attributes:
                 print(f"\n📋 Attributes ({len(attributes)}):")
@@ -210,8 +202,8 @@ class KnowledgeGraphQuerier:
 
         return {"methods": methods, "attributes": attributes}
 
-    async def search_method(self, method_name: str, class_name: str = None):
-        """Search for methods by name"""
+    async def search_method(self, method_name: str, class_name: str | None = None):
+        """Search for methods by name."""
         title = f"Method '{method_name}'"
         if class_name:
             title += f" in class '{class_name}'"
@@ -229,9 +221,7 @@ class KnowledgeGraphQuerier:
                        m.name as method_name, m.params_list as params_list,
                        m.return_type as return_type, m.args as args
                 """
-                result = await session.run(
-                    query, class_name=class_name, method_name=method_name
-                )
+                result = await session.run(query, class_name=class_name, method_name=method_name)
             else:
                 query = """
                 MATCH (c:Class)-[:HAS_METHOD]->(m:Method)
@@ -258,11 +248,7 @@ class KnowledgeGraphQuerier:
 
             if methods:
                 for i, method in enumerate(methods, 1):
-                    params = (
-                        ", ".join(method["params_list"])
-                        if method["params_list"]
-                        else ""
-                    )
+                    params = ", ".join(method["params_list"]) if method["params_list"] else ""
                     print(
                         f"{i}. {method['class_full_name']}.{method['method_name']}({params}) -> {method['return_type']}"
                     )
@@ -274,7 +260,7 @@ class KnowledgeGraphQuerier:
         return methods
 
     async def run_custom_query(self, query: str):
-        """Run a custom Cypher query"""
+        """Run a custom Cypher query."""
         print("\n🔍 Running Custom Query:")
         print("=" * 60)
         print(f"Query: {query}")
@@ -305,7 +291,7 @@ class KnowledgeGraphQuerier:
 
 
 async def interactive_mode(querier: KnowledgeGraphQuerier):
-    """Interactive exploration mode"""
+    """Interactive exploration mode."""
     print("\n🚀 Welcome to Knowledge Graph Explorer!")
     print("Available commands:")
     print("  repos          - List all repositories")
@@ -358,19 +344,13 @@ async def interactive_mode(querier: KnowledgeGraphQuerier):
 
 
 async def main():
-    """Main function with CLI argument support"""
+    """Main function with CLI argument support."""
     parser = argparse.ArgumentParser(description="Query the knowledge graph")
     parser.add_argument("--repos", action="store_true", help="List repositories")
-    parser.add_argument(
-        "--classes", metavar="REPO", nargs="?", const="", help="List classes"
-    )
+    parser.add_argument("--classes", metavar="REPO", nargs="?", const="", help="List classes")
     parser.add_argument("--explore", metavar="REPO", help="Explore repository")
-    parser.add_argument(
-        "--class", dest="class_name", metavar="NAME", help="Explore class"
-    )
-    parser.add_argument(
-        "--method", nargs="+", metavar=("NAME", "CLASS"), help="Search method"
-    )
+    parser.add_argument("--class", dest="class_name", metavar="NAME", help="Explore class")
+    parser.add_argument("--method", nargs="+", metavar=("NAME", "CLASS"), help="Search method")
     parser.add_argument("--query", metavar="CYPHER", help="Run custom query")
     parser.add_argument("--interactive", action="store_true", help="Interactive mode")
 

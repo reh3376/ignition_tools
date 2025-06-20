@@ -53,16 +53,12 @@ class HealthChecker:
                 print(f"✅ **Node Count**: {total_nodes}")
 
             if total_relationships < 200:
-                print(
-                    f"⚠️ **Relationship Count**: {total_relationships} (Warning: Low count)"
-                )
+                print(f"⚠️ **Relationship Count**: {total_relationships} (Warning: Low count)")
             else:
                 print(f"✅ **Relationship Count**: {total_relationships}")
 
             # Test 3: Function count validation
-            result = self.client.execute_query(
-                "MATCH (f:Function) RETURN count(f) as total"
-            )
+            result = self.client.execute_query("MATCH (f:Function) RETURN count(f) as total")
             function_count = result[0]["total"]
 
             if function_count < 60:

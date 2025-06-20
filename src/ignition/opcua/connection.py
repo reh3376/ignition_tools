@@ -49,15 +49,11 @@ class ConnectionManager:
 
             # Set client properties
             self.client.name = self.config.get("name", "IgnitionClient")
-            self.client.description = self.config.get(
-                "description", "Ignition OPC-UA Client"
-            )
+            self.client.description = self.config.get("description", "Ignition OPC-UA Client")
 
             # Set timeout
             timeout = kwargs.get("timeout", self.config.get("timeout", 10.0))
-            self.client.secure_channel_timeout = (
-                timeout * 1000
-            )  # Convert to milliseconds
+            self.client.secure_channel_timeout = timeout * 1000  # Convert to milliseconds
 
             # Attempt connection
             await self.client.connect()
@@ -96,9 +92,7 @@ class ConnectionManager:
         if username and password:
             self.client.set_user(username)
             self.client.set_password(password)
-            logger.debug(
-                "Configured username/password authentication for user: %s", username
-            )
+            logger.debug("Configured username/password authentication for user: %s", username)
 
     async def check_connection(self) -> bool:
         """Check if connection is still alive.

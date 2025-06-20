@@ -169,9 +169,7 @@ def main():
     print(f"   👤 Username: {os.getenv('OPCUA_USERNAME')}")
     print(f"   🔒 Security Policy: {os.getenv('OPCUA_SECURITY_POLICY')}")
     print(f"   🔐 Security Mode: {os.getenv('OPCUA_SECURITY_MODE')}")
-    print(
-        f"   🌍 UI Address: {os.getenv('STREAMLIT_SERVER_ADDRESS')}:{os.getenv('STREAMLIT_SERVER_PORT')}"
-    )
+    print(f"   🌍 UI Address: {os.getenv('STREAMLIT_SERVER_ADDRESS')}:{os.getenv('STREAMLIT_SERVER_PORT')}")
 
     # Check .env file
     env_file = project_root / ".env"

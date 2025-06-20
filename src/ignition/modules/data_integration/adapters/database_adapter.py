@@ -38,9 +38,7 @@ class DatabaseAdapter(BaseDataAdapter):
         """Test database connection."""
         return self._connected
 
-    async def read_data(
-        self, query: dict[str, Any] | None = None
-    ) -> list[dict[str, Any]]:
+    async def read_data(self, query: dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """Execute SELECT query and return results."""
         # TODO: Implement actual database query execution
         return [
@@ -61,9 +59,7 @@ class DatabaseAdapter(BaseDataAdapter):
         self.logger.info(f"Wrote {len(data)} records to database")
         return True
 
-    async def stream_data(
-        self, callback: callable, query: dict[str, Any] | None = None
-    ) -> None:
+    async def stream_data(self, callback: callable, query: dict[str, Any] | None = None) -> None:
         """Stream data from database using polling or triggers."""
         # TODO: Implement database change data capture or polling
         pass

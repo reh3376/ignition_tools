@@ -65,7 +65,7 @@ except ImportError:
             print(f"WarningBox - {title}: {message}")
 
     class MockNav:
-        def openWindow(self, path: str, params: dict = None) -> None:
+        def openWindow(self, path: str, params: dict | None = None) -> None:
             print(f"Opening window: {path}")
 
         def closeWindow(self, path: str) -> None:
@@ -102,7 +102,7 @@ except ImportError:
 class WrapperError(Exception):
     """Base exception for wrapper-related errors."""
 
-    def __init__(self, message: str, original_error: Exception = None) -> None:
+    def __init__(self, message: str, original_error: Exception | None = None) -> None:
         super().__init__(message)
         self.original_error = original_error
 
@@ -167,9 +167,7 @@ class IgnitionWrapperBase(ABC):
 
         if not logger.handlers:
             handler = logging.StreamHandler()
-            formatter = logging.Formatter(
-                "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-            )
+            formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
             handler.setFormatter(formatter)
             logger.addHandler(handler)
 
@@ -219,9 +217,7 @@ class IgnitionWrapperBase(ABC):
 
         successful_calls = sum(1 for m in self.metrics if m.success)
         failed_calls = len(self.metrics) - successful_calls
-        avg_execution_time = sum(m.execution_time_ms for m in self.metrics) / len(
-            self.metrics
-        )
+        avg_execution_time = sum(m.execution_time_ms for m in self.metrics) / len(self.metrics)
 
         return {
             "total_calls": len(self.metrics),
@@ -250,15 +246,13 @@ def wrapper_function(func):
     """Decorator for wrapper functions to add common functionality."""
 
     @wraps(func)
-    def wrapper_impl(*args, **kwargs):
+    def wrapper_impl(self, *args, **kwargs):
         start_time = time.time()
         function_name = f"{self.__class__.__name__}.{func.__name__}"
         retry_count = 0
 
         # Log operation start
-        self._log_operation(
-            f"Starting {function_name}", f"args={args}, kwargs={kwargs}"
-        )
+        self._log_operation(f"Starting {function_name}", f"args={args}, kwargs={kwargs}")
 
         for attempt in range(self.config.retry_attempts):
             try:
@@ -305,7 +299,7 @@ def wrapper_function(func):
                     raise WrapperError(
                         f"Function {function_name} failed after {self.config.retry_attempts} attempts: {e}",
                         original_error=e,
-                    )
+                    ) from e
 
                 # Wait before retry
                 if self.config.retry_delay_seconds > 0:

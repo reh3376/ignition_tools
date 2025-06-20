@@ -61,15 +61,9 @@ class Neo4jMCPConnectivityFixer:
 
             return {
                 "name": container_name,
-                "network": next(
-                    iter(container_info["NetworkSettings"]["Networks"].keys())
-                ),
-                "ip_address": next(
-                    iter(container_info["NetworkSettings"]["Networks"].values())
-                )["IPAddress"],
-                "aliases": next(
-                    iter(container_info["NetworkSettings"]["Networks"].values())
-                )["Aliases"],
+                "network": next(iter(container_info["NetworkSettings"]["Networks"].keys())),
+                "ip_address": next(iter(container_info["NetworkSettings"]["Networks"].values()))["IPAddress"],
+                "aliases": next(iter(container_info["NetworkSettings"]["Networks"].values()))["Aliases"],
                 "env": container_info["Config"]["Env"],
             }
 
@@ -125,11 +119,7 @@ class Neo4jMCPConnectivityFixer:
         """Test Neo4j connectivity from within the Docker network."""
         try:
             network_name = container_info["network"]
-            neo4j_host = (
-                "neo4j"
-                if "neo4j" in container_info["aliases"]
-                else container_info["name"]
-            )
+            neo4j_host = "neo4j" if "neo4j" in container_info["aliases"] else container_info["name"]
 
             # Extract auth from container
             username, password = self.extract_neo4j_auth(container_info["env"])
@@ -152,9 +142,7 @@ class Neo4jMCPConnectivityFixer:
                 "RETURN 1 as test",
             ]
 
-            result = subprocess.run(
-                test_cmd, capture_output=True, text=True, timeout=30
-            )
+            result = subprocess.run(test_cmd, capture_output=True, text=True, timeout=30)
 
             if result.returncode == 0 and "1" in result.stdout:
                 logger.info("✅ Container network connectivity test passed")
@@ -242,12 +230,8 @@ class Neo4jMCPConnectivityFixer:
                 return True
             else:
                 # Check logs for errors
-                logs_result = subprocess.run(
-                    ["docker", "logs", server_name], capture_output=True, text=True
-                )
-                logger.error(
-                    f"❌ {server_name} failed to start. Logs: {logs_result.stdout}"
-                )
+                logs_result = subprocess.run(["docker", "logs", server_name], capture_output=True, text=True)
+                logger.error(f"❌ {server_name} failed to start. Logs: {logs_result.stdout}")
                 return False
 
         except Exception as e:
@@ -285,9 +269,7 @@ class Neo4jMCPConnectivityFixer:
 
             if not result["running"]:
                 result["error"] = "Container not running"
-            elif (
-                "error" in result["logs"].lower() or "failed" in result["logs"].lower()
-            ):
+            elif "error" in result["logs"].lower() or "failed" in result["logs"].lower():
                 result["error"] = "Errors found in logs"
 
         except Exception as e:
@@ -322,15 +304,11 @@ class Neo4jMCPConnectivityFixer:
 
         # Step 2: Test host connectivity
         logger.info("🔗 Testing Neo4j connectivity from host...")
-        results["host_connectivity"] = self.test_neo4j_connectivity_from_host(
-            container_info
-        )
+        results["host_connectivity"] = self.test_neo4j_connectivity_from_host(container_info)
 
         # Step 3: Test container network connectivity
         logger.info("🐳 Testing Neo4j connectivity from container network...")
-        results["container_connectivity"] = self.test_neo4j_connectivity_from_container(
-            container_info
-        )
+        results["container_connectivity"] = self.test_neo4j_connectivity_from_container(container_info)
 
         # Step 4: Start and test Neo4j MCP servers
         neo4j_servers = ["neo4j-memory", "neo4j-cypher"]
@@ -352,8 +330,7 @@ class Neo4jMCPConnectivityFixer:
         successful_servers = sum(
             1
             for server_data in results["mcp_servers"].values()
-            if server_data["test_result"]["running"]
-            and not server_data["test_result"]["error"]
+            if server_data["test_result"]["running"] and not server_data["test_result"]["error"]
         )
 
         results["summary"] = {
@@ -388,23 +365,15 @@ class Neo4jMCPConnectivityFixer:
         # Connectivity Tests
         print("\n🔗 CONNECTIVITY TESTS")
         print("-" * 40)
-        print(
-            f"Host connectivity: {'✅ PASS' if results['host_connectivity'] else '❌ FAIL'}"
-        )
-        print(
-            f"Container network: {'✅ PASS' if results['container_connectivity'] else '❌ FAIL'}"
-        )
+        print(f"Host connectivity: {'✅ PASS' if results['host_connectivity'] else '❌ FAIL'}")
+        print(f"Container network: {'✅ PASS' if results['container_connectivity'] else '❌ FAIL'}")
 
         # MCP Servers
         print("\n🖥️ MCP SERVERS")
         print("-" * 40)
         for server_name, server_data in results["mcp_servers"].items():
             test_result = server_data["test_result"]
-            status = (
-                "✅ RUNNING"
-                if test_result["running"] and not test_result["error"]
-                else "❌ FAILED"
-            )
+            status = "✅ RUNNING" if test_result["running"] and not test_result["error"] else "❌ FAILED"
             print(f"{server_name}: {status}")
 
             if test_result["error"]:
@@ -425,12 +394,8 @@ class Neo4jMCPConnectivityFixer:
             print(f"❌ Error: {summary['error']}")
         else:
             print(f"Neo4j Container: {'✅' if summary['neo4j_found'] else '❌'}")
-            print(
-                f"Host Connectivity: {'✅' if summary['host_connectivity'] else '❌'}"
-            )
-            print(
-                f"Container Connectivity: {'✅' if summary['container_connectivity'] else '❌'}"
-            )
+            print(f"Host Connectivity: {'✅' if summary['host_connectivity'] else '❌'}")
+            print(f"Container Connectivity: {'✅' if summary['container_connectivity'] else '❌'}")
             print(f"MCP Servers: {summary['success_rate']} successful")
 
             if summary["servers_successful"] == summary["servers_tested"]:

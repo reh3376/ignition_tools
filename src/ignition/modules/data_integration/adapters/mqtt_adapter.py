@@ -39,9 +39,7 @@ class MQTTAdapter(BaseDataAdapter):
         """Test MQTT broker connection."""
         return self._connected
 
-    async def read_data(
-        self, query: dict[str, Any] | None = None
-    ) -> list[dict[str, Any]]:
+    async def read_data(self, query: dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """Read data from MQTT topics."""
         # TODO: Implement actual MQTT data reading
         return [
@@ -60,9 +58,7 @@ class MQTTAdapter(BaseDataAdapter):
         self.logger.info(f"Published {len(data)} messages to MQTT")
         return True
 
-    async def stream_data(
-        self, callback: callable, query: dict[str, Any] | None = None
-    ) -> None:
+    async def stream_data(self, callback: callable, query: dict[str, Any] | None = None) -> None:
         """Stream data from MQTT subscriptions."""
         # TODO: Implement actual MQTT streaming
         pass

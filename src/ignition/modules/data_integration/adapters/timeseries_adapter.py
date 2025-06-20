@@ -20,9 +20,7 @@ class TimeSeriesAdapter(BaseDataAdapter):
     async def test_connection(self) -> bool:
         return self._connected
 
-    async def read_data(
-        self, query: dict[str, Any] | None = None
-    ) -> list[dict[str, Any]]:
+    async def read_data(self, query: dict[str, Any] | None = None) -> list[dict[str, Any]]:
         return [
             {
                 "measurement": "process_values",
@@ -38,7 +36,5 @@ class TimeSeriesAdapter(BaseDataAdapter):
         self.logger.info(f"Wrote {len(data)} time-series points")
         return True
 
-    async def stream_data(
-        self, callback: callable, query: dict[str, Any] | None = None
-    ) -> None:
+    async def stream_data(self, callback: callable, query: dict[str, Any] | None = None) -> None:
         pass

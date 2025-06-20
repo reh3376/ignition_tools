@@ -19,9 +19,7 @@ def template() -> None:
 
 
 @template.command()
-@click.option(
-    "--detailed", "-d", is_flag=True, help="Show detailed template information"
-)
+@click.option("--detailed", "-d", is_flag=True, help="Show detailed template information")
 @click.pass_context
 def list(ctx: click.Context, detailed: bool) -> None:
     """📋 list available script templates with usage statistics."""
@@ -39,9 +37,7 @@ def list(ctx: click.Context, detailed: bool) -> None:
             return
 
         # Create a rich table
-        table = Table(
-            title="📋 Available Templates", show_header=True, header_style="bold blue"
-        )
+        table = Table(title="📋 Available Templates", show_header=True, header_style="bold blue")
         table.add_column("Template", style="cyan", no_wrap=True)
         table.add_column("Type", style="green")
 
@@ -65,9 +61,7 @@ def list(ctx: click.Context, detailed: bool) -> None:
             if detailed and enhanced_cli.manager:
                 # Get usage statistics
                 try:
-                    patterns = enhanced_cli.manager.get_patterns_by_entity(
-                        template, "template"
-                    )
+                    patterns = enhanced_cli.manager.get_patterns_by_entity(template, "template")
                     usage_count = 0
                     success_rate = 0
                     last_used = "Never"
@@ -107,9 +101,7 @@ def show_template_recommendations() -> None:
 
     try:
         top_patterns = enhanced_cli.manager.get_top_patterns_summary(limit=3)
-        template_patterns = top_patterns.get("top_patterns", {}).get(
-            "template_usage", []
-        )
+        template_patterns = top_patterns.get("top_patterns", {}).get("template_usage", [])
 
         if template_patterns:
             console.print("\n[bold green]🌟 Most Popular Templates[/bold green]")
@@ -117,8 +109,6 @@ def show_template_recommendations() -> None:
                 template = pattern.get("template", "Unknown")
                 usage = pattern.get("usage_count", 0)
                 success = pattern.get("success_rate", 0)
-                console.print(
-                    f"  {i}. {template} ({usage} uses, {success:.1%} success)"
-                )
+                console.print(f"  {i}. {template} ({usage} uses, {success:.1%} success)")
     except Exception:
         pass

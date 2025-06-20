@@ -101,6 +101,4 @@ if __name__ == "__main__":
         assert "patterns" in func
 
     print("✅ All function definitions are valid!")
-    print(
-        f"✅ Refactored into {len(metadata['refactoring_info']['extracted_modules'])} modules"
-    )
+    print(f"✅ Refactored into {len(metadata['refactoring_info']['extracted_modules'])} modules")

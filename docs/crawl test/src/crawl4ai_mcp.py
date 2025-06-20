@@ -50,7 +50,6 @@ from utils import (
     extract_source_summary,
     generate_code_example_summary,
     get_supabase_client,
-    search_code_examples,
     search_documents,
     update_source_info,
 )
@@ -66,9 +65,7 @@ load_dotenv(dotenv_path, override=True)
 # Helper functions for Neo4j validation and error handling
 def validate_neo4j_connection() -> bool:
     """Check if Neo4j environment variables are configured."""
-    return all(
-        [os.getenv("NEO4J_URI"), os.getenv("NEO4J_USER"), os.getenv("NEO4J_PASSWORD")]
-    )
+    return all([os.getenv("NEO4J_URI"), os.getenv("NEO4J_USER"), os.getenv("NEO4J_PASSWORD")])
 
 
 def format_neo4j_error(error: Exception) -> str:
@@ -183,16 +180,12 @@ async def crawl4ai_lifespan(server: FastMCP) -> AsyncIterator[Crawl4AIContext]:
                 print("Initializing knowledge graph components...")
 
                 # Initialize knowledge graph validator
-                knowledge_validator = KnowledgeGraphValidator(
-                    neo4j_uri, neo4j_user, neo4j_password
-                )
+                knowledge_validator = KnowledgeGraphValidator(neo4j_uri, neo4j_user, neo4j_password)
                 await knowledge_validator.initialize()
                 print("✓ Knowledge graph validator initialized")
 
                 # Initialize repository extractor
-                repo_extractor = DirectNeo4jExtractor(
-                    neo4j_uri, neo4j_user, neo4j_password
-                )
+                repo_extractor = DirectNeo4jExtractor(neo4j_uri, neo4j_user, neo4j_password)
                 await repo_extractor.initialize()
                 print("✓ Repository extractor initialized")
 
@@ -201,13 +194,9 @@ async def crawl4ai_lifespan(server: FastMCP) -> AsyncIterator[Crawl4AIContext]:
                 knowledge_validator = None
                 repo_extractor = None
         else:
-            print(
-                "Neo4j credentials not configured - knowledge graph tools will be unavailable"
-            )
+            print("Neo4j credentials not configured - knowledge graph tools will be unavailable")
     else:
-        print(
-            "Knowledge graph functionality disabled - set USE_KNOWLEDGE_GRAPH=true to enable"
-        )
+        print("Knowledge graph functionality disabled - set USE_KNOWLEDGE_GRAPH=true to enable")
 
     try:
         yield Crawl4AIContext(
@@ -358,18 +347,14 @@ def smart_chunk_markdown(text: str, chunk_size: int = 5000) -> list[str]:
         elif "\n\n" in chunk:
             # Find the last paragraph break
             last_break = chunk.rfind("\n\n")
-            if (
-                last_break > chunk_size * 0.3
-            ):  # Only break if we're past 30% of chunk_size
+            if last_break > chunk_size * 0.3:  # Only break if we're past 30% of chunk_size
                 end = start + last_break
 
         # If no paragraph break, try to break at a sentence
         elif ". " in chunk:
             # Find the last sentence break
             last_period = chunk.rfind(". ")
-            if (
-                last_period > chunk_size * 0.3
-            ):  # Only break if we're past 30% of chunk_size
+            if last_period > chunk_size * 0.3:  # Only break if we're past 30% of chunk_size
                 end = start + last_period + 1
 
         # Extract chunk and clean it up
@@ -479,9 +464,7 @@ async def crawl_single_page(ctx: Context, url: str) -> str:
             source_summary = extract_source_summary(
                 source_id, result.markdown[:5000]
             )  # Use first 5000 chars for summary
-            update_source_info(
-                supabase_client, source_id, source_summary, total_word_count
-            )
+            update_source_info(supabase_client, source_id, source_summary, total_word_count)
 
             # Add documentation chunks to Supabase (AFTER source exists)
             add_documents_to_supabase(
@@ -505,9 +488,7 @@ async def crawl_single_page(ctx: Context, url: str) -> str:
                     code_metadatas = []
 
                     # Process code examples in parallel
-                    with concurrent.futures.ThreadPoolExecutor(
-                        max_workers=10
-                    ) as executor:
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
                         # Prepare arguments for parallel processing
                         summary_args = [
                             (
@@ -519,14 +500,10 @@ async def crawl_single_page(ctx: Context, url: str) -> str:
                         ]
 
                         # Generate summaries in parallel
-                        summaries = list(
-                            executor.map(process_code_example, summary_args)
-                        )
+                        summaries = list(executor.map(process_code_example, summary_args))
 
                     # Prepare code example data
-                    for i, (block, summary) in enumerate(
-                        zip(code_blocks, summaries, strict=False)
-                    ):
+                    for i, (block, summary) in enumerate(zip(code_blocks, summaries, strict=False)):
                         code_urls.append(url)
                         code_chunk_numbers.append(i)
                         code_examples.append(block["code"])
@@ -569,9 +546,7 @@ async def crawl_single_page(ctx: Context, url: str) -> str:
                 indent=2,
             )
         else:
-            return json.dumps(
-                {"success": False, "url": url, "error": result.error_message}, indent=2
-            )
+            return json.dumps({"success": False, "url": url, "error": result.error_message}, indent=2)
     except Exception as e:
         return json.dumps({"success": False, "url": url, "error": str(e)}, indent=2)
 
@@ -624,9 +599,7 @@ async def smart_crawl_url(
                     {"success": False, "url": url, "error": "No URLs found in sitemap"},
                     indent=2,
                 )
-            crawl_results = await crawl_batch(
-                crawler, sitemap_urls, max_concurrent=max_concurrent
-            )
+            crawl_results = await crawl_batch(crawler, sitemap_urls, max_concurrent=max_concurrent)
             crawl_type = "sitemap"
         else:
             # For regular URLs, use recursive crawl
@@ -636,9 +609,7 @@ async def smart_crawl_url(
             crawl_type = "webpage"
 
         if not crawl_results:
-            return json.dumps(
-                {"success": False, "url": url, "error": "No content found"}, indent=2
-            )
+            return json.dumps({"success": False, "url": url, "error": "No content found"}, indent=2)
 
         # Process results and store in Supabase
         urls = []
@@ -692,10 +663,7 @@ async def smart_crawl_url(
 
         # Update source information for each unique source FIRST (before inserting documents)
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-            source_summary_args = [
-                (source_id, content)
-                for source_id, content in source_content_map.items()
-            ]
+            source_summary_args = list(source_content_map.items())
             source_summaries = list(
                 executor.map(
                     lambda args: extract_source_summary(args[0], args[1]),
@@ -703,9 +671,7 @@ async def smart_crawl_url(
                 )
             )
 
-        for (source_id, _), summary in zip(
-            source_summary_args, source_summaries, strict=False
-        ):
+        for (source_id, _), summary in zip(source_summary_args, source_summaries, strict=False):
             word_count = source_word_counts.get(source_id, 0)
             update_source_info(supabase_client, source_id, summary, word_count)
 
@@ -724,7 +690,6 @@ async def smart_crawl_url(
         # Extract and process code examples from all documents only if enabled
         extract_code_examples_enabled = os.getenv("USE_AGENTIC_RAG", "false") == "true"
         if extract_code_examples_enabled:
-            all_code_blocks = []
             code_urls = []
             code_chunk_numbers = []
             code_examples = []
@@ -739,9 +704,7 @@ async def smart_crawl_url(
 
                 if code_blocks:
                     # Process code examples in parallel
-                    with concurrent.futures.ThreadPoolExecutor(
-                        max_workers=10
-                    ) as executor:
+                    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
                         # Prepare arguments for parallel processing
                         summary_args = [
                             (
@@ -753,21 +716,15 @@ async def smart_crawl_url(
                         ]
 
                         # Generate summaries in parallel
-                        summaries = list(
-                            executor.map(process_code_example, summary_args)
-                        )
+                        summaries = list(executor.map(process_code_example, summary_args))
 
                     # Prepare code example data
                     parsed_url = urlparse(source_url)
                     source_id = parsed_url.netloc or parsed_url.path
 
-                    for i, (block, summary) in enumerate(
-                        zip(code_blocks, summaries, strict=False)
-                    ):
+                    for i, (block, summary) in enumerate(zip(code_blocks, summaries, strict=False)):
                         code_urls.append(source_url)
-                        code_chunk_numbers.append(
-                            len(code_examples)
-                        )  # Use global code example index
+                        code_chunk_numbers.append(len(code_examples))  # Use global code example index
                         code_examples.append(block["code"])
                         code_summaries.append(summary)
 
@@ -802,8 +759,7 @@ async def smart_crawl_url(
                 "chunks_stored": chunk_count,
                 "code_examples_stored": len(code_examples),
                 "sources_updated": len(source_content_map),
-                "urls_crawled": [doc["url"] for doc in crawl_results][:5]
-                + (["..."] if len(crawl_results) > 5 else []),
+                "urls_crawled": [doc["url"] for doc in crawl_results][:5] + (["..."] if len(crawl_results) > 5 else []),
             },
             indent=2,
         )
@@ -833,9 +789,7 @@ async def get_available_sources(ctx: Context) -> str:
         supabase_client = ctx.request_context.lifespan_context.supabase_client
 
         # Query the sources table directly
-        result = (
-            supabase_client.from_("sources").select("*").order("source_id").execute()
-        )
+        result = supabase_client.from_("sources").select("*").order("source_id").execute()
 
         # Format the sources with their details
         sources = []
@@ -851,17 +805,13 @@ async def get_available_sources(ctx: Context) -> str:
                     }
                 )
 
-        return json.dumps(
-            {"success": True, "sources": sources, "count": len(sources)}, indent=2
-        )
+        return json.dumps({"success": True, "sources": sources, "count": len(sources)}, indent=2)
     except Exception as e:
         return json.dumps({"success": False, "error": str(e)}, indent=2)
 
 
 @mcp.tool()
-async def perform_rag_query(
-    ctx: Context, query: str, source: str = None, match_count: int = 5
-) -> str:
+async def perform_rag_query(ctx: Context, query: str, source: str | None = None, match_count: int = 5) -> str:
     """Perform a RAG (Retrieval Augmented Generation) query on the stored content.
 
     This tool searches the vector database for content relevant to the query and returns
@@ -934,11 +884,7 @@ async def perform_rag_query(
 
             # Then add remaining vector results (semantic matches without exact keyword)
             for vr in vector_results:
-                if (
-                    vr.get("id")
-                    and vr["id"] not in seen_ids
-                    and len(combined_results) < match_count
-                ):
+                if vr.get("id") and vr["id"] not in seen_ids and len(combined_results) < match_count:
                     combined_results.append(vr)
                     seen_ids.add(vr["id"])
 
@@ -1001,8 +947,7 @@ async def perform_rag_query(
                 "query": query,
                 "source_filter": source,
                 "search_mode": "hybrid" if use_hybrid_search else "vector",
-                "reranking_applied": use_reranking
-                and ctx.request_context.lifespan_context.reranking_model is not None,
+                "reranking_applied": use_reranking and ctx.request_context.lifespan_context.reranking_model is not None,
                 "results": formatted_results,
                 "count": len(formatted_results),
             },
@@ -1013,9 +958,7 @@ async def perform_rag_query(
 
 
 @mcp.tool()
-async def search_code_examples(
-    ctx: Context, query: str, source_id: str = None, match_count: int = 5
-) -> str:
+async def search_code_examples(ctx: Context, query: str, source_id: str | None = None, match_count: int = 5) -> str:
     """Search for code examples relevant to the query.
 
     This tool searches the vector database for code examples relevant to the query and returns
@@ -1104,11 +1047,7 @@ async def search_code_examples(
 
             # Then add remaining vector results (semantic matches without exact keyword)
             for vr in vector_results:
-                if (
-                    vr.get("id")
-                    and vr["id"] not in seen_ids
-                    and len(combined_results) < match_count
-                ):
+                if vr.get("id") and vr["id"] not in seen_ids and len(combined_results) < match_count:
                     combined_results.append(vr)
                     seen_ids.add(vr["id"])
 
@@ -1176,8 +1115,7 @@ async def search_code_examples(
                 "query": query,
                 "source_filter": source_id,
                 "search_mode": "hybrid" if use_hybrid_search else "vector",
-                "reranking_applied": use_reranking
-                and ctx.request_context.lifespan_context.reranking_model is not None,
+                "reranking_applied": use_reranking and ctx.request_context.lifespan_context.reranking_model is not None,
                 "results": formatted_results,
                 "count": len(formatted_results),
             },
@@ -1266,16 +1204,12 @@ async def check_ai_script_hallucinations(ctx: Context, script_path: str) -> str:
                 "script_path": script_path,
                 "overall_confidence": validation_result.overall_confidence,
                 "validation_summary": {
-                    "total_validations": report["validation_summary"][
-                        "total_validations"
-                    ],
+                    "total_validations": report["validation_summary"]["total_validations"],
                     "valid_count": report["validation_summary"]["valid_count"],
                     "invalid_count": report["validation_summary"]["invalid_count"],
                     "uncertain_count": report["validation_summary"]["uncertain_count"],
                     "not_found_count": report["validation_summary"]["not_found_count"],
-                    "hallucination_rate": report["validation_summary"][
-                        "hallucination_rate"
-                    ],
+                    "hallucination_rate": report["validation_summary"]["hallucination_rate"],
                 },
                 "hallucinations_detected": report["hallucinations_detected"],
                 "recommendations": report["recommendations"],
@@ -1447,9 +1381,7 @@ async def query_knowledge_graph(ctx: Context, command: str) -> str:
                     )
                 method_name = args[0]
                 class_name = args[1] if len(args) > 1 else None
-                return await _handle_method_command(
-                    session, command, method_name, class_name
-                )
+                return await _handle_method_command(session, command, method_name, class_name)
             elif cmd == "query":
                 if not args:
                     return json.dumps(
@@ -1484,7 +1416,7 @@ async def query_knowledge_graph(ctx: Context, command: str) -> str:
 
 
 async def _handle_repos_command(session, command: str) -> str:
-    """Handle 'repos' command - list all repositories"""
+    """Handle 'repos' command - list all repositories."""
     query = "MATCH (r:Repository) RETURN r.name as name ORDER BY r.name"
     result = await session.run(query)
 
@@ -1504,7 +1436,7 @@ async def _handle_repos_command(session, command: str) -> str:
 
 
 async def _handle_explore_command(session, command: str, repo_name: str) -> str:
-    """Handle 'explore <repo>' command - get repository overview"""
+    """Handle 'explore <repo>' command - get repository overview."""
     # Check if repository exists
     repo_check_query = "MATCH (r:Repository {name: $repo_name}) RETURN r.name as name"
     result = await session.run(repo_check_query, repo_name=repo_name)
@@ -1571,8 +1503,8 @@ async def _handle_explore_command(session, command: str, repo_name: str) -> str:
     )
 
 
-async def _handle_classes_command(session, command: str, repo_name: str = None) -> str:
-    """Handle 'classes [repo]' command - list classes"""
+async def _handle_classes_command(session, command: str, repo_name: str | None = None) -> str:
+    """Handle 'classes [repo]' command - list classes."""
     limit = 20
 
     if repo_name:
@@ -1611,7 +1543,7 @@ async def _handle_classes_command(session, command: str, repo_name: str = None) 
 
 
 async def _handle_class_command(session, command: str, class_name: str) -> str:
-    """Handle 'class <name>' command - explore specific class"""
+    """Handle 'class <name>' command - explore specific class."""
     # Find the class
     class_query = """
     MATCH (c:Class)
@@ -1692,10 +1624,8 @@ async def _handle_class_command(session, command: str, class_name: str) -> str:
     )
 
 
-async def _handle_method_command(
-    session, command: str, method_name: str, class_name: str = None
-) -> str:
-    """Handle 'method <name> [class]' command - search for methods"""
+async def _handle_method_command(session, command: str, method_name: str, class_name: str | None = None) -> str:
+    """Handle 'method <name> [class]' command - search for methods."""
     if class_name:
         query = """
         MATCH (c:Class)-[:HAS_METHOD]->(m:Method)
@@ -1705,9 +1635,7 @@ async def _handle_method_command(
                m.name as method_name, m.params_list as params_list,
                m.params_detailed as params_detailed, m.return_type as return_type, m.args as args
         """
-        result = await session.run(
-            query, class_name=class_name, method_name=method_name
-        )
+        result = await session.run(query, class_name=class_name, method_name=method_name)
     else:
         query = """
         MATCH (c:Class)-[:HAS_METHOD]->(m:Method)
@@ -1740,9 +1668,7 @@ async def _handle_method_command(
             {
                 "success": False,
                 "command": command,
-                "error": f"Method '{method_name}'"
-                + (f" in class '{class_name}'" if class_name else "")
-                + " not found",
+                "error": f"Method '{method_name}'" + (f" in class '{class_name}'" if class_name else "") + " not found",
             },
             indent=2,
         )
@@ -1762,7 +1688,7 @@ async def _handle_method_command(
 
 
 async def _handle_query_command(session, command: str, cypher_query: str) -> str:
-    """Handle 'query <cypher>' command - execute custom Cypher query"""
+    """Handle 'query <cypher>' command - execute custom Cypher query."""
     try:
         # Execute the query with a limit to prevent overwhelming responses
         result = await session.run(cypher_query)
@@ -1943,9 +1869,7 @@ async def parse_github_repository(ctx: Context, repo_url: str) -> str:
         )
 
 
-async def crawl_markdown_file(
-    crawler: AsyncWebCrawler, url: str
-) -> list[dict[str, Any]]:
+async def crawl_markdown_file(crawler: AsyncWebCrawler, url: str) -> list[dict[str, Any]]:
     """Crawl a .txt or markdown file.
 
     Args:
@@ -1965,9 +1889,7 @@ async def crawl_markdown_file(
         return []
 
 
-async def crawl_batch(
-    crawler: AsyncWebCrawler, urls: list[str], max_concurrent: int = 10
-) -> list[dict[str, Any]]:
+async def crawl_batch(crawler: AsyncWebCrawler, urls: list[str], max_concurrent: int = 10) -> list[dict[str, Any]]:
     """Batch crawl multiple URLs in parallel.
 
     Args:
@@ -1985,14 +1907,8 @@ async def crawl_batch(
         max_session_permit=max_concurrent,
     )
 
-    results = await crawler.arun_many(
-        urls=urls, config=crawl_config, dispatcher=dispatcher
-    )
-    return [
-        {"url": r.url, "markdown": r.markdown}
-        for r in results
-        if r.success and r.markdown
-    ]
+    results = await crawler.arun_many(urls=urls, config=crawl_config, dispatcher=dispatcher)
+    return [{"url": r.url, "markdown": r.markdown} for r in results if r.success and r.markdown]
 
 
 async def crawl_recursive_internal_links(
@@ -2024,21 +1940,15 @@ async def crawl_recursive_internal_links(
     def normalize_url(url):
         return urldefrag(url)[0]
 
-    current_urls = set([normalize_url(u) for u in start_urls])
+    current_urls = {normalize_url(u) for u in start_urls}
     results_all = []
 
-    for depth in range(max_depth):
-        urls_to_crawl = [
-            normalize_url(url)
-            for url in current_urls
-            if normalize_url(url) not in visited
-        ]
+    for _depth in range(max_depth):
+        urls_to_crawl = [normalize_url(url) for url in current_urls if normalize_url(url) not in visited]
         if not urls_to_crawl:
             break
 
-        results = await crawler.arun_many(
-            urls=urls_to_crawl, config=run_config, dispatcher=dispatcher
-        )
+        results = await crawler.arun_many(urls=urls_to_crawl, config=run_config, dispatcher=dispatcher)
         next_level_urls = set()
 
         for result in results:

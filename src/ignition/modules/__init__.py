@@ -1,4 +1,4 @@
-"""Ignition Modules Package
+"""Ignition Modules Package.
 
 This package contains all Ignition development modules including:
 - Base module framework
@@ -12,16 +12,16 @@ from .base import AbstractIgnitionModule, ModuleConfig, ModuleContext
 from .data_integration import DataIntegrationModule, create_data_integration_module
 
 __all__ = [
-    # Base framework
-    "AbstractIgnitionModule",
-    "ModuleConfig",
-    "ModuleContext",
-    # Data Integration Module
-    "DataIntegrationModule",
-    "create_data_integration_module",
     # AI Assistant Module
     "AIAssistantModule",
+    # Base framework
+    "AbstractIgnitionModule",
+    # Data Integration Module
+    "DataIntegrationModule",
+    "ModuleConfig",
+    "ModuleContext",
     "create_ai_assistant_module",
+    "create_data_integration_module",
 ]
 
 __version__ = "1.0.0"

@@ -121,14 +121,10 @@ def impact(file_path: str) -> None:
             "medium": "yellow",
             "low": "green",
         }.get(impact_analysis.risk_level, "white")
-        console.print(
-            f"Risk Level: [{risk_color}]{impact_analysis.risk_level.upper()}[/{risk_color}]"
-        )
+        console.print(f"Risk Level: [{risk_color}]{impact_analysis.risk_level.upper()}[/{risk_color}]")
 
         if impact_analysis.affected_files:
-            console.print(
-                f"\n📁 Affected Files ({len(impact_analysis.affected_files)}):"
-            )
+            console.print(f"\n📁 Affected Files ({len(impact_analysis.affected_files)}):")
             for file in impact_analysis.affected_files[:5]:
                 console.print(f"  • {file}")
 

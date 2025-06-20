@@ -166,9 +166,7 @@ class GraphDatabaseTester:
 
         # Test 1: Function count validation
         def test_function_count():
-            result = self.client.execute_query(
-                "MATCH (f:Function) RETURN count(f) as total"
-            )
+            result = self.client.execute_query("MATCH (f:Function) RETURN count(f) as total")
             total = result[0]["total"]
             expected_min = 60  # We should have at least 60 functions after Task 1
 
@@ -304,9 +302,7 @@ class GraphDatabaseTester:
                 {"invalid_gateway_mappings": invalid},
             )
 
-        tests.append(
-            self._run_test("Gateway-Only Functions", test_gateway_only_functions)
-        )
+        tests.append(self._run_test("Gateway-Only Functions", test_gateway_only_functions))
 
         return tests
 
@@ -345,9 +341,7 @@ class GraphDatabaseTester:
 
             distribution = {r["category"]: r["count"] for r in result}
             # After Task 1, 'tag' should be the largest category
-            largest_category = (
-                max(distribution, key=distribution.get) if distribution else None
-            )
+            largest_category = max(distribution, key=distribution.get) if distribution else None
 
             return (
                 largest_category == "tag",
@@ -355,9 +349,7 @@ class GraphDatabaseTester:
                 {"distribution": distribution},
             )
 
-        tests.append(
-            self._run_test("Category Distribution", test_category_distribution)
-        )
+        tests.append(self._run_test("Category Distribution", test_category_distribution))
 
         return tests
 
@@ -383,11 +375,7 @@ class GraphDatabaseTester:
                 {"query_time": query_time},
             )
 
-        tests.append(
-            self._run_test(
-                "Function Query Performance", test_function_query_performance
-            )
-        )
+        tests.append(self._run_test("Function Query Performance", test_function_query_performance))
 
         # Test 2: Context relationship performance
         def test_context_query_performance():
@@ -407,9 +395,7 @@ class GraphDatabaseTester:
                 {"query_time": query_time},
             )
 
-        tests.append(
-            self._run_test("Context Query Performance", test_context_query_performance)
-        )
+        tests.append(self._run_test("Context Query Performance", test_context_query_performance))
 
         # Test 3: Complex relationship traversal
         def test_complex_traversal_performance():
@@ -430,11 +416,7 @@ class GraphDatabaseTester:
                 {"query_time": query_time},
             )
 
-        tests.append(
-            self._run_test(
-                "Complex Traversal Performance", test_complex_traversal_performance
-            )
-        )
+        tests.append(self._run_test("Complex Traversal Performance", test_complex_traversal_performance))
 
         return tests
 
@@ -478,11 +460,7 @@ class GraphDatabaseTester:
                 {"inconsistent": inconsistent},
             )
 
-        tests.append(
-            self._run_test(
-                "Category-Function Consistency", test_category_function_consistency
-            )
-        )
+        tests.append(self._run_test("Category-Function Consistency", test_category_function_consistency))
 
         return tests
 
@@ -575,9 +553,7 @@ class GraphDatabaseTester:
         if summary["success"]:
             print(f"✅ **ALL TESTS PASSED** ({passed_tests}/{total_tests})")
         else:
-            print(
-                f"❌ **{failed_tests} TESTS FAILED** ({passed_tests}/{total_tests} passed)"
-            )
+            print(f"❌ **{failed_tests} TESTS FAILED** ({passed_tests}/{total_tests} passed)")
 
         print(f"📊 **Pass Rate**: {summary['pass_rate']:.1f}%")
         print(f"⏱️ **Total Time**: {total_time:.2f}s")
@@ -585,9 +561,7 @@ class GraphDatabaseTester:
         print("\n📋 **Test Results**:")
         for result in self.test_results:
             status = "✅" if result.passed else "❌"
-            print(
-                f"{status} {result.test_name}: {result.message} ({result.execution_time:.3f}s)"
-            )
+            print(f"{status} {result.test_name}: {result.message} ({result.execution_time:.3f}s)")
 
         if failed_tests > 0:
             print("\n⚠️ **Failed Tests Details**:")
@@ -609,9 +583,7 @@ def main():
         logger.info("✅ All tests passed - database is healthy!")
         return True
     else:
-        logger.error(
-            f"❌ {results['failed_tests']} tests failed - please review issues"
-        )
+        logger.error(f"❌ {results['failed_tests']} tests failed - please review issues")
         return False
 
 

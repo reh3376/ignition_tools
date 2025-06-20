@@ -113,9 +113,7 @@ class IgnitionScriptGenerator:
 
         return script_content
 
-    def generate_from_config(
-        self, config: str | Path | dict[str, Any], output_file: str | Path | None = None
-    ) -> str:
+    def generate_from_config(self, config: str | Path | dict[str, Any], output_file: str | Path | None = None) -> str:
         """Generate a script from a configuration file or dictionary.
 
         Args:
@@ -173,14 +171,9 @@ class IgnitionScriptGenerator:
 
         # Template-specific validation
         if "vision/button_click_handler" in template_name:
-            if (
-                config.get("action_type") == "navigation"
-                and "target_window" not in config
-            ):
+            if config.get("action_type") == "navigation" and "target_window" not in config:
                 errors.append("'target_window' is required for navigation actions")
-            elif (
-                config.get("action_type") == "tag_write" and "target_tag" not in config
-            ):
+            elif config.get("action_type") == "tag_write" and "target_tag" not in config:
                 errors.append("'target_tag' is required for tag write actions")
 
         return errors

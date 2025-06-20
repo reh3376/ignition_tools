@@ -170,11 +170,7 @@ def captured_logs():
             """Get captured log messages, optionally filtered by level."""
             if level is None:
                 return [record.getMessage() for record in self.records]
-            return [
-                record.getMessage()
-                for record in self.records
-                if record.levelno >= level
-            ]
+            return [record.getMessage() for record in self.records if record.levelno >= level]
 
     return LogCapture()
 

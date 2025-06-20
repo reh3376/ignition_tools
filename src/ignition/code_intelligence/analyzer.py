@@ -94,9 +94,7 @@ class CodeAnalyzer:
             logger.error(f"Failed to analyze file {file_path}: {e}")
             return None
 
-    def analyze_directory(
-        self, directory_path: Path, recursive: bool = True
-    ) -> list[dict[str, Any]]:
+    def analyze_directory(self, directory_path: Path, recursive: bool = True) -> list[dict[str, Any]]:
         """Analyze all Python files in a directory."""
         results = []
 
@@ -164,9 +162,7 @@ class CodeAnalyzer:
                 complexity_calc.visit(node)
 
                 # Count methods
-                methods_count = sum(
-                    1 for n in node.body if isinstance(n, ast.FunctionDef)
-                )
+                methods_count = sum(1 for n in node.body if isinstance(n, ast.FunctionDef))
 
                 # Extract inheritance
                 inheritance = []
@@ -211,7 +207,7 @@ class CodeAnalyzer:
         for node in ast.walk(tree):
             if isinstance(node, ast.ClassDef):
                 class_stack.append(node.name)
-            elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            elif isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef):
                 # Calculate method complexity
                 complexity_calc = ComplexityCalculator()
                 complexity_calc.visit(node)
@@ -273,9 +269,7 @@ class CodeAnalyzer:
                     )
                     imports.append(import_node)
 
-            elif (
-                isinstance(node, ast.ImportFrom) and node.module
-            ):  # Skip relative imports without module
+            elif isinstance(node, ast.ImportFrom) and node.module:  # Skip relative imports without module
                 for alias in node.names:
                     import_node = ImportNode(
                         module=alias.name,
@@ -294,10 +288,7 @@ class CodeAnalyzer:
         # Simple heuristic: if it starts with 'src.' or doesn't contain dots, it might be local
         if module_name.startswith("src."):
             return True
-        return bool(
-            "." not in module_name
-            and module_name not in ["os", "sys", "json", "datetime", "logging"]
-        )
+        return bool("." not in module_name and module_name not in ["os", "sys", "json", "datetime", "logging"])
 
     def get_file_dependencies(self, file_analysis: dict[str, Any]) -> list[str]:
         """Extract file dependencies from analysis results."""
@@ -314,9 +305,7 @@ class CodeAnalyzer:
 
         return dependencies
 
-    def calculate_change_impact(
-        self, file_path: Path, changes: list[str]
-    ) -> dict[str, Any]:
+    def calculate_change_impact(self, file_path: Path, changes: list[str]) -> dict[str, Any]:
         """Calculate the potential impact of changes to a file."""
         # This is a simplified implementation
         # In a full implementation, this would analyze the specific changes

@@ -1,4 +1,4 @@
-"""AI Assistant Module for Ignition Development
+"""AI Assistant Module for Ignition Development.
 
 This module provides AI-powered assistance for Ignition development, including:
 - Intelligent code analysis and validation
@@ -12,7 +12,8 @@ import os
 from dataclasses import dataclass, field
 from typing import Any
 
-from ..base import AbstractIgnitionModule, ModuleConfig, ModuleContext
+from src.ignition.modules.base import AbstractIgnitionModule, ModuleConfig, ModuleContext
+
 from .code_analyzer import AnalysisResult, CodeAnalyzer
 from .knowledge_validator import KnowledgeValidator, ScriptValidationResult
 
@@ -21,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class AIAssistantConfig:
-    """Configuration for AI Assistant Module"""
+    """Configuration for AI Assistant Module."""
 
     neo4j_uri: str = "bolt://localhost:7687"
     neo4j_user: str = "neo4j"
@@ -34,7 +35,7 @@ class AIAssistantConfig:
 
 @dataclass
 class CodeAnalysisRequest:
-    """Request for code analysis"""
+    """Request for code analysis."""
 
     code: str | None = None
     file_path: str | None = None
@@ -44,7 +45,7 @@ class CodeAnalysisRequest:
 
 @dataclass
 class CodeAnalysisResponse:
-    """Response from code analysis"""
+    """Response from code analysis."""
 
     analysis_result: AnalysisResult | None = None
     validation_result: ScriptValidationResult | None = None
@@ -55,7 +56,7 @@ class CodeAnalysisResponse:
 
 
 class AIAssistantModule(AbstractIgnitionModule):
-    """AI Assistant Module for intelligent Ignition development assistance"""
+    """AI Assistant Module for intelligent Ignition development assistance."""
 
     def __init__(self, context: ModuleContext):
         super().__init__(context.config)
@@ -65,7 +66,7 @@ class AIAssistantModule(AbstractIgnitionModule):
         self.knowledge_validator: KnowledgeValidator | None = None
 
     async def initialize(self, context: ModuleContext | None = None) -> bool:
-        """Initialize the AI Assistant Module"""
+        """Initialize the AI Assistant Module."""
         try:
             logger.info("Initializing AI Assistant Module...")
             if context:
@@ -84,9 +85,7 @@ class AIAssistantModule(AbstractIgnitionModule):
                 await self.knowledge_validator.initialize()
                 logger.info("Knowledge graph validator initialized")
             else:
-                logger.warning(
-                    "Neo4j not available - knowledge graph validation disabled"
-                )
+                logger.warning("Neo4j not available - knowledge graph validation disabled")
 
             self._set_initialized(True)
             logger.info("AI Assistant Module initialized successfully")
@@ -97,7 +96,7 @@ class AIAssistantModule(AbstractIgnitionModule):
             return False
 
     async def shutdown(self) -> bool:
-        """Shutdown the AI Assistant Module"""
+        """Shutdown the AI Assistant Module."""
         try:
             logger.info("Shutting down AI Assistant Module...")
 
@@ -113,7 +112,7 @@ class AIAssistantModule(AbstractIgnitionModule):
             return False
 
     async def analyze_code(self, request: CodeAnalysisRequest) -> CodeAnalysisResponse:
-        """Analyze code for potential issues and provide suggestions"""
+        """Analyze code for potential issues and provide suggestions."""
         if not self.is_initialized:
             raise RuntimeError("AI Assistant Module not initialized")
 
@@ -126,39 +125,25 @@ class AIAssistantModule(AbstractIgnitionModule):
                     request.code, request.file_path or "<string>"
                 )
             elif request.file_path:
-                response.analysis_result = self.code_analyzer.analyze_script(
-                    request.file_path
-                )
+                response.analysis_result = self.code_analyzer.analyze_script(request.file_path)
             else:
                 response.errors.append("Either code or file_path must be provided")
                 return response
 
             # Step 2: Validate against knowledge graph if requested and available
             if request.validate_against_knowledge_graph and self.knowledge_validator:
-                response.validation_result = (
-                    await self.knowledge_validator.validate_script(
-                        response.analysis_result
-                    )
-                )
-                response.confidence_score = (
-                    response.validation_result.overall_confidence
-                )
-                response.hallucinations_detected = (
-                    response.validation_result.hallucinations_detected
-                )
+                response.validation_result = await self.knowledge_validator.validate_script(response.analysis_result)
+                response.confidence_score = response.validation_result.overall_confidence
+                response.hallucinations_detected = response.validation_result.hallucinations_detected
 
                 # Generate suggestions based on validation results
-                response.suggestions = self._generate_suggestions(
-                    response.validation_result
-                )
+                response.suggestions = self._generate_suggestions(response.validation_result)
 
             # Step 3: Add analysis errors to response
             if response.analysis_result and response.analysis_result.errors:
                 response.errors.extend(response.analysis_result.errors)
 
-            logger.info(
-                f"Code analysis completed with confidence: {response.confidence_score:.2%}"
-            )
+            logger.info(f"Code analysis completed with confidence: {response.confidence_score:.2%}")
 
         except Exception as e:
             error_msg = f"Code analysis failed: {e!s}"
@@ -168,7 +153,7 @@ class AIAssistantModule(AbstractIgnitionModule):
         return response
 
     async def analyze_file(self, file_path: str) -> CodeAnalysisResponse:
-        """Convenience method to analyze a file"""
+        """Convenience method to analyze a file."""
         request = CodeAnalysisRequest(
             file_path=file_path,
             validate_against_knowledge_graph=True,
@@ -176,10 +161,8 @@ class AIAssistantModule(AbstractIgnitionModule):
         )
         return await self.analyze_code(request)
 
-    async def analyze_code_string(
-        self, code: str, file_path: str = "<string>"
-    ) -> CodeAnalysisResponse:
-        """Convenience method to analyze code from string"""
+    async def analyze_code_string(self, code: str, file_path: str = "<string>") -> CodeAnalysisResponse:
+        """Convenience method to analyze code from string."""
         request = CodeAnalysisRequest(
             code=code,
             file_path=file_path,
@@ -189,7 +172,7 @@ class AIAssistantModule(AbstractIgnitionModule):
         return await self.analyze_code(request)
 
     def get_module_info(self) -> dict[str, Any]:
-        """Get comprehensive module information"""
+        """Get comprehensive module information."""
         return {
             "module_name": "AI Assistant",
             "version": "1.0.0",
@@ -228,7 +211,7 @@ class AIAssistantModule(AbstractIgnitionModule):
         }
 
     async def get_statistics(self) -> dict[str, Any]:
-        """Get module statistics"""
+        """Get module statistics."""
         stats = {
             "module_status": "active" if self.is_initialized else "inactive",
             "knowledge_graph_available": self.knowledge_validator is not None,
@@ -273,9 +256,7 @@ class AIAssistantModule(AbstractIgnitionModule):
                 analysis_request = CodeAnalysisRequest(
                     code=request.get("code"),
                     file_path=request.get("file_path"),
-                    validate_against_knowledge_graph=request.get(
-                        "validate_against_knowledge_graph", True
-                    ),
+                    validate_against_knowledge_graph=request.get("validate_against_knowledge_graph", True),
                     detect_hallucinations=request.get("detect_hallucinations", True),
                 )
 
@@ -284,16 +265,8 @@ class AIAssistantModule(AbstractIgnitionModule):
                 # Convert response to dict
                 return {
                     "success": True,
-                    "analysis_result": (
-                        response.analysis_result.__dict__
-                        if response.analysis_result
-                        else None
-                    ),
-                    "validation_result": (
-                        response.validation_result.__dict__
-                        if response.validation_result
-                        else None
-                    ),
+                    "analysis_result": (response.analysis_result.__dict__ if response.analysis_result else None),
+                    "validation_result": (response.validation_result.__dict__ if response.validation_result else None),
                     "confidence_score": response.confidence_score,
                     "suggestions": response.suggestions,
                     "hallucinations_detected": response.hallucinations_detected,
@@ -316,13 +289,11 @@ class AIAssistantModule(AbstractIgnitionModule):
             return {"success": False, "error": str(e)}
 
     async def _load_configuration(self):
-        """Load configuration from environment variables"""
+        """Load configuration from environment variables."""
         # Load from environment variables
         self.ai_config.neo4j_uri = os.getenv("NEO4J_URI", self.ai_config.neo4j_uri)
         self.ai_config.neo4j_user = os.getenv("NEO4J_USER", self.ai_config.neo4j_user)
-        self.ai_config.neo4j_password = os.getenv(
-            "NEO4J_PASSWORD", self.ai_config.neo4j_password
-        )
+        self.ai_config.neo4j_password = os.getenv("NEO4J_PASSWORD", self.ai_config.neo4j_password)
 
         # Load from module configuration if available
         ai_config_data = self.config.get("ai_assistant", {})
@@ -330,9 +301,7 @@ class AIAssistantModule(AbstractIgnitionModule):
             self.ai_config.confidence_threshold = ai_config_data.get(
                 "confidence_threshold", self.ai_config.confidence_threshold
             )
-            self.ai_config.max_suggestions = ai_config_data.get(
-                "max_suggestions", self.ai_config.max_suggestions
-            )
+            self.ai_config.max_suggestions = ai_config_data.get("max_suggestions", self.ai_config.max_suggestions)
             self.ai_config.enable_web_crawling = ai_config_data.get(
                 "enable_web_crawling", self.ai_config.enable_web_crawling
             )
@@ -341,12 +310,10 @@ class AIAssistantModule(AbstractIgnitionModule):
                 self.ai_config.enable_hallucination_detection,
             )
 
-        logger.info(
-            f"AI Assistant configuration loaded: confidence_threshold={self.ai_config.confidence_threshold}"
-        )
+        logger.info(f"AI Assistant configuration loaded: confidence_threshold={self.ai_config.confidence_threshold}")
 
     def _is_neo4j_available(self) -> bool:
-        """Check if Neo4j is available"""
+        """Check if Neo4j is available."""
         try:
             # Try to import neo4j driver
             from neo4j import GraphDatabase
@@ -367,10 +334,8 @@ class AIAssistantModule(AbstractIgnitionModule):
             logger.debug(f"Neo4j not available: {e}")
             return False
 
-    def _generate_suggestions(
-        self, validation_result: ScriptValidationResult
-    ) -> list[str]:
-        """Generate intelligent suggestions based on validation results"""
+    def _generate_suggestions(self, validation_result: ScriptValidationResult) -> list[str]:
+        """Generate intelligent suggestions based on validation results."""
         suggestions = []
 
         # Collect suggestions from all validation results
@@ -395,7 +360,7 @@ class AIAssistantModule(AbstractIgnitionModule):
 
 
 def create_ai_assistant_module() -> AIAssistantModule:
-    """Factory function to create AI Assistant Module with default configuration"""
+    """Factory function to create AI Assistant Module with default configuration."""
     # Create default module configuration
     config = ModuleConfig(
         name="ai_assistant",

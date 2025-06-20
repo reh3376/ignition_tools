@@ -50,9 +50,7 @@ class Task16SFCRecipeSystem:
     def create_all_functions(self) -> dict[str, Any]:
         """Create all SFC and Recipe Management functions in the graph database."""
         try:
-            self.logger.info(
-                "Starting Task 16: SFC & Recipe Management System implementation"
-            )
+            self.logger.info("Starting Task 16: SFC & Recipe Management System implementation")
 
             # Create function categories
             sfc_functions = self._create_sfc_control_functions()
@@ -65,14 +63,11 @@ class Task16SFCRecipeSystem:
                 **integration_functions,
             }
 
-            self.logger.info(
-                f"Task 16 completed: {len(all_functions)} functions created"
-            )
+            self.logger.info(f"Task 16 completed: {len(all_functions)} functions created")
             return {
                 "task_16_summary": {
                     "total_functions": len(all_functions),
-                    "target_met": len(all_functions)
-                    >= self.task_info["function_count_target"],
+                    "target_met": len(all_functions) >= self.task_info["function_count_target"],
                     "categories": {
                         "sfc_control": len(sfc_functions),
                         "recipe_management": len(recipe_functions),
@@ -95,9 +90,7 @@ class Task16SFCRecipeSystem:
             name="sfc.start",
             description="Start execution of a Sequential Function Chart",
             parameters=[
-                self._create_parameter(
-                    "chart_path", "str", "Path to the SFC chart to start", True
-                ),
+                self._create_parameter("chart_path", "str", "Path to the SFC chart to start", True),
                 self._create_parameter(
                     "initial_variables",
                     "dict",
@@ -143,9 +136,7 @@ else:
             name="sfc.stop",
             description="Stop execution of a Sequential Function Chart",
             parameters=[
-                self._create_parameter(
-                    "chart_path", "str", "Path to the SFC chart to stop", True
-                ),
+                self._create_parameter("chart_path", "str", "Path to the SFC chart to stop", True),
                 self._create_parameter(
                     "force_stop",
                     "bool",
@@ -186,12 +177,8 @@ else:
             name="sfc.pause",
             description="Pause execution of a Sequential Function Chart",
             parameters=[
-                self._create_parameter(
-                    "chart_path", "str", "Path to the SFC chart to pause", True
-                ),
-                self._create_parameter(
-                    "safe_pause", "bool", "Pause only at safe points", False, True
-                ),
+                self._create_parameter("chart_path", "str", "Path to the SFC chart to pause", True),
+                self._create_parameter("safe_pause", "bool", "Pause only at safe points", False, True),
             ],
             return_type="bool",
             context=["Gateway", "Vision Client", "Perspective Session"],
@@ -227,9 +214,7 @@ if success:
             name="sfc.resume",
             description="Resume execution of a paused Sequential Function Chart",
             parameters=[
-                self._create_parameter(
-                    "chart_path", "str", "Path to the SFC chart to resume", True
-                ),
+                self._create_parameter("chart_path", "str", "Path to the SFC chart to resume", True),
                 self._create_parameter(
                     "verify_conditions",
                     "bool",
@@ -276,12 +261,8 @@ else:
             name="sfc.reset",
             description="Reset a Sequential Function Chart to its initial state",
             parameters=[
-                self._create_parameter(
-                    "chart_path", "str", "Path to the SFC chart to reset", True
-                ),
-                self._create_parameter(
-                    "clear_variables", "bool", "Clear all chart variables", False, True
-                ),
+                self._create_parameter("chart_path", "str", "Path to the SFC chart to reset", True),
+                self._create_parameter("clear_variables", "bool", "Clear all chart variables", False, True),
             ],
             return_type="bool",
             context=["Gateway", "Vision Client", "Perspective Session"],
@@ -319,9 +300,7 @@ if success:
             name="sfc.getStatus",
             description="Get comprehensive status information for an SFC chart",
             parameters=[
-                self._create_parameter(
-                    "chart_path", "str", "Path to the SFC chart", True
-                ),
+                self._create_parameter("chart_path", "str", "Path to the SFC chart", True),
                 self._create_parameter(
                     "include_variables",
                     "bool",
@@ -375,9 +354,7 @@ if status:
             name="sfc.getCurrentStep",
             description="Get the currently executing step of an SFC chart",
             parameters=[
-                self._create_parameter(
-                    "chart_path", "str", "Path to the SFC chart", True
-                ),
+                self._create_parameter("chart_path", "str", "Path to the SFC chart", True),
                 self._create_parameter(
                     "include_details",
                     "bool",
@@ -420,12 +397,8 @@ if current_step:
             name="sfc.getStepHistory",
             description="Get execution history of steps for an SFC chart",
             parameters=[
-                self._create_parameter(
-                    "chart_path", "str", "Path to the SFC chart", True
-                ),
-                self._create_parameter(
-                    "limit", "int", "Maximum number of history entries", False, 100
-                ),
+                self._create_parameter("chart_path", "str", "Path to the SFC chart", True),
+                self._create_parameter("limit", "int", "Maximum number of history entries", False, 100),
                 self._create_parameter(
                     "execution_id",
                     "str",
@@ -481,15 +454,9 @@ if history:
             description="Create a new recipe from a template or structure",
             parameters=[
                 self._create_parameter("name", "str", "Name for the new recipe", True),
-                self._create_parameter(
-                    "template", "dict", "Recipe template or structure definition", True
-                ),
-                self._create_parameter(
-                    "description", "str", "Recipe description", False, ""
-                ),
-                self._create_parameter(
-                    "version", "str", "Recipe version", False, "1.0"
-                ),
+                self._create_parameter("template", "dict", "Recipe template or structure definition", True),
+                self._create_parameter("description", "str", "Recipe description", False, ""),
+                self._create_parameter("version", "str", "Recipe version", False, "1.0"),
             ],
             return_type="str",
             context=["Gateway", "Vision Client", "Perspective Session"],
@@ -568,12 +535,8 @@ if recipe_id:
             name="recipe.load",
             description="Load an existing recipe for execution or editing",
             parameters=[
-                self._create_parameter(
-                    "recipe_name", "str", "Name of the recipe to load", True
-                ),
-                self._create_parameter(
-                    "version", "str", "Specific recipe version to load", False, "latest"
-                ),
+                self._create_parameter("recipe_name", "str", "Name of the recipe to load", True),
+                self._create_parameter("version", "str", "Specific recipe version to load", False, "latest"),
             ],
             return_type="dict",
             context=["Gateway", "Vision Client", "Perspective Session"],
@@ -628,12 +591,8 @@ else:
             name="recipe.save",
             description="Save recipe data to the recipe database",
             parameters=[
-                self._create_parameter(
-                    "recipe_name", "str", "Name of the recipe to save", True
-                ),
-                self._create_parameter(
-                    "recipe_data", "dict", "Complete recipe data structure", True
-                ),
+                self._create_parameter("recipe_name", "str", "Name of the recipe to save", True),
+                self._create_parameter("recipe_data", "dict", "Complete recipe data structure", True),
                 self._create_parameter(
                     "overwrite",
                     "bool",
@@ -692,15 +651,9 @@ else:
             name="recipe.execute",
             description="Execute a recipe on specified equipment",
             parameters=[
-                self._create_parameter(
-                    "recipe_name", "str", "Name of the recipe to execute", True
-                ),
-                self._create_parameter(
-                    "equipment_id", "str", "Target equipment identifier", True
-                ),
-                self._create_parameter(
-                    "batch_id", "str", "Batch identifier for tracking", False, ""
-                ),
+                self._create_parameter("recipe_name", "str", "Name of the recipe to execute", True),
+                self._create_parameter("equipment_id", "str", "Target equipment identifier", True),
+                self._create_parameter("batch_id", "str", "Batch identifier for tracking", False, ""),
                 self._create_parameter(
                     "execution_parameters",
                     "dict",
@@ -762,9 +715,7 @@ else:
             name="recipe.abort",
             description="Abort a running recipe execution",
             parameters=[
-                self._create_parameter(
-                    "execution_id", "str", "Execution ID to abort", True
-                ),
+                self._create_parameter("execution_id", "str", "Execution ID to abort", True),
                 self._create_parameter(
                     "abort_reason",
                     "str",
@@ -772,9 +723,7 @@ else:
                     False,
                     "User requested",
                 ),
-                self._create_parameter(
-                    "safe_abort", "bool", "Perform safe abort with cleanup", False, True
-                ),
+                self._create_parameter("safe_abort", "bool", "Perform safe abort with cleanup", False, True),
             ],
             return_type="bool",
             context=["Gateway", "Vision Client", "Perspective Session"],
@@ -826,9 +775,7 @@ else:
             name="recipe.getStatus",
             description="Get execution status of a running recipe",
             parameters=[
-                self._create_parameter(
-                    "execution_id", "str", "Execution ID to check", True
-                ),
+                self._create_parameter("execution_id", "str", "Execution ID to check", True),
                 self._create_parameter(
                     "include_details",
                     "bool",
@@ -891,12 +838,8 @@ else:
             name="recipe.getHistory",
             description="Get execution history for a recipe",
             parameters=[
-                self._create_parameter(
-                    "recipe_name", "str", "Recipe name to get history for", True
-                ),
-                self._create_parameter(
-                    "limit", "int", "Maximum number of history records", False, 50
-                ),
+                self._create_parameter("recipe_name", "str", "Recipe name to get history for", True),
+                self._create_parameter("limit", "int", "Maximum number of history records", False, 50),
                 self._create_parameter(
                     "include_details",
                     "bool",
@@ -966,12 +909,8 @@ else:
             name="sfc.setRecipeData",
             description="Bind recipe data to an SFC chart for execution",
             parameters=[
-                self._create_parameter(
-                    "chart_path", "str", "Path to the SFC chart", True
-                ),
-                self._create_parameter(
-                    "recipe_data", "dict", "Recipe data to bind to the chart", True
-                ),
+                self._create_parameter("chart_path", "str", "Path to the SFC chart", True),
+                self._create_parameter("recipe_data", "dict", "Recipe data to bind to the chart", True),
                 self._create_parameter(
                     "validate_compatibility",
                     "bool",
@@ -1028,9 +967,7 @@ else:
             name="sfc.getRecipeData",
             description="Retrieve recipe data currently bound to an SFC chart",
             parameters=[
-                self._create_parameter(
-                    "chart_path", "str", "Path to the SFC chart", True
-                ),
+                self._create_parameter("chart_path", "str", "Path to the SFC chart", True),
                 self._create_parameter(
                     "include_runtime_data",
                     "bool",
@@ -1083,9 +1020,7 @@ else:
             name="recipe.validateStructure",
             description="Validate recipe data structure and parameters",
             parameters=[
-                self._create_parameter(
-                    "recipe_data", "dict", "Recipe data to validate", True
-                ),
+                self._create_parameter("recipe_data", "dict", "Recipe data to validate", True),
                 self._create_parameter(
                     "validation_level",
                     "str",
@@ -1160,12 +1095,8 @@ else:
             name="recipe.compare",
             description="Compare two recipes and highlight differences",
             parameters=[
-                self._create_parameter(
-                    "recipe1", "dict", "First recipe to compare", True
-                ),
-                self._create_parameter(
-                    "recipe2", "dict", "Second recipe to compare", True
-                ),
+                self._create_parameter("recipe1", "dict", "First recipe to compare", True),
+                self._create_parameter("recipe2", "dict", "Second recipe to compare", True),
                 self._create_parameter(
                     "comparison_depth",
                     "str",
@@ -1218,9 +1149,7 @@ else:
             name="sfc.validateChart",
             description="Validate SFC chart structure and configuration",
             parameters=[
-                self._create_parameter(
-                    "chart_path", "str", "Path to the SFC chart to validate", True
-                ),
+                self._create_parameter("chart_path", "str", "Path to the SFC chart to validate", True),
                 self._create_parameter(
                     "validation_type",
                     "str",
@@ -1392,9 +1321,7 @@ if __name__ == "__main__":
 
     # Note: This would require a connected client in actual usage
     print("Task 16: SFC & Recipe Management System")
-    print(
-        "This module provides Sequential Function Chart and Recipe Management capabilities"
-    )
+    print("This module provides Sequential Function Chart and Recipe Management capabilities")
     print("for industrial automation systems in Ignition.")
     print("\nFunctions include:")
     print("- SFC chart control (start, stop, pause, resume, reset)")

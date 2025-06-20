@@ -15,11 +15,7 @@ def add_memory_and_curl_configs():
     manager = MCPConfigManager()
 
     # Memory configuration
-    memory_config = {
-        "mcpServers": {
-            "memory": {"command": "docker", "args": ["run", "-i", "--rm", "mcp/memory"]}
-        }
-    }
+    memory_config = {"mcpServers": {"memory": {"command": "docker", "args": ["run", "-i", "--rm", "mcp/memory"]}}}
 
     # curl configuration - based on the provided template
     # Note: This follows a different pattern than the other configs

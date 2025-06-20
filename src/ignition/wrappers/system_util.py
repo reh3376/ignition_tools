@@ -29,12 +29,10 @@ class SystemUtilWrapper(IgnitionWrapperBase):
             return logger
 
         except Exception as e:
-            raise WrapperError(f"Logger retrieval failed: {e}", original_error=e)
+            raise WrapperError(f"Logger retrieval failed: {e}", original_error=e) from e
 
     @wrapper_function
-    def send_message(
-        self, project: str, message_handler: str, payload: dict[str, Any]
-    ) -> dict[str, Any]:
+    def send_message(self, project: str, message_handler: str, payload: dict[str, Any]) -> dict[str, Any]:
         """Enhanced message sending with validation."""
         if self.config.validate_inputs:
             if not isinstance(project, str):
@@ -55,10 +53,8 @@ class SystemUtilWrapper(IgnitionWrapperBase):
                 "success": True,
             }
 
-            self._log_operation(
-                "Message sent", f"Project: {project}, Handler: {message_handler}"
-            )
+            self._log_operation("Message sent", f"Project: {project}, Handler: {message_handler}")
             return result
 
         except Exception as e:
-            raise WrapperError(f"Message sending failed: {e}", original_error=e)
+            raise WrapperError(f"Message sending failed: {e}", original_error=e) from e

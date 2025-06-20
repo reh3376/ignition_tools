@@ -116,9 +116,7 @@ class EnhancedIgnitionGraphPopulator:
             for func_data in task_1_functions:
                 self._create_function_with_relationships(func_data)
 
-            logger.info(
-                "Successfully loaded comprehensive Ignition functions including Task 1"
-            )
+            logger.info("Successfully loaded comprehensive Ignition functions including Task 1")
             return True
 
         except Exception as e:
@@ -131,9 +129,7 @@ class EnhancedIgnitionGraphPopulator:
             # Create function node
             node = GraphNode(NodeType.FUNCTION, func_data)
             if not self.client.create_node(node):
-                logger.warning(
-                    f"Failed to create function node: {func_data.get('name', 'unknown')}"
-                )
+                logger.warning(f"Failed to create function node: {func_data.get('name', 'unknown')}")
                 return False
 
             # Create function-context relationships

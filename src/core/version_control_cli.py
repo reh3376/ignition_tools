@@ -39,9 +39,7 @@ def status(repository: str | None, detailed: bool):
 
         with console.status("[bold blue]Checking version control status..."):
             if not manager.initialize():
-                console.print(
-                    "[red]✗[/red] Failed to initialize version control manager"
-                )
+                console.print("[red]✗[/red] Failed to initialize version control manager")
                 return
 
             status_info = manager.get_repository_status()
@@ -55,25 +53,15 @@ def status(repository: str | None, detailed: bool):
         # Show capabilities
         capabilities = status_info["capabilities"]
         console.print("\n[bold]Capabilities:[/bold]")
-        console.print(
-            f"  Impact Analysis: {'✓' if capabilities['impact_analysis'] else '✗'}"
-        )
-        console.print(
-            f"  Conflict Prediction: {'✓' if capabilities['conflict_prediction'] else '✗'}"
-        )
-        console.print(
-            f"  Release Planning: {'✓' if capabilities['release_planning'] else '✗'}"
-        )
-        console.print(
-            f"  Auto Tracking: {'✓' if capabilities['auto_tracking'] else '✗'}"
-        )
+        console.print(f"  Impact Analysis: {'✓' if capabilities['impact_analysis'] else '✗'}")
+        console.print(f"  Conflict Prediction: {'✓' if capabilities['conflict_prediction'] else '✗'}")
+        console.print(f"  Release Planning: {'✓' if capabilities['release_planning'] else '✗'}")
+        console.print(f"  Auto Tracking: {'✓' if capabilities['auto_tracking'] else '✗'}")
 
         # Show connections
         connections = status_info["connections"]
         console.print("\n[bold]Connections:[/bold]")
-        console.print(
-            f"  Graph Database: {'✓' if connections['graph_database'] else '✗'}"
-        )
+        console.print(f"  Graph Database: {'✓' if connections['graph_database'] else '✗'}")
         console.print(f"  Gateway: {'✓' if connections['gateway'] else '✗'}")
 
         # Show git status if available
@@ -103,9 +91,7 @@ def status(repository: str | None, detailed: bool):
 @click.option("--files", "-f", help="Comma-separated list of files to analyze")
 @click.option("--detailed", "-d", is_flag=True, help="Show detailed impact analysis")
 @click.option("--repository", "-r", help="Repository path (default: current directory)")
-def analyze_commit(
-    commit_hash: str | None, files: str | None, detailed: bool, repository: str | None
-):
+def analyze_commit(commit_hash: str | None, files: str | None, detailed: bool, repository: str | None):
     """🔍 Analyze the impact of a commit or changes."""
     try:
         from src.ignition.version_control.manager import (
@@ -124,18 +110,14 @@ def analyze_commit(
 
         with console.status("[bold blue]Analyzing commit impact..."):
             if not manager.initialize():
-                console.print(
-                    "[red]✗[/red] Failed to initialize version control manager"
-                )
+                console.print("[red]✗[/red] Failed to initialize version control manager")
                 return
 
             # Parse files list
             file_list = [f.strip() for f in files.split(",")] if files else None
 
             # Analyze impact
-            result = manager.analyze_commit_impact(
-                commit_hash=commit_hash, files=file_list, detailed=detailed
-            )
+            result = manager.analyze_commit_impact(commit_hash=commit_hash, files=file_list, detailed=detailed)
 
         if "error" in result:
             console.print(f"[red]✗[/red] Analysis failed: {result['error']}")
@@ -164,17 +146,11 @@ def analyze_commit(
 
 
 @version.command()
-@click.option(
-    "--source-branch", "-s", required=True, help="Source branch to merge from"
-)
+@click.option("--source-branch", "-s", required=True, help="Source branch to merge from")
 @click.option("--target-branch", "-t", default="main", help="Target branch to merge to")
-@click.option(
-    "--detailed", "-d", is_flag=True, help="Show detailed conflict predictions"
-)
+@click.option("--detailed", "-d", is_flag=True, help="Show detailed conflict predictions")
 @click.option("--repository", "-r", help="Repository path (default: current directory)")
-def predict_conflicts(
-    source_branch: str, target_branch: str, detailed: bool, repository: str | None
-):
+def predict_conflicts(source_branch: str, target_branch: str, detailed: bool, repository: str | None):
     """🔮 Predict merge conflicts between branches."""
     try:
         from src.ignition.version_control.manager import (
@@ -191,13 +167,9 @@ def predict_conflicts(
         # Initialize manager
         manager = VersionControlManager(config=config)
 
-        with console.status(
-            f"[bold blue]Predicting conflicts between {source_branch} and {target_branch}..."
-        ):
+        with console.status(f"[bold blue]Predicting conflicts between {source_branch} and {target_branch}..."):
             if not manager.initialize():
-                console.print(
-                    "[red]✗[/red] Failed to initialize version control manager"
-                )
+                console.print("[red]✗[/red] Failed to initialize version control manager")
                 return
 
             # Predict conflicts
@@ -216,9 +188,7 @@ def predict_conflicts(
         console.print(f"Source: {source_branch} → Target: {target_branch}")
 
         # This will be implemented when the conflict predictor is complete
-        console.print(
-            "[yellow]💡[/yellow] Conflict prediction implementation in progress"
-        )
+        console.print("[yellow]💡[/yellow] Conflict prediction implementation in progress")
         console.print("Features coming soon:")
         console.print("  • Resource overlap detection")
         console.print("  • Semantic conflict analysis")
@@ -237,9 +207,7 @@ def predict_conflicts(
     "--strategy",
     "-s",
     default="incremental",
-    type=click.Choice(
-        ["incremental", "big_bang", "feature_flag", "blue_green", "canary"]
-    ),
+    type=click.Choice(["incremental", "big_bang", "feature_flag", "blue_green", "canary"]),
     help="Release strategy",
 )
 @click.option("--include", "-i", help="Comma-separated list of changes to include")
@@ -268,13 +236,9 @@ def plan_release(
         # Initialize manager
         manager = VersionControlManager(config=config)
 
-        with console.status(
-            f"[bold blue]Planning release {version} with {strategy} strategy..."
-        ):
+        with console.status(f"[bold blue]Planning release {version} with {strategy} strategy..."):
             if not manager.initialize():
-                console.print(
-                    "[red]✗[/red] Failed to initialize version control manager"
-                )
+                console.print("[red]✗[/red] Failed to initialize version control manager")
                 return
 
             # Parse include/exclude lists
@@ -345,13 +309,9 @@ def report(type: str, format: str, output: str | None, repository: str | None):
         # Initialize manager
         manager = VersionControlManager(config=config)
 
-        with console.status(
-            f"[bold blue]Generating {type} report in {format} format..."
-        ):
+        with console.status(f"[bold blue]Generating {type} report in {format} format..."):
             if not manager.initialize():
-                console.print(
-                    "[red]✗[/red] Failed to initialize version control manager"
-                )
+                console.print("[red]✗[/red] Failed to initialize version control manager")
                 return
 
             # Determine output path
@@ -366,9 +326,7 @@ def report(type: str, format: str, output: str | None, repository: str | None):
                 output_path = repo_path / f"version_control_report_{type}.md"
 
             # Generate report
-            result = manager.generate_report(
-                report_type=type, format=format, output_path=output_path
-            )
+            result = manager.generate_report(report_type=type, format=format, output_path=output_path)
 
         if "error" in result:
             console.print(f"[red]✗[/red] Report generation failed: {result['error']}")
@@ -463,9 +421,7 @@ def predict():
 @click.option("--repository", "-r", help="Repository path (default: current directory)")
 def conflicts(merge_from: str, merge_to: str, repository: str | None):
     """🔮 Predict merge conflicts."""
-    console.print(
-        f"[bold blue]🔮 Predicting conflicts: {merge_from} → {merge_to}[/bold blue]"
-    )
+    console.print(f"[bold blue]🔮 Predicting conflicts: {merge_from} → {merge_to}[/bold blue]")
     console.print("[yellow]💡[/yellow] Conflict prediction implementation in progress")
 
 
@@ -475,13 +431,9 @@ def conflicts(merge_from: str, merge_to: str, repository: str | None):
 @click.option("--repository", "-p", help="Repository path (default: current directory)")
 def deployment(release: str, environment: str, repository: str | None):
     """🚀 Predict deployment issues."""
-    console.print(
-        f"[bold blue]🚀 Predicting deployment issues for: {release}[/bold blue]"
-    )
+    console.print(f"[bold blue]🚀 Predicting deployment issues for: {release}[/bold blue]")
     console.print(f"Environment: {environment}")
-    console.print(
-        "[yellow]💡[/yellow] Deployment prediction implementation in progress"
-    )
+    console.print("[yellow]💡[/yellow] Deployment prediction implementation in progress")
 
 
 @predict.command()

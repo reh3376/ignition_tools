@@ -13,9 +13,7 @@ class SystemNavWrapper(IgnitionWrapperBase):
         return ["open_window", "close_window", "swap_window", "center_window"]
 
     @wrapper_function
-    def open_window(
-        self, path: str, params: dict[str, Any] | None = None
-    ) -> dict[str, Any]:
+    def open_window(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
         """Enhanced window opening with validation and logging."""
         if self.config.validate_inputs:
             if not isinstance(path, str):
@@ -40,7 +38,7 @@ class SystemNavWrapper(IgnitionWrapperBase):
             return result
 
         except Exception as e:
-            raise WrapperError(f"Window open failed: {e}", original_error=e)
+            raise WrapperError(f"Window open failed: {e}", original_error=e) from e
 
     @wrapper_function
     def close_window(self, path: str) -> dict[str, Any]:
@@ -60,4 +58,4 @@ class SystemNavWrapper(IgnitionWrapperBase):
             return result
 
         except Exception as e:
-            raise WrapperError(f"Window close failed: {e}", original_error=e)
+            raise WrapperError(f"Window close failed: {e}", original_error=e) from e

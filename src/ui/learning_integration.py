@@ -53,17 +53,13 @@ class LearningSystemUI:
         return all([self.client, self.tracker, self.analyzer, self.manager])
 
     @contextmanager
-    def track_session(
-        self, user_id: str = "streamlit_user", session_type: str = "ui_session"
-    ):
+    def track_session(self, user_id: str = "streamlit_user", session_type: str = "ui_session"):
         """Context manager for tracking UI sessions."""
         session_id = None
 
         if self.tracker:
             try:
-                session_id = self.tracker.start_session(
-                    user_id=user_id, session_type=session_type
-                )
+                session_id = self.tracker.start_session(user_id=user_id, session_type=session_type)
                 yield session_id
             finally:
                 if session_id:
@@ -84,9 +80,7 @@ class LearningSystemUI:
         try:
             # Start session if none exists
             if not self.tracker.current_session_id:
-                self.tracker.start_session(
-                    user_id="streamlit_user", session_type="ui_session"
-                )
+                self.tracker.start_session(user_id="streamlit_user", session_type="ui_session")
 
             # Track the action
             self.tracker.track_function_query(
@@ -99,18 +93,14 @@ class LearningSystemUI:
             # Silently fail for usage tracking
             pass
 
-    def get_recommendations(
-        self, current_action: str, limit: int = 5
-    ) -> list[dict[str, Any]]:
+    def get_recommendations(self, current_action: str, limit: int = 5) -> list[dict[str, Any]]:
         """Get UI recommendations based on usage patterns."""
         if not self.analyzer:
             return []
 
         try:
             function_name = f"ui.{current_action}"
-            recommendations = self.analyzer.get_recommendations_for_function(
-                function_name
-            )
+            recommendations = self.analyzer.get_recommendations_for_function(function_name)
 
             # Convert to UI actions
             ui_recommendations = []
@@ -151,9 +141,7 @@ class LearningSystemUI:
         else:
             self._render_recommendations(recommendations, current_action)
 
-    def _render_recommendations(
-        self, recommendations: list[dict[str, Any]], current_action: str
-    ):
+    def _render_recommendations(self, recommendations: list[dict[str, Any]], current_action: str):
         """Render recommendations in the UI."""
         st.markdown("### 🎯 Smart Recommendations")
         st.markdown(f"*Based on your {current_action} usage patterns*")
@@ -163,9 +151,7 @@ class LearningSystemUI:
             confidence = rec["confidence"]
             reasoning = rec["reasoning"]
 
-            with st.expander(
-                f"💡 {action.replace('_', ' ').title()} (Confidence: {confidence:.1%})"
-            ):
+            with st.expander(f"💡 {action.replace('_', ' ').title()} (Confidence: {confidence:.1%})"):
                 st.markdown(f"**Why this suggestion?** {reasoning}")
 
                 # Add action buttons for common recommendations
@@ -177,9 +163,7 @@ class LearningSystemUI:
                     if st.button(f"📋 Browse Templates #{i}", key=f"rec_template_{i}"):
                         st.session_state.page = "templates"
                         st.rerun()
-                elif action == "validation" and st.button(
-                    f"✅ Validate Script #{i}", key=f"rec_validate_{i}"
-                ):
+                elif action == "validation" and st.button(f"✅ Validate Script #{i}", key=f"rec_validate_{i}"):
                     st.session_state.page = "validation"
                     st.rerun()
 
@@ -207,9 +191,7 @@ class LearningSystemUI:
                 st.metric("High Confidence", high_conf)
 
             with col3:
-                template_patterns = stats.get("pattern_counts", {}).get(
-                    "template_usage", 0
-                )
+                template_patterns = stats.get("pattern_counts", {}).get("template_usage", 0)
                 st.metric("Template Patterns", template_patterns)
 
             # Pattern distribution chart
@@ -230,9 +212,7 @@ class LearningSystemUI:
         # Prepare data for chart
         chart_data = []
         for pattern_type, count in pattern_counts.items():
-            chart_data.append(
-                {"Pattern Type": pattern_type.replace("_", " ").title(), "Count": count}
-            )
+            chart_data.append({"Pattern Type": pattern_type.replace("_", " ").title(), "Count": count})
 
         if chart_data:
             df = pd.DataFrame(chart_data)
@@ -255,9 +235,7 @@ class LearningSystemUI:
             st.markdown("#### 🌟 Top Patterns")
 
             # Function co-occurrence patterns
-            co_patterns = top_patterns.get("top_patterns", {}).get(
-                "function_co_occurrence", []
-            )
+            co_patterns = top_patterns.get("top_patterns", {}).get("function_co_occurrence", [])
             if co_patterns:
                 st.markdown("**Most Common Function Combinations:**")
                 for pattern in co_patterns[:3]:
@@ -267,9 +245,7 @@ class LearningSystemUI:
                     st.markdown(f"• {func1} → {func2} (Confidence: {confidence:.1%})")
 
             # Template usage patterns
-            template_patterns = top_patterns.get("top_patterns", {}).get(
-                "template_usage", []
-            )
+            template_patterns = top_patterns.get("top_patterns", {}).get("template_usage", [])
             if template_patterns:
                 st.markdown("**Most Popular Templates:**")
                 for pattern in template_patterns[:3]:
@@ -305,17 +281,13 @@ class LearningSystemUI:
                 med_conf = conf_dist.get("medium_confidence", 0)
                 low_conf = conf_dist.get("low_confidence", 0)
                 confidence_rate = (
-                    (high_conf / (high_conf + med_conf + low_conf))
-                    if (high_conf + med_conf + low_conf) > 0
-                    else 0
+                    (high_conf / (high_conf + med_conf + low_conf)) if (high_conf + med_conf + low_conf) > 0 else 0
                 )
                 st.metric("Confidence Rate", f"{confidence_rate:.1%}")
 
             with col3:
                 pattern_counts = stats.get("pattern_counts", {})
-                active_types = len(
-                    [count for count in pattern_counts.values() if count > 0]
-                )
+                active_types = len([count for count in pattern_counts.values() if count > 0])
                 st.metric("Active Pattern Types", active_types)
 
             with col4:
@@ -329,9 +301,7 @@ class LearningSystemUI:
             return
 
         # Tabs for different views
-        tab1, tab2, tab3, tab4 = st.tabs(
-            ["📊 Overview", "🔗 Co-occurrence", "📋 Templates", "⚙️ Parameters"]
-        )
+        tab1, tab2, tab3, tab4 = st.tabs(["📊 Overview", "🔗 Co-occurrence", "📋 Templates", "⚙️ Parameters"])
 
         with tab1:
             self.display_usage_insights()
@@ -350,9 +320,7 @@ class LearningSystemUI:
         st.markdown("### 🔗 Function Co-occurrence Patterns")
 
         try:
-            patterns = self.manager.get_patterns_by_type(
-                "function_co_occurrence", limit=10
-            )
+            patterns = self.manager.get_patterns_by_type("function_co_occurrence", limit=10)
 
             if patterns:
                 # Create a table of co-occurrence patterns
@@ -365,11 +333,7 @@ class LearningSystemUI:
                             "Confidence (1→2)": f"{pattern.get('confidence_1_to_2', 0):.1%}",
                             "Confidence (2→1)": f"{pattern.get('confidence_2_to_1', 0):.1%}",
                             "Support": f"{pattern.get('support', 0):.1%}",
-                            "Created": (
-                                pattern.get("created_at", "")[:10]
-                                if pattern.get("created_at")
-                                else ""
-                            ),
+                            "Created": (pattern.get("created_at", "")[:10] if pattern.get("created_at") else ""),
                         }
                     )
 
@@ -397,11 +361,7 @@ class LearningSystemUI:
                             "Usage Count": pattern.get("usage_count", 0),
                             "Success Rate": f"{pattern.get('success_rate', 0):.1%}",
                             "Avg Generation Time": f"{pattern.get('avg_generation_time', 0):.2f}s",
-                            "Last Used": (
-                                pattern.get("last_used", "")[:10]
-                                if pattern.get("last_used")
-                                else ""
-                            ),
+                            "Last Used": (pattern.get("last_used", "")[:10] if pattern.get("last_used") else ""),
                         }
                     )
 
@@ -445,9 +405,7 @@ class LearningSystemUI:
         st.markdown("### ⚙️ Parameter Combination Patterns")
 
         try:
-            patterns = self.manager.get_patterns_by_type(
-                "parameter_combination", limit=15
-            )
+            patterns = self.manager.get_patterns_by_type("parameter_combination", limit=15)
 
             if patterns:
                 # Group patterns by entity
@@ -468,12 +426,8 @@ class LearningSystemUI:
                                     "Parameter": pattern.get("parameter_key", ""),
                                     "Frequency": f"{pattern.get('frequency', 0):.1%}",
                                     "Success Rate": f"{pattern.get('success_rate', 0):.1%}",
-                                    "Avg Value Length": pattern.get(
-                                        "avg_value_length", 0
-                                    ),
-                                    "Common Values": ", ".join(
-                                        pattern.get("common_values", [])[:3]
-                                    ),
+                                    "Avg Value Length": pattern.get("avg_value_length", 0),
+                                    "Common Values": ", ".join(pattern.get("common_values", [])[:3]),
                                 }
                             )
 
@@ -515,9 +469,7 @@ def track_script_generation(template: str, config: dict[str, Any], success: bool
 def track_template_usage(template: str, action: str):
     """Track template-related actions."""
     learning_system = get_learning_system()
-    learning_system.track_action(
-        "template_usage", {"template": template, "action": action}
-    )
+    learning_system.track_action("template_usage", {"template": template, "action": action})
 
 
 def show_smart_recommendations(current_action: str, container=None):

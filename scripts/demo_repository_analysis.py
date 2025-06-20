@@ -63,9 +63,7 @@ def main():
         action="store_true",
         help="Run full Pydantic AI analysis (large repo)",
     )
-    parser.add_argument(
-        "--clear-all", action="store_true", help="Clear all existing data first"
-    )
+    parser.add_argument("--clear-all", action="store_true", help="Clear all existing data first")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
 
     args = parser.parse_args()
@@ -90,9 +88,7 @@ def main():
 
         if not client.connect():
             console.print("❌ Failed to connect to Neo4j database", style="red")
-            console.print(
-                "Make sure Neo4j is running: docker-compose up -d neo4j", style="yellow"
-            )
+            console.print("Make sure Neo4j is running: docker-compose up -d neo4j", style="yellow")
             sys.exit(1)
 
         console.print("✅ Connected to Neo4j database", style="green")

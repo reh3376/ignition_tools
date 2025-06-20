@@ -159,9 +159,7 @@ def test_perspective_navigation_template():
     }
 
     try:
-        result = generator.generate_script(
-            "perspective/session_navigation.jinja2", config
-        )
+        result = generator.generate_script("perspective/session_navigation.jinja2", config)
 
         print(f"✅ Template generated successfully ({len(result)} characters)")
         print("\n--- First 300 characters ---")

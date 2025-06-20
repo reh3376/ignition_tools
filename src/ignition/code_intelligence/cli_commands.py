@@ -29,9 +29,7 @@ def refactor_commands() -> None:
 
 
 @refactor_commands.command()
-@click.option(
-    "--directory", "-d", default="src", help="Directory to scan for large files"
-)
+@click.option("--directory", "-d", default="src", help="Directory to scan for large files")
 @click.option("--threshold", "-t", default=1000, help="Line threshold for large files")
 @click.option(
     "--format",
@@ -109,9 +107,7 @@ def split(file_path: str, dry_run: bool, no_git: bool) -> None:
     file_path_obj = Path(file_path)
 
     try:
-        click.echo(
-            f"{'🔍 Simulating' if dry_run else '🔄 Executing'} split for {file_path}"
-        )
+        click.echo(f"{'🔍 Simulating' if dry_run else '🔄 Executing'} split for {file_path}")
 
         result = splitter.split_file(file_path_obj, dry_run=dry_run)
 
@@ -134,9 +130,7 @@ def split(file_path: str, dry_run: bool, no_git: bool) -> None:
                     click.echo(f"     - {func}")
 
             if result.import_updates:
-                click.echo(
-                    f"   Import updates needed in {len(result.import_updates)} files"
-                )
+                click.echo(f"   Import updates needed in {len(result.import_updates)} files")
 
         else:
             click.echo(f"❌ Split failed: {result.error_message}")
@@ -157,9 +151,7 @@ def batch_split(directory: str, dry_run: bool, no_git: bool, max_files: int) -> 
     BatchCodeSplitter(preserve_git_history=not no_git)
 
     try:
-        click.echo(
-            f"{'🔍 Simulating' if dry_run else '🔄 Executing'} batch split in {directory}"
-        )
+        click.echo(f"{'🔍 Simulating' if dry_run else '🔄 Executing'} batch split in {directory}")
 
         # Get oversized files
         detector = LargeFileDetector()
@@ -191,9 +183,7 @@ def batch_split(directory: str, dry_run: bool, no_git: bool, max_files: int) -> 
         # Show details for each file
         for file_path, result in results.items():
             status = "✅" if result.success else "❌"
-            click.echo(
-                f"{status} {Path(file_path).name}: {result.error_message or 'Success'}"
-            )
+            click.echo(f"{status} {Path(file_path).name}: {result.error_message or 'Success'}")
 
     except Exception as e:
         click.echo(f"❌ Error during batch split: {e!s}", err=True)
@@ -216,9 +206,7 @@ def workflow(files: tuple, directory: str, dry_run: bool, no_git: bool) -> None:
         else:
             # Find large files automatically
             detector = LargeFileDetector()
-            target_files = detector.scan_directory(Path(directory))[
-                :5
-            ]  # Limit to top 5
+            target_files = detector.scan_directory(Path(directory))[:5]  # Limit to top 5
 
         if not target_files:
             click.echo("No files found that need refactoring")
@@ -233,9 +221,7 @@ def workflow(files: tuple, directory: str, dry_run: bool, no_git: bool) -> None:
 
         click.echo(f"\nPlanned {len(operations)} refactoring operations:")
         for op in operations:
-            risk_color = {"low": "green", "medium": "yellow", "high": "red"}.get(
-                op.risk_level, "white"
-            )
+            risk_color = {"low": "green", "medium": "yellow", "high": "red"}.get(op.risk_level, "white")
             click.echo(click.style(f"  - {op.description}", fg=risk_color))
             click.echo(f"    Risk: {op.risk_level}, Estimated: {op.estimated_time}s")
 
@@ -293,9 +279,7 @@ def rollback(workflow_id: str) -> None:
         sys.exit(1)
 
 
-def _display_files_table(
-    files: list[Path], engine: RefactoringRecommendationEngine
-) -> None:
+def _display_files_table(files: list[Path], engine: RefactoringRecommendationEngine) -> None:
     """Display files in table format."""
     click.echo(f"\n{'File':<50} {'Lines':<8} {'Complexity':<12} {'Issues':<8}")
     click.echo("-" * 80)
@@ -314,9 +298,7 @@ def _display_files_table(
             click.echo(f"{file_path!s:<50} {'ERROR':<8} {'ERROR':<12} {'ERROR':<8}")
 
 
-def _display_files_json(
-    files: list[Path], engine: RefactoringRecommendationEngine
-) -> None:
+def _display_files_json(files: list[Path], engine: RefactoringRecommendationEngine) -> None:
     """Display files in JSON format."""
     import json
 
@@ -335,11 +317,7 @@ def _display_files_json(
                         "risk_level": (
                             "high"
                             if recommendation.complexity_score > 100
-                            else (
-                                "medium"
-                                if recommendation.complexity_score > 50
-                                else "low"
-                            )
+                            else ("medium" if recommendation.complexity_score > 50 else "low")
                         ),
                     }
                 )
@@ -349,9 +327,7 @@ def _display_files_json(
     click.echo(json.dumps(data, indent=2))
 
 
-def _display_files_detailed(
-    files: list[Path], engine: RefactoringRecommendationEngine
-) -> None:
+def _display_files_detailed(files: list[Path], engine: RefactoringRecommendationEngine) -> None:
     """Display files in detailed format."""
     for i, file_path in enumerate(files, 1):
         click.echo(f"\n{i}. {file_path}")
@@ -362,12 +338,8 @@ def _display_files_detailed(
             if recommendation:
                 click.echo(f"   Physical lines: {recommendation.physical_lines}")
                 click.echo(f"   Complexity: {recommendation.complexity_score:.1f}")
-                click.echo(
-                    f"   Maintainability: {recommendation.maintainability_index:.1f}"
-                )
-                click.echo(
-                    f"   Violations: {len(recommendation.single_responsibility_violations)}"
-                )
+                click.echo(f"   Maintainability: {recommendation.maintainability_index:.1f}")
+                click.echo(f"   Violations: {len(recommendation.single_responsibility_violations)}")
 
                 if recommendation.single_responsibility_violations:
                     click.echo("   Issues:")
@@ -412,9 +384,7 @@ def _display_analysis_detailed(recommendation) -> None:
 
     if recommendation.single_responsibility_violations:
         click.echo("\n🚨 SINGLE RESPONSIBILITY VIOLATIONS:")
-        for i, violation in enumerate(
-            recommendation.single_responsibility_violations, 1
-        ):
+        for i, violation in enumerate(recommendation.single_responsibility_violations, 1):
             click.echo(f"  {i}. {violation}")
 
     if recommendation.suggested_splits:
@@ -422,12 +392,8 @@ def _display_analysis_detailed(recommendation) -> None:
         for i, split in enumerate(recommendation.suggested_splits, 1):
             click.echo(f"  {i}. {split.target_module_name}")
             click.echo(f"     Reason: {split.reason}")
-            click.echo(
-                f"     Classes: {', '.join(split.classes_to_move) if split.classes_to_move else 'None'}"
-            )
-            click.echo(
-                f"     Functions: {', '.join(split.functions_to_move) if split.functions_to_move else 'None'}"
-            )
+            click.echo(f"     Classes: {', '.join(split.classes_to_move) if split.classes_to_move else 'None'}")
+            click.echo(f"     Functions: {', '.join(split.functions_to_move) if split.functions_to_move else 'None'}")
             click.echo(f"     Estimated lines: {split.estimated_lines}")
             click.echo(f"     Confidence: {split.confidence_score:.1f}")
 
@@ -450,12 +416,8 @@ def _display_analysis_json(recommendation) -> None:
 
 
 @refactor_commands.command()
-@click.option(
-    "--file-path", "-f", required=True, help="File path to track evolution for"
-)
-@click.option(
-    "--days", "-d", default=30, help="Number of days to analyze (default: 30)"
-)
+@click.option("--file-path", "-f", required=True, help="File path to track evolution for")
+@click.option("--days", "-d", default=30, help="Number of days to analyze (default: 30)")
 @click.option(
     "--format",
     "output_format",
@@ -501,9 +463,7 @@ def track_evolution(file_path: str, days: int, output_format: str) -> None:
 
 @refactor_commands.command()
 @click.option("--source-branch", "-s", required=True, help="Source branch to analyze")
-@click.option(
-    "--target-branch", "-t", default="main", help="Target branch (default: main)"
-)
+@click.option("--target-branch", "-t", default="main", help="Target branch (default: main)")
 @click.option(
     "--format",
     "output_format",
@@ -520,9 +480,7 @@ def analyze_branch(source_branch: str, target_branch: str, output_format: str) -
 
         git_integration = GitIntegration(Path.cwd(), graph_client=None)
 
-        analysis = git_integration.analyze_branch_differences(
-            source_branch, target_branch
-        )
+        analysis = git_integration.analyze_branch_differences(source_branch, target_branch)
         if not analysis:
             click.echo("❌ Could not analyze branch differences", err=True)
             return
@@ -540,9 +498,7 @@ def analyze_branch(source_branch: str, target_branch: str, output_format: str) -
 
 @refactor_commands.command()
 @click.option("--operation-id", "-o", help="Specific operation ID to report on")
-@click.option(
-    "--days", "-d", default=30, help="Number of days for period report (default: 30)"
-)
+@click.option("--days", "-d", default=30, help="Number of days for period report (default: 30)")
 @click.option(
     "--format",
     "output_format",
@@ -578,12 +534,8 @@ def tracking_report(operation_id: str, days: int, output_format: str) -> None:
 
 
 @refactor_commands.command()
-@click.option(
-    "--operation-id", "-o", required=True, help="Operation ID to generate diagram for"
-)
-@click.option(
-    "--output-dir", "-d", default=".", help="Output directory for diagram files"
-)
+@click.option("--operation-id", "-o", required=True, help="Operation ID to generate diagram for")
+@click.option("--output-dir", "-d", default=".", help="Output directory for diagram files")
 def generate_diagram(operation_id: str, output_dir: str) -> None:
     """🎨 Generate architecture diagram for a refactoring operation."""
     try:
@@ -607,9 +559,7 @@ def generate_diagram(operation_id: str, output_dir: str) -> None:
         # Generate diagram
         diagram = tracker.generate_architecture_diagram(operation)
         if not diagram:
-            click.echo(
-                f"❌ Could not generate diagram for operation {operation_id}", err=True
-            )
+            click.echo(f"❌ Could not generate diagram for operation {operation_id}", err=True)
             return
 
         # Save to output directory
@@ -632,9 +582,7 @@ def generate_diagram(operation_id: str, output_dir: str) -> None:
 
 
 @refactor_commands.command()
-@click.option(
-    "--days", "-d", default=30, help="Number of days to analyze (default: 30)"
-)
+@click.option("--days", "-d", default=30, help="Number of days to analyze (default: 30)")
 @click.option(
     "--format",
     "output_format",
@@ -696,19 +644,13 @@ def statistics() -> None:
 
         # Improvements
         improvements = stats["improvements"]
-        click.echo(
-            f"\nAverage Complexity Reduction: {improvements['average_complexity_reduction']:.1f}"
-        )
-        click.echo(
-            f"Average Maintainability Improvement: {improvements['average_maintainability_improvement']:.1f}"
-        )
+        click.echo(f"\nAverage Complexity Reduction: {improvements['average_complexity_reduction']:.1f}")
+        click.echo(f"Average Maintainability Improvement: {improvements['average_maintainability_improvement']:.1f}")
 
         # TODOs
         todos = stats["todos"]
         click.echo(f"\nTODOs Created: {todos['total']}")
-        click.echo(
-            f"TODOs Resolved: {todos['resolved']} ({todos['resolution_rate']:.1f}%)"
-        )
+        click.echo(f"TODOs Resolved: {todos['resolved']} ({todos['resolution_rate']:.1f}%)")
 
         # Diagrams
         click.echo(f"Architecture Diagrams Generated: {stats['diagrams_generated']}")
@@ -743,11 +685,7 @@ def _display_evolution_table(evolution) -> None:
 
         for commit in evolution.commits[:5]:
             changes = f"+{commit.lines_added}/-{commit.lines_deleted}"
-            message = (
-                commit.message[:50] + "..."
-                if len(commit.message) > 50
-                else commit.message
-            )
+            message = commit.message[:50] + "..." if len(commit.message) > 50 else commit.message
             table.add_row(
                 commit.short_hash,
                 commit.author,
@@ -773,11 +711,7 @@ def _display_detailed_evolution(evolution) -> None:
     report = git_integration.generate_evolution_report(evolution.file_path)
 
     # Display detailed information
-    console.print(
-        Panel.fit(
-            f"[bold blue]Code Evolution Report[/bold blue]\n{evolution.file_path}"
-        )
-    )
+    console.print(Panel.fit(f"[bold blue]Code Evolution Report[/bold blue]\n{evolution.file_path}"))
 
     # Size evolution
     if report.get("size_evolution"):
@@ -852,9 +786,7 @@ def _display_tracking_report_table(report) -> None:
             impact = report["impact_analysis"]
             console.print(f"Files Affected: {impact['files_affected']}")
             console.print(f"Lines Moved: {impact['lines_moved']}")
-            console.print(
-                f"Complexity Improvement: {impact['complexity_improvement']:.1f}"
-            )
+            console.print(f"Complexity Improvement: {impact['complexity_improvement']:.1f}")
             console.print(f"Impact Score: {impact['impact_score']:.2f}")
     else:
         # Period report
@@ -864,9 +796,7 @@ def _display_tracking_report_table(report) -> None:
             console.print(f"Total Operations: {summary['total_operations']}")
             console.print(f"Success Rate: {summary['success_rate']:.1f}%")
             console.print(f"Total Lines Moved: {summary['total_lines_moved']:,}")
-            console.print(
-                f"Average Impact Score: {summary['average_impact_score']:.2f}"
-            )
+            console.print(f"Average Impact Score: {summary['average_impact_score']:.2f}")
 
 
 def _display_detailed_tracking_report(report) -> None:

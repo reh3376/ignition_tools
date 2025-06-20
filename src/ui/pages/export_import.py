@@ -9,9 +9,7 @@ def show_export_import_page() -> None:
     st.markdown("Manage project exports, imports, and deployments.")
 
     # Create tabs for different export/import operations
-    tab1, tab2, tab3, tab4 = st.tabs(
-        ["📤 Export", "📥 Import", "🚀 Deploy", "📋 History"]
-    )
+    tab1, tab2, tab3, tab4 = st.tabs(["📤 Export", "📥 Import", "🚀 Deploy", "📋 History"])
 
     with tab1:
         st.subheader("Export Project")
@@ -50,9 +48,7 @@ def show_export_import_page() -> None:
             help="Name for the exported project",
         )
 
-        _description = st.text_area(
-            "Description:", value="", help="Optional description for this export"
-        )
+        _description = st.text_area("Description:", value="", help="Optional description for this export")
 
         if st.button("📤 Start Export", use_container_width=True):
             with st.spinner("Exporting project..."):
@@ -97,9 +93,7 @@ def show_export_import_page() -> None:
     with tab2:
         st.subheader("Import Project")
 
-        import_method = st.radio(
-            "Import Method:", ["Upload File", "Local Path", "Remote URL"]
-        )
+        import_method = st.radio("Import Method:", ["Upload File", "Local Path", "Remote URL"])
 
         if import_method == "Upload File":
             uploaded_file = st.file_uploader(
@@ -112,9 +106,7 @@ def show_export_import_page() -> None:
                 st.success(f"✅ File selected: {uploaded_file.name}")
 
         elif import_method == "Local Path":
-            import_path = st.text_input(
-                "File Path:", value="", help="Full path to the file to import"
-            )
+            import_path = st.text_input("File Path:", value="", help="Full path to the file to import")
 
         else:  # Remote URL
             import_url = st.text_input(

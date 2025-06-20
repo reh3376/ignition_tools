@@ -80,9 +80,7 @@ def test_curl_service():
                 if "url" in response and "httpbin.org" in response["url"]:
                     print("   ✅ HTTP requests working perfectly")
                     print(f"   📋 Response from: {response['url']}")
-                    print(
-                        f"   🔄 User-Agent: {response['headers'].get('User-Agent', 'N/A')}"
-                    )
+                    print(f"   🔄 User-Agent: {response['headers'].get('User-Agent', 'N/A')}")
                 else:
                     print("   ⚠️ Unexpected response format")
                     return False

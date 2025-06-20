@@ -51,9 +51,7 @@ class SystemTagWrapper(IgnitionWrapperBase):
         return self.QUALITY_CODES.get(quality_code, f"UNKNOWN_QUALITY_{quality_code}")
 
     @wrapper_function
-    def read_blocking(
-        self, tag_paths: str | list[str], timeout_ms: int = 45000
-    ) -> list[TagResult]:
+    def read_blocking(self, tag_paths: str | list[str], timeout_ms: int = 45000) -> list[TagResult]:
         """Enhanced blocking tag read with comprehensive error handling."""
         if self.config.validate_inputs:
             tag_paths = validate_tag_paths(tag_paths)
@@ -81,9 +79,7 @@ class SystemTagWrapper(IgnitionWrapperBase):
                 )
 
                 if not result.success:
-                    result.error_message = (
-                        f"Tag quality is {quality_name} ({qv.quality})"
-                    )
+                    result.error_message = f"Tag quality is {quality_name} ({qv.quality})"
 
                 results.append(result)
 
@@ -96,7 +92,7 @@ class SystemTagWrapper(IgnitionWrapperBase):
             return results
 
         except Exception as e:
-            raise WrapperError(f"Tag read operation failed: {e}", original_error=e)
+            raise WrapperError(f"Tag read operation failed: {e}", original_error=e) from e
 
     @wrapper_function
     def write_blocking(
@@ -117,9 +113,7 @@ class SystemTagWrapper(IgnitionWrapperBase):
             values = [values]
 
         if len(tag_paths) != len(values):
-            raise WrapperError(
-                f"Tag path count ({len(tag_paths)}) must match value count ({len(values)})"
-            )
+            raise WrapperError(f"Tag path count ({len(tag_paths)}) must match value count ({len(values)})")
 
         try:
             quality_codes = system.tag.writeBlocking(tag_paths, values, timeout_ms)
@@ -127,9 +121,7 @@ class SystemTagWrapper(IgnitionWrapperBase):
             results = []
             for i, quality_code in enumerate(quality_codes):
                 tag_path = tag_paths[i] if i < len(tag_paths) else f"unknown_{i}"
-                code = (
-                    quality_code.code if hasattr(quality_code, "code") else quality_code
-                )
+                code = quality_code.code if hasattr(quality_code, "code") else quality_code
                 quality_name = self.get_tag_quality_name(code)
 
                 result = {
@@ -141,9 +133,7 @@ class SystemTagWrapper(IgnitionWrapperBase):
                 }
 
                 if not result["success"]:
-                    result["error_message"] = (
-                        f"Write failed with quality {quality_name} ({code})"
-                    )
+                    result["error_message"] = f"Write failed with quality {quality_name} ({code})"
 
                 results.append(result)
 
@@ -156,4 +146,4 @@ class SystemTagWrapper(IgnitionWrapperBase):
             return results
 
         except Exception as e:
-            raise WrapperError(f"Tag write operation failed: {e}", original_error=e)
+            raise WrapperError(f"Tag write operation failed: {e}", original_error=e) from e

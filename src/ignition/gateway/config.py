@@ -115,9 +115,7 @@ class GatewayConfigManager:
         """Get list of configured gateway names from environment."""
         gateways_env = os.getenv("IGN_GATEWAYS", "")
         if not gateways_env:
-            logger.warning(
-                "No gateways configured. Set IGN_GATEWAYS environment variable"
-            )
+            logger.warning("No gateways configured. Set IGN_GATEWAYS environment variable")
             return []
 
         return [name.strip() for name in gateways_env.split(",") if name.strip()]
@@ -201,9 +199,7 @@ class GatewayConfigManager:
                 # Validate authentication
                 if config.auth_type == "basic":
                     if not config.username or not config.password:
-                        config_errors.append(
-                            "Username and password required for basic auth"
-                        )
+                        config_errors.append("Username and password required for basic auth")
                 elif config.auth_type == "token" and not config.token:
                     config_errors.append("Token required for token auth")
 

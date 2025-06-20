@@ -90,9 +90,7 @@ def generate_sample_usage_data(tracker: UsageTracker, num_sessions: int = 10):
                     if success:
                         tracker.track_function_query(
                             function_name=func,
-                            context=random.choice(
-                                ["Gateway", "Vision Client", "Perspective Session"]
-                            ),
+                            context=random.choice(["Gateway", "Vision Client", "Perspective Session"]),
                             parameters=params,
                             success=True,
                             execution_time=execution_time,
@@ -100,9 +98,7 @@ def generate_sample_usage_data(tracker: UsageTracker, num_sessions: int = 10):
                     else:
                         tracker.track_function_query(
                             function_name=func,
-                            context=random.choice(
-                                ["Gateway", "Vision Client", "Perspective Session"]
-                            ),
+                            context=random.choice(["Gateway", "Vision Client", "Perspective Session"]),
                             parameters=params,
                             success=False,
                             execution_time=execution_time,
@@ -121,9 +117,7 @@ def generate_sample_usage_data(tracker: UsageTracker, num_sessions: int = 10):
                 if "button" in template:
                     template_params = {
                         "component_name": f"Button{random.randint(1, 10)}",
-                        "action_type": random.choice(
-                            ["navigation", "tag_write", "popup"]
-                        ),
+                        "action_type": random.choice(["navigation", "tag_write", "popup"]),
                     }
                 elif "navigation" in template:
                     template_params = {
@@ -186,12 +180,8 @@ def test_pattern_analysis():
             print(f"✅ Found {len(co_occurrence_patterns)} co-occurrence patterns:")
             for pattern in co_occurrence_patterns[:3]:  # Show top 3
                 print(f"   • {pattern['function_1']} + {pattern['function_2']}")
-                print(
-                    f"     Confidence: {pattern['confidence_1_to_2']:.2%} / {pattern['confidence_2_to_1']:.2%}"
-                )
-                print(
-                    f"     Support: {pattern['support']:.2%}, Lift: {pattern['lift']:.2f}"
-                )
+                print(f"     Confidence: {pattern['confidence_1_to_2']:.2%} / {pattern['confidence_2_to_1']:.2%}")
+                print(f"     Support: {pattern['support']:.2%}, Lift: {pattern['lift']:.2f}")
         else:
             print("ℹ No co-occurrence patterns found (need more diverse data)")
 
@@ -203,9 +193,7 @@ def test_pattern_analysis():
             print(f"✅ Found {len(template_patterns)} template patterns:")
             for pattern in template_patterns[:3]:  # Show top 3
                 print(f"   • {pattern['template_name']}")
-                print(
-                    f"     Usage: {pattern['usage_count']}, Success: {pattern['success_rate']:.1%}"
-                )
+                print(f"     Usage: {pattern['usage_count']}, Success: {pattern['success_rate']:.1%}")
                 print(f"     Avg time: {pattern['avg_execution_time']:.3f}s")
         else:
             print("ℹ No template patterns found")
@@ -218,12 +206,8 @@ def test_pattern_analysis():
             print(f"✅ Found {len(param_patterns)} parameter patterns:")
             for pattern in param_patterns[:3]:  # Show top 3
                 print(f"   • {pattern['entity_name']} -> {pattern['parameter_key']}")
-                print(
-                    f"     Frequency: {pattern['frequency']:.1%}, Success: {pattern['success_rate']:.1%}"
-                )
-                print(
-                    f"     Common values: {list(pattern['common_values'].keys())[:3]}"
-                )
+                print(f"     Frequency: {pattern['frequency']:.1%}, Success: {pattern['success_rate']:.1%}")
+                print(f"     Common values: {list(pattern['common_values'].keys())[:3]}")
         else:
             print("ℹ No parameter patterns found")
 
@@ -235,33 +219,23 @@ def test_pattern_analysis():
             print(f"✅ Found {len(sequential_patterns)} sequential patterns:")
             for pattern in sequential_patterns[:3]:  # Show top 3
                 print(f"   • {' → '.join(pattern['sequence'])}")
-                print(
-                    f"     Support: {pattern['support']:.2%}, Frequency: {pattern['frequency']}"
-                )
+                print(f"     Support: {pattern['support']:.2%}, Frequency: {pattern['frequency']}")
         else:
             print("ℹ No sequential patterns found")
 
         # Test 6: Pattern Retrieval
         print("\n🔄 Test 6: Pattern Retrieval from Database")
-        stored_patterns = analyzer.get_patterns_by_type(
-            "function_co_occurrence", limit=3
-        )
+        stored_patterns = analyzer.get_patterns_by_type("function_co_occurrence", limit=3)
         print(f"✅ Retrieved {len(stored_patterns)} stored co-occurrence patterns")
 
         # Test 7: Function Recommendations
         print("\n🔄 Test 7: Function Recommendations")
-        recommendations = analyzer.get_recommendations_for_function(
-            "system.tag.readBlocking"
-        )
+        recommendations = analyzer.get_recommendations_for_function("system.tag.readBlocking")
 
         if recommendations:
-            print(
-                f"✅ Found {len(recommendations)} recommendations for 'system.tag.readBlocking':"
-            )
+            print(f"✅ Found {len(recommendations)} recommendations for 'system.tag.readBlocking':")
             for rec in recommendations:
-                print(
-                    f"   • {rec['recommended_function']} (confidence: {rec['confidence']:.1%})"
-                )
+                print(f"   • {rec['recommended_function']} (confidence: {rec['confidence']:.1%})")
                 print(f"     {rec['reasoning']}")
         else:
             print("ℹ No recommendations found (need more usage data)")

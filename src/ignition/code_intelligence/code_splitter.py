@@ -48,9 +48,7 @@ class CodeExtraction:
 class CodeSplitter:
     """Splits large files into smaller, more maintainable modules."""
 
-    def __init__(
-        self, preserve_git_history: bool = True, max_file_lines: int = 1000
-    ) -> None:
+    def __init__(self, preserve_git_history: bool = True, max_file_lines: int = 1000) -> None:
         self.preserve_git_history = preserve_git_history
         self.max_file_lines = max_file_lines
         self.recommendation_engine = RefactoringRecommendationEngine()
@@ -105,9 +103,7 @@ class CodeSplitter:
                 error_message=f"Split failed: {e!s}",
             )
 
-    def _plan_extractions(
-        self, file_path: Path, recommendation
-    ) -> list[CodeExtraction]:
+    def _plan_extractions(self, file_path: Path, recommendation) -> list[CodeExtraction]:
         """Plan which code blocks to extract to new modules."""
         extractions = []
 
@@ -127,9 +123,7 @@ class CodeSplitter:
             if split_rec.confidence_score < 0.6:
                 continue  # Skip low-confidence recommendations
 
-            extraction = self._create_extraction_plan(
-                file_path, split_rec, tree, source_lines
-            )
+            extraction = self._create_extraction_plan(file_path, split_rec, tree, source_lines)
             if extraction:
                 extractions.append(extraction)
 
@@ -165,10 +159,7 @@ class CodeSplitter:
                 class_imports = self._analyze_class_imports(node, tree)
                 imports_needed.update(class_imports)
 
-            elif (
-                isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
-                and node.name in functions_to_extract
-            ):
+            elif isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef) and node.name in functions_to_extract:
                 start_line = node.lineno - 1
                 end_line = getattr(node, "end_lineno", node.lineno) - 1
                 code_blocks.append((start_line, end_line))
@@ -190,9 +181,7 @@ class CodeSplitter:
             estimated_lines=split_rec.estimated_lines,
         )
 
-    def _analyze_class_imports(
-        self, class_node: ast.ClassDef, tree: ast.AST
-    ) -> set[str]:
+    def _analyze_class_imports(self, class_node: ast.ClassDef, tree: ast.AST) -> set[str]:
         """Analyze which imports a class needs."""
         imports_needed = set()
 
@@ -247,9 +236,7 @@ class CodeSplitter:
 
         return imports_needed
 
-    def _simulate_split(
-        self, file_path: Path, extractions: list[CodeExtraction]
-    ) -> SplitResult:
+    def _simulate_split(self, file_path: Path, extractions: list[CodeExtraction]) -> SplitResult:
         """Simulate the split operation without making actual changes."""
         new_files = []
         moved_classes = []
@@ -262,9 +249,7 @@ class CodeSplitter:
             moved_functions.extend(extraction.functions)
 
             if self.preserve_git_history:
-                git_operations.append(
-                    f"git mv {file_path} {extraction.target_module_path}"
-                )
+                git_operations.append(f"git mv {file_path} {extraction.target_module_path}")
 
         return SplitResult(
             original_file=str(file_path),
@@ -276,9 +261,7 @@ class CodeSplitter:
             success=True,
         )
 
-    def _execute_split(
-        self, file_path: Path, extractions: list[CodeExtraction]
-    ) -> SplitResult:
+    def _execute_split(self, file_path: Path, extractions: list[CodeExtraction]) -> SplitResult:
         """Execute the actual split operation."""
         # Read the original file
         with open(file_path, encoding="utf-8") as f:
@@ -295,9 +278,7 @@ class CodeSplitter:
         try:
             # Create new module files
             for extraction in extractions:
-                new_file_content = self._create_new_module_content(
-                    original_lines, extraction
-                )
+                new_file_content = self._create_new_module_content(original_lines, extraction)
 
                 # Write the new module
                 with open(extraction.target_module_path, "w", encoding="utf-8") as f:
@@ -314,9 +295,7 @@ class CodeSplitter:
                     subprocess.run(git_cmd.split(), check=True)
 
             # Update the original file (remove extracted code)
-            updated_original = self._create_updated_original(
-                original_lines, extractions
-            )
+            updated_original = self._create_updated_original(original_lines, extractions)
 
             # Create backup and update original
             backup_path = file_path.with_suffix(".py.backup")
@@ -326,9 +305,7 @@ class CodeSplitter:
                 f.write(updated_original)
 
             # Update import statements across the codebase
-            import_updates = self._update_imports_across_codebase(
-                file_path, extractions
-            )
+            import_updates = self._update_imports_across_codebase(file_path, extractions)
 
             return SplitResult(
                 original_file=str(file_path),
@@ -345,22 +322,16 @@ class CodeSplitter:
             self._rollback_split(file_path, new_files)
             raise e
 
-    def _create_new_module_content(
-        self, original_lines: list[str], extraction: CodeExtraction
-    ) -> str:
+    def _create_new_module_content(self, original_lines: list[str], extraction: CodeExtraction) -> str:
         """Create the content for a new module file."""
         content_parts = []
 
         # Add module docstring
         content_parts.append('"""')
-        content_parts.append(
-            f"{extraction.target_module_name.replace('_', ' ').title()}"
-        )
+        content_parts.append(f"{extraction.target_module_name.replace('_', ' ').title()}")
         content_parts.append("")
         content_parts.append("Extracted from large file for better maintainability.")
-        content_parts.append(
-            "This module contains related functionality that was grouped together."
-        )
+        content_parts.append("This module contains related functionality that was grouped together.")
         content_parts.append('"""')
         content_parts.append("")
 
@@ -380,9 +351,7 @@ class CodeSplitter:
 
         return "\n".join(content_parts)
 
-    def _create_updated_original(
-        self, original_lines: list[str], extractions: list[CodeExtraction]
-    ) -> str:
+    def _create_updated_original(self, original_lines: list[str], extractions: list[CodeExtraction]) -> str:
         """Create the updated original file with extracted code removed."""
         # Collect all line ranges to remove
         lines_to_remove = set()
@@ -443,11 +412,7 @@ class CodeSplitter:
         # No imports found, insert after docstring/comments
         for i, line in enumerate(lines):
             stripped = line.strip()
-            if (
-                stripped
-                and not stripped.startswith("#")
-                and not stripped.startswith('"""')
-            ):
+            if stripped and not stripped.startswith("#") and not stripped.startswith('"""'):
                 return i
 
         return 0
@@ -472,9 +437,7 @@ class CodeSplitter:
 
                 # Check if this file imports from the original module
                 if original_module in content:
-                    updates = self._calculate_import_updates(
-                        py_file, content, original_module, extractions
-                    )
+                    updates = self._calculate_import_updates(py_file, content, original_module, extractions)
                     if updates:
                         import_updates[str(py_file)] = updates
 
@@ -511,7 +474,7 @@ class CodeSplitter:
                             old_import = f"from {original_module} import {item_name}"
                             new_import = f"from {original_module}.{new_module} import {item_name}"
                             updates.append(f"Replace: {old_import} -> {new_import}")
-        except:
+        except Exception:
             pass
 
         return updates
@@ -529,7 +492,7 @@ class CodeSplitter:
                 return module_name
             else:
                 return file_path.stem
-        except:
+        except Exception:
             return file_path.stem
 
     def _rollback_split(self, original_file: Path, new_files: list[str]) -> None:
@@ -554,9 +517,7 @@ class BatchCodeSplitter:
         self.splitter = CodeSplitter(preserve_git_history=preserve_git_history)
         self.detector = RefactoringRecommendationEngine().detector
 
-    def split_oversized_files(
-        self, directory: Path, dry_run: bool = False
-    ) -> dict[str, SplitResult]:
+    def split_oversized_files(self, directory: Path, dry_run: bool = False) -> dict[str, SplitResult]:
         """Split all oversized files in a directory."""
         results = {}
 
@@ -572,13 +533,9 @@ class BatchCodeSplitter:
             results[str(file_path)] = result
 
             if result.success:
-                print(
-                    f"✅ Successfully {'simulated' if dry_run else 'completed'} split"
-                )
+                print(f"✅ Successfully {'simulated' if dry_run else 'completed'} split")
                 print(f"   Created {len(result.new_files)} new files")
-                print(
-                    f"   Moved {len(result.moved_classes)} classes, {len(result.moved_functions)} functions"
-                )
+                print(f"   Moved {len(result.moved_classes)} classes, {len(result.moved_functions)} functions")
             else:
                 print(f"❌ Split failed: {result.error_message}")
 
@@ -591,15 +548,9 @@ def main() -> None:
 
     parser = argparse.ArgumentParser(description="Split large code files")
     parser.add_argument("--file", type=str, help="Specific file to split")
-    parser.add_argument(
-        "--directory", type=str, default="src", help="Directory to scan for large files"
-    )
-    parser.add_argument(
-        "--dry-run", action="store_true", help="Simulate without making changes"
-    )
-    parser.add_argument(
-        "--no-git", action="store_true", help="Don't preserve git history"
-    )
+    parser.add_argument("--directory", type=str, default="src", help="Directory to scan for large files")
+    parser.add_argument("--dry-run", action="store_true", help="Simulate without making changes")
+    parser.add_argument("--no-git", action="store_true", help="Don't preserve git history")
 
     args = parser.parse_args()
 
@@ -618,9 +569,7 @@ def main() -> None:
     else:
         # Batch split directory
         batch_splitter = BatchCodeSplitter(preserve_git_history=not args.no_git)
-        results = batch_splitter.split_oversized_files(
-            Path(args.directory), dry_run=args.dry_run
-        )
+        results = batch_splitter.split_oversized_files(Path(args.directory), dry_run=args.dry_run)
 
         print(f"\n{'=' * 60}")
         print("BATCH SPLIT SUMMARY")

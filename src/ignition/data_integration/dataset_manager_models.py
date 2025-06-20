@@ -1,4 +1,4 @@
-"""Dataset Manager Models
+"""Dataset Manager Models.
 
 Extracted from large file for better maintainability.
 This module contains related functionality that was grouped together.
@@ -52,9 +52,7 @@ class FeatureDefinition:
     transformation: str | None = None  # scaling, encoding, etc.
     is_target: bool = False
     is_feature: bool = True
-    missing_value_strategy: str = (
-        "drop"  # drop, fill_mean, fill_median, fill_mode, custom
-    )
+    missing_value_strategy: str = "drop"  # drop, fill_mean, fill_median, fill_mode, custom
     custom_fill_value: Any | None = None
     validation_rules: list[dict[str, Any]] = field(default_factory=list)
     description: str | None = None
@@ -125,6 +123,4 @@ class Dataset:
     created_by: str = "system"
     tags: list[str] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
-    export_formats: list[str] = field(
-        default_factory=lambda: ["csv", "parquet", "json"]
-    )
+    export_formats: list[str] = field(default_factory=lambda: ["csv", "parquet", "json"])

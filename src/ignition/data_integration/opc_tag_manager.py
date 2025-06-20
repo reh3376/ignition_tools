@@ -194,9 +194,7 @@ class OPCTagManager:
             if recursive and folders:
                 for folder in folders:
                     sub_path = f"{parent_path}/{folder}" if parent_path else folder
-                    sub_result = self.browse_tags(
-                        sub_path, recursive=True, filter_pattern=filter_pattern
-                    )
+                    sub_result = self.browse_tags(sub_path, recursive=True, filter_pattern=filter_pattern)
                     if sub_result.success:
                         tags.extend(sub_result.tags)
                         folders.extend([f"{folder}/{f}" for f in sub_result.folders])
@@ -210,9 +208,7 @@ class OPCTagManager:
 
         except Exception as e:
             self.logger.error(f"Tag browsing failed: {e}")
-            return BrowseResult(
-                success=False, tags=[], folders=[], total_items=0, error_message=str(e)
-            )
+            return BrowseResult(success=False, tags=[], folders=[], total_items=0, error_message=str(e))
 
     def create_tag(self, tag_def: TagDefinition) -> dict[str, Any]:
         """Create a new tag."""
@@ -371,9 +367,7 @@ class OPCTagManager:
                     successful_count += 1
 
                 except Exception as e:
-                    results.append(
-                        {"tag_path": tag_path, "success": False, "error": str(e)}
-                    )
+                    results.append({"tag_path": tag_path, "success": False, "error": str(e)})
                     failed_count += 1
 
             return {
@@ -393,9 +387,7 @@ class OPCTagManager:
                 "results": [],
             }
 
-    def generate_tag_creation_script(
-        self, tag_definitions: list[TagDefinition], script_type: str = "jython"
-    ) -> str:
+    def generate_tag_creation_script(self, tag_definitions: list[TagDefinition], script_type: str = "jython") -> str:
         """Generate Ignition script for tag creation."""
         if script_type == "jython":
             return self._generate_jython_tag_script(tag_definitions)

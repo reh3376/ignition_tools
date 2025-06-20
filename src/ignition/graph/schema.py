@@ -270,9 +270,7 @@ class IgnitionGraphSchema:
             },
         ]
 
-        return [
-            GraphNode(NodeType.SCRIPT_TYPE, script_type) for script_type in script_types
-        ]
+        return [GraphNode(NodeType.SCRIPT_TYPE, script_type) for script_type in script_types]
 
     @staticmethod
     def create_category_nodes() -> list[GraphNode]:

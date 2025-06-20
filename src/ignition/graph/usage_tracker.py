@@ -30,9 +30,7 @@ class UsageTracker:
         self.session_start_time: datetime | None = None
         self.session_events: list[dict[str, Any]] = []
 
-    def start_session(
-        self, user_id: str | None = None, session_type: str = "exploration"
-    ) -> str:
+    def start_session(self, user_id: str | None = None, session_type: str = "exploration") -> str:
         """Start a new usage tracking session.
 
         Args:
@@ -88,27 +86,15 @@ class UsageTracker:
 
         # Calculate session statistics
         unique_functions = len(
-            {
-                event.get("function_name")
-                for event in self.session_events
-                if event.get("function_name")
-            }
+            {event.get("function_name") for event in self.session_events if event.get("function_name")}
         )
 
         unique_templates = len(
-            {
-                event.get("template_name")
-                for event in self.session_events
-                if event.get("template_name")
-            }
+            {event.get("template_name") for event in self.session_events if event.get("template_name")}
         )
 
-        success_events = sum(
-            1 for event in self.session_events if event.get("success", True)
-        )
-        success_rate = (
-            success_events / len(self.session_events) if self.session_events else 1.0
-        )
+        success_events = sum(1 for event in self.session_events if event.get("success", True))
+        success_rate = success_events / len(self.session_events) if self.session_events else 1.0
 
         # Update session node with final statistics
         update_query = """
@@ -153,9 +139,7 @@ class UsageTracker:
         return session_summary
 
     @contextmanager
-    def track_session(
-        self, user_id: str | None = None, session_type: str = "exploration"
-    ):
+    def track_session(self, user_id: str | None = None, session_type: str = "exploration"):
         """Context manager for automatic session tracking.
 
         Args:
@@ -373,9 +357,7 @@ class UsageTracker:
         """
 
         try:
-            self.client.execute_write_query(
-                rel_query, {"event_id": event_id, "function_name": function_name}
-            )
+            self.client.execute_write_query(rel_query, {"event_id": event_id, "function_name": function_name})
         except Exception as e:
             logger.debug(f"Could not create event-function relationship: {e}")
 
@@ -387,9 +369,7 @@ class UsageTracker:
         """
 
         try:
-            self.client.execute_write_query(
-                rel_query, {"event_id": event_id, "template_name": template_name}
-            )
+            self.client.execute_write_query(rel_query, {"event_id": event_id, "template_name": template_name})
         except Exception as e:
             logger.debug(f"Could not create event-template relationship: {e}")
 
@@ -434,9 +414,7 @@ class UsageTracker:
             "session_type": session_data.get("session_type"),
         }
 
-    def get_recent_events(
-        self, limit: int = 10, event_type: str | None = None
-    ) -> list[dict[str, Any]]:
+    def get_recent_events(self, limit: int = 10, event_type: str | None = None) -> list[dict[str, Any]]:
         """Get recent usage events.
 
         Args:

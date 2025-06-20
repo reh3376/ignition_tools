@@ -141,13 +141,9 @@ def format_validation_error(error: Exception) -> str:
     if "permission" in error_str or "access" in error_str:
         return "Permission denied. Check file permissions and user access rights."
     elif "connection" in error_str or "timeout" in error_str:
-        return (
-            "Connection failed. Check Ignition Gateway status and network connectivity."
-        )
+        return "Connection failed. Check Ignition Gateway status and network connectivity."
     elif "license" in error_str or "authentication" in error_str:
-        return (
-            "License or authentication error. Check Ignition license and credentials."
-        )
+        return "License or authentication error. Check Ignition license and credentials."
     elif "version" in error_str or "compatibility" in error_str:
         return "Version compatibility issue. Check Ignition version requirements."
     else:
@@ -175,14 +171,10 @@ class ModuleValidator:
         self.ignition_version = os.getenv("IGNITION_TEST_VERSION", "8.1.0")
         self.test_gateway_url = os.getenv("TEST_GATEWAY_URL", "http://localhost:8088")
         self.test_timeout = int(os.getenv("TEST_TIMEOUT", "300"))
-        self.docker_enabled = (
-            os.getenv("DOCKER_TEST_ENABLED", "false").lower() == "true"
-        )
+        self.docker_enabled = os.getenv("DOCKER_TEST_ENABLED", "false").lower() == "true"
 
     @asynccontextmanager
-    async def validation_context(
-        self, module_path: str
-    ) -> AsyncIterator[ValidationContext]:
+    async def validation_context(self, module_path: str) -> AsyncIterator[ValidationContext]:
         """Create a validation context with resource management.
 
         Following patterns from crawl_mcp.py for context management.
@@ -227,16 +219,12 @@ class ModuleValidator:
             True if Docker is available, False otherwise
         """
         try:
-            result = subprocess.run(
-                ["docker", "--version"], capture_output=True, text=True, timeout=10
-            )
+            result = subprocess.run(["docker", "--version"], capture_output=True, text=True, timeout=10)
             return result.returncode == 0
         except (subprocess.TimeoutExpired, FileNotFoundError):
             return False
 
-    async def validate_module_structure(
-        self, context: ValidationContext
-    ) -> dict[str, Any]:
+    async def validate_module_structure(self, context: ValidationContext) -> dict[str, Any]:
         """Validate the internal structure of the module.
 
         Following patterns from crawl_mcp.py for comprehensive validation.
@@ -297,9 +285,7 @@ class ModuleValidator:
                 "exception": str(e),
             }
 
-    async def validate_module_compatibility(
-        self, context: ValidationContext
-    ) -> dict[str, bool]:
+    async def validate_module_compatibility(self, context: ValidationContext) -> dict[str, bool]:
         """Validate module compatibility with different Ignition versions.
 
         Args:
@@ -345,9 +331,7 @@ class ModuleValidator:
 
         return test_results
 
-    async def _run_performance_tests(
-        self, _context: ValidationContext
-    ) -> dict[str, Any]:
+    async def _run_performance_tests(self, _context: ValidationContext) -> dict[str, Any]:
         """Run performance tests on the module.
 
         Args:
@@ -379,18 +363,14 @@ class ModuleValidator:
             "passed": True,
         }
 
-    async def _run_integration_tests(
-        self, context: ValidationContext
-    ) -> dict[str, Any]:
+    async def _run_integration_tests(self, context: ValidationContext) -> dict[str, Any]:
         """Run integration tests based on available environment."""
         if context.docker_available:
             return await self._run_docker_integration_tests(context)
         else:
             return await self._run_local_integration_tests(context)
 
-    async def _run_docker_integration_tests(
-        self, _context: ValidationContext
-    ) -> dict[str, Any]:
+    async def _run_docker_integration_tests(self, _context: ValidationContext) -> dict[str, Any]:
         """Run Docker-based integration tests.
 
         Args:
@@ -406,9 +386,7 @@ class ModuleValidator:
             "passed": True,
         }
 
-    async def _run_local_integration_tests(
-        self, _context: ValidationContext
-    ) -> dict[str, Any]:
+    async def _run_local_integration_tests(self, _context: ValidationContext) -> dict[str, Any]:
         """Run local integration tests.
 
         Args:
@@ -445,22 +423,16 @@ class ModuleValidator:
                 # Environment validation
                 env_validation = validate_ignition_environment()
                 if not env_validation["valid"]:
-                    warnings.append(
-                        f"Environment validation warning: {env_validation['error']}"
-                    )
+                    warnings.append(f"Environment validation warning: {env_validation['error']}")
 
                 # Structure validation
                 structure_result = await self.validate_module_structure(context)
                 test_results["structure"] = structure_result
                 if not structure_result["valid"]:
-                    errors.append(
-                        f"Structure validation failed: {structure_result['error']}"
-                    )
+                    errors.append(f"Structure validation failed: {structure_result['error']}")
 
                 # Compatibility validation
-                compatibility_results = await self.validate_module_compatibility(
-                    context
-                )
+                compatibility_results = await self.validate_module_compatibility(context)
 
                 # Run comprehensive tests
                 if not errors:  # Only run tests if basic validation passed
@@ -499,9 +471,7 @@ class ModuleValidator:
                     errors=[error_msg],
                 )
 
-    def generate_validation_report(
-        self, output_path: str | None = None
-    ) -> dict[str, Any]:
+    def generate_validation_report(self, output_path: str | None = None) -> dict[str, Any]:
         """Generate a comprehensive validation report.
 
         Following patterns from crawl_mcp.py for comprehensive reporting.
@@ -530,28 +500,18 @@ class ModuleValidator:
         # Performance aggregation
         avg_performance = {}
         if self.validation_results:
-            perf_metrics = [
-                r.performance_metrics
-                for r in self.validation_results
-                if r.performance_metrics
-            ]
+            perf_metrics = [r.performance_metrics for r in self.validation_results if r.performance_metrics]
             if perf_metrics:
                 for metric in ["load_time", "memory_usage", "cpu_usage"]:
                     values = [m.get(metric, 0) for m in perf_metrics]
-                    avg_performance[f"avg_{metric}"] = (
-                        sum(values) / len(values) if values else 0
-                    )
+                    avg_performance[f"avg_{metric}"] = sum(values) / len(values) if values else 0
 
         report = {
             "summary": {
                 "total_modules": total_validations,
                 "successful": successful_validations,
                 "failed": failed_validations,
-                "success_rate": (
-                    (successful_validations / total_validations * 100)
-                    if total_validations > 0
-                    else 0
-                ),
+                "success_rate": ((successful_validations / total_validations * 100) if total_validations > 0 else 0),
             },
             "errors": all_errors,
             "warnings": all_warnings,
@@ -592,21 +552,15 @@ class ModuleValidator:
 
         # Generate recommendations based on patterns
         if any("environment" in error.lower() for error in common_errors):
-            recommendations.append(
-                "Consider setting up proper environment variables for testing"
-            )
+            recommendations.append("Consider setting up proper environment variables for testing")
 
         if any("docker" in error.lower() for error in common_errors):
-            recommendations.append(
-                "Install and configure Docker for enhanced testing capabilities"
-            )
+            recommendations.append("Install and configure Docker for enhanced testing capabilities")
 
         if any("permission" in error.lower() for error in common_errors):
             recommendations.append("Check file permissions and user access rights")
 
         if not recommendations:
-            recommendations.append(
-                "All validations completed successfully - no specific recommendations"
-            )
+            recommendations.append("All validations completed successfully - no specific recommendations")
 
         return recommendations

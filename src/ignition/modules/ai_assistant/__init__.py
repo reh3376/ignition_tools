@@ -1,4 +1,4 @@
-"""AI Assistant Module for Ignition Development
+"""AI Assistant Module for Ignition Development.
 
 This module provides AI-powered assistance for Ignition development, including:
 - Intelligent code analysis and validation

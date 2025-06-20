@@ -138,9 +138,7 @@ class LogAnalyzer:
                     analysis["errors"].append(
                         {
                             "timestamp": entry["timestamp"],
-                            "message": (
-                                message[:200] + "..." if len(message) > 200 else message
-                            ),
+                            "message": (message[:200] + "..." if len(message) > 200 else message),
                         }
                     )
 
@@ -149,39 +147,27 @@ class LogAnalyzer:
                     analysis["warnings"].append(
                         {
                             "timestamp": entry["timestamp"],
-                            "message": (
-                                message[:200] + "..." if len(message) > 200 else message
-                            ),
+                            "message": (message[:200] + "..." if len(message) > 200 else message),
                         }
                     )
 
             # Collect performance metrics
             if "duration_seconds" in entry["metrics"]:
-                analysis["performance_metrics"]["durations"].append(
-                    entry["metrics"]["duration_seconds"]
-                )
+                analysis["performance_metrics"]["durations"].append(entry["metrics"]["duration_seconds"])
 
             if "memory_mb" in entry["metrics"]:
-                analysis["performance_metrics"]["memory_usage"].append(
-                    entry["metrics"]["memory_mb"]
-                )
+                analysis["performance_metrics"]["memory_usage"].append(entry["metrics"]["memory_mb"])
 
             # Track test results
             for pattern in self.log_patterns["test_results"]:
                 matches = re.finditer(pattern, message, re.IGNORECASE)
                 for match in matches:
                     if "passed" in pattern:
-                        analysis["performance_metrics"]["test_results"]["passed"] = int(
-                            match.group(1)
-                        )
+                        analysis["performance_metrics"]["test_results"]["passed"] = int(match.group(1))
                     elif "failed" in pattern:
-                        analysis["performance_metrics"]["test_results"]["failed"] = int(
-                            match.group(1)
-                        )
+                        analysis["performance_metrics"]["test_results"]["failed"] = int(match.group(1))
                     elif "skipped" in pattern:
-                        analysis["performance_metrics"]["test_results"]["skipped"] = (
-                            int(match.group(1))
-                        )
+                        analysis["performance_metrics"]["test_results"]["skipped"] = int(match.group(1))
 
         # Generate recommendations
         analysis["recommendations"] = self.generate_recommendations(analysis)
@@ -195,9 +181,7 @@ class LogAnalyzer:
         # Error analysis
         error_count = len(analysis["errors"])
         if error_count > 10:
-            recommendations.append(
-                f"High error count ({error_count}). Review error patterns and add error handling."
-            )
+            recommendations.append(f"High error count ({error_count}). Review error patterns and add error handling.")
 
         # Performance analysis
         durations = analysis["performance_metrics"]["durations"]
@@ -238,9 +222,7 @@ class LogAnalyzer:
 
         # Log level analysis
         if analysis["levels"]["ERROR"] > analysis["levels"]["INFO"] * 0.1:
-            recommendations.append(
-                "High error-to-info ratio detected. Review error handling and logging levels."
-            )
+            recommendations.append("High error-to-info ratio detected. Review error handling and logging levels.")
 
         return recommendations
 
@@ -334,9 +316,7 @@ class LogAnalyzer:
             for i, rec in enumerate(report["recommendations"], 1):
                 print(f"  {i}. {rec}")
         else:
-            print(
-                "\n✅ No specific recommendations - system appears to be running well!"
-            )
+            print("\n✅ No specific recommendations - system appears to be running well!")
 
 
 def monitor_live_logs(containers: list[str], analyzer: LogAnalyzer) -> None:
@@ -381,20 +361,13 @@ def monitor_live_logs(containers: list[str], analyzer: LogAnalyzer) -> None:
                         entry = analyzer.parse_log_entry(line)
 
                         # Highlight important entries
-                        if entry["level"] == "ERROR" or any(
-                            pattern in line for pattern in ["❌", "FAILED"]
-                        ):
+                        if entry["level"] == "ERROR" or any(pattern in line for pattern in ["❌", "FAILED"]):
                             print(f"🔴 [{container}] {line.strip()}")
                         elif entry["level"] == "WARNING" or "⚠️" in line:
                             print(f"🟡 [{container}] {line.strip()}")
-                        elif any(
-                            metric in entry["metrics"]
-                            for metric in ["duration_seconds", "memory_mb"]
-                        ):
+                        elif any(metric in entry["metrics"] for metric in ["duration_seconds", "memory_mb"]):
                             print(f"⚡ [{container}] {line.strip()}")
-                        elif any(
-                            pattern in line for pattern in ["✅", "passed", "completed"]
-                        ):
+                        elif any(pattern in line for pattern in ["✅", "passed", "completed"]):
                             print(f"🟢 [{container}] {line.strip()}")
                         else:
                             # Regular log entry
@@ -420,18 +393,10 @@ def monitor_live_logs(containers: list[str], analyzer: LogAnalyzer) -> None:
 
 def main():
     """Main entry point."""
-    parser = argparse.ArgumentParser(
-        description="IGN Scripts Docker Log Monitor and Analyzer"
-    )
-    parser.add_argument(
-        "--analyze", action="store_true", help="Analyze logs from all containers"
-    )
-    parser.add_argument(
-        "--container", type=str, help="Analyze logs from specific container"
-    )
-    parser.add_argument(
-        "--since", type=str, help="Analyze logs since specific time (e.g., '1h', '30m')"
-    )
+    parser = argparse.ArgumentParser(description="IGN Scripts Docker Log Monitor and Analyzer")
+    parser.add_argument("--analyze", action="store_true", help="Analyze logs from all containers")
+    parser.add_argument("--container", type=str, help="Analyze logs from specific container")
+    parser.add_argument("--since", type=str, help="Analyze logs since specific time (e.g., '1h', '30m')")
     parser.add_argument("--output", type=str, help="Output file for analysis report")
     parser.add_argument("--live", action="store_true", help="Monitor logs in real-time")
     parser.add_argument(
@@ -467,10 +432,7 @@ def main():
         analyzer.save_report(report, output_path)
     else:
         # Default output location
-        output_path = (
-            Path("test-results")
-            / f"log_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-        )
+        output_path = Path("test-results") / f"log_analysis_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         analyzer.save_report(report, output_path)
 
     # Print summary unless report-only mode

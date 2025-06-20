@@ -168,11 +168,7 @@ class CodebaseAnalyzer:
             return "CLI commands"
 
         if "task_" in file_path:
-            task_num = (
-                file_path.split("task_")[1].split("_")[0]
-                if "task_" in file_path
-                else ""
-            )
+            task_num = file_path.split("task_")[1].split("_")[0] if "task_" in file_path else ""
             return f"Task {task_num} implementation"
 
         return ""
@@ -183,11 +179,7 @@ class CodebaseAnalyzer:
 
         for root, dirs, files in os.walk(self.root_path):
             # Remove excluded directories from the search
-            dirs[:] = [
-                d
-                for d in dirs
-                if not any(pattern in d for pattern in self.exclude_patterns)
-            ]
+            dirs[:] = [d for d in dirs if not any(pattern in d for pattern in self.exclude_patterns)]
 
             root_path = Path(root)
             if self.should_exclude_path(root_path):
@@ -218,9 +210,7 @@ class CodebaseAnalyzer:
 
         # Sort files by line count (descending)
         self.file_data.sort(key=lambda x: x[1], reverse=True)
-        print(
-            f"✅ Analysis complete: {self.total_files} files, {self.total_lines:,} lines"
-        )
+        print(f"✅ Analysis complete: {self.total_files} files, {self.total_lines:,} lines")
 
     def categorize_files(self) -> dict[str, list[tuple[str, int, str]]]:
         """Categorize files based on their paths and patterns."""
@@ -248,15 +238,11 @@ class CodebaseAnalyzer:
 
         # Add uncategorized files to a special category
         if uncategorized:
-            categorized["other"] = sorted(
-                uncategorized, key=lambda x: x[1], reverse=True
-            )
+            categorized["other"] = sorted(uncategorized, key=lambda x: x[1], reverse=True)
 
         return dict(categorized)
 
-    def generate_report(
-        self, output_file: str | None = None, include_small_files: bool = False
-    ) -> str:
+    def generate_report(self, output_file: str | None = None, include_small_files: bool = False) -> str:
         """Generate a comprehensive analysis report."""
         report_lines = []
 
@@ -281,9 +267,7 @@ class CodebaseAnalyzer:
         for file_path, line_count, _ in top_files:
             description = self.get_file_description(file_path)
             desc_text = f" ({description})" if description else ""
-            report_lines.append(
-                f"- **`{file_path}`** - {line_count:,} lines{desc_text}"
-            )
+            report_lines.append(f"- **`{file_path}`** - {line_count:,} lines{desc_text}")
 
         report_lines.append("")
 
@@ -301,9 +285,7 @@ class CodebaseAnalyzer:
 
         report_lines.append("### **Main Application Files:**")
         for file_pattern, desc in main_files:
-            matching_files = [
-                (p, lines, e) for p, lines, e in self.file_data if file_pattern in p
-            ]
+            matching_files = [(p, lines, e) for p, lines, e in self.file_data if file_pattern in p]
             for file_path, line_count, _ in matching_files[:1]:  # Take first match
                 report_lines.append(f"- `{file_path}` - {line_count:,} lines ({desc})")
         report_lines.append("")
@@ -349,14 +331,10 @@ class CodebaseAnalyzer:
             for file_path, line_count, _ in files[:display_limit]:
                 description = self.get_file_description(file_path)
                 desc_text = f" ({description})" if description else ""
-                report_lines.append(
-                    f"- `{file_path}` - {line_count:,} lines{desc_text}"
-                )
+                report_lines.append(f"- `{file_path}` - {line_count:,} lines{desc_text}")
 
             if len(files) > display_limit:
-                report_lines.append(
-                    f"- *...and {len(files) - display_limit} more files*"
-                )
+                report_lines.append(f"- *...and {len(files) - display_limit} more files*")
 
             report_lines.append("")
 
@@ -378,9 +356,7 @@ class CodebaseAnalyzer:
         # Generate insights
         largest_modules = ", ".join(
             f"{cat.replace('_', ' ').title()} ({lines:,}+ lines)"
-            for cat, lines in sorted(
-                module_totals.items(), key=lambda x: x[1], reverse=True
-            )[:3]
+            for cat, lines in sorted(module_totals.items(), key=lambda x: x[1], reverse=True)[:3]
         )
 
         complex_tasks = ", ".join(
@@ -388,12 +364,8 @@ class CodebaseAnalyzer:
             for p, lines, _ in [f for f in self.file_data if "task_" in f[0]][:3]
         )
 
-        doc_lines = sum(
-            lines for p, lines, _ in categorized_files.get("documentation", [])
-        )
-        test_lines = sum(
-            lines for p, lines, _ in categorized_files.get("testing_scripts", [])
-        )
+        doc_lines = sum(lines for p, lines, _ in categorized_files.get("documentation", []))
+        test_lines = sum(lines for p, lines, _ in categorized_files.get("testing_scripts", []))
 
         insights = [
             f"1. **Largest Modules:** {largest_modules}",

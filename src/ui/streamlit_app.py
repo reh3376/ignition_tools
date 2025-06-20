@@ -69,9 +69,7 @@ def render_header() -> None:
 
     st.title("⚙️ IGN Scripts")
     st.subheader("Ignition Jython Script Generator")
-    st.markdown(
-        "Generate, validate, and export Jython scripts for Ignition SCADA systems"
-    )
+    st.markdown("Generate, validate, and export Jython scripts for Ignition SCADA systems")
 
     # Add version info with learning system status
     col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
@@ -237,9 +235,7 @@ def render_template_generator() -> None:
     templates = st.session_state.generator.list_templates()
 
     if not templates:
-        st.warning(
-            "No templates found. Please add templates to the templates/ directory."
-        )
+        st.warning("No templates found. Please add templates to the templates/ directory.")
         return
 
     col1, col2 = st.columns([2, 1])
@@ -247,24 +243,17 @@ def render_template_generator() -> None:
     with col1:
         # Template selection (use pre-selected if available)
         default_template = 0
-        if (
-            hasattr(st.session_state, "selected_template")
-            and st.session_state.selected_template in templates
-        ):
+        if hasattr(st.session_state, "selected_template") and st.session_state.selected_template in templates:
             default_template = templates.index(st.session_state.selected_template)
 
-        selected_template = st.selectbox(
-            "Select Template:", templates, index=default_template
-        )
+        selected_template = st.selectbox("Select Template:", templates, index=default_template)
 
         # Track template selection
         if selected_template:
             track_template_usage(selected_template, "selected")
 
         # Basic configuration
-        component_name = st.text_input(
-            "Component Name:", placeholder="e.g., MainMenuButton"
-        )
+        component_name = st.text_input("Component Name:", placeholder="e.g., MainMenuButton")
 
         if "button_click_handler" in selected_template:
             action_type = st.selectbox(
@@ -297,11 +286,7 @@ def render_template_generator() -> None:
                 selected_template,
                 {
                     "component_name": component_name,
-                    "action_type": (
-                        action_type
-                        if "button_click_handler" in selected_template
-                        else None
-                    ),
+                    "action_type": (action_type if "button_click_handler" in selected_template else None),
                 },
             )
 
@@ -309,18 +294,14 @@ def render_template_generator() -> None:
         # Show template-specific recommendations
         if selected_template:
             st.markdown("### 💡 Template Insights")
-            show_smart_recommendations(
-                f"template_{selected_template.replace('.jinja2', '')}"
-            )
+            show_smart_recommendations(f"template_{selected_template.replace('.jinja2', '')}")
 
 
 def generate_template_script(template: str, context: dict[str, Any]):
     """Generate script from template with tracking."""
     try:
         with st.spinner("Generating script..."):
-            script_content = st.session_state.generator.generate_script(
-                template, context
-            )
+            script_content = st.session_state.generator.generate_script(template, context)
             st.session_state.generated_script = script_content
 
             # Track successful generation
@@ -367,9 +348,7 @@ def render_config_generator() -> None:
                 st.json(config_content)
 
                 if st.button("🎯 Generate from Config", type="primary"):
-                    script_content = st.session_state.generator.generate_from_config(
-                        config_content
-                    )
+                    script_content = st.session_state.generator.generate_from_config(config_content)
                     st.session_state.generated_script = script_content
                     st.success("✅ Script generated from configuration!")
 
@@ -467,9 +446,7 @@ def render_templates_page() -> None:
     templates = st.session_state.generator.list_templates()
 
     if not templates:
-        st.warning(
-            "No templates found. Please add templates to the templates/ directory."
-        )
+        st.warning("No templates found. Please add templates to the templates/ directory.")
         return
 
     # Template grid
@@ -603,102 +580,66 @@ def render_gateways_page() -> None:
                                 with col1:
                                     st.markdown(f"**🏢 {config.name}**")
                                     st.text(f"URL: {config.base_url}")
-                                    st.text(
-                                        f"Auth: {config.auth_type} ({config.username})"
-                                    )
-                                    st.text(
-                                        f"SSL: {'✓' if config.verify_ssl else '✗'} | Timeout: {config.timeout}s"
-                                    )
+                                    st.text(f"Auth: {config.auth_type} ({config.username})")
+                                    st.text(f"SSL: {'✓' if config.verify_ssl else '✗'} | Timeout: {config.timeout}s")
 
                                     if config.description:
                                         st.caption(config.description)
 
                                     if config.tags:
-                                        tags_display = " ".join(
-                                            [f"`{tag}`" for tag in config.tags]
-                                        )
+                                        tags_display = " ".join([f"`{tag}`" for tag in config.tags])
                                         st.markdown(f"Tags: {tags_display}")
 
                                 with col2:
                                     test_key = f"test_{config_name}"
                                     if st.button("🧪 Test", key=test_key):
-                                        with st.spinner(
-                                            f"Testing connection to {config.name}..."
-                                        ):
+                                        with st.spinner(f"Testing connection to {config.name}..."):
                                             try:
                                                 client = IgnitionGatewayClient(
                                                     config=config  # type: ignore[arg-type]
                                                 )
                                                 if client.connect():
-                                                    st.success(
-                                                        f"✅ Connection to {config.name} successful!"
-                                                    )
+                                                    st.success(f"✅ Connection to {config.name} successful!")
                                                     client.disconnect()
                                                 else:
-                                                    st.error(
-                                                        f"❌ Connection to {config.name} failed"
-                                                    )
+                                                    st.error(f"❌ Connection to {config.name} failed")
                                             except Exception as e:
                                                 st.error(f"❌ Error: {e!s}")
 
                                 with col3:
                                     health_key = f"health_{config_name}"
                                     if st.button("🏥 Health", key=health_key):
-                                        with st.spinner(
-                                            f"Checking health of {config.name}..."
-                                        ):
+                                        with st.spinner(f"Checking health of {config.name}..."):
                                             try:
                                                 with IgnitionGatewayClient(
                                                     config=config  # type: ignore[arg-type]
                                                 ) as client:  # type: ignore[attr-defined]
                                                     health_data = client.health_check()
 
-                                                    status = health_data.get(
-                                                        "overall_status", "unknown"
-                                                    )
+                                                    status = health_data.get("overall_status", "unknown")
                                                     if status == "healthy":
-                                                        st.success(
-                                                            f"✅ {config.name} is healthy"
-                                                        )
+                                                        st.success(f"✅ {config.name} is healthy")
                                                     elif status == "warning":
-                                                        st.warning(
-                                                            f"⚠️ {config.name} has warnings"
-                                                        )
+                                                        st.warning(f"⚠️ {config.name} has warnings")
                                                     else:
-                                                        st.error(
-                                                            f"❌ {config.name} is unhealthy"
-                                                        )
+                                                        st.error(f"❌ {config.name} is unhealthy")
 
                                                     # Show detailed health info
                                                     with st.expander("Health Details"):
-                                                        checks = health_data.get(
-                                                            "checks", {}
-                                                        )
+                                                        checks = health_data.get("checks", {})
                                                         for (
                                                             check_name,
                                                             check_result,
                                                         ) in checks.items():
-                                                            check_status = (
-                                                                check_result.get(
-                                                                    "status", "unknown"
-                                                                )
-                                                            )
-                                                            details = check_result.get(
-                                                                "details", ""
-                                                            )
+                                                            check_status = check_result.get("status", "unknown")
+                                                            details = check_result.get("details", "")
 
-                                                            if (
-                                                                check_status
-                                                                == "healthy"
-                                                            ):
+                                                            if check_status == "healthy":
                                                                 st.success(
                                                                     f"✅ {check_name.replace('_', ' ').title()}: "
                                                                     f"{details}"
                                                                 )
-                                                            elif (
-                                                                check_status
-                                                                == "warning"
-                                                            ):
+                                                            elif check_status == "warning":
                                                                 st.warning(
                                                                     f"⚠️ {check_name.replace('_', ' ').title()}: "
                                                                     f"{details}"
@@ -709,18 +650,14 @@ def render_gateways_page() -> None:
                                                                     f"{details}"
                                                                 )
                                             except Exception as e:
-                                                st.error(
-                                                    f"❌ Health check failed: {e!s}"
-                                                )
+                                                st.error(f"❌ Health check failed: {e!s}")
 
                                 st.divider()
 
             except Exception as e:
                 st.error("❌ Gateway system not available")
                 st.error(f"Import error: {e!s}")
-                st.info(
-                    "Make sure the gateway modules are properly installed and accessible."
-                )
+                st.info("Make sure the gateway modules are properly installed and accessible.")
 
         with tab2:
             st.subheader("Connection Test")
@@ -758,9 +695,7 @@ def render_gateways_page() -> None:
                                     progress_bar.progress(50)
 
                                     if client.connect():
-                                        status_text.text(
-                                            "Getting gateway information..."
-                                        )
+                                        status_text.text("Getting gateway information...")
                                         progress_bar.progress(75)
 
                                         info = client.get_gateway_info()
@@ -768,9 +703,7 @@ def render_gateways_page() -> None:
                                         progress_bar.progress(100)
                                         status_text.text("Connection successful!")
 
-                                        st.success(
-                                            "✅ Connection established successfully!"
-                                        )
+                                        st.success("✅ Connection established successfully!")
 
                                         if info:
                                             st.subheader("Gateway Information")
@@ -780,17 +713,12 @@ def render_gateways_page() -> None:
 
                                             with col1:
                                                 for key, value in info.items():
-                                                    if (
-                                                        key != "gateway_info_raw"
-                                                        and isinstance(
-                                                            value,
-                                                            str | int | float | bool,
-                                                        )
+                                                    if key != "gateway_info_raw" and isinstance(
+                                                        value,
+                                                        str | int | float | bool,
                                                     ):
                                                         st.metric(
-                                                            key.replace(
-                                                                "_", " "
-                                                            ).title(),
+                                                            key.replace("_", " ").title(),
                                                             str(value),
                                                         )
 
@@ -798,10 +726,7 @@ def render_gateways_page() -> None:
                                                 if "gateway_info_raw" in info:
                                                     st.text_area(
                                                         "Raw Gateway Data",
-                                                        str(info["gateway_info_raw"])[
-                                                            :500
-                                                        ]
-                                                        + "...",
+                                                        str(info["gateway_info_raw"])[:500] + "...",
                                                     )
 
                                         client.disconnect()
@@ -834,9 +759,7 @@ def render_gateways_page() -> None:
             except Exception as e:
                 st.error("❌ Gateway system not available")
                 st.error(f"Import error: {e!s}")
-                st.info(
-                    "Make sure the gateway modules are properly installed and accessible."
-                )
+                st.info("Make sure the gateway modules are properly installed and accessible.")
 
         with tab3:
             st.subheader("Health Check")
@@ -850,9 +773,7 @@ def render_gateways_page() -> None:
                     check_all = st.checkbox("Check all gateways", value=False)
 
                     if check_all:
-                        if st.button(
-                            "🏥 Check All Gateways Health", use_container_width=True
-                        ):
+                        if st.button("🏥 Check All Gateways Health", use_container_width=True):
                             with st.spinner("Checking health of all gateways..."):
                                 try:
                                     from src.ignition.gateway.client import (
@@ -870,22 +791,14 @@ def render_gateways_page() -> None:
                                         gateway_name,
                                         health_data,
                                     ) in health_results.items():
-                                        status = health_data.get(
-                                            "overall_status", "unknown"
-                                        )
+                                        status = health_data.get("overall_status", "unknown")
 
                                         if status == "healthy":
-                                            st.success(
-                                                f"✅ **{gateway_name}** - Healthy"
-                                            )
+                                            st.success(f"✅ **{gateway_name}** - Healthy")
                                         elif status == "warning":
-                                            st.warning(
-                                                f"⚠️ **{gateway_name}** - Warning"
-                                            )
+                                            st.warning(f"⚠️ **{gateway_name}** - Warning")
                                         else:
-                                            st.error(
-                                                f"❌ **{gateway_name}** - Unhealthy"
-                                            )
+                                            st.error(f"❌ **{gateway_name}** - Unhealthy")
 
                                         # Show detailed checks
                                         with st.expander(f"Details for {gateway_name}"):
@@ -894,15 +807,9 @@ def render_gateways_page() -> None:
                                                 check_name,
                                                 check_result,
                                             ) in checks.items():
-                                                check_status = check_result.get(
-                                                    "status", "unknown"
-                                                )
-                                                details = check_result.get(
-                                                    "details", ""
-                                                )
-                                                value_ms = check_result.get(
-                                                    "value_ms", None
-                                                )
+                                                check_status = check_result.get("status", "unknown")
+                                                details = check_result.get("details", "")
+                                                value_ms = check_result.get("value_ms", None)
 
                                                 check_display = f"{check_name.replace('_', ' ').title()}"
                                                 if value_ms:
@@ -939,25 +846,15 @@ def render_gateways_page() -> None:
                                             health_data = client.health_check()
 
                                             # Overall status
-                                            status = health_data.get(
-                                                "overall_status", "unknown"
-                                            )
-                                            timestamp = health_data.get(
-                                                "timestamp", "unknown"
-                                            )
+                                            status = health_data.get("overall_status", "unknown")
+                                            timestamp = health_data.get("timestamp", "unknown")
 
                                             if status == "healthy":
-                                                st.success(
-                                                    "✅ **Overall Status: HEALTHY**"
-                                                )
+                                                st.success("✅ **Overall Status: HEALTHY**")
                                             elif status == "warning":
-                                                st.warning(
-                                                    "⚠️ **Overall Status: WARNING**"
-                                                )
+                                                st.warning("⚠️ **Overall Status: WARNING**")
                                             else:
-                                                st.error(
-                                                    "❌ **Overall Status: UNHEALTHY**"
-                                                )
+                                                st.error("❌ **Overall Status: UNHEALTHY**")
 
                                             st.info(f"🕐 Timestamp: {timestamp}")
 
@@ -969,15 +866,9 @@ def render_gateways_page() -> None:
                                                 check_name,
                                                 check_result,
                                             ) in checks.items():
-                                                check_status = check_result.get(
-                                                    "status", "unknown"
-                                                )
-                                                details = check_result.get(
-                                                    "details", ""
-                                                )
-                                                value_ms = check_result.get(
-                                                    "value_ms", None
-                                                )
+                                                check_status = check_result.get("status", "unknown")
+                                                details = check_result.get("details", "")
+                                                value_ms = check_result.get("value_ms", None)
 
                                                 with st.container():
                                                     col1, col2 = st.columns([1, 3])
@@ -991,15 +882,9 @@ def render_gateways_page() -> None:
                                                             st.error("❌")
 
                                                     with col2:
-                                                        check_display = (
-                                                            check_name.replace(
-                                                                "_", " "
-                                                            ).title()
-                                                        )
+                                                        check_display = check_name.replace("_", " ").title()
                                                         if value_ms:
-                                                            check_display += (
-                                                                f" ({value_ms}ms)"
-                                                            )
+                                                            check_display += f" ({value_ms}ms)"
 
                                                         st.write(f"**{check_display}**")
                                                         if details:
@@ -1010,9 +895,7 @@ def render_gateways_page() -> None:
             except Exception as e:
                 st.error("❌ Gateway system not available")
                 st.error(f"Import error: {e!s}")
-                st.info(
-                    "Make sure the gateway modules are properly installed and accessible."
-                )
+                st.info("Make sure the gateway modules are properly installed and accessible.")
 
         with tab4:
             st.subheader("Gateway Configuration")
@@ -1035,9 +918,7 @@ def render_gateways_page() -> None:
                         value="my_gateway",
                         help="Unique name for this gateway",
                     )
-                    host = st.text_input(
-                        "Host", value="localhost", help="Gateway hostname or IP address"
-                    )
+                    host = st.text_input("Host", value="localhost", help="Gateway hostname or IP address")
                     port = st.number_input(
                         "Port",
                         value=8088,
@@ -1045,9 +926,7 @@ def render_gateways_page() -> None:
                         max_value=65535,
                         help="Gateway port",
                     )
-                    username = st.text_input(
-                        "Username", value="admin", help="Gateway username"
-                    )
+                    username = st.text_input("Username", value="admin", help="Gateway username")
 
                 with col2:
                     password = st.text_input(
@@ -1056,12 +935,8 @@ def render_gateways_page() -> None:
                         type="password",
                         help="Gateway password",
                     )
-                    use_https = st.checkbox(
-                        "Use HTTPS", value=False, help="Use HTTPS connection"
-                    )
-                    verify_ssl = st.checkbox(
-                        "Verify SSL", value=True, help="Verify SSL certificates"
-                    )
+                    use_https = st.checkbox("Use HTTPS", value=False, help="Use HTTPS connection")
+                    verify_ssl = st.checkbox("Verify SSL", value=True, help="Verify SSL certificates")
                     timeout = st.number_input(
                         "Timeout (seconds)",
                         value=30,
@@ -1081,9 +956,7 @@ def render_gateways_page() -> None:
                     help="Optional tags for organization",
                 )
 
-                if st.form_submit_button(
-                    "📋 Generate Configuration", use_container_width=True
-                ):
+                if st.form_submit_button("📋 Generate Configuration", use_container_width=True):
                     # Generate configuration
                     config_lines = [
                         f"# Gateway Configuration: {gateway_name}",
@@ -1101,18 +974,12 @@ def render_gateways_page() -> None:
                     ]
 
                     if description:
-                        config_lines.append(
-                            f"IGN_{gateway_name.upper()}_DESCRIPTION={description}"
-                        )
+                        config_lines.append(f"IGN_{gateway_name.upper()}_DESCRIPTION={description}")
 
                     if tags:
-                        tag_list = [
-                            tag.strip() for tag in tags.split(",") if tag.strip()
-                        ]
+                        tag_list = [tag.strip() for tag in tags.split(",") if tag.strip()]
                         if tag_list:
-                            config_lines.append(
-                                f"IGN_{gateway_name.upper()}_TAGS={','.join(tag_list)}"
-                            )
+                            config_lines.append(f"IGN_{gateway_name.upper()}_TAGS={','.join(tag_list)}")
 
                     config_text = "\n".join(config_lines)
 
@@ -1133,9 +1000,7 @@ def render_gateways_page() -> None:
             # Configuration validation
             st.markdown("### ✅ Validate Current Configuration")
 
-            if st.button(
-                "🔍 Check Environment Configuration", use_container_width=True
-            ):
+            if st.button("🔍 Check Environment Configuration", use_container_width=True):
                 try:
                     configs = manager.list_configs()  # type: ignore[attr-defined]
 
@@ -1148,9 +1013,7 @@ def render_gateways_page() -> None:
                                 st.info(f"**{config_name}**: {config.base_url}")
                     else:
                         st.warning("⚠️ No gateways found in environment configuration")
-                        st.info(
-                            "Add gateways to your .env file using the template generator above"
-                        )
+                        st.info("Add gateways to your .env file using the template generator above")
 
                 except Exception as e:
                     st.error(f"❌ Configuration validation failed: {e!s}")
@@ -1172,9 +1035,7 @@ def render_docs_page() -> None:
     """Render the documentation page."""
     st.markdown("## 📚 Documentation")
 
-    tab1, tab2, tab3, tab4 = st.tabs(
-        ["Getting Started", "Templates", "CLI Usage", "Examples"]
-    )
+    tab1, tab2, tab3, tab4 = st.tabs(["Getting Started", "Templates", "CLI Usage", "Examples"])
 
     with tab1:
         st.markdown(

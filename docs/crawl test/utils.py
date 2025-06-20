@@ -23,9 +23,7 @@ def get_supabase_client() -> Client:
     key = os.getenv("SUPABASE_SERVICE_KEY")
 
     if not url or not key:
-        raise ValueError(
-            "SUPABASE_URL and SUPABASE_SERVICE_KEY must be set in environment variables"
-        )
+        raise ValueError("SUPABASE_URL and SUPABASE_SERVICE_KEY must be set in environment variables")
 
     return create_client(url, key)
 
@@ -54,16 +52,12 @@ def create_embeddings_batch(texts: list[str]) -> list[list[float]]:
             return [item.embedding for item in response.data]
         except Exception as e:
             if retry < max_retries - 1:
-                print(
-                    f"Error creating batch embeddings (attempt {retry + 1}/{max_retries}): {e}"
-                )
+                print(f"Error creating batch embeddings (attempt {retry + 1}/{max_retries}): {e}")
                 print(f"Retrying in {retry_delay} seconds...")
                 time.sleep(retry_delay)
                 retry_delay *= 2  # Exponential backoff
             else:
-                print(
-                    f"Failed to create batch embeddings after {max_retries} attempts: {e}"
-                )
+                print(f"Failed to create batch embeddings after {max_retries} attempts: {e}")
                 # Try creating embeddings one by one as fallback
                 print("Attempting to create embeddings individually...")
                 embeddings = []
@@ -71,21 +65,15 @@ def create_embeddings_batch(texts: list[str]) -> list[list[float]]:
 
                 for i, text in enumerate(texts):
                     try:
-                        individual_response = openai.embeddings.create(
-                            model="text-embedding-3-small", input=[text]
-                        )
+                        individual_response = openai.embeddings.create(model="text-embedding-3-small", input=[text])
                         embeddings.append(individual_response.data[0].embedding)
                         successful_count += 1
                     except Exception as individual_error:
-                        print(
-                            f"Failed to create embedding for text {i}: {individual_error}"
-                        )
+                        print(f"Failed to create embedding for text {i}: {individual_error}")
                         # Add zero embedding as fallback
                         embeddings.append([0.0] * 1536)
 
-                print(
-                    f"Successfully created {successful_count}/{len(texts)} embeddings individually"
-                )
+                print(f"Successfully created {successful_count}/{len(texts)} embeddings individually")
                 return embeddings
 
 
@@ -155,9 +143,7 @@ Please give a short succinct context to situate this chunk within the overall do
         return contextual_text, True
 
     except Exception as e:
-        print(
-            f"Error generating contextual embedding: {e}. Using original chunk instead."
-        )
+        print(f"Error generating contextual embedding: {e}. Using original chunk instead.")
         return chunk, False
 
 
@@ -217,9 +203,7 @@ def add_documents_to_supabase(
                 # Continue with the next URL even if one fails
 
     # Check if MODEL_CHOICE is set for contextual embeddings
-    use_contextual_embeddings = (
-        os.getenv("USE_CONTEXTUAL_EMBEDDINGS", "false") == "true"
-    )
+    use_contextual_embeddings = os.getenv("USE_CONTEXTUAL_EMBEDDINGS", "false") == "true"
     print(f"\n\nUse contextual embeddings: {use_contextual_embeddings}\n\n")
 
     # Process in batches to avoid memory issues
@@ -246,8 +230,7 @@ def add_documents_to_supabase(
             with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
                 # Submit all tasks and collect results
                 future_to_idx = {
-                    executor.submit(process_chunk_with_context, arg): idx
-                    for idx, arg in enumerate(process_args)
+                    executor.submit(process_chunk_with_context, arg): idx for idx, arg in enumerate(process_args)
                 }
 
                 # Process results as they complete
@@ -265,9 +248,7 @@ def add_documents_to_supabase(
 
             # Sort results back into original order if needed
             if len(contextual_contents) != len(batch_contents):
-                print(
-                    f"Warning: Expected {len(batch_contents)} results but got {len(contextual_contents)}"
-                )
+                print(f"Warning: Expected {len(batch_contents)} results but got {len(contextual_contents)}")
                 # Use original contents as fallback
                 contextual_contents = batch_contents
         else:
@@ -293,9 +274,7 @@ def add_documents_to_supabase(
                 "content": contextual_contents[j],  # Store original content
                 "metadata": {"chunk_size": chunk_size, **batch_metadatas[j]},
                 "source_id": source_id,  # Add source_id field
-                "embedding": batch_embeddings[
-                    j
-                ],  # Use embedding from contextual content
+                "embedding": batch_embeddings[j],  # Use embedding from contextual content
             }
 
             batch_data.append(data)
@@ -311,9 +290,7 @@ def add_documents_to_supabase(
                 break
             except Exception as e:
                 if retry < max_retries - 1:
-                    print(
-                        f"Error inserting batch into Supabase (attempt {retry + 1}/{max_retries}): {e}"
-                    )
+                    print(f"Error inserting batch into Supabase (attempt {retry + 1}/{max_retries}): {e}")
                     print(f"Retrying in {retry_delay} seconds...")
                     time.sleep(retry_delay)
                     retry_delay *= 2  # Exponential backoff
@@ -328,14 +305,10 @@ def add_documents_to_supabase(
                             client.table("crawled_pages").insert(record).execute()
                             successful_inserts += 1
                         except Exception as individual_error:
-                            print(
-                                f"Failed to insert individual record for URL {record['url']}: {individual_error}"
-                            )
+                            print(f"Failed to insert individual record for URL {record['url']}: {individual_error}")
 
                     if successful_inserts > 0:
-                        print(
-                            f"Successfully inserted {successful_inserts}/{len(batch_data)} records individually"
-                        )
+                        print(f"Successfully inserted {successful_inserts}/{len(batch_data)} records individually")
 
 
 def search_documents(
@@ -365,9 +338,7 @@ def search_documents(
 
         # Only add the filter if it's actually provided and not empty
         if filter_metadata:
-            params["filter"] = (
-                filter_metadata  # Pass the dictionary directly, not JSON-encoded
-            )
+            params["filter"] = filter_metadata  # Pass the dictionary directly, not JSON-encoded
 
         result = client.rpc("match_crawled_pages", params).execute()
 
@@ -377,9 +348,7 @@ def search_documents(
         return []
 
 
-def extract_code_blocks(
-    markdown_content: str, min_length: int = 1000
-) -> list[dict[str, Any]]:
+def extract_code_blocks(markdown_content: str, min_length: int = 1000) -> list[dict[str, Any]]:
     """Extract code blocks from markdown content along with context.
 
     Args:
@@ -462,9 +431,7 @@ def extract_code_blocks(
     return code_blocks
 
 
-def generate_code_example_summary(
-    code: str, context_before: str, context_after: str
-) -> str:
+def generate_code_example_summary(code: str, context_before: str, context_after: str) -> str:
     """Generate a summary for a code example using its surrounding context.
 
     Args:
@@ -565,9 +532,7 @@ def add_code_examples_to_supabase(
             if embedding and not all(v == 0.0 for v in embedding):
                 valid_embeddings.append(embedding)
             else:
-                print(
-                    "Warning: Zero or invalid embedding detected, creating new one..."
-                )
+                print("Warning: Zero or invalid embedding detected, creating new one...")
                 # Try to create a single embedding as fallback
                 single_embedding = create_embedding(batch_texts[len(valid_embeddings)])
                 valid_embeddings.append(single_embedding)
@@ -604,9 +569,7 @@ def add_code_examples_to_supabase(
                 break
             except Exception as e:
                 if retry < max_retries - 1:
-                    print(
-                        f"Error inserting batch into Supabase (attempt {retry + 1}/{max_retries}): {e}"
-                    )
+                    print(f"Error inserting batch into Supabase (attempt {retry + 1}/{max_retries}): {e}")
                     print(f"Retrying in {retry_delay} seconds...")
                     time.sleep(retry_delay)
                     retry_delay *= 2  # Exponential backoff
@@ -621,17 +584,11 @@ def add_code_examples_to_supabase(
                             client.table("code_examples").insert(record).execute()
                             successful_inserts += 1
                         except Exception as individual_error:
-                            print(
-                                f"Failed to insert individual record for URL {record['url']}: {individual_error}"
-                            )
+                            print(f"Failed to insert individual record for URL {record['url']}: {individual_error}")
 
                     if successful_inserts > 0:
-                        print(
-                            f"Successfully inserted {successful_inserts}/{len(batch_data)} records individually"
-                        )
-        print(
-            f"Inserted batch {i // batch_size + 1} of {(total_items + batch_size - 1) // batch_size} code examples"
-        )
+                        print(f"Successfully inserted {successful_inserts}/{len(batch_data)} records individually")
+        print(f"Inserted batch {i // batch_size + 1} of {(total_items + batch_size - 1) // batch_size} code examples")
 
 
 def update_source_info(client: Client, source_id: str, summary: str, word_count: int):
@@ -733,9 +690,7 @@ The above content is from the documentation for '{source_id}'. Please provide a 
         return summary
 
     except Exception as e:
-        print(
-            f"Error generating summary with LLM for {source_id}: {e}. Using default summary."
-        )
+        print(f"Error generating summary with LLM for {source_id}: {e}. Using default summary.")
         return default_summary
 
 
@@ -760,9 +715,7 @@ def search_code_examples(
     """
     # Create a more descriptive query for better embedding match
     # Since code examples are embedded with their summaries, we should make the query more descriptive
-    enhanced_query = (
-        f"Code example for {query}\n\nSummary: Example code showing {query}"
-    )
+    enhanced_query = f"Code example for {query}\n\nSummary: Example code showing {query}"
 
     # Create embedding for the enhanced query
     query_embedding = create_embedding(enhanced_query)

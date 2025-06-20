@@ -39,9 +39,7 @@ class EmbeddingResult:
 class CodeEmbeddingGenerator:
     """Generates vector embeddings for code elements."""
 
-    def __init__(
-        self, model_name: str = "all-MiniLM-L6-v2", cache_dir: str | None = None
-    ) -> None:
+    def __init__(self, model_name: str = "all-MiniLM-L6-v2", cache_dir: str | None = None) -> None:
         """Initialize the embedding generator.
 
         Args:
@@ -49,11 +47,7 @@ class CodeEmbeddingGenerator:
             cache_dir: Directory to cache embeddings
         """
         self.model_name = model_name
-        self.cache_dir = (
-            Path(cache_dir)
-            if cache_dir
-            else Path.home() / ".ignition" / "embeddings_cache"
-        )
+        self.cache_dir = Path(cache_dir) if cache_dir else Path.home() / ".ignition" / "embeddings_cache"
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize model
@@ -64,24 +58,18 @@ class CodeEmbeddingGenerator:
     def _initialize_model(self) -> None:
         """Initialize the sentence transformer model."""
         if not EMBEDDINGS_AVAILABLE:
-            logger.warning(
-                "Sentence transformers not available. Install with: pip install sentence-transformers"
-            )
+            logger.warning("Sentence transformers not available. Install with: pip install sentence-transformers")
             return
 
         try:
             self.model = SentenceTransformer(self.model_name)
             self.dimensions = self.model.get_sentence_embedding_dimension()
-            logger.info(
-                f"Initialized embedding model: {self.model_name} ({self.dimensions}D)"
-            )
+            logger.info(f"Initialized embedding model: {self.model_name} ({self.dimensions}D)")
         except Exception as e:
             logger.error(f"Failed to initialize embedding model: {e}")
             self.model = None
 
-    def generate_embedding(
-        self, text: str, use_cache: bool = True
-    ) -> EmbeddingResult | None:
+    def generate_embedding(self, text: str, use_cache: bool = True) -> EmbeddingResult | None:
         """Generate embedding for text.
 
         Args:
@@ -127,9 +115,7 @@ class CodeEmbeddingGenerator:
             logger.error(f"Failed to generate embedding: {e}")
             return None
 
-    def generate_file_embedding(
-        self, file_content: str, file_path: str
-    ) -> EmbeddingResult | None:
+    def generate_file_embedding(self, file_content: str, file_path: str) -> EmbeddingResult | None:
         """Generate embedding for a code file.
 
         Preprocesses the code content for optimal embedding.
@@ -147,9 +133,7 @@ class CodeEmbeddingGenerator:
         Combines function code, name, and docstring for optimal embedding.
         """
         # Combine function elements for embedding
-        embedding_text = self._prepare_function_text(
-            function_code, function_name, docstring
-        )
+        embedding_text = self._prepare_function_text(function_code, function_name, docstring)
 
         return self.generate_embedding(embedding_text)
 
@@ -165,9 +149,7 @@ class CodeEmbeddingGenerator:
         Combines class code, name, docstring, and method names for optimal embedding.
         """
         # Combine class elements for embedding
-        embedding_text = self._prepare_class_text(
-            class_code, class_name, docstring, method_names
-        )
+        embedding_text = self._prepare_class_text(class_code, class_name, docstring, method_names)
 
         return self.generate_embedding(embedding_text)
 
@@ -210,28 +192,20 @@ class CodeEmbeddingGenerator:
             file_summary += f"Classes: {', '.join(classes)}\n"
 
         if functions:
-            file_summary += (
-                f"Functions: {', '.join(functions[:20])}\n"  # Limit functions
-            )
+            file_summary += f"Functions: {', '.join(functions[:20])}\n"  # Limit functions
 
         if comments:
             file_summary += f"Key comments: {' | '.join(comments[:5])}\n"
 
         # Add first few meaningful lines of code (skip imports and comments)
-        code_lines = [
-            line
-            for line in lines
-            if line.strip() and not line.strip().startswith(("#", "import ", "from "))
-        ]
+        code_lines = [line for line in lines if line.strip() and not line.strip().startswith(("#", "import ", "from "))]
 
         if code_lines:
             file_summary += f"Code excerpt: {' '.join(code_lines[:5])}"
 
         return file_summary
 
-    def _prepare_function_text(
-        self, function_code: str, function_name: str, docstring: str | None = None
-    ) -> str:
+    def _prepare_function_text(self, function_code: str, function_name: str, docstring: str | None = None) -> str:
         """Prepare function text for embedding."""
         text_parts = [f"Function: {function_name}"]
 
@@ -246,16 +220,10 @@ class CodeEmbeddingGenerator:
                 break
 
         # Add some key code lines (excluding docstring)
-        code_lines = [
-            line.strip()
-            for line in lines
-            if line.strip() and not line.strip().startswith('"""')
-        ]
+        code_lines = [line.strip() for line in lines if line.strip() and not line.strip().startswith('"""')]
 
         if len(code_lines) > 1:
-            meaningful_lines = [
-                line for line in code_lines[1:6] if line and not line.startswith("#")
-            ]
+            meaningful_lines = [line for line in code_lines[1:6] if line and not line.startswith("#")]
             if meaningful_lines:
                 text_parts.append(f"Implementation: {' | '.join(meaningful_lines)}")
 
@@ -359,9 +327,7 @@ class CodeEmbeddingGenerator:
 class SemanticCodeSearch:
     """Provides semantic search capabilities for code using vector embeddings."""
 
-    def __init__(
-        self, graph_client, embedding_generator: CodeEmbeddingGenerator
-    ) -> None:
+    def __init__(self, graph_client, embedding_generator: CodeEmbeddingGenerator) -> None:
         """Initialize semantic search system.
 
         Args:
@@ -371,9 +337,7 @@ class SemanticCodeSearch:
         self.client = graph_client
         self.embedder = embedding_generator
 
-    def find_similar_code(
-        self, query: str, context_type: str = "all", limit: int = 10
-    ) -> list[dict[str, Any]]:
+    def find_similar_code(self, query: str, context_type: str = "all", limit: int = 10) -> list[dict[str, Any]]:
         """Find semantically similar code using vector search.
 
         Args:
@@ -406,9 +370,7 @@ class SemanticCodeSearch:
         results.sort(key=lambda x: x.get("score", 0), reverse=True)
         return results[:limit]
 
-    def find_similar_to_file(
-        self, file_path: str, limit: int = 10
-    ) -> list[dict[str, Any]]:
+    def find_similar_to_file(self, file_path: str, limit: int = 10) -> list[dict[str, Any]]:
         """Find files similar to the given file.
 
         Args:
@@ -467,9 +429,7 @@ class SemanticCodeSearch:
             logger.error(f"Failed to search files: {e}")
             return []
 
-    def _search_classes(
-        self, query_embedding: list[float], limit: int
-    ) -> list[dict[str, Any]]:
+    def _search_classes(self, query_embedding: list[float], limit: int) -> list[dict[str, Any]]:
         """Search for similar classes using vector similarity."""
         cypher = """
         CALL db.index.vector.queryNodes('class_embeddings', $limit, $embedding)
@@ -495,9 +455,7 @@ class SemanticCodeSearch:
             logger.error(f"Failed to search classes: {e}")
             return []
 
-    def _search_methods(
-        self, query_embedding: list[float], limit: int
-    ) -> list[dict[str, Any]]:
+    def _search_methods(self, query_embedding: list[float], limit: int) -> list[dict[str, Any]]:
         """Search for similar methods using vector similarity."""
         cypher = """
         CALL db.index.vector.queryNodes('method_embeddings', $limit, $embedding)
@@ -557,9 +515,7 @@ class SemanticCodeSearch:
         params: dict[str, Any] = {"embedding": pattern_embedding.embedding}
 
         if complexity_range:
-            conditions.append(
-                "node.complexity >= $min_complexity AND node.complexity <= $max_complexity"
-            )
+            conditions.append("node.complexity >= $min_complexity AND node.complexity <= $max_complexity")
             params["min_complexity"] = float(complexity_range[0])
             params["max_complexity"] = float(complexity_range[1])
 

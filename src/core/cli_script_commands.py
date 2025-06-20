@@ -25,12 +25,8 @@ def script(ctx: click.Context) -> None:
 @click.option("--config", "-c", help="Configuration file (JSON)")
 @click.option("--output", "-o", help="Output file path")
 @click.option("--component-name", help="Name of the component")
-@click.option(
-    "--action-type", help="Type of action (navigation, tag_write, popup, etc.)"
-)
-@click.option(
-    "--interactive", "-i", is_flag=True, help="Interactive mode with recommendations"
-)
+@click.option("--action-type", help="Type of action (navigation, tag_write, popup, etc.)")
+@click.option("--interactive", "-i", is_flag=True, help="Interactive mode with recommendations")
 @click.pass_context
 def generate(
     ctx: click.Context,
@@ -61,13 +57,9 @@ def generate(
             if config:
                 # Generate from config file
                 if enhanced_cli.generator:
-                    script_content = enhanced_cli.generator.generate_from_config(
-                        config, output
-                    )
+                    script_content = enhanced_cli.generator.generate_from_config(config, output)
                     enhanced_cli.track_cli_usage("script", "generate", params, True)
-                    console.print(
-                        f"[green]✓[/green] Generated script from config: {config}"
-                    )
+                    console.print(f"[green]✓[/green] Generated script from config: {config}")
                 else:
                     console.print("[red]✗[/red] Script generator not available")
                     enhanced_cli.track_cli_usage("script", "generate", params, False)
@@ -85,22 +77,16 @@ def generate(
                     template += ".jinja2"
 
                 if enhanced_cli.generator:
-                    script_content = enhanced_cli.generator.generate_script(
-                        template, context, output
-                    )
+                    script_content = enhanced_cli.generator.generate_script(template, context, output)
                     enhanced_cli.track_cli_usage("script", "generate", params, True)
-                    console.print(
-                        f"[green]✓[/green] Generated script from template: {template}"
-                    )
+                    console.print(f"[green]✓[/green] Generated script from template: {template}")
                 else:
                     console.print("[red]✗[/red] Script generator not available")
                     enhanced_cli.track_cli_usage("script", "generate", params, False)
                     return
 
             else:
-                console.print(
-                    "[red]✗[/red] Either --template or --config must be specified"
-                )
+                console.print("[red]✗[/red] Either --template or --config must be specified")
                 enhanced_cli.track_cli_usage("script", "generate", params, False)
                 return
 
@@ -109,12 +95,8 @@ def generate(
             console.print(f"[blue]💾[/blue] Saved to: {output}")
         else:
             # Show script with syntax highlighting
-            syntax = Syntax(
-                script_content, "python", theme="monokai", line_numbers=True
-            )
-            console.print(
-                Panel(syntax, title="📄 Generated Script", border_style="green")
-            )
+            syntax = Syntax(script_content, "python", theme="monokai", line_numbers=True)
+            console.print(Panel(syntax, title="📄 Generated Script", border_style="green"))
 
         # Show follow-up recommendations
         if interactive:
@@ -135,40 +117,28 @@ def show_generation_recommendations(template: str, action_type: str) -> None:
     # Get template usage patterns
     try:
         if template:
-            template_patterns = enhanced_cli.manager.get_patterns_by_entity(
-                template, "template"
-            )
+            template_patterns = enhanced_cli.manager.get_patterns_by_entity(template, "template")
             if template_patterns:
-                console.print(
-                    f"[green]💡[/green] Template '{template}' usage insights:"
-                )
+                console.print(f"[green]💡[/green] Template '{template}' usage insights:")
 
                 for pattern in template_patterns[:3]:
                     if pattern.get("pattern_type") == "template_usage":
                         success_rate = pattern.get("success_rate", 0)
                         usage_count = pattern.get("usage_count", 0)
-                        console.print(
-                            f"   • Success rate: {success_rate:.1%} ({usage_count} uses)"
-                        )
+                        console.print(f"   • Success rate: {success_rate:.1%} ({usage_count} uses)")
 
                         common_params = pattern.get("common_parameters", {})
                         if common_params:
                             console.print("   • Common parameters:")
                             for param, info in list(common_params.items())[:3]:
                                 freq = info.get("frequency", 0)
-                                console.print(
-                                    f"     - {param}: used {freq:.1%} of the time"
-                                )
+                                console.print(f"     - {param}: used {freq:.1%} of the time")
 
         # Get action type recommendations
         if action_type:
-            recommendations = enhanced_cli.get_recommendations(
-                f"script.generate.{action_type}"
-            )
+            recommendations = enhanced_cli.get_recommendations(f"script.generate.{action_type}")
             if recommendations:
-                console.print(
-                    f"\n[blue]🎯[/blue] Users who generate {action_type} scripts also use:"
-                )
+                console.print(f"\n[blue]🎯[/blue] Users who generate {action_type} scripts also use:")
                 for rec in recommendations[:3]:
                     cmd = rec["command"].replace("script.generate.", "")
                     console.print(f"   • {cmd} (confidence: {rec['confidence']:.1%})")

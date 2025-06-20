@@ -35,7 +35,7 @@ class SystemGuiWrapper(IgnitionWrapperBase):
             return result
 
         except Exception as e:
-            raise WrapperError(f"Message box failed: {e}", original_error=e)
+            raise WrapperError(f"Message box failed: {e}", original_error=e) from e
 
     @wrapper_function
     def error_box(self, message: str, title: str = "Error") -> dict[str, Any]:
@@ -60,7 +60,7 @@ class SystemGuiWrapper(IgnitionWrapperBase):
             return result
 
         except Exception as e:
-            raise WrapperError(f"Error box failed: {e}", original_error=e)
+            raise WrapperError(f"Error box failed: {e}", original_error=e) from e
 
     @wrapper_function
     def warning_box(self, message: str, title: str = "Warning") -> dict[str, Any]:
@@ -85,4 +85,4 @@ class SystemGuiWrapper(IgnitionWrapperBase):
             return result
 
         except Exception as e:
-            raise WrapperError(f"Warning box failed: {e}", original_error=e)
+            raise WrapperError(f"Warning box failed: {e}", original_error=e) from e

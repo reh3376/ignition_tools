@@ -5,17 +5,19 @@ Designer environment, leveraging existing templates and Neo4j graph data.
 """
 
 import logging
-from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from jinja2 import Template
+from src.ignition.generators.script_generator import IgnitionScriptGenerator
+from src.ignition.graph.client import IgnitionGraphClient
 
-from ...generators.script_generator import IgnitionScriptGenerator
-from ...graph.client import IgnitionGraphClient
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from jinja2 import Template
 
 
 class ScriptContext(str, Enum):
@@ -105,9 +107,7 @@ class DynamicScriptGenerator:
         self._cache_access_times: dict[str, datetime] = {}
 
         # Context validators
-        self._validators: dict[ScriptContext, list[Callable]] = {
-            context: [] for context in ScriptContext
-        }
+        self._validators: dict[ScriptContext, list[Callable]] = {context: [] for context in ScriptContext}
 
         # Script history for suggestions
         self._generation_history: list[GenerationRequest] = []
@@ -177,14 +177,10 @@ class DynamicScriptGenerator:
                 result.suggestions.extend(suggestions)
 
                 # Apply AI-suggested improvements to parameters
-                request.parameters = self._apply_ai_improvements(
-                    request.parameters, suggestions
-                )
+                request.parameters = self._apply_ai_improvements(request.parameters, suggestions)
 
             # Generate script using base generator
-            script_content = self.base_generator.generate_script(
-                request.template_name, request.parameters
-            )
+            script_content = self.base_generator.generate_script(request.template_name, request.parameters)
 
             # Post-process script
             script_content = self._post_process_script(script_content, request.context)
@@ -244,9 +240,7 @@ class DynamicScriptGenerator:
 
         # Validate required parameters
         required_params = self._get_required_parameters(request.template_name)
-        missing_params = [
-            param for param in required_params if param not in request.parameters
-        ]
+        missing_params = [param for param in required_params if param not in request.parameters]
         if missing_params:
             errors.append(f"Missing required parameters: {', '.join(missing_params)}")
 
@@ -325,9 +319,7 @@ class DynamicScriptGenerator:
 
         return suggestions
 
-    def _apply_ai_improvements(
-        self, parameters: dict[str, Any], suggestions: list[str]
-    ) -> dict[str, Any]:
+    def _apply_ai_improvements(self, parameters: dict[str, Any], suggestions: list[str]) -> dict[str, Any]:
         """Apply AI-suggested improvements to parameters.
 
         Args:
@@ -547,9 +539,7 @@ class DynamicScriptGenerator:
                        t.examples as examples
                 """
 
-                results = self.graph_client.execute_query(
-                    query, {"name": template_name}
-                )
+                results = self.graph_client.execute_query(query, {"name": template_name})
 
                 if results:
                     record = results[0]
@@ -561,9 +551,7 @@ class DynamicScriptGenerator:
 
         return info
 
-    def suggest_templates(
-        self, context: ScriptContext, keywords: list[str] | None = None
-    ) -> list[dict[str, Any]]:
+    def suggest_templates(self, context: ScriptContext, keywords: list[str] | None = None) -> list[dict[str, Any]]:
         """Suggest templates based on context and keywords.
 
         Args:
@@ -582,11 +570,7 @@ class DynamicScriptGenerator:
         # Filter by keywords if provided
         if keywords:
             keyword_lower = [k.lower() for k in keywords]
-            context_templates = [
-                t
-                for t in context_templates
-                if any(k in t.lower() for k in keyword_lower)
-            ]
+            context_templates = [t for t in context_templates if any(k in t.lower() for k in keyword_lower)]
 
         # Get template info for each
         for template in context_templates[:10]:  # Limit to 10 suggestions

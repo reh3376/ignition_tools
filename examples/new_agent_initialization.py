@@ -26,9 +26,7 @@ def main():
 
         context = initialize_agent_knowledge()
 
-        print(
-            f"✅ Successfully connected to {len(context['knowledge_base_status'])} knowledge bases"
-        )
+        print(f"✅ Successfully connected to {len(context['knowledge_base_status'])} knowledge bases")
         print(f"🎯 Project: {context['project_context']['project_name']}")
         print(f"📊 Current Phase: {context['project_context']['current_phase']}")
         print(f"🛠️ Available Tools: {len(context['available_tools'])}")
@@ -43,11 +41,7 @@ def main():
 
         print("Available Knowledge Bases:")
         for kb in discovery.knowledge_bases:
-            status_emoji = (
-                "✅"
-                if kb.status == "available"
-                else "❌" if kb.status == "error" else "⚠️"
-            )
+            status_emoji = "✅" if kb.status == "available" else "❌" if kb.status == "error" else "⚠️"
             print(f"  {status_emoji} {kb.name}")
             print(f"     Type: {kb.type}")
             print(f"     Status: {kb.status}")
@@ -64,9 +58,7 @@ def main():
         from ignition.code_intelligence import quick_start
 
         quick_context = quick_start()
-        print(
-            f"✅ Quick start complete! Found {len(quick_context.get('knowledge_base_status', []))} knowledge bases"
-        )
+        print(f"✅ Quick start complete! Found {len(quick_context.get('knowledge_base_status', []))} knowledge bases")
 
         # Demonstrate accessing specific knowledge bases
         print("\n🔗 Connecting to Specific Knowledge Bases")
@@ -81,9 +73,7 @@ def main():
                 print("✅ Neo4j Graph Database: Connected")
 
                 # Example query
-                result = manager.client.execute_query(
-                    "MATCH (n) RETURN count(n) as node_count"
-                )
+                result = manager.client.execute_query("MATCH (n) RETURN count(n) as node_count")
                 node_count = result[0]["node_count"]
                 print(f"   📊 Total nodes in graph: {node_count:,}")
             else:
@@ -155,14 +145,10 @@ def main():
         print("python -m src.ignition.code_intelligence.cli_commands refactor detect")
         print()
         print("# Analyze a specific file:")
-        print(
-            "python -m src.ignition.code_intelligence.cli_commands refactor analyze path/to/file.py"
-        )
+        print("python -m src.ignition.code_intelligence.cli_commands refactor analyze path/to/file.py")
         print()
         print("# Get refactoring statistics:")
-        print(
-            "python -m src.ignition.code_intelligence.cli_commands refactor statistics"
-        )
+        print("python -m src.ignition.code_intelligence.cli_commands refactor statistics")
 
         print("\n🎉 AGENT INITIALIZATION COMPLETE!")
         print("=" * 50)

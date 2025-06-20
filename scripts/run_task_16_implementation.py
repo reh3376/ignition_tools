@@ -30,9 +30,7 @@ def main():
 
         # Display results
         print("\n=== Task 16: SFC & Recipe Management - Implementation Results ===")
-        print(
-            f"Total functions created: {result['task_16_summary']['total_functions']}"
-        )
+        print(f"Total functions created: {result['task_16_summary']['total_functions']}")
         print(f"Target met: {result['task_16_summary']['target_met']}")
         print("\nFunction categories:")
         for category, count in result["task_16_summary"]["categories"].items():

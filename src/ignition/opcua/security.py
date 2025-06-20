@@ -142,9 +142,7 @@ class SecurityManager:
                 .public_key(private_key.public_key())
                 .serial_number(x509.random_serial_number())
                 .not_valid_before(datetime.datetime.utcnow())
-                .not_valid_after(
-                    datetime.datetime.utcnow() + datetime.timedelta(days=days_valid)
-                )
+                .not_valid_after(datetime.datetime.utcnow() + datetime.timedelta(days=days_valid))
                 .add_extension(
                     x509.SubjectAlternativeName(
                         [
@@ -211,9 +209,7 @@ class SecurityManager:
 
             # Check for subject alternative names
             try:
-                san_ext = cert.extensions.get_extension_for_oid(
-                    x509.ExtensionOID.SUBJECT_ALTERNATIVE_NAME
-                )
+                san_ext = cert.extensions.get_extension_for_oid(x509.ExtensionOID.SUBJECT_ALTERNATIVE_NAME)
                 sans = [str(name) for name in san_ext.value]
                 info["subject_alternative_names"] = sans
             except x509.ExtensionNotFound:
@@ -240,9 +236,7 @@ class SecurityManager:
                 cert_info["file_name"] = cert_file.name
 
                 # Look for corresponding private key
-                key_file = cert_file.parent / cert_file.name.replace(
-                    "_cert.pem", "_key.pem"
-                )
+                key_file = cert_file.parent / cert_file.name.replace("_cert.pem", "_key.pem")
                 cert_info["has_private_key"] = key_file.exists()
                 if cert_info["has_private_key"]:
                     cert_info["private_key_path"] = str(key_file)

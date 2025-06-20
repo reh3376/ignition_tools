@@ -129,15 +129,11 @@ def test_context_manager():
         client.connect()
 
         # Test context manager
-        with tracker.track_session(
-            user_id="context_test_user", session_type="development"
-        ) as session_id:
+        with tracker.track_session(user_id="context_test_user", session_type="development") as session_id:
             print(f"📝 In context manager with session: {session_id}")
 
             # Track some events
-            tracker.track_function_query(
-                "system.perspective.navigate", context="Perspective Session"
-            )
+            tracker.track_function_query("system.perspective.navigate", context="Perspective Session")
             tracker.track_template_generation("perspective/session_navigation.jinja2")
 
             # Get stats while session is active

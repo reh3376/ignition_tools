@@ -90,9 +90,7 @@ class MCPConfigManager:
                     remaining = content[start_idx + i :]
                     return_idx = remaining.find("        return configs")
                     if return_idx != -1:
-                        end_idx = (
-                            start_idx + i + return_idx + len("        return configs")
-                        )
+                        end_idx = start_idx + i + return_idx + len("        return configs")
                         break
 
             # Replace the method

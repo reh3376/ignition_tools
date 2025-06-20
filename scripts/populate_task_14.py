@@ -50,9 +50,7 @@ def create_function_node(func_data: dict[str, Any]) -> GraphNode:
     )
 
 
-def create_relationships(
-    function_node: GraphNode, func_data: dict[str, Any]
-) -> list[GraphRelationship]:
+def create_relationships(function_node: GraphNode, func_data: dict[str, Any]) -> list[GraphRelationship]:
     """Create relationships for an OPC-UA function node."""
     relationships = []
 
@@ -117,9 +115,7 @@ def populate_task_14():
 
     for i, func_data in enumerate(functions, 1):
         try:
-            print(
-                f"🔧 Processing OPC-UA function {i}/{total_functions}: {func_data['name']}"
-            )
+            print(f"🔧 Processing OPC-UA function {i}/{total_functions}: {func_data['name']}")
 
             # Create function node
             function_node = create_function_node(func_data)
@@ -137,9 +133,7 @@ def populate_task_14():
                     if client.create_relationship(relationship):
                         total_relationships += 1
 
-                print(
-                    f"   ✅ Successfully created OPC-UA function with {len(relationships)} relationships"
-                )
+                print(f"   ✅ Successfully created OPC-UA function with {len(relationships)} relationships")
             else:
                 print(f"   ❌ Failed to create function: {func_data['name']}")
 
@@ -169,9 +163,7 @@ def populate_task_14():
 
     # Summary
     print("\n🎉 Task 14 OPC-UA Population Complete!")
-    print(
-        f"   ✅ Successfully created: {successful_functions}/{total_functions} functions"
-    )
+    print(f"   ✅ Successfully created: {successful_functions}/{total_functions} functions")
     print(f"   🔗 Total relationships: {total_relationships}")
     print(f"   📈 Success rate: {(successful_functions / total_functions) * 100:.1f}%")
 
@@ -236,9 +228,7 @@ def verify_task_14_functions():
         print(f"   🎯 All {len(test_functions)} sample OPC-UA functions verified!")
         return True
     else:
-        print(
-            f"   ⚠️  Only {len(verification_results)}/{len(test_functions)} functions verified"
-        )
+        print(f"   ⚠️  Only {len(verification_results)}/{len(test_functions)} functions verified")
         return False
 
 
@@ -323,9 +313,7 @@ if __name__ == "__main__":
         print(f"   • Database now contains {total_functions} total functions")
         print("   • Industrial connectivity: PLCs, SCADA, MES, DCS systems")
         print("   • Real-time monitoring: Subscriptions, alarms, historical data")
-        print(
-            "   • 🏭 MILESTONE: Full industrial automation OPC-UA client capabilities!"
-        )
+        print("   • 🏭 MILESTONE: Full industrial automation OPC-UA client capabilities!")
 
     else:
         print("\n⚠️  Task 14 completed with some issues")

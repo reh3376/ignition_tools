@@ -148,9 +148,7 @@ class CodeSchema:
                 self.client.execute_query(index_info["query"])
                 logger.info(f"Created vector index: {index_info['name']}")
             except Exception as e:
-                logger.debug(
-                    f"Vector index {index_info['name']} may already exist: {e}"
-                )
+                logger.debug(f"Vector index {index_info['name']} may already exist: {e}")
 
     def get_schema_info(self) -> dict[str, Any]:
         """Get information about the current schema."""
@@ -166,9 +164,7 @@ class CodeSchema:
             # Get node counts
             node_counts = {}
             for node_type in ["CodeFile", "Class", "Method", "Import"]:
-                count_result = self.client.execute_query(
-                    f"MATCH (n:{node_type}) RETURN count(n) as count"
-                )
+                count_result = self.client.execute_query(f"MATCH (n:{node_type}) RETURN count(n) as count")
                 node_counts[node_type] = count_result[0]["count"] if count_result else 0
 
             return {

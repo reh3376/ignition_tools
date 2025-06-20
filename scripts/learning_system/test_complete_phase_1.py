@@ -123,9 +123,7 @@ def simulate_realistic_usage_patterns(tracker: UsageTracker, sessions: int = 30)
 
                     tracker.track_function_query(
                         function_name=func,
-                        context=random.choice(
-                            ["Gateway", "Vision Client", "Perspective Session"]
-                        ),
+                        context=random.choice(["Gateway", "Vision Client", "Perspective Session"]),
                         parameters=params,
                         success=success,
                         execution_time=execution_time,
@@ -147,12 +145,8 @@ def simulate_realistic_usage_patterns(tracker: UsageTracker, sessions: int = 30)
                     }
                 elif "database" in template:
                     template_params = {
-                        "table_name": random.choice(
-                            ["production_data", "alarm_log", "user_actions"]
-                        ),
-                        "columns": random.choice(
-                            [["timestamp", "value"], ["id", "message", "priority"]]
-                        ),
+                        "table_name": random.choice(["production_data", "alarm_log", "user_actions"]),
+                        "columns": random.choice([["timestamp", "value"], ["id", "message", "priority"]]),
                     }
                 elif "navigation" in template:
                     template_params = {
@@ -161,12 +155,8 @@ def simulate_realistic_usage_patterns(tracker: UsageTracker, sessions: int = 30)
                     }
                 elif "alarm" in template:
                     template_params = {
-                        "alarm_priority": random.choice(
-                            scenario["parameters"]["priority"]
-                        ),
-                        "notification_type": random.choice(
-                            ["popup", "banner", "sound"]
-                        ),
+                        "alarm_priority": random.choice(scenario["parameters"]["priority"]),
+                        "notification_type": random.choice(["popup", "banner", "sound"]),
                     }
 
                 tracker.track_template_generation(
@@ -221,9 +211,7 @@ def test_complete_learning_system():
         stats = manager.get_pattern_statistics()
         print("✅ Pattern Statistics:")
         print(f"   • Total patterns by type: {stats['pattern_counts']}")
-        print(
-            f"   • Confidence distribution: {stats.get('confidence_distribution', {})}"
-        )
+        print(f"   • Confidence distribution: {stats.get('confidence_distribution', {})}")
 
         # Get top patterns summary
         top_patterns = manager.get_top_patterns_summary(limit=3)
@@ -236,9 +224,7 @@ def test_complete_learning_system():
         print("\n🔄 Test 4: Pattern Retrieval")
 
         # Get high-confidence co-occurrence patterns
-        co_occurrence = manager.get_patterns_by_type(
-            "function_co_occurrence", limit=5, min_confidence=0.5
-        )
+        co_occurrence = manager.get_patterns_by_type("function_co_occurrence", limit=5, min_confidence=0.5)
         print(f"✅ High-confidence co-occurrence patterns: {len(co_occurrence)}")
 
         # Get patterns for specific function
@@ -273,9 +259,7 @@ def test_complete_learning_system():
             if recommendations:
                 print(f"✅ Recommendations for '{func}': {len(recommendations)}")
                 for rec in recommendations[:2]:  # Show top 2
-                    print(
-                        f"   → {rec['recommended_function']} (confidence: {rec['confidence']:.1%})"
-                    )
+                    print(f"   → {rec['recommended_function']} (confidence: {rec['confidence']:.1%})")
             else:
                 print(f"ℹ No recommendations found for '{func}'")
 

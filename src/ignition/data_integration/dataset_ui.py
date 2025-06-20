@@ -162,10 +162,7 @@ class DatasetCurationUI:
             datasets = self.manager.list_datasets()
 
             if datasets:
-                dataset_options = {
-                    f"{ds['name']} ({ds['status']})": ds["dataset_id"]
-                    for ds in datasets
-                }
+                dataset_options = {f"{ds['name']} ({ds['status']})": ds["dataset_id"] for ds in datasets}
 
                 selected_name = st.selectbox(
                     "Choose a dataset:",
@@ -174,9 +171,7 @@ class DatasetCurationUI:
                 )
 
                 if selected_name:
-                    st.session_state.selected_dataset_id = dataset_options[
-                        selected_name
-                    ]
+                    st.session_state.selected_dataset_id = dataset_options[selected_name]
             else:
                 st.info("No datasets available. Create one to get started!")
 
@@ -206,9 +201,7 @@ class DatasetCurationUI:
         datasets = self.manager.list_datasets()
 
         if not datasets:
-            st.info(
-                "👋 Welcome to Dataset Curation Studio! Create your first dataset to get started."
-            )
+            st.info("👋 Welcome to Dataset Curation Studio! Create your first dataset to get started.")
             if st.button("➕ Create Your First Dataset", type="primary"):
                 st.session_state.current_page = "Create Dataset"
                 st.rerun()
@@ -237,17 +230,11 @@ class DatasetCurationUI:
 
         if datasets:
             df = pd.DataFrame(datasets)
-            df["created_at"] = pd.to_datetime(df["created_at"]).dt.strftime(
-                "%Y-%m-%d %H:%M"
-            )
-            df["updated_at"] = pd.to_datetime(df["updated_at"]).dt.strftime(
-                "%Y-%m-%d %H:%M"
-            )
+            df["created_at"] = pd.to_datetime(df["created_at"]).dt.strftime("%Y-%m-%d %H:%M")
+            df["updated_at"] = pd.to_datetime(df["updated_at"]).dt.strftime("%Y-%m-%d %H:%M")
 
             # Format the display
-            display_df = df[
-                ["name", "type", "status", "row_count", "quality", "created_at"]
-            ].copy()
+            display_df = df[["name", "type", "status", "row_count", "quality", "created_at"]].copy()
             display_df.columns = [
                 "Name",
                 "Type",
@@ -262,12 +249,8 @@ class DatasetCurationUI:
                 use_container_width=True,
                 hide_index=True,
                 column_config={
-                    "Status": st.column_config.TextColumn(
-                        "Status", help="Current processing status"
-                    ),
-                    "Quality": st.column_config.TextColumn(
-                        "Quality", help="Data quality assessment"
-                    ),
+                    "Status": st.column_config.TextColumn("Status", help="Current processing status"),
+                    "Quality": st.column_config.TextColumn("Quality", help="Data quality assessment"),
                     "Rows": st.column_config.NumberColumn("Rows", format="%d"),
                 },
             )
@@ -346,11 +329,7 @@ class DatasetCurationUI:
 
                 try:
                     # Parse tags
-                    tag_list = (
-                        [tag.strip() for tag in tags.split(",") if tag.strip()]
-                        if tags
-                        else []
-                    )
+                    tag_list = [tag.strip() for tag in tags.split(",") if tag.strip()] if tags else []
 
                     # Create dataset
                     dataset = self.manager.create_dataset(
@@ -410,9 +389,7 @@ class DatasetCurationUI:
             st.metric("File Size", f"{dataset.file_size_mb:.2f} MB")
 
             if dataset.quality_report:
-                quality_color = self.get_quality_color(
-                    dataset.quality_report.overall_quality
-                )
+                quality_color = self.get_quality_color(dataset.quality_report.overall_quality)
                 st.markdown(
                     f"**Quality:** <span style='color: {quality_color}'>{dataset.quality_report.overall_quality.value}</span>",
                     unsafe_allow_html=True,
@@ -486,17 +463,13 @@ class DatasetCurationUI:
             st.error("Dataset not found!")
             return
 
-        st.markdown(
-            '<div class="section-header">🔗 Data Sources</div>', unsafe_allow_html=True
-        )
+        st.markdown('<div class="section-header">🔗 Data Sources</div>', unsafe_allow_html=True)
 
         # Existing sources
         if dataset.data_sources:
             st.markdown("### 📋 Configured Sources")
             for i, source in enumerate(dataset.data_sources):
-                with st.expander(
-                    f"Source {i + 1}: {source.source_type} ({'Active' if source.active else 'Inactive'})"
-                ):
+                with st.expander(f"Source {i + 1}: {source.source_type} ({'Active' if source.active else 'Inactive'})"):
                     col1, col2 = st.columns([3, 1])
 
                     with col1:
@@ -634,9 +607,7 @@ class DatasetCurationUI:
                             data_type=data_type,
                             source_column=source_column,
                             is_target=is_target,
-                            transformation=(
-                                transformation if transformation != "none" else None
-                            ),
+                            transformation=(transformation if transformation != "none" else None),
                             description=description,
                         )
                         st.success(f"✅ Feature '{feature_name}' added successfully!")
@@ -663,9 +634,7 @@ class DatasetCurationUI:
         )
 
         if not dataset.quality_report:
-            st.info(
-                "No quality report available. Process the dataset to generate a quality assessment."
-            )
+            st.info("No quality report available. Process the dataset to generate a quality assessment.")
             if st.button("🔄 Process Dataset and Generate Report"):
                 self.process_dataset_action(dataset.dataset_id)
             return
@@ -797,9 +766,7 @@ class DatasetCurationUI:
                 st.success(f"✅ Dataset exported successfully to: {export_path}")
 
                 # Show download link (in a real app, this would be a downloadable file)
-                st.info(
-                    "💾 Export completed! In a production environment, you would see download links here."
-                )
+                st.info("💾 Export completed! In a production environment, you would see download links here.")
 
             except Exception as e:
                 st.error(f"Export failed: {e}")

@@ -56,15 +56,11 @@ class MCPTestSuite:
     def test_docker_availability(self) -> tuple[bool, str]:
         """Test if Docker is available and running."""
         try:
-            result = subprocess.run(
-                ["docker", "--version"], capture_output=True, text=True, check=True
-            )
+            result = subprocess.run(["docker", "--version"], capture_output=True, text=True, check=True)
             version = result.stdout.strip()
 
             # Test if Docker daemon is running
-            subprocess.run(
-                ["docker", "info"], capture_output=True, text=True, check=True
-            )
+            subprocess.run(["docker", "info"], capture_output=True, text=True, check=True)
 
             return True, version
         except (subprocess.CalledProcessError, FileNotFoundError) as e:
@@ -111,10 +107,7 @@ class MCPTestSuite:
             mcp_images = [
                 img
                 for img in available_images
-                if any(
-                    keyword in img.lower()
-                    for keyword in ["mcp", "neo4j", "github", "context", "commander"]
-                )
+                if any(keyword in img.lower() for keyword in ["mcp", "neo4j", "github", "context", "commander"])
             ]
 
             return {
@@ -141,9 +134,7 @@ class MCPTestSuite:
                     parts = line.split("\t")
                     if len(parts) >= 3:
                         name, status, image = parts[0], parts[1], parts[2]
-                        containers.append(
-                            {"name": name, "status": status, "image": image}
-                        )
+                        containers.append({"name": name, "status": status, "image": image})
 
             # Filter MCP-related containers
             mcp_containers = [
@@ -187,9 +178,7 @@ class MCPTestSuite:
                 test_value = result.single()["test"]
 
                 # Get database info
-                db_info = session.run(
-                    "CALL dbms.components() YIELD name, versions"
-                ).data()
+                db_info = session.run("CALL dbms.components() YIELD name, versions").data()
 
             driver.close()
 
@@ -217,9 +206,7 @@ class MCPTestSuite:
 
         return server_tests
 
-    def test_individual_server(
-        self, server_name: str, server_config: dict[str, Any]
-    ) -> dict[str, Any]:
+    def test_individual_server(self, server_name: str, server_config: dict[str, Any]) -> dict[str, Any]:
         """Test an individual MCP server."""
         if server_config.get("command") != "docker":
             return {
@@ -295,9 +282,7 @@ class MCPTestSuite:
                 missing_vars.append(var)
 
         # Check for alternative GitHub token
-        if "GITHUB_PERSONAL_ACCESS_TOKEN" in missing_vars and env_vars.get(
-            "GITHUB_TOKEN"
-        ):
+        if "GITHUB_PERSONAL_ACCESS_TOKEN" in missing_vars and env_vars.get("GITHUB_TOKEN"):
             missing_vars.remove("GITHUB_PERSONAL_ACCESS_TOKEN")
             present_vars.append("GITHUB_TOKEN (alternative)")
 
@@ -314,46 +299,31 @@ class MCPTestSuite:
 
         # Docker recommendations
         if not self.results["docker"].get("available"):
-            recommendations.append(
-                "Install and start Docker to enable MCP server functionality"
-            )
+            recommendations.append("Install and start Docker to enable MCP server functionality")
 
         # Configuration recommendations
         if not self.results["configuration"].get("valid"):
-            recommendations.append(
-                "Fix MCP server configuration in .cursor/mcp_servers.json"
-            )
+            recommendations.append("Fix MCP server configuration in .cursor/mcp_servers.json")
 
         # Environment variable recommendations
         env_check = self.results["environment"]
         if env_check.get("missing_vars"):
-            recommendations.append(
-                f"Add missing environment variables: {', '.join(env_check['missing_vars'])}"
-            )
+            recommendations.append(f"Add missing environment variables: {', '.join(env_check['missing_vars'])}")
 
         # Neo4j recommendations
         neo4j_test = self.results["connectivity"].get("neo4j", {})
         if not neo4j_test.get("connected"):
-            recommendations.append(
-                "Fix Neo4j connectivity for MCP memory functionality"
-            )
+            recommendations.append("Fix Neo4j connectivity for MCP memory functionality")
 
         # Server accessibility recommendations
         servers = self.results["servers"]
-        inaccessible_servers = [
-            name for name, test in servers.items() if not test.get("accessible")
-        ]
+        inaccessible_servers = [name for name, test in servers.items() if not test.get("accessible")]
         if inaccessible_servers:
-            recommendations.append(
-                f"Fix accessibility for MCP servers: {', '.join(inaccessible_servers)}"
-            )
+            recommendations.append(f"Fix accessibility for MCP servers: {', '.join(inaccessible_servers)}")
 
         # Image availability recommendations
         docker_images = self.results["docker"].get("images", {})
-        if (
-            docker_images.get("available")
-            and len(docker_images.get("mcp_images", [])) == 0
-        ):
+        if docker_images.get("available") and len(docker_images.get("mcp_images", [])) == 0:
             recommendations.append("Pull required Docker images for MCP servers")
 
         return recommendations
@@ -424,12 +394,8 @@ class MCPTestSuite:
 
             containers = docker.get("containers", {})
             if containers.get("available"):
-                print(
-                    f"   🏃 Running containers: {containers.get('total_containers', 0)}"
-                )
-                print(
-                    f"   🔧 MCP-related containers: {len(containers.get('mcp_containers', []))}"
-                )
+                print(f"   🏃 Running containers: {containers.get('total_containers', 0)}")
+                print(f"   🔧 MCP-related containers: {len(containers.get('mcp_containers', []))}")
                 for container in containers.get("mcp_containers", []):
                     print(f"      • {container['name']}: {container['status']}")
         else:

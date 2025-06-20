@@ -8,6 +8,7 @@ import logging
 import subprocess
 from dataclasses import dataclass
 from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -61,8 +62,14 @@ class BranchAnalysis:
 class GitIntegration:
     """Provides git integration for code intelligence tracking."""
 
-    def __init__(self) -> None:
-        self.repository_path = repository_path
+    def __init__(self, repository_path: str | None = None, graph_client: Any = None) -> None:
+        """Initialize git integration.
+
+        Args:
+            repository_path: Path to the git repository (defaults to current directory)
+            graph_client: Optional graph client for storing evolution data
+        """
+        self.repository_path = Path(repository_path) if repository_path else Path.cwd()
         self.graph_client = graph_client
         self._git_available = self._check_git_availability()
 
@@ -78,14 +85,10 @@ class GitIntegration:
             )
             return True
         except (subprocess.CalledProcessError, FileNotFoundError):
-            logger.warning(
-                f"Git not available or not a git repository: {self.repository_path}"
-            )
+            logger.warning(f"Git not available or not a git repository: {self.repository_path}")
             return False
 
-    def get_commit_history(
-        self, file_path: str | None = None, limit: int = 100
-    ) -> list[GitCommit]:
+    def get_commit_history(self, file_path: str | None = None, limit: int = 100) -> list[GitCommit]:
         """Get commit history for a file or entire repository."""
         if not self._git_available:
             return []
@@ -240,15 +243,11 @@ class GitIntegration:
                             # This would require code analysis at each commit
                             # For now, we'll estimate based on file size
                             estimated_complexity = lines * 0.1  # Rough estimate
-                            complexity_history.append(
-                                (commit.date, estimated_complexity)
-                            )
+                            complexity_history.append((commit.date, estimated_complexity))
 
                             # Estimate maintainability
                             estimated_maintainability = max(0, 100 - lines * 0.05)
-                            maintainability_history.append(
-                                (commit.date, estimated_maintainability)
-                            )
+                            maintainability_history.append((commit.date, estimated_maintainability))
 
                 except Exception as e:
                     logger.debug(f"Could not analyze commit {commit.short_hash}: {e}")
@@ -338,9 +337,7 @@ class GitIntegration:
         else:
             return "stable"
 
-    def analyze_branch_differences(
-        self, source_branch: str, target_branch: str = "main"
-    ) -> BranchAnalysis | None:
+    def analyze_branch_differences(self, source_branch: str, target_branch: str = "main") -> BranchAnalysis | None:
         """Analyze differences between branches."""
         if not self._git_available:
             return None
@@ -373,9 +370,7 @@ class GitIntegration:
                 text=True,
                 check=True,
             )
-            files_modified = [
-                f.strip() for f in diff_result.stdout.strip().split("\n") if f.strip()
-            ]
+            files_modified = [f.strip() for f in diff_result.stdout.strip().split("\n") if f.strip()]
 
             # Assess risk based on number of files and commits
             risk_score = commits_ahead * 0.1 + len(files_modified) * 0.2
@@ -387,9 +382,7 @@ class GitIntegration:
                 risk_assessment = "low"
 
             # Predict potential merge conflicts (simplified)
-            merge_conflicts_predicted = self._predict_merge_conflicts(
-                source_branch, target_branch
-            )
+            merge_conflicts_predicted = self._predict_merge_conflicts(source_branch, target_branch)
 
             return BranchAnalysis(
                 branch_name=source_branch,
@@ -406,18 +399,12 @@ class GitIntegration:
             logger.error(f"Failed to analyze branch differences: {e}")
             return None
 
-    def _predict_merge_conflicts(
-        self, source_branch: str, target_branch: str
-    ) -> list[str]:
+    def _predict_merge_conflicts(self, source_branch: str, target_branch: str) -> list[str]:
         """Predict potential merge conflicts between branches."""
         try:
             # Get files modified in both branches
-            source_files = set(
-                self._get_modified_files_in_branch(source_branch, target_branch)
-            )
-            target_files = set(
-                self._get_modified_files_in_branch(target_branch, source_branch)
-            )
+            source_files = set(self._get_modified_files_in_branch(source_branch, target_branch))
+            target_files = set(self._get_modified_files_in_branch(target_branch, source_branch))
 
             # Files modified in both branches are potential conflicts
             potential_conflicts = list(source_files.intersection(target_files))
@@ -477,9 +464,7 @@ class GitIntegration:
             for date, size in evolution.size_history:
                 self._store_size_history_in_graph(evolution.file_path, date, size)
 
-            logger.info(
-                f"Stored evolution data for {evolution.file_path} in graph database"
-            )
+            logger.info(f"Stored evolution data for {evolution.file_path} in graph database")
             return True
 
         except Exception as e:
@@ -521,9 +506,7 @@ class GitIntegration:
             },
         )
 
-    def _store_size_history_in_graph(
-        self, file_path: str, date: datetime, size: int
-    ) -> None:
+    def _store_size_history_in_graph(self, file_path: str, date: datetime, size: int) -> None:
         """Store size history point in graph database."""
         cypher = """
         MERGE (ce:CodeEvolution {file_path: $file_path})
@@ -532,9 +515,7 @@ class GitIntegration:
         MERGE (ce)-[:HAS_SIZE_HISTORY]->(sh)
         """
 
-        self.graph_client.execute_query(
-            cypher, {"file_path": file_path, "date": date.isoformat(), "size": size}
-        )
+        self.graph_client.execute_query(cypher, {"file_path": file_path, "date": date.isoformat(), "size": size})
 
     def get_complexity_trends(self, days: int = 30) -> dict[str, Any]:
         """Get complexity trends for files over the specified period."""
@@ -557,15 +538,9 @@ class GitIntegration:
             trends = {
                 "files_analyzed": len(results),
                 "high_growth_files": [r for r in results if r["growth_rate"] > 5],
-                "increasing_complexity": [
-                    r for r in results if r["complexity_trend"] == "increasing"
-                ],
-                "stable_files": [
-                    r for r in results if r["complexity_trend"] == "stable"
-                ],
-                "improving_files": [
-                    r for r in results if r["complexity_trend"] == "decreasing"
-                ],
+                "increasing_complexity": [r for r in results if r["complexity_trend"] == "increasing"],
+                "stable_files": [r for r in results if r["complexity_trend"] == "stable"],
+                "improving_files": [r for r in results if r["complexity_trend"] == "decreasing"],
             }
 
             return trends
@@ -590,11 +565,7 @@ class GitIntegration:
                         "hash": c.short_hash,
                         "author": c.author,
                         "date": c.date.isoformat(),
-                        "message": (
-                            c.message[:100] + "..."
-                            if len(c.message) > 100
-                            else c.message
-                        ),
+                        "message": (c.message[:100] + "..." if len(c.message) > 100 else c.message),
                         "lines_changed": c.lines_added + c.lines_deleted,
                     }
                     for c in evolution.commits[:5]
@@ -602,10 +573,7 @@ class GitIntegration:
             },
             "size_evolution": {
                 "growth_rate": evolution.growth_rate,
-                "size_history": [
-                    {"date": date.isoformat(), "lines": lines}
-                    for date, lines in evolution.size_history
-                ],
+                "size_history": [{"date": date.isoformat(), "lines": lines} for date, lines in evolution.size_history],
             },
             "complexity_evolution": {
                 "trend": evolution.complexity_trend,
@@ -619,9 +587,7 @@ class GitIntegration:
 
         return report
 
-    def _generate_evolution_recommendations(
-        self, evolution: CodeEvolution
-    ) -> list[str]:
+    def _generate_evolution_recommendations(self, evolution: CodeEvolution) -> list[str]:
         """Generate recommendations based on file evolution."""
         recommendations = []
 
@@ -654,8 +620,6 @@ class GitIntegration:
             )
 
         if not recommendations:
-            recommendations.append(
-                "File evolution looks healthy. Continue current practices."
-            )
+            recommendations.append("File evolution looks healthy. Continue current practices.")
 
         return recommendations

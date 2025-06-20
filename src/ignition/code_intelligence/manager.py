@@ -53,9 +53,7 @@ class CodeIntelligenceManager:
             logger.error(f"Failed to analyze and store file {file_path}: {e}")
             return False
 
-    def analyze_and_store_directory(
-        self, directory_path: Path, recursive: bool = True
-    ) -> dict[str, Any]:
+    def analyze_and_store_directory(self, directory_path: Path, recursive: bool = True) -> dict[str, Any]:
         """Analyze all files in a directory and store results."""
         results = {
             "files_processed": 0,
@@ -234,9 +232,7 @@ class CodeIntelligenceManager:
             MATCH (c:Class {name: $class_name, file_path: $file_path})
             MERGE (f)-[:CONTAINS]->(c)
             """
-            self.client.execute_query(
-                cypher, {"file_path": file_path, "class_name": class_info.name}
-            )
+            self.client.execute_query(cypher, {"file_path": file_path, "class_name": class_info.name})
 
         # Class HAS_METHOD Method relationships
         for method_info in analysis["methods"]:
@@ -319,9 +315,7 @@ class CodeIntelligenceManager:
             "dependents": [path for path in data["dependents"] if path],
         }
 
-    def find_similar_files(
-        self, file_path: str, limit: int = 10
-    ) -> list[dict[str, Any]]:
+    def find_similar_files(self, file_path: str, limit: int = 10) -> list[dict[str, Any]]:
         """Find files similar to the given file based on structure."""
         # Get the target file's characteristics
         context = self.get_file_context(file_path)
@@ -464,8 +458,6 @@ class CodeIntelligenceManager:
                relationships(path) as relationships
         """
 
-        dependencies = self.client.execute_query(
-            cypher, {"path": file_path, "depth": depth}
-        )
+        dependencies = self.client.execute_query(cypher, {"path": file_path, "depth": depth})
 
         return {"center_file": file_path, "dependencies": dependencies, "depth": depth}

@@ -76,7 +76,7 @@ class SystemDbWrapper(IgnitionWrapperBase):
                 success=False,
                 error_message=str(e),
             )
-            raise WrapperError(f"Database query failed: {e}", original_error=e)
+            raise WrapperError(f"Database query failed: {e}", original_error=e) from e
 
     @wrapper_function
     def run_update_query(self, query: str, database: str = "") -> dict[str, Any]:
@@ -110,4 +110,4 @@ class SystemDbWrapper(IgnitionWrapperBase):
 
         except Exception as e:
             execution_time = (time.time() - start_time) * 1000
-            raise WrapperError(f"Database update failed: {e}", original_error=e)
+            raise WrapperError(f"Database update failed: {e}", original_error=e) from e

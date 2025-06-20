@@ -10,9 +10,9 @@ from contextlib import contextmanager
 from typing import Any
 
 from dotenv import load_dotenv
-from neo4j.exceptions import AuthError, ServiceUnavailable
 
 from neo4j import GraphDatabase
+from neo4j.exceptions import AuthError, ServiceUnavailable
 
 from .schema import GraphNode, GraphRelationship, IgnitionGraphSchema
 
@@ -51,9 +51,7 @@ class IgnitionGraphClient:
             True if connection successful, False otherwise
         """
         try:
-            self.driver = GraphDatabase.driver(
-                self.uri, auth=(self.username, self.password)
-            )
+            self.driver = GraphDatabase.driver(self.uri, auth=(self.username, self.password))
 
             # Test the connection
             with self.driver.session() as session:
@@ -92,9 +90,7 @@ class IgnitionGraphClient:
         finally:
             session.close()
 
-    def execute_query(
-        self, query: str, parameters: dict[str, Any] | None = None
-    ) -> list[dict[str, Any]]:
+    def execute_query(self, query: str, parameters: dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """Execute a Cypher query and return results.
 
         Args:
@@ -117,9 +113,7 @@ class IgnitionGraphClient:
             logger.error(f"Parameters: {parameters}")
             raise
 
-    def execute_write_query(
-        self, query: str, parameters: dict[str, Any] | None = None
-    ) -> Any:
+    def execute_write_query(self, query: str, parameters: dict[str, Any] | None = None) -> Any:
         """Execute a write query (CREATE, MERGE, etc.).
 
         Args:
@@ -134,9 +128,7 @@ class IgnitionGraphClient:
 
         try:
             with self.session() as session:
-                result = session.write_transaction(
-                    lambda tx: tx.run(query, parameters).consume()
-                )
+                result = session.write_transaction(lambda tx: tx.run(query, parameters).consume())
                 return result
         except Exception as e:
             logger.error(f"Write query execution failed: {e}")
@@ -156,9 +148,7 @@ class IgnitionGraphClient:
         try:
             query = node.to_cypher_merge()
             self.execute_write_query(query, node.properties)
-            logger.debug(
-                f"Created node: {node.node_type.value} - {node.properties.get('name', 'unknown')}"
-            )
+            logger.debug(f"Created node: {node.node_type.value} - {node.properties.get('name', 'unknown')}")
             return True
         except Exception as e:
             logger.error(f"Failed to create node: {e}")
@@ -329,9 +319,7 @@ class IgnitionGraphClient:
                     test_query = "CREATE (test:HealthCheck {name: 'test', timestamp: timestamp()}) RETURN test"
                     self.execute_write_query(test_query)
 
-                    cleanup_query = (
-                        "MATCH (test:HealthCheck {name: 'test'}) DELETE test"
-                    )
+                    cleanup_query = "MATCH (test:HealthCheck {name: 'test'}) DELETE test"
                     self.execute_write_query(cleanup_query)
 
                     health["writable"] = True

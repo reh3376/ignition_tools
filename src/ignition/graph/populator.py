@@ -67,10 +67,7 @@ class IgnitionGraphPopulator:
     def _create_context_nodes(self) -> bool:
         """Create Context nodes."""
         try:
-            return all(
-                self.client.create_node(node)
-                for node in IgnitionGraphSchema.create_context_nodes()
-            )
+            return all(self.client.create_node(node) for node in IgnitionGraphSchema.create_context_nodes())
         except Exception as e:
             logger.error(f"Failed to create context nodes: {e}")
             return False
@@ -78,10 +75,7 @@ class IgnitionGraphPopulator:
     def _create_script_type_nodes(self) -> bool:
         """Create ScriptType nodes."""
         try:
-            return all(
-                self.client.create_node(node)
-                for node in IgnitionGraphSchema.create_script_type_nodes()
-            )
+            return all(self.client.create_node(node) for node in IgnitionGraphSchema.create_script_type_nodes())
         except Exception as e:
             logger.error(f"Failed to create script type nodes: {e}")
             return False
@@ -89,10 +83,7 @@ class IgnitionGraphPopulator:
     def _create_category_nodes(self) -> bool:
         """Create Category nodes."""
         try:
-            return all(
-                self.client.create_node(node)
-                for node in IgnitionGraphSchema.create_category_nodes()
-            )
+            return all(self.client.create_node(node) for node in IgnitionGraphSchema.create_category_nodes())
         except Exception as e:
             logger.error(f"Failed to create category nodes: {e}")
             return False
@@ -146,9 +137,7 @@ class IgnitionGraphPopulator:
             for func_data in functions_data:
                 node = GraphNode(NodeType.FUNCTION, func_data)
                 if not self.client.create_node(node):
-                    logger.warning(
-                        f"Failed to create function node: {func_data.get('name', 'unknown')}"
-                    )
+                    logger.warning(f"Failed to create function node: {func_data.get('name', 'unknown')}")
 
             # Create function-context relationships
             for func_data in functions_data:
@@ -163,9 +152,7 @@ class IgnitionGraphPopulator:
                     )
 
                     if not self.client.create_relationship(relationship):
-                        logger.warning(
-                            f"Failed to create function-context relationship: {func_name} -> {context}"
-                        )
+                        logger.warning(f"Failed to create function-context relationship: {func_name} -> {context}")
 
             # Create function-category relationships
             for func_data in functions_data:
@@ -181,9 +168,7 @@ class IgnitionGraphPopulator:
                 )
 
                 if not self.client.create_relationship(relationship):
-                    logger.warning(
-                        f"Failed to create function-category relationship: {func_name} -> {category}"
-                    )
+                    logger.warning(f"Failed to create function-category relationship: {func_name} -> {category}")
 
             logger.info(f"Successfully loaded {len(functions_data)} Ignition functions")
             return True
@@ -493,9 +478,7 @@ class IgnitionGraphPopulator:
             for template_data in templates_data:
                 node = GraphNode(NodeType.TEMPLATE, template_data)
                 if not self.client.create_node(node):
-                    logger.warning(
-                        f"Failed to create template node: {template_data.get('name', 'unknown')}"
-                    )
+                    logger.warning(f"Failed to create template node: {template_data.get('name', 'unknown')}")
 
             # Create template-context relationships
             for template_data in templates_data:
@@ -511,9 +494,7 @@ class IgnitionGraphPopulator:
                 )
 
                 if not self.client.create_relationship(relationship):
-                    logger.warning(
-                        f"Failed to create template-context relationship: {template_name} -> {context}"
-                    )
+                    logger.warning(f"Failed to create template-context relationship: {template_name} -> {context}")
 
             # Create template-function relationships (based on functions used)
             for template_data in templates_data:

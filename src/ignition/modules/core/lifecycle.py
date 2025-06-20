@@ -80,9 +80,7 @@ class ModuleLifecycleManager:
         self._max_events = 1000  # Keep last 1000 events
 
         # State change callbacks
-        self._state_change_callbacks: list[
-            Callable[[ModuleState, ModuleState], None]
-        ] = []
+        self._state_change_callbacks: list[Callable[[ModuleState, ModuleState], None]] = []
 
         # Health monitoring
         self._health_check_interval = 60  # seconds
@@ -183,9 +181,7 @@ class ModuleLifecycleManager:
         elif new_state == ModuleState.ERROR:
             self._on_module_error()
 
-    def add_state_change_callback(
-        self, callback: Callable[[ModuleState, ModuleState], None]
-    ):
+    def add_state_change_callback(self, callback: Callable[[ModuleState, ModuleState], None]):
         """Add a state change callback.
 
         Args:
@@ -193,9 +189,7 @@ class ModuleLifecycleManager:
         """
         self._state_change_callbacks.append(callback)
 
-    def remove_state_change_callback(
-        self, callback: Callable[[ModuleState, ModuleState], None]
-    ):
+    def remove_state_change_callback(self, callback: Callable[[ModuleState, ModuleState], None]):
         """Remove a state change callback.
 
         Args:
@@ -242,9 +236,7 @@ class ModuleLifecycleManager:
 
     # Lifecycle tracking
 
-    def _update_lifecycle_tracking(
-        self, old_state: ModuleState, new_state: ModuleState
-    ):
+    def _update_lifecycle_tracking(self, old_state: ModuleState, new_state: ModuleState):
         """Update lifecycle tracking metrics.
 
         Args:
@@ -260,9 +252,7 @@ class ModuleLifecycleManager:
             self._start_time = now
 
             # Calculate startup time
-            startup_events = [
-                e for e in self._events if e.new_state == ModuleState.INITIALIZING
-            ]
+            startup_events = [e for e in self._events if e.new_state == ModuleState.INITIALIZING]
             if startup_events:
                 startup_time = (now - startup_events[-1].timestamp).total_seconds()
                 self._performance_metrics["startup_time"] = startup_time
@@ -272,9 +262,7 @@ class ModuleLifecycleManager:
                     self._performance_metrics["average_startup_time"] = startup_time
                 else:
                     current_avg = self._performance_metrics["average_startup_time"]
-                    self._performance_metrics["average_startup_time"] = (
-                        current_avg + startup_time
-                    ) / 2
+                    self._performance_metrics["average_startup_time"] = (current_avg + startup_time) / 2
 
         elif new_state == ModuleState.STOPPED and old_state == ModuleState.STOPPING:
             if self._start_time:
@@ -282,9 +270,7 @@ class ModuleLifecycleManager:
                 self._start_time = None
 
             # Calculate shutdown time
-            shutdown_events = [
-                e for e in self._events if e.new_state == ModuleState.STOPPING
-            ]
+            shutdown_events = [e for e in self._events if e.new_state == ModuleState.STOPPING]
             if shutdown_events:
                 shutdown_time = (now - shutdown_events[-1].timestamp).total_seconds()
                 self._performance_metrics["shutdown_time"] = shutdown_time
@@ -307,16 +293,11 @@ class ModuleLifecycleManager:
 
     def _on_module_error(self):
         """Handle module error event."""
-        self._module.logger.error(
-            f"Module lifecycle: Error occurred - {self._last_error}"
-        )
+        self._module.logger.error(f"Module lifecycle: Error occurred - {self._last_error}")
         self._health_status = "error"
 
         # Attempt auto-recovery if enabled
-        if (
-            self._auto_recovery_enabled
-            and self._restart_count < self._max_restart_attempts
-        ):
+        if self._auto_recovery_enabled and self._restart_count < self._max_restart_attempts:
             self._schedule_auto_recovery()
 
     # Health monitoring
@@ -337,9 +318,7 @@ class ModuleLifecycleManager:
             "restart_count": self._restart_count,
             "error_count": self._error_count,
             "last_error": self._last_error,
-            "last_error_time": (
-                self._last_error_time.isoformat() if self._last_error_time else None
-            ),
+            "last_error_time": (self._last_error_time.isoformat() if self._last_error_time else None),
             "check_time": now.isoformat(),
         }
 
@@ -400,9 +379,7 @@ class ModuleLifecycleManager:
         self._restart_delay = delay
         self._restart_count = 0  # Reset count when re-enabling
 
-        self._module.logger.info(
-            f"Auto-recovery enabled: max_attempts={max_attempts}, delay={delay}s"
-        )
+        self._module.logger.info(f"Auto-recovery enabled: max_attempts={max_attempts}, delay={delay}s")
 
     def disable_auto_recovery(self):
         """Disable automatic recovery."""
@@ -427,13 +404,9 @@ class ModuleLifecycleManager:
             "restart_count": self._restart_count,
             "error_count": self._error_count,
             "last_error": self._last_error,
-            "last_error_time": (
-                self._last_error_time.isoformat() if self._last_error_time else None
-            ),
+            "last_error_time": (self._last_error_time.isoformat() if self._last_error_time else None),
             "health_status": self._health_status,
-            "last_health_check": (
-                self._last_health_check.isoformat() if self._last_health_check else None
-            ),
+            "last_health_check": (self._last_health_check.isoformat() if self._last_health_check else None),
             "auto_recovery_enabled": self._auto_recovery_enabled,
             "max_restart_attempts": self._max_restart_attempts,
             "event_count": len(self._events),
@@ -463,12 +436,8 @@ class ModuleLifecycleManager:
             "availability_percentage": round(availability, 2),
             "restart_count": self._restart_count,
             "error_count": self._error_count,
-            "mean_time_between_failures": (
-                total_uptime / self._error_count if self._error_count > 0 else None
-            ),
-            "average_startup_time": self._performance_metrics.get(
-                "average_startup_time"
-            ),
+            "mean_time_between_failures": (total_uptime / self._error_count if self._error_count > 0 else None),
+            "average_startup_time": self._performance_metrics.get("average_startup_time"),
             "last_startup_time": self._performance_metrics.get("startup_time"),
             "last_shutdown_time": self._performance_metrics.get("shutdown_time"),
         }

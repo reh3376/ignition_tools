@@ -49,23 +49,15 @@ class GraphitiSearchResult(BaseModel):
     """Model representing a search result from Graphiti."""
 
     uuid: str = Field(description="The unique identifier for this fact")
-    fact: str = Field(
-        description="The factual statement retrieved from the knowledge graph"
-    )
-    valid_at: str | None = Field(
-        None, description="When this fact became valid (if known)"
-    )
-    invalid_at: str | None = Field(
-        None, description="When this fact became invalid (if known)"
-    )
+    fact: str = Field(description="The factual statement retrieved from the knowledge graph")
+    valid_at: str | None = Field(None, description="When this fact became valid (if known)")
+    invalid_at: str | None = Field(None, description="When this fact became invalid (if known)")
     source_node_uuid: str | None = Field(None, description="UUID of the source node")
 
 
 # ========== Graphiti search tool ==========
 @graphiti_agent.tool
-async def search_graphiti(
-    ctx: RunContext[GraphitiDependencies], query: str
-) -> list[GraphitiSearchResult]:
+async def search_graphiti(ctx: RunContext[GraphitiDependencies], query: str) -> list[GraphitiSearchResult]:
     """Search the Graphiti knowledge graph with the given query.
 
     Args:
@@ -88,11 +80,7 @@ async def search_graphiti(
             formatted_result = GraphitiSearchResult(
                 uuid=result.uuid,
                 fact=result.fact,
-                source_node_uuid=(
-                    result.source_node_uuid
-                    if hasattr(result, "source_node_uuid")
-                    else None
-                ),
+                source_node_uuid=(result.source_node_uuid if hasattr(result, "source_node_uuid") else None),
             )
 
             # Add temporal information if available
@@ -152,9 +140,7 @@ async def main():
                     # Pass the Graphiti client as a dependency
                     deps = GraphitiDependencies(graphiti_client=graphiti_client)
 
-                    async with graphiti_agent.run_a_stream(
-                        user_input, message_history=messages, deps=deps
-                    ) as result:
+                    async with graphiti_agent.run_a_stream(user_input, message_history=messages, deps=deps) as result:
                         curr_message = ""
                         async for message in result.stream_text(delta=True):
                             curr_message += message

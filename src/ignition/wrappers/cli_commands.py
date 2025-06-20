@@ -23,9 +23,7 @@ def wrapper_group() -> None:
 
 
 @wrapper_group.command()
-@click.option(
-    "--enable-logging/--disable-logging", default=True, help="Enable wrapper logging"
-)
+@click.option("--enable-logging/--disable-logging", default=True, help="Enable wrapper logging")
 @click.option(
     "--log-level",
     default="INFO",
@@ -93,9 +91,7 @@ def test_tag_wrapper(
             console.print("\n[bold]Performance Metrics:[/bold]")
             console.print(f"Total calls: {metrics['total_calls']}")
             console.print(f"Success rate: {metrics.get('success_rate', 0):.1%}")
-            console.print(
-                f"Average execution time: {metrics.get('average_execution_time_ms', 0):.2f}ms"
-            )
+            console.print(f"Average execution time: {metrics.get('average_execution_time_ms', 0):.2f}ms")
 
         console.print("\n[green]✅ Tag wrapper test completed successfully![/green]")
 
@@ -127,22 +123,16 @@ def test_db_wrapper(query: str, database: str) -> None:
         if result.data and result.row_count > 0:
             console.print(f"\nFirst few rows: {result.data[:5]}")
 
-        console.print(
-            "\n[green]✅ Database wrapper test completed successfully![/green]"
-        )
+        console.print("\n[green]✅ Database wrapper test completed successfully![/green]")
 
     except Exception as e:
         console.print(f"\n[red]❌ Database wrapper test failed: {e}[/red]")
 
 
 @wrapper_group.command()
-@click.option(
-    "--message", default="Test message from wrapper", help="Message to display"
-)
+@click.option("--message", default="Test message from wrapper", help="Message to display")
 @click.option("--title", default="Wrapper Test", help="Message box title")
-@click.option(
-    "--box-type", default="message", type=click.Choice(["message", "error", "warning"])
-)
+@click.option("--box-type", default="message", type=click.Choice(["message", "error", "warning"]))
 def test_gui_wrapper(message: str, title: str, box_type: str) -> None:
     """🖥️ Test the system.gui wrapper functionality."""
     console.print("[bold blue]🖥️ Testing System GUI Wrapper[/bold blue]\n")
@@ -210,9 +200,7 @@ def test_nav_wrapper(window_path: str) -> None:
         )
 
         console.print(table)
-        console.print(
-            "\n[green]✅ Navigation wrapper test completed successfully![/green]"
-        )
+        console.print("\n[green]✅ Navigation wrapper test completed successfully![/green]")
 
     except Exception as e:
         console.print(f"\n[red]❌ Navigation wrapper test failed: {e}[/red]")
@@ -248,9 +236,7 @@ def test_alarm_wrapper() -> None:
 
 
 @wrapper_group.command()
-@click.option(
-    "--logger-name", default="test.wrapper.logger", help="Logger name to test"
-)
+@click.option("--logger-name", default="test.wrapper.logger", help="Logger name to test")
 def test_util_wrapper(logger_name: str) -> None:
     """🔧 Test the system.util wrapper functionality."""
     console.print("[bold blue]🔧 Testing System Utility Wrapper[/bold blue]\n")
@@ -258,9 +244,7 @@ def test_util_wrapper(logger_name: str) -> None:
     wrapper = SystemUtilWrapper()
 
     try:
-        console.print(
-            f"[yellow]Testing utility operations with logger: {logger_name}[/yellow]"
-        )
+        console.print(f"[yellow]Testing utility operations with logger: {logger_name}[/yellow]")
 
         # Test logger retrieval
         logger = wrapper.get_logger(logger_name)
@@ -271,9 +255,7 @@ def test_util_wrapper(logger_name: str) -> None:
         console.print(f"Logger level: {logger.level}")
         console.print("Success: ✅")
 
-        console.print(
-            "\n[green]✅ Utility wrapper test completed successfully![/green]"
-        )
+        console.print("\n[green]✅ Utility wrapper test completed successfully![/green]")
 
     except Exception as e:
         console.print(f"\n[red]❌ Utility wrapper test failed: {e}[/red]")
@@ -327,15 +309,9 @@ def test_all_wrappers() -> None:
     table.add_column("Details", style="dim")
 
     for result in results:
-        status = (
-            "[green]✅ Success[/green]" if result["success"] else "[red]❌ Failed[/red]"
-        )
+        status = "[green]✅ Success[/green]" if result["success"] else "[red]❌ Failed[/red]"
         function_count = str(result.get("function_count", 0))
-        details = (
-            ", ".join(result.get("functions", []))
-            if result["success"]
-            else result.get("error", "")
-        )
+        details = ", ".join(result.get("functions", [])) if result["success"] else result.get("error", "")
 
         table.add_row(
             result["name"],
@@ -350,13 +326,9 @@ def test_all_wrappers() -> None:
     total_tests = len(results)
 
     if successful_tests == total_tests:
-        console.print(
-            f"\n[bold green]🎉 All {total_tests} wrapper tests passed![/bold green]"
-        )
+        console.print(f"\n[bold green]🎉 All {total_tests} wrapper tests passed![/bold green]")
     else:
-        console.print(
-            f"\n[bold yellow]⚠️ {successful_tests}/{total_tests} wrapper tests passed[/bold yellow]"
-        )
+        console.print(f"\n[bold yellow]⚠️ {successful_tests}/{total_tests} wrapper tests passed[/bold yellow]")
 
 
 @wrapper_group.command()

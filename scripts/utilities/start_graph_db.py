@@ -17,9 +17,7 @@ def check_docker_compose():
     """Check if docker compose is available."""
     try:
         # Try new docker compose syntax first
-        result = subprocess.run(
-            ["docker", "compose", "version"], capture_output=True, text=True, check=True
-        )
+        result = subprocess.run(["docker", "compose", "version"], capture_output=True, text=True, check=True)
         print(f"✅ Docker Compose found: {result.stdout.strip()}")
         return True
     except (subprocess.CalledProcessError, FileNotFoundError):

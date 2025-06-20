@@ -107,18 +107,12 @@ class OPCUAConnectionWizard:
 
         return config
 
-    async def _collect_basic_info(
-        self, config: OPCUAConnectionConfig
-    ) -> OPCUAConnectionConfig:
+    async def _collect_basic_info(self, config: OPCUAConnectionConfig) -> OPCUAConnectionConfig:
         """Collect basic connection information."""
-        self.console.print(
-            "\n[bold yellow]📡 Basic Connection Information[/bold yellow]"
-        )
+        self.console.print("\n[bold yellow]📡 Basic Connection Information[/bold yellow]")
 
         # Server URL
-        config.server_url = Prompt.ask(
-            "🔗 OPC-UA Server URL", default="opc.tcp://localhost:4840"
-        )
+        config.server_url = Prompt.ask("🔗 OPC-UA Server URL", default="opc.tcp://localhost:4840")
 
         # Configuration name
         config.config_name = Prompt.ask(
@@ -139,9 +133,7 @@ class OPCUAConnectionWizard:
 
         return config
 
-    async def _collect_security_info(
-        self, config: OPCUAConnectionConfig
-    ) -> OPCUAConnectionConfig:
+    async def _collect_security_info(self, config: OPCUAConnectionConfig) -> OPCUAConnectionConfig:
         """Collect security configuration."""
         self.console.print("\n[bold yellow]🔐 Security Configuration[/bold yellow]")
 
@@ -156,11 +148,7 @@ class OPCUAConnectionWizard:
 
         self.console.print("Available security policies:")
         for i, policy in enumerate(policies, 1):
-            recommended = (
-                " [bold green](Recommended for Ignition)[/bold green]"
-                if policy == "Basic256Sha256"
-                else ""
-            )
+            recommended = " [bold green](Recommended for Ignition)[/bold green]" if policy == "Basic256Sha256" else ""
             self.console.print(f"  {i}. {policy}{recommended}")
 
         policy_choice = Prompt.ask(
@@ -176,11 +164,7 @@ class OPCUAConnectionWizard:
 
             self.console.print("Available security modes:")
             for i, mode in enumerate(modes, 1):
-                recommended = (
-                    " [bold green](Recommended)[/bold green]"
-                    if mode == "SignAndEncrypt"
-                    else ""
-                )
+                recommended = " [bold green](Recommended)[/bold green]" if mode == "SignAndEncrypt" else ""
                 self.console.print(f"  {i}. {mode}{recommended}")
 
             mode_choice = Prompt.ask(
@@ -192,9 +176,7 @@ class OPCUAConnectionWizard:
 
         return config
 
-    async def _collect_certificate_info(
-        self, config: OPCUAConnectionConfig
-    ) -> OPCUAConnectionConfig:
+    async def _collect_certificate_info(self, config: OPCUAConnectionConfig) -> OPCUAConnectionConfig:
         """Collect certificate configuration."""
         if config.security_policy == "None":
             return config
@@ -209,9 +191,7 @@ class OPCUAConnectionWizard:
         default_client_key = cert_dir / "IgnitionOPCUA-Client_key.pem"
 
         if default_client_cert.exists() and default_client_key.exists():
-            if Confirm.ask(
-                f"📜 Use existing client certificates in {cert_dir}?", default=True
-            ):
+            if Confirm.ask(f"📜 Use existing client certificates in {cert_dir}?", default=True):
                 config.client_cert_path = str(default_client_cert)
                 config.client_key_path = str(default_client_key)
             else:
@@ -254,9 +234,7 @@ class OPCUAConnectionWizard:
                 )
                 config.server_cert_path = str(found_server_certs[int(cert_choice) - 1])
             else:
-                config.server_cert_path = Prompt.ask(
-                    "🏢 Server certificate path (.der file)"
-                )
+                config.server_cert_path = Prompt.ask("🏢 Server certificate path (.der file)")
         else:
             config.server_cert_path = Prompt.ask(
                 "🏢 Server certificate path (.der file)",
@@ -265,68 +243,44 @@ class OPCUAConnectionWizard:
 
         return config
 
-    async def _collect_cert_generation_info(
-        self, config: OPCUAConnectionConfig
-    ) -> OPCUAConnectionConfig:
+    async def _collect_cert_generation_info(self, config: OPCUAConnectionConfig) -> OPCUAConnectionConfig:
         """Collect certificate generation parameters."""
-        self.console.print(
-            "\n[bold yellow]🔧 Certificate Generation Parameters[/bold yellow]"
-        )
+        self.console.print("\n[bold yellow]🔧 Certificate Generation Parameters[/bold yellow]")
 
         # Application URI
         default_uri = f"urn:ignition:client:{config.config_name}"
         config.application_uri = Prompt.ask("🔗 Application URI", default=default_uri)
 
         # Application Name
-        config.application_name = Prompt.ask(
-            "📝 Application Name", default="IgnitionCLI"
-        )
+        config.application_name = Prompt.ask("📝 Application Name", default="IgnitionCLI")
 
         # Organization
         config.organization = Prompt.ask("🏢 Organization", default="IGN Scripts")
 
         # DNS Names
-        if Confirm.ask(
-            "📡 Add DNS names to certificate? (Recommended for hostname validation)"
-        ):
-            dns_input = Prompt.ask(
-                "🌐 DNS names (comma-separated)", default="localhost"
-            )
-            config.dns_names = [
-                name.strip() for name in dns_input.split(",") if name.strip()
-            ]
+        if Confirm.ask("📡 Add DNS names to certificate? (Recommended for hostname validation)"):
+            dns_input = Prompt.ask("🌐 DNS names (comma-separated)", default="localhost")
+            config.dns_names = [name.strip() for name in dns_input.split(",") if name.strip()]
 
         # IP Addresses
         if Confirm.ask("🌐 Add IP addresses to certificate?"):
-            ip_input = Prompt.ask(
-                "🔢 IP addresses (comma-separated)", default="127.0.0.1"
-            )
-            config.ip_addresses = [
-                ip.strip() for ip in ip_input.split(",") if ip.strip()
-            ]
+            ip_input = Prompt.ask("🔢 IP addresses (comma-separated)", default="127.0.0.1")
+            config.ip_addresses = [ip.strip() for ip in ip_input.split(",") if ip.strip()]
 
         return config
 
-    async def _collect_advanced_settings(
-        self, config: OPCUAConnectionConfig
-    ) -> OPCUAConnectionConfig:
+    async def _collect_advanced_settings(self, config: OPCUAConnectionConfig) -> OPCUAConnectionConfig:
         """Collect advanced connection settings."""
         if not Confirm.ask("\n⚙️ Configure advanced settings?"):
             return config
 
-        self.console.print(
-            "\n[bold yellow]⚙️ Advanced Connection Settings[/bold yellow]"
-        )
+        self.console.print("\n[bold yellow]⚙️ Advanced Connection Settings[/bold yellow]")
 
         # Timeout settings
-        config.timeout = float(
-            Prompt.ask("⏱️ Connection timeout (seconds)", default=str(config.timeout))
-        )
+        config.timeout = float(Prompt.ask("⏱️ Connection timeout (seconds)", default=str(config.timeout)))
 
         config.session_timeout = int(
-            Prompt.ask(
-                "🔗 Session timeout (milliseconds)", default=str(config.session_timeout)
-            )
+            Prompt.ask("🔗 Session timeout (milliseconds)", default=str(config.session_timeout))
         )
 
         config.subscription_period = int(
@@ -338,9 +292,7 @@ class OPCUAConnectionWizard:
 
         return config
 
-    async def _collect_ignition_settings(
-        self, config: OPCUAConnectionConfig
-    ) -> OPCUAConnectionConfig:
+    async def _collect_ignition_settings(self, config: OPCUAConnectionConfig) -> OPCUAConnectionConfig:
         """Collect Ignition-specific settings."""
         if not Confirm.ask("\n🏭 Configure Ignition-specific settings?"):
             return config
@@ -356,13 +308,9 @@ class OPCUAConnectionWizard:
         except Exception:
             default_gateway = "http://localhost:8088"
 
-        config.ignition_gateway_url = Prompt.ask(
-            "🌐 Ignition Gateway URL (for web interface)", default=default_gateway
-        )
+        config.ignition_gateway_url = Prompt.ask("🌐 Ignition Gateway URL (for web interface)", default=default_gateway)
 
-        config.ignition_project = Prompt.ask(
-            "📂 Ignition Project name (optional)", default=""
-        )
+        config.ignition_project = Prompt.ask("📂 Ignition Project name (optional)", default="")
 
         return config
 

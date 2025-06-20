@@ -106,9 +106,7 @@ def test_performance_test_execution(client, sample_test_data):
     client.post("/api/tests", json=sample_test_data)
 
     # Run performance test
-    response = client.post(
-        f"/api/tests/{sample_test_data['test_id']}/run", json={"type": "performance"}
-    )
+    response = client.post(f"/api/tests/{sample_test_data['test_id']}/run", json={"type": "performance"})
     assert response.status_code == 200
     data = response.json()
     assert "test_id" in data

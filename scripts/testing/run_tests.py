@@ -361,9 +361,7 @@ def run_full_test_suite() -> bool:
         if not passed:
             all_passed = False
 
-    print(
-        f"\nOverall result: {'✅ ALL TESTS PASSED' if all_passed else '❌ SOME TESTS FAILED'}"
-    )
+    print(f"\nOverall result: {'✅ ALL TESTS PASSED' if all_passed else '❌ SOME TESTS FAILED'}")
     return all_passed
 
 
@@ -395,24 +393,16 @@ def main():
     parser = argparse.ArgumentParser(description="IGN Scripts Test Runner")
     parser.add_argument("--build", action="store_true", help="Build Docker image")
     parser.add_argument("--unit", action="store_true", help="Run unit tests")
-    parser.add_argument(
-        "--integration", action="store_true", help="Run integration tests"
-    )
+    parser.add_argument("--integration", action="store_true", help="Run integration tests")
     parser.add_argument("--ui", action="store_true", help="Run UI tests")
-    parser.add_argument(
-        "--performance", action="store_true", help="Run performance tests"
-    )
-    parser.add_argument(
-        "--coverage", action="store_true", help="Run tests with coverage"
-    )
+    parser.add_argument("--performance", action="store_true", help="Run performance tests")
+    parser.add_argument("--coverage", action="store_true", help="Run tests with coverage")
     parser.add_argument("--lint", action="store_true", help="Run code quality checks")
     parser.add_argument("--security", action="store_true", help="Run security scan")
     parser.add_argument("--all", action="store_true", help="Run full test suite")
     parser.add_argument("--clean", action="store_true", help="Clean Docker resources")
     parser.add_argument("--logs", action="store_true", help="Watch container logs")
-    parser.add_argument(
-        "--view-logs", type=str, help="View logs for specific container"
-    )
+    parser.add_argument("--view-logs", type=str, help="View logs for specific container")
 
     args = parser.parse_args()
 

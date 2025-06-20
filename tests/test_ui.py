@@ -26,10 +26,7 @@ class TestStreamlitUI:
         with patch("streamlit.session_state", {}) as mock_session_state:
             init_session_state()
             # Should have initialized required session state variables
-            assert (
-                hasattr(mock_session_state, "generator")
-                or "generator" in mock_session_state
-            )
+            assert hasattr(mock_session_state, "generator") or "generator" in mock_session_state
 
     @pytest.mark.ui
     def test_render_header(self, mock_streamlit):
@@ -159,9 +156,7 @@ class TestStreamlitUI:
 
             # Mock generator
             mock_generator = Mock()
-            mock_generator.list_templates.return_value = [
-                "vision/button_click_handler.jinja2"
-            ]
+            mock_generator.list_templates.return_value = ["vision/button_click_handler.jinja2"]
             mock_generator.generate_script.return_value = "# Generated script"
             mock_session_state.generator = mock_generator
 
@@ -193,9 +188,7 @@ class TestStreamlitUI:
         with patch("streamlit.file_uploader") as mock_uploader, patch("streamlit.json"):
             # Mock uploaded file
             mock_file = Mock()
-            mock_file.read.return_value = (
-                b'{"template": "test", "component_name": "TestButton"}'
-            )
+            mock_file.read.return_value = b'{"template": "test", "component_name": "TestButton"}'
             mock_uploader.return_value = mock_file
 
             # Simulate file upload processing

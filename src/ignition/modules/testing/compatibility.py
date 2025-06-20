@@ -206,9 +206,7 @@ def validate_compatibility_environment() -> dict[str, Any]:
 def _check_docker_available() -> bool:
     """Check if Docker is available."""
     try:
-        result = subprocess.run(
-            ["docker", "--version"], capture_output=True, timeout=10, check=False
-        )
+        result = subprocess.run(["docker", "--version"], capture_output=True, timeout=10, check=False)
         return result.returncode == 0
     except (subprocess.TimeoutExpired, FileNotFoundError):
         return False
@@ -339,14 +337,10 @@ class CompatibilityTester:
         self.report: CompatibilityReport | None = None
 
         # Load configuration from environment
-        self.test_versions = self._parse_versions(
-            os.getenv("COMPAT_TEST_VERSIONS", "8.1.15,8.1.20,8.1.25")
-        )
+        self.test_versions = self._parse_versions(os.getenv("COMPAT_TEST_VERSIONS", "8.1.15,8.1.20,8.1.25"))
         self.parallel_tests = int(os.getenv("COMPAT_PARALLEL_TESTS", "3"))
         self.default_timeout = int(os.getenv("COMPAT_TEST_TIMEOUT", "300"))
-        self.docker_registry = os.getenv(
-            "COMPAT_DOCKER_REGISTRY", "inductiveautomation/ignition"
-        )
+        self.docker_registry = os.getenv("COMPAT_DOCKER_REGISTRY", "inductiveautomation/ignition")
 
         # Auto-detect current platform
         self.current_platform = _detect_current_platform()
@@ -364,9 +358,7 @@ class CompatibilityTester:
         return versions
 
     @asynccontextmanager
-    async def compatibility_context(
-        self, module_path: str
-    ) -> AsyncIterator["CompatibilityTester"]:
+    async def compatibility_context(self, module_path: str) -> AsyncIterator["CompatibilityTester"]:
         """Create compatibility testing context with resource management.
 
         Following patterns from crawl_mcp.py for context management.
@@ -406,9 +398,7 @@ class CompatibilityTester:
                 ignition_version=version,
                 platform=self.current_platform,
                 test_type="basic",
-                priority=(
-                    "high" if version.major == 8 and version.minor >= 1 else "medium"
-                ),
+                priority=("high" if version.major == 8 and version.minor >= 1 else "medium"),
                 timeout=self.default_timeout,
             )
             self.tests.append(test)
@@ -430,16 +420,13 @@ class CompatibilityTester:
                     platform=docker_platform,
                     test_type="docker",
                     priority="medium",
-                    timeout=self.default_timeout
-                    + 60,  # Extra time for container startup
+                    timeout=self.default_timeout + 60,  # Extra time for container startup
                 )
                 self.tests.append(docker_test)
 
         # Add database compatibility tests for latest version
         if self.test_versions:
-            latest_version = max(
-                self.test_versions, key=lambda v: (v.major, v.minor, v.patch)
-            )
+            latest_version = max(self.test_versions, key=lambda v: (v.major, v.minor, v.patch))
             for db_type in [DatabaseType.MYSQL, DatabaseType.POSTGRESQL]:
                 db_test = CompatibilityTest(
                     id=f"compat_db_{db_type.value}",
@@ -467,10 +454,7 @@ class CompatibilityTester:
 
         # Run tests in parallel with semaphore for concurrency control
         semaphore = asyncio.Semaphore(self.parallel_tests)
-        tasks = [
-            asyncio.create_task(self._run_single_test(test, semaphore))
-            for test in self.tests
-        ]
+        tasks = [asyncio.create_task(self._run_single_test(test, semaphore)) for test in self.tests]
 
         try:
             await asyncio.gather(*tasks, return_exceptions=True)
@@ -484,9 +468,7 @@ class CompatibilityTester:
         self.report = self._generate_report(duration)
         return self.report
 
-    async def _run_single_test(
-        self, test: CompatibilityTest, semaphore: asyncio.Semaphore
-    ) -> None:
+    async def _run_single_test(self, test: CompatibilityTest, semaphore: asyncio.Semaphore) -> None:
         """Run a single compatibility test.
 
         Args:
@@ -527,22 +509,14 @@ class CompatibilityTester:
 
             if test.ignition_version.minor < 1:
                 test.status = CompatibilityStatus.PARTIAL
-                test.warnings.append(
-                    "Limited functionality with Ignition versions below 8.1"
-                )
+                test.warnings.append("Limited functionality with Ignition versions below 8.1")
             else:
                 test.status = CompatibilityStatus.COMPATIBLE
 
             # Add platform-specific checks
-            if (
-                test.platform.platform_type == PlatformType.WINDOWS
-                and "32" in test.platform.architecture
-            ):
+            if test.platform.platform_type == PlatformType.WINDOWS and "32" in test.platform.architecture:
                 test.warnings.append("32-bit Windows support is deprecated")
-            elif (
-                test.platform.platform_type == PlatformType.LINUX
-                and "arm" in test.platform.architecture.lower()
-            ):
+            elif test.platform.platform_type == PlatformType.LINUX and "arm" in test.platform.architecture.lower():
                 test.warnings.append("ARM architecture has limited testing")
 
             # Check Java version compatibility
@@ -553,14 +527,11 @@ class CompatibilityTester:
                 elif "11." in java_version or "17." in java_version:
                     test.result_data["java_status"] = "recommended"
                 else:
-                    test.warnings.append(
-                        f"Java version {java_version} compatibility not verified"
-                    )
+                    test.warnings.append(f"Java version {java_version} compatibility not verified")
 
             test.result_data.update(
                 {
-                    "version_compatible": test.status
-                    != CompatibilityStatus.INCOMPATIBLE,
+                    "version_compatible": test.status != CompatibilityStatus.INCOMPATIBLE,
                     "platform_supported": True,
                     "test_type": "basic",
                 }
@@ -574,9 +545,7 @@ class CompatibilityTester:
         """Run Docker-based compatibility test."""
         try:
             # Check if Docker image exists
-            image_name = (
-                f"{self.docker_registry}:{test.ignition_version.version_string}"
-            )
+            image_name = f"{self.docker_registry}:{test.ignition_version.version_string}"
 
             # Simulate Docker availability check
             await asyncio.sleep(2)  # Simulate Docker operations
@@ -616,9 +585,7 @@ class CompatibilityTester:
                 test.result_data["postgresql_versions"] = ["11", "12", "13", "14"]
             elif test.database_type == DatabaseType.MSSQL:
                 test.status = CompatibilityStatus.PARTIAL
-                test.warnings.append(
-                    "Some advanced features may not work with SQL Server"
-                )
+                test.warnings.append("Some advanced features may not work with SQL Server")
             elif test.database_type == DatabaseType.ORACLE:
                 test.status = CompatibilityStatus.UNKNOWN
                 test.warnings.append("Oracle compatibility not fully verified")
@@ -645,21 +612,11 @@ class CompatibilityTester:
         Returns:
             CompatibilityReport with results
         """
-        compatible_tests = sum(
-            1 for t in self.tests if t.status == CompatibilityStatus.COMPATIBLE
-        )
-        incompatible_tests = sum(
-            1 for t in self.tests if t.status == CompatibilityStatus.INCOMPATIBLE
-        )
-        partial_tests = sum(
-            1 for t in self.tests if t.status == CompatibilityStatus.PARTIAL
-        )
-        error_tests = sum(
-            1 for t in self.tests if t.status == CompatibilityStatus.ERROR
-        )
-        unknown_tests = sum(
-            1 for t in self.tests if t.status == CompatibilityStatus.UNKNOWN
-        )
+        compatible_tests = sum(1 for t in self.tests if t.status == CompatibilityStatus.COMPATIBLE)
+        incompatible_tests = sum(1 for t in self.tests if t.status == CompatibilityStatus.INCOMPATIBLE)
+        partial_tests = sum(1 for t in self.tests if t.status == CompatibilityStatus.PARTIAL)
+        error_tests = sum(1 for t in self.tests if t.status == CompatibilityStatus.ERROR)
+        unknown_tests = sum(1 for t in self.tests if t.status == CompatibilityStatus.UNKNOWN)
 
         # Determine overall status
         if error_tests > len(self.tests) / 2:
@@ -729,14 +686,10 @@ class CompatibilityTester:
             test_summary={
                 "total_combinations": len(self.tests),
                 "compatible_combinations": sum(
-                    1
-                    for status in compatibility_results.values()
-                    if status == CompatibilityStatus.COMPATIBLE
+                    1 for status in compatibility_results.values() if status == CompatibilityStatus.COMPATIBLE
                 ),
                 "coverage_percentage": (
-                    len(compatibility_results)
-                    / max(1, len(tested_versions) * len(tested_platforms))
-                    * 100
+                    len(compatibility_results) / max(1, len(tested_versions) * len(tested_platforms)) * 100
                 ),
             },
             recommendations=self._generate_matrix_recommendations(),
@@ -747,38 +700,24 @@ class CompatibilityTester:
         """Generate recommendations based on compatibility results."""
         recommendations = []
 
-        incompatible_tests = [
-            t for t in self.tests if t.status == CompatibilityStatus.INCOMPATIBLE
-        ]
-        partial_tests = [
-            t for t in self.tests if t.status == CompatibilityStatus.PARTIAL
-        ]
+        incompatible_tests = [t for t in self.tests if t.status == CompatibilityStatus.INCOMPATIBLE]
+        partial_tests = [t for t in self.tests if t.status == CompatibilityStatus.PARTIAL]
         error_tests = [t for t in self.tests if t.status == CompatibilityStatus.ERROR]
 
         if incompatible_tests:
-            recommendations.append(
-                "Address incompatibility issues with specific Ignition versions"
-            )
+            recommendations.append("Address incompatibility issues with specific Ignition versions")
             versions = {t.ignition_version.short_version for t in incompatible_tests}
-            recommendations.append(
-                f"Incompatible versions: {', '.join(sorted(versions))}"
-            )
+            recommendations.append(f"Incompatible versions: {', '.join(sorted(versions))}")
 
         if partial_tests:
-            recommendations.append(
-                "Review partial compatibility issues and consider feature limitations"
-            )
+            recommendations.append("Review partial compatibility issues and consider feature limitations")
 
         if error_tests:
             recommendations.append("Investigate and resolve testing errors")
 
         # Platform-specific recommendations
-        windows_tests = [
-            t for t in self.tests if t.platform.platform_type == PlatformType.WINDOWS
-        ]
-        if windows_tests and all(
-            t.status != CompatibilityStatus.COMPATIBLE for t in windows_tests
-        ):
+        windows_tests = [t for t in self.tests if t.platform.platform_type == PlatformType.WINDOWS]
+        if windows_tests and all(t.status != CompatibilityStatus.COMPATIBLE for t in windows_tests):
             recommendations.append("Consider improving Windows platform support")
 
         # Database-specific recommendations
@@ -790,14 +729,10 @@ class CompatibilityTester:
                 if t.database_type and t.status == CompatibilityStatus.INCOMPATIBLE
             ]
             if failed_dbs:
-                recommendations.append(
-                    f"Database compatibility issues: {', '.join(failed_dbs)}"
-                )
+                recommendations.append(f"Database compatibility issues: {', '.join(failed_dbs)}")
 
         if not recommendations:
-            recommendations.append(
-                "Module shows good compatibility across tested environments"
-            )
+            recommendations.append("Module shows good compatibility across tested environments")
 
         return recommendations
 
@@ -806,24 +741,16 @@ class CompatibilityTester:
         recommendations = []
 
         # Analyze coverage
-        coverage = len(self.tests) / max(
-            1, len(self.test_versions) * 2
-        )  # Assuming 2 platforms
+        coverage = len(self.tests) / max(1, len(self.test_versions) * 2)  # Assuming 2 platforms
         if coverage < 0.5:
-            recommendations.append(
-                "Consider testing additional platform/version combinations"
-            )
+            recommendations.append("Consider testing additional platform/version combinations")
 
         # Check for missing critical versions
         critical_versions = ["8.1.15", "8.1.20", "8.1.25"]
         tested_version_strings = [t.ignition_version.version_string for t in self.tests]
-        missing_critical = [
-            v for v in critical_versions if v not in tested_version_strings
-        ]
+        missing_critical = [v for v in critical_versions if v not in tested_version_strings]
         if missing_critical:
-            recommendations.append(
-                f"Consider testing critical versions: {', '.join(missing_critical)}"
-            )
+            recommendations.append(f"Consider testing critical versions: {', '.join(missing_critical)}")
 
         return recommendations
 
@@ -866,9 +793,7 @@ class CompatibilityTester:
                     "name": test.name,
                     "ignition_version": str(test.ignition_version),
                     "platform": str(test.platform),
-                    "database_type": (
-                        test.database_type.value if test.database_type else None
-                    ),
+                    "database_type": (test.database_type.value if test.database_type else None),
                     "test_type": test.test_type,
                     "status": test.status.value,
                     "execution_time": test.execution_time,
@@ -878,32 +803,19 @@ class CompatibilityTester:
                 for test in self.report.tests
             ],
             "compatibility_matrix": {
-                "tested_versions": (
-                    [str(v) for v in self.report.matrix.tested_versions]
-                    if self.report.matrix
-                    else []
-                ),
+                "tested_versions": ([str(v) for v in self.report.matrix.tested_versions] if self.report.matrix else []),
                 "tested_platforms": (
-                    [str(p) for p in self.report.matrix.tested_platforms]
-                    if self.report.matrix
-                    else []
+                    [str(p) for p in self.report.matrix.tested_platforms] if self.report.matrix else []
                 ),
                 "tested_databases": (
-                    [db.value for db in self.report.matrix.tested_databases]
-                    if self.report.matrix
-                    else []
+                    [db.value for db in self.report.matrix.tested_databases] if self.report.matrix else []
                 ),
                 "results": (
-                    {
-                        k: v.value
-                        for k, v in self.report.matrix.compatibility_results.items()
-                    }
+                    {k: v.value for k, v in self.report.matrix.compatibility_results.items()}
                     if self.report.matrix
                     else {}
                 ),
-                "summary": (
-                    self.report.matrix.test_summary if self.report.matrix else {}
-                ),
+                "summary": (self.report.matrix.test_summary if self.report.matrix else {}),
             },
             "recommendations": self.report.recommendations,
             "metadata": self.report.metadata,

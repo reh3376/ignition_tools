@@ -86,10 +86,7 @@ class TypeAnnotationFixer:
                 if "@click." in line or "@" in line:
                     # Check if next few lines have a function definition without -> None
                     for j in range(i + 1, min(i + 5, len(lines))):
-                        if (
-                            re.match(r"\s*def\s+\w+.*:\s*$", lines[j])
-                            and "->" not in lines[j]
-                        ):
+                        if re.match(r"\s*def\s+\w+.*:\s*$", lines[j]) and "->" not in lines[j]:
                             # This is likely a Click command function
                             lines[j] = lines[j].replace(":", " -> None:")
                             modified = True

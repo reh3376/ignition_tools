@@ -182,9 +182,7 @@ class BasicExampleModule(AbstractIgnitionModule):
                 self.logger.info(f"Updated batch size to {config['batch_size']}")
 
             if "timeout_seconds" in config:
-                self.logger.info(
-                    f"Updated timeout to {config['timeout_seconds']} seconds"
-                )
+                self.logger.info(f"Updated timeout to {config['timeout_seconds']} seconds")
 
             self.logger.info("Basic Example Module configured successfully")
             return True
@@ -248,9 +246,7 @@ class BasicExampleModule(AbstractIgnitionModule):
         batch_size = self._custom_config.get("batch_size", 100)
         timeout = self._custom_config.get("timeout_seconds", 30)
 
-        self.logger.debug(
-            f"Data processing setup complete - batch_size: {batch_size}, timeout: {timeout}"
-        )
+        self.logger.debug(f"Data processing setup complete - batch_size: {batch_size}, timeout: {timeout}")
 
     def _start_processing(self):
         """Start data processing."""

@@ -8,6 +8,7 @@ Following patterns from crawl_mcp.py for comprehensive testing and validation.
 """
 
 import asyncio
+import contextlib
 import json
 import tempfile
 from pathlib import Path
@@ -128,24 +129,16 @@ async def run_phase_96_integration_test(
         results["test_results"]["quality_assurance"] = {
             "overall_score": qa_report.overall_score,
             "checks_performed": len(qa_report.checks),
-            "passed_checks": sum(
-                1 for check in qa_report.checks if check.status == "passed"
-            ),
-            "failed_checks": sum(
-                1 for check in qa_report.checks if check.status == "failed"
-            ),
-            "warning_checks": sum(
-                1 for check in qa_report.checks if check.status == "warning"
-            ),
+            "passed_checks": sum(1 for check in qa_report.checks if check.status == "passed"),
+            "failed_checks": sum(1 for check in qa_report.checks if check.status == "failed"),
+            "warning_checks": sum(1 for check in qa_report.checks if check.status == "warning"),
             "summary": qa_report.summary,
         }
 
         grade = qa_pipeline._calculate_grade(qa_report.overall_score)
         print(f"  QA Score: {qa_report.overall_score:.1f}/100 (Grade: {grade})")
         print(f"  Checks: {len(qa_report.checks)} total")
-        print(
-            f"  Categories: {', '.join(qa_report.summary.get('categories', {}).keys())}"
-        )
+        print(f"  Categories: {', '.join(qa_report.summary.get('categories', {}).keys())}")
 
         # Step 5: User Acceptance Testing
         print("\n👥 Step 5: User Acceptance Testing")
@@ -160,18 +153,12 @@ async def run_phase_96_integration_test(
             "scenarios_executed": len(uat_report.results),
             "execution_rate": uat_report.test_summary.get("execution_rate", 0),
             "feedback_collected": len(uat_report.feedback),
-            "average_rating": uat_report.test_summary.get("feedback_summary", {}).get(
-                "average_rating", 0
-            ),
+            "average_rating": uat_report.test_summary.get("feedback_summary", {}).get("average_rating", 0),
             "recommendations": len(uat_report.recommendations),
         }
 
-        print(
-            f"  Scenarios: {len(uat_report.scenarios)} generated, {len(uat_report.results)} executed"
-        )
-        print(
-            f"  Execution Rate: {uat_report.test_summary.get('execution_rate', 0):.1f}%"
-        )
+        print(f"  Scenarios: {len(uat_report.scenarios)} generated, {len(uat_report.results)} executed")
+        print(f"  Execution Rate: {uat_report.test_summary.get('execution_rate', 0):.1f}%")
         print(f"  User Feedback: {len(uat_report.feedback)} responses")
         print(
             f"  Average Rating: {uat_report.test_summary.get('feedback_summary', {}).get('average_rating', 0):.1f}/5.0"
@@ -181,9 +168,7 @@ async def run_phase_96_integration_test(
         print("\n📊 Step 6: Comprehensive Reporting")
         print("-" * 40)
 
-        comprehensive_report = await generate_comprehensive_report(
-            validation_result, qa_report, uat_report, results
-        )
+        comprehensive_report = await generate_comprehensive_report(validation_result, qa_report, uat_report, results)
 
         results["test_results"]["comprehensive_report"] = comprehensive_report
         results["status"] = "completed"
@@ -208,17 +193,13 @@ async def run_phase_96_integration_test(
         print("\nKey Metrics:")
         print(f"  • Module Validation Success: {validation_result.success}")
         print(f"  • Quality Assurance Score: {qa_report.overall_score:.1f}/100")
-        print(
-            f"  • UAT Execution Rate: {uat_report.test_summary.get('execution_rate', 0):.1f}%"
-        )
+        print(f"  • UAT Execution Rate: {uat_report.test_summary.get('execution_rate', 0):.1f}%")
         print(
             f"  • User Satisfaction: {uat_report.test_summary.get('feedback_summary', {}).get('average_rating', 0):.1f}/5.0"
         )
 
         # Recommendations
-        all_recommendations = collect_all_recommendations(
-            validation_result, qa_report, uat_report
-        )
+        all_recommendations = collect_all_recommendations(validation_result, qa_report, uat_report)
         results["recommendations"] = all_recommendations
 
         if all_recommendations:
@@ -239,10 +220,8 @@ async def run_phase_96_integration_test(
     finally:
         # Cleanup test module if we created one
         if not module_path and "test_module_path" in locals():
-            try:
+            with contextlib.suppress(Exception):
                 Path(test_module_path).unlink(missing_ok=True)
-            except Exception:
-                pass
 
     return results
 
@@ -345,9 +324,7 @@ async def generate_comprehensive_report(
             "validation_success": validation_result.success,
             "qa_score": qa_report.overall_score,
             "uat_execution_rate": uat_report.test_summary.get("execution_rate", 0),
-            "user_satisfaction": uat_report.test_summary.get(
-                "feedback_summary", {}
-            ).get("average_rating", 0),
+            "user_satisfaction": uat_report.test_summary.get("feedback_summary", {}).get("average_rating", 0),
         },
         "detailed_results": {
             "module_validation": {
@@ -358,9 +335,7 @@ async def generate_comprehensive_report(
             "quality_assurance": {
                 "overall_score": qa_report.overall_score,
                 "checks_performed": len(qa_report.checks),
-                "categories_tested": list(
-                    qa_report.summary.get("categories", {}).keys()
-                ),
+                "categories_tested": list(qa_report.summary.get("categories", {}).keys()),
             },
             "user_acceptance": {
                 "scenarios": len(uat_report.scenarios),
@@ -371,11 +346,8 @@ async def generate_comprehensive_report(
         "success_criteria": {
             "module_validation_passed": validation_result.success,
             "qa_score_acceptable": qa_report.overall_score >= 70,
-            "uat_execution_complete": uat_report.test_summary.get("execution_rate", 0)
-            >= 80,
-            "user_satisfaction_good": uat_report.test_summary.get(
-                "feedback_summary", {}
-            ).get("average_rating", 0)
+            "uat_execution_complete": uat_report.test_summary.get("execution_rate", 0) >= 80,
+            "user_satisfaction_good": uat_report.test_summary.get("feedback_summary", {}).get("average_rating", 0)
             >= 3.5,
         },
     }
@@ -407,18 +379,14 @@ def calculate_overall_score(results: dict[str, Any]) -> float:
     if "user_acceptance_testing" in results["test_results"]:
         uat_data = results["test_results"]["user_acceptance_testing"]
         execution_score = uat_data.get("execution_rate", 0)
-        satisfaction_score = (
-            uat_data.get("average_rating", 0) * 20
-        )  # Convert 5-point to 100-point scale
+        satisfaction_score = uat_data.get("average_rating", 0) * 20  # Convert 5-point to 100-point scale
         uat_score = (execution_score + satisfaction_score) / 2
         scores.append(uat_score)
 
     return sum(scores) / len(scores) if scores else 0.0
 
 
-def collect_all_recommendations(
-    validation_result: Any, qa_report: Any, uat_report: Any
-) -> list[str]:
+def collect_all_recommendations(validation_result: Any, qa_report: Any, uat_report: Any) -> list[str]:
     """Collect recommendations from all test components.
 
     Args:
@@ -437,9 +405,7 @@ def collect_all_recommendations(
     if validation_result.errors:
         recommendations.append(f"Fix {len(validation_result.errors)} validation errors")
     if validation_result.warnings:
-        recommendations.append(
-            f"Review {len(validation_result.warnings)} validation warnings"
-        )
+        recommendations.append(f"Review {len(validation_result.warnings)} validation warnings")
 
     # QA recommendations
     for check in qa_report.checks:

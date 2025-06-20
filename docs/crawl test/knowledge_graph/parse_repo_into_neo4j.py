@@ -1,4 +1,4 @@
-"""Direct Neo4j GitHub Code Repository Extractor
+"""Direct Neo4j GitHub Code Repository Extractor.
 
 Creates nodes and relationships directly in Neo4j without Graphiti:
 - File nodes
@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 
 
 class Neo4jCodeAnalyzer:
-    """Analyzes code for direct Neo4j insertion"""
+    """Analyzes code for direct Neo4j insertion."""
 
     def __init__(self):
         # External modules to ignore
@@ -164,19 +164,15 @@ class Neo4jCodeAnalyzer:
             "oauthlib",
         }
 
-    def analyze_python_file(
-        self, file_path: Path, repo_root: Path, project_modules: set[str]
-    ) -> dict[str, Any]:
-        """Extract structure for direct Neo4j insertion"""
+    def analyze_python_file(self, file_path: Path, repo_root: Path, project_modules: set[str]) -> dict[str, Any]:
+        """Extract structure for direct Neo4j insertion."""
         try:
             with open(file_path, encoding="utf-8") as f:
                 content = f.read()
 
             tree = ast.parse(content)
             relative_path = str(file_path.relative_to(repo_root))
-            module_name = self._get_importable_module_name(
-                file_path, repo_root, relative_path
-            )
+            module_name = self._get_importable_module_name(file_path, repo_root, relative_path)
 
             # Extract structure
             classes = []
@@ -190,17 +186,13 @@ class Neo4jCodeAnalyzer:
                     attributes = []
 
                     for item in node.body:
-                        if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        if isinstance(item, ast.FunctionDef | ast.AsyncFunctionDef):
                             if not item.name.startswith("_"):  # Public methods only
                                 # Extract comprehensive parameter info
                                 params = self._extract_function_parameters(item)
 
                                 # Get return type annotation
-                                return_type = (
-                                    self._get_name(item.returns)
-                                    if item.returns
-                                    else "Any"
-                                )
+                                return_type = self._get_name(item.returns) if item.returns else "Any"
 
                                 # Create detailed parameter list for Neo4j storage
                                 params_detailed = []
@@ -221,25 +213,17 @@ class Neo4jCodeAnalyzer:
                                         "params_detailed": params_detailed,  # Detailed string format
                                         "return_type": return_type,
                                         "args": [
-                                            arg.arg
-                                            for arg in item.args.args
-                                            if arg.arg != "self"
+                                            arg.arg for arg in item.args.args if arg.arg != "self"
                                         ],  # Keep for backwards compatibility
                                     }
                                 )
-                        elif isinstance(item, ast.AnnAssign) and isinstance(
-                            item.target, ast.Name
-                        ):
+                        elif isinstance(item, ast.AnnAssign) and isinstance(item.target, ast.Name):
                             # Type annotated attributes
                             if not item.target.id.startswith("_"):
                                 attributes.append(
                                     {
                                         "name": item.target.id,
-                                        "type": (
-                                            self._get_name(item.annotation)
-                                            if item.annotation
-                                            else "Any"
-                                        ),
+                                        "type": (self._get_name(item.annotation) if item.annotation else "Any"),
                                     }
                                 )
 
@@ -252,61 +236,52 @@ class Neo4jCodeAnalyzer:
                         }
                     )
 
-                elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                elif isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef):
                     # Only top-level functions
                     if not any(
-                        node in cls_node.body
-                        for cls_node in ast.walk(tree)
-                        if isinstance(cls_node, ast.ClassDef)
-                    ):
-                        if not node.name.startswith("_"):
-                            # Extract comprehensive parameter info
-                            params = self._extract_function_parameters(node)
+                        node in cls_node.body for cls_node in ast.walk(tree) if isinstance(cls_node, ast.ClassDef)
+                    ) and not node.name.startswith("_"):
+                        # Extract comprehensive parameter info
+                        params = self._extract_function_parameters(node)
 
-                            # Get return type annotation
-                            return_type = (
-                                self._get_name(node.returns) if node.returns else "Any"
-                            )
+                        # Get return type annotation
+                        return_type = self._get_name(node.returns) if node.returns else "Any"
 
-                            # Create detailed parameter list for Neo4j storage
-                            params_detailed = []
-                            for p in params:
-                                param_str = f"{p['name']}:{p['type']}"
-                                if p["optional"] and p["default"] is not None:
-                                    param_str += f"={p['default']}"
-                                elif p["optional"]:
-                                    param_str += "=None"
-                                if p["kind"] != "positional":
-                                    param_str = f"[{p['kind']}] {param_str}"
-                                params_detailed.append(param_str)
+                        # Create detailed parameter list for Neo4j storage
+                        params_detailed = []
+                        for p in params:
+                            param_str = f"{p['name']}:{p['type']}"
+                            if p["optional"] and p["default"] is not None:
+                                param_str += f"={p['default']}"
+                            elif p["optional"]:
+                                param_str += "=None"
+                            if p["kind"] != "positional":
+                                param_str = f"[{p['kind']}] {param_str}"
+                            params_detailed.append(param_str)
 
-                            # Simple format for backwards compatibility
-                            params_list = [f"{p['name']}:{p['type']}" for p in params]
+                        # Simple format for backwards compatibility
+                        params_list = [f"{p['name']}:{p['type']}" for p in params]
 
-                            functions.append(
-                                {
-                                    "name": node.name,
-                                    "full_name": f"{module_name}.{node.name}",
-                                    "params": params,  # Full parameter objects
-                                    "params_detailed": params_detailed,  # Detailed string format
-                                    "params_list": params_list,  # Simple string format for backwards compatibility
-                                    "return_type": return_type,
-                                    "args": [
-                                        arg.arg for arg in node.args.args
-                                    ],  # Keep for backwards compatibility
-                                }
-                            )
+                        functions.append(
+                            {
+                                "name": node.name,
+                                "full_name": f"{module_name}.{node.name}",
+                                "params": params,  # Full parameter objects
+                                "params_detailed": params_detailed,  # Detailed string format
+                                "params_list": params_list,  # Simple string format for backwards compatibility
+                                "return_type": return_type,
+                                "args": [arg.arg for arg in node.args.args],  # Keep for backwards compatibility
+                            }
+                        )
 
-                elif isinstance(node, (ast.Import, ast.ImportFrom)):
+                elif isinstance(node, ast.Import | ast.ImportFrom):
                     # Track internal imports only
                     if isinstance(node, ast.Import):
                         for alias in node.names:
                             if self._is_likely_internal(alias.name, project_modules):
                                 imports.append(alias.name)
                     elif isinstance(node, ast.ImportFrom) and node.module:
-                        if node.module.startswith(".") or self._is_likely_internal(
-                            node.module, project_modules
-                        ):
+                        if node.module.startswith(".") or self._is_likely_internal(node.module, project_modules):
                             imports.append(node.module)
 
             return {
@@ -323,7 +298,7 @@ class Neo4jCodeAnalyzer:
             return None
 
     def _is_likely_internal(self, import_name: str, project_modules: set[str]) -> bool:
-        """Check if an import is likely internal to the project"""
+        """Check if an import is likely internal to the project."""
         if not import_name:
             return False
 
@@ -342,23 +317,16 @@ class Neo4jCodeAnalyzer:
                 return True
 
         # If it's not obviously external, consider it internal
-        if (
+        return bool(
             not any(ext in base_module.lower() for ext in ["test", "mock", "fake"])
             and not base_module.startswith("_")
             and len(base_module) > 2
-        ):
-            return True
-
-        return False
-
-    def _get_importable_module_name(
-        self, file_path: Path, repo_root: Path, relative_path: str
-    ) -> str:
-        """Determine the actual importable module name for a Python file"""
-        # Start with the default: convert file path to module path
-        default_module = (
-            relative_path.replace("/", ".").replace("\\", ".").replace(".py", "")
         )
+
+    def _get_importable_module_name(self, file_path: Path, repo_root: Path, relative_path: str) -> str:
+        """Determine the actual importable module name for a Python file."""
+        # Start with the default: convert file path to module path
+        default_module = relative_path.replace("/", ".").replace("\\", ".").replace(".py", "")
 
         # Common patterns to detect the actual package root
         path_parts = Path(relative_path).parts
@@ -388,9 +356,7 @@ class Neo4jCodeAnalyzer:
         # Find the first directory that's not in skip_dirs
         filtered_parts = []
         for part in path_parts:
-            if (
-                part.lower() not in skip_dirs or filtered_parts
-            ):  # Once we start including, include everything
+            if part.lower() not in skip_dirs or filtered_parts:  # Once we start including, include everything
                 filtered_parts.append(part)
 
         if filtered_parts:
@@ -401,7 +367,7 @@ class Neo4jCodeAnalyzer:
         return default_module
 
     def _extract_function_parameters(self, func_node):
-        """Comprehensive parameter extraction from function definition"""
+        """Comprehensive parameter extraction from function definition."""
         params = []
 
         # Regular positional arguments
@@ -423,9 +389,7 @@ class Neo4jCodeAnalyzer:
                 default_idx = i - defaults_start
                 if default_idx < len(func_node.args.defaults):
                     param_info["optional"] = True
-                    param_info["default"] = self._get_default_value(
-                        func_node.args.defaults[default_idx]
-                    )
+                    param_info["default"] = self._get_default_value(func_node.args.defaults[default_idx])
 
             params.append(param_info)
 
@@ -435,9 +399,7 @@ class Neo4jCodeAnalyzer:
                 {
                     "name": f"*{func_node.args.vararg.arg}",
                     "type": (
-                        self._get_name(func_node.args.vararg.annotation)
-                        if func_node.args.vararg.annotation
-                        else "Any"
+                        self._get_name(func_node.args.vararg.annotation) if func_node.args.vararg.annotation else "Any"
                     ),
                     "kind": "var_positional",
                     "optional": True,
@@ -456,13 +418,8 @@ class Neo4jCodeAnalyzer:
             }
 
             # Check for default value
-            if (
-                i < len(func_node.args.kw_defaults)
-                and func_node.args.kw_defaults[i] is not None
-            ):
-                param_info["default"] = self._get_default_value(
-                    func_node.args.kw_defaults[i]
-                )
+            if i < len(func_node.args.kw_defaults) and func_node.args.kw_defaults[i] is not None:
+                param_info["default"] = self._get_default_value(func_node.args.kw_defaults[i])
             else:
                 param_info["optional"] = False  # No default = required kwonly arg
 
@@ -487,7 +444,7 @@ class Neo4jCodeAnalyzer:
         return params
 
     def _get_default_value(self, default_node):
-        """Extract default value from AST node"""
+        """Extract default value from AST node."""
         try:
             if isinstance(default_node, ast.Constant):
                 return repr(default_node.value)
@@ -505,7 +462,7 @@ class Neo4jCodeAnalyzer:
             return "..."
 
     def _get_name(self, node):
-        """Extract name from AST node, handling complex types safely"""
+        """Extract name from AST node, handling complex types safely."""
         if node is None:
             return "Any"
 
@@ -528,16 +485,14 @@ class Neo4jCodeAnalyzer:
                         return f"{base}[{', '.join(elts)}]"
                     elif isinstance(node.slice, ast.Constant):
                         return f"{base}[{node.slice.value!r}]"
-                    elif isinstance(node.slice, ast.Attribute) or isinstance(
-                        node.slice, ast.Subscript
-                    ):
+                    elif isinstance(node.slice, ast.Attribute | ast.Subscript):
                         return f"{base}[{self._get_name(node.slice)}]"
                     else:
                         # Try to get the name of the slice, fallback to Any if it fails
                         try:
                             slice_name = self._get_name(node.slice)
                             return f"{base}[{slice_name}]"
-                        except:
+                        except Exception:
                             return f"{base}[Any]"
                 return base
             elif isinstance(node, ast.Constant):
@@ -559,7 +514,7 @@ class Neo4jCodeAnalyzer:
 
 
 class DirectNeo4jExtractor:
-    """Creates nodes and relationships directly in Neo4j"""
+    """Creates nodes and relationships directly in Neo4j."""
 
     def __init__(self, neo4j_uri: str, neo4j_user: str, neo4j_password: str):
         self.neo4j_uri = neo4j_uri
@@ -569,11 +524,9 @@ class DirectNeo4jExtractor:
         self.analyzer = Neo4jCodeAnalyzer()
 
     async def initialize(self):
-        """Initialize Neo4j connection"""
+        """Initialize Neo4j connection."""
         logger.info("Initializing Neo4j connection...")
-        self.driver = AsyncGraphDatabase.driver(
-            self.neo4j_uri, auth=(self.neo4j_user, self.neo4j_password)
-        )
+        self.driver = AsyncGraphDatabase.driver(self.neo4j_uri, auth=(self.neo4j_user, self.neo4j_password))
 
         # Clear existing data
         # logger.info("Clearing existing data...")
@@ -584,12 +537,8 @@ class DirectNeo4jExtractor:
         logger.info("Creating constraints and indexes...")
         async with self.driver.session() as session:
             # Create constraints - using MERGE-friendly approach
-            await session.run(
-                "CREATE CONSTRAINT IF NOT EXISTS FOR (f:File) REQUIRE f.path IS UNIQUE"
-            )
-            await session.run(
-                "CREATE CONSTRAINT IF NOT EXISTS FOR (c:Class) REQUIRE c.full_name IS UNIQUE"
-            )
+            await session.run("CREATE CONSTRAINT IF NOT EXISTS FOR (f:File) REQUIRE f.path IS UNIQUE")
+            await session.run("CREATE CONSTRAINT IF NOT EXISTS FOR (c:Class) REQUIRE c.full_name IS UNIQUE")
             # Remove unique constraints for methods/attributes since they can be duplicated across classes
             # await session.run("CREATE CONSTRAINT IF NOT EXISTS FOR (m:Method) REQUIRE m.full_name IS UNIQUE")
             # await session.run("CREATE CONSTRAINT IF NOT EXISTS FOR (f:Function) REQUIRE f.full_name IS UNIQUE")
@@ -603,7 +552,7 @@ class DirectNeo4jExtractor:
         logger.info("Neo4j initialized successfully")
 
     async def clear_repository_data(self, repo_name: str):
-        """Clear all data for a specific repository"""
+        """Clear all data for a specific repository."""
         logger.info(f"Clearing existing data for repository: {repo_name}")
         async with self.driver.session() as session:
             # Delete in specific order to avoid constraint issues
@@ -664,12 +613,12 @@ class DirectNeo4jExtractor:
         logger.info(f"Cleared data for repository: {repo_name}")
 
     async def close(self):
-        """Close Neo4j connection"""
+        """Close Neo4j connection."""
         if self.driver:
             await self.driver.close()
 
     def clone_repo(self, repo_url: str, target_dir: str) -> str:
-        """Clone repository with shallow clone"""
+        """Clone repository with shallow clone."""
         logger.info(f"Cloning repository to: {target_dir}")
         if os.path.exists(target_dir):
             logger.info(f"Removing existing directory: {target_dir}")
@@ -681,26 +630,20 @@ class DirectNeo4jExtractor:
                             os.chmod(path, 0o777)
                             func(path)
                     except PermissionError:
-                        logger.warning(
-                            f"Could not remove {path} - file in use, skipping"
-                        )
+                        logger.warning(f"Could not remove {path} - file in use, skipping")
                         pass
 
                 shutil.rmtree(target_dir, onerror=handle_remove_readonly)
             except Exception as e:
-                logger.warning(
-                    f"Could not fully remove {target_dir}: {e}. Proceeding anyway..."
-                )
+                logger.warning(f"Could not fully remove {target_dir}: {e}. Proceeding anyway...")
 
         logger.info(f"Running git clone from {repo_url}")
-        subprocess.run(
-            ["git", "clone", "--depth", "1", repo_url, target_dir], check=True
-        )
+        subprocess.run(["git", "clone", "--depth", "1", repo_url, target_dir], check=True)
         logger.info("Repository cloned successfully")
         return target_dir
 
     def get_python_files(self, repo_path: str) -> list[Path]:
-        """Get Python files, focusing on main source directories"""
+        """Get Python files, focusing on main source directories."""
         python_files = []
         exclude_dirs = {
             "tests",
@@ -721,9 +664,7 @@ class DirectNeo4jExtractor:
         }
 
         for root, dirs, files in os.walk(repo_path):
-            dirs[:] = [
-                d for d in dirs if d not in exclude_dirs and not d.startswith(".")
-            ]
+            dirs[:] = [d for d in dirs if d not in exclude_dirs and not d.startswith(".")]
 
             for file in files:
                 if file.endswith(".py") and not file.startswith("test_"):
@@ -736,8 +677,8 @@ class DirectNeo4jExtractor:
 
         return python_files
 
-    async def analyze_repository(self, repo_url: str, temp_dir: str = None):
-        """Analyze repository and create nodes/relationships in Neo4j"""
+    async def analyze_repository(self, repo_url: str, temp_dir: str | None = None):
+        """Analyze repository and create nodes/relationships in Neo4j."""
         repo_name = repo_url.split("/")[-1].replace(".git", "")
         logger.info(f"Analyzing repository: {repo_name}")
 
@@ -762,9 +703,7 @@ class DirectNeo4jExtractor:
             project_modules = set()
             for file_path in python_files:
                 relative_path = str(file_path.relative_to(repo_path))
-                module_parts = (
-                    relative_path.replace("/", ".").replace(".py", "").split(".")
-                )
+                module_parts = relative_path.replace("/", ".").replace(".py", "").split(".")
                 if len(module_parts) > 0 and not module_parts[0].startswith("."):
                     project_modules.add(module_parts[0])
 
@@ -775,13 +714,9 @@ class DirectNeo4jExtractor:
             modules_data = []
             for i, file_path in enumerate(python_files):
                 if i % 20 == 0:
-                    logger.info(
-                        f"Analyzing file {i + 1}/{len(python_files)}: {file_path.name}"
-                    )
+                    logger.info(f"Analyzing file {i + 1}/{len(python_files)}: {file_path.name}")
 
-                analysis = self.analyzer.analyze_python_file(
-                    file_path, repo_path, project_modules
-                )
+                analysis = self.analyzer.analyze_python_file(file_path, repo_path, project_modules)
                 if analysis:
                     modules_data.append(analysis)
 
@@ -793,9 +728,7 @@ class DirectNeo4jExtractor:
 
             # Print summary
             total_classes = sum(len(mod["classes"]) for mod in modules_data)
-            total_methods = sum(
-                len(cls["methods"]) for mod in modules_data for cls in mod["classes"]
-            )
+            total_methods = sum(len(cls["methods"]) for mod in modules_data for cls in mod["classes"])
             total_functions = sum(len(mod["functions"]) for mod in modules_data)
             total_imports = sum(len(mod["imports"]) for mod in modules_data)
 
@@ -819,21 +752,17 @@ class DirectNeo4jExtractor:
                                 os.chmod(path, 0o777)
                                 func(path)
                         except PermissionError:
-                            logger.warning(
-                                f"Could not remove {path} - file in use, skipping"
-                            )
+                            logger.warning(f"Could not remove {path} - file in use, skipping")
                             pass
 
                     shutil.rmtree(temp_dir, onerror=handle_remove_readonly)
                     logger.info("Cleanup completed")
                 except Exception as e:
-                    logger.warning(
-                        f"Cleanup failed: {e}. Directory may remain at {temp_dir}"
-                    )
+                    logger.warning(f"Cleanup failed: {e}. Directory may remain at {temp_dir}")
                     # Don't fail the whole process due to cleanup issues
 
     async def _create_graph(self, repo_name: str, modules_data: list[dict]):
-        """Create all nodes and relationships in Neo4j"""
+        """Create all nodes and relationships in Neo4j."""
         async with self.driver.session() as session:
             # Create Repository node
             await session.run(
@@ -921,12 +850,8 @@ class DirectNeo4jExtractor:
                             full_name=method_full_name,
                             method_id=method_id,
                             args=method["args"],
-                            params_list=[
-                                f"{p['name']}:{p['type']}" for p in method["params"]
-                            ],  # Simple format
-                            params_detailed=method.get(
-                                "params_detailed", []
-                            ),  # Detailed format
+                            params_list=[f"{p['name']}:{p['type']}" for p in method["params"]],  # Simple format
+                            params_detailed=method.get("params_detailed", []),  # Detailed format
                             return_type=method["return_type"],
                         )
                         nodes_created += 1
@@ -993,12 +918,8 @@ class DirectNeo4jExtractor:
                         full_name=func["full_name"],
                         func_id=func_id,
                         args=func["args"],
-                        params_list=func.get(
-                            "params_list", []
-                        ),  # Simple format for backwards compatibility
-                        params_detailed=func.get(
-                            "params_detailed", []
-                        ),  # Detailed format
+                        params_list=func.get("params_list", []),  # Simple format for backwards compatibility
+                        params_detailed=func.get("params_detailed", []),  # Detailed format
                         return_type=func["return_type"],
                     )
                     nodes_created += 1
@@ -1035,12 +956,10 @@ class DirectNeo4jExtractor:
                 if (i + 1) % 10 == 0:
                     logger.info(f"Processed {i + 1}/{len(modules_data)} files...")
 
-            logger.info(
-                f"Created {nodes_created} nodes and {relationships_created} relationships"
-            )
+            logger.info(f"Created {nodes_created} nodes and {relationships_created} relationships")
 
     async def search_graph(self, query_type: str, **kwargs):
-        """Search the Neo4j graph directly"""
+        """Search the Neo4j graph directly."""
         async with self.driver.session() as session:
             if query_type == "files_importing":
                 target = kwargs.get("target")
@@ -1052,10 +971,7 @@ class DirectNeo4jExtractor:
                 """,
                     target=target,
                 )
-                return [
-                    {"file": record["file"], "imports": record["imports"]}
-                    async for record in result
-                ]
+                return [{"file": record["file"], "imports": record["imports"]} async for record in result]
 
             elif query_type == "classes_in_file":
                 file_path = kwargs.get("file_path")
@@ -1084,14 +1000,11 @@ class DirectNeo4jExtractor:
                 """,
                     class_name=class_name,
                 )
-                return [
-                    {"method_name": record["method_name"], "args": record["args"]}
-                    async for record in result
-                ]
+                return [{"method_name": record["method_name"], "args": record["args"]} async for record in result]
 
 
 async def main():
-    """Example usage"""
+    """Example usage."""
     load_dotenv()
 
     neo4j_uri = os.environ.get("NEO4J_URI", "bolt://localhost:7687")
@@ -1118,17 +1031,13 @@ async def main():
             print(f"- {result['file']} imports {result['imports']}")
 
         # What classes are in a specific file?
-        results = await extractor.search_graph(
-            "classes_in_file", file_path="pydantic_ai/models/openai.py"
-        )
+        results = await extractor.search_graph("classes_in_file", file_path="pydantic_ai/models/openai.py")
         print(f"\\nClasses in openai.py: {len(results)}")
         for result in results:
             print(f"- {result['class_name']}")
 
         # What methods does OpenAIModel have?
-        results = await extractor.search_graph(
-            "methods_of_class", class_name="OpenAIModel"
-        )
+        results = await extractor.search_graph("methods_of_class", class_name="OpenAIModel")
         print(f"\\nMethods of OpenAIModel: {len(results)}")
         for result in results[:5]:
             print(f"- {result['method_name']}({', '.join(result['args'])})")

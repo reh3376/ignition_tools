@@ -32,9 +32,7 @@ def test_module_discovery(module_name: str, module_path: str) -> bool:
             print(f"✅ {module_name}: main module imported successfully")
         except ImportError as e:
             if "fastapi" in str(e).lower() or "uvicorn" in str(e).lower():
-                print(
-                    f"⚠️  {module_name}: FastAPI dependencies not available (expected)"
-                )
+                print(f"⚠️  {module_name}: FastAPI dependencies not available (expected)")
             else:
                 print(f"❌ {module_name}: unexpected import error: {e}")
                 return False
@@ -135,9 +133,7 @@ def main():
     if all_passed:
         print("🎉 All validation tests passed!")
         print("✅ Import resolution setup is working correctly")
-        print(
-            "⚠️  Pylance warnings for FastAPI imports are expected when dependencies not installed"
-        )
+        print("⚠️  Pylance warnings for FastAPI imports are expected when dependencies not installed")
     else:
         print("❌ Some validation tests failed")
         print("🔧 Please check the issues above and fix them")

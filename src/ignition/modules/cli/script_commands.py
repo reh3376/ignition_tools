@@ -68,9 +68,7 @@ def generate(
             task = progress.add_task("Generating script...", total=None)
 
             if template:
-                script_content = generator.generate_from_template(
-                    template, context_data
-                )
+                script_content = generator.generate_from_template(template, context_data)
             else:
                 script_content = generator.generate_dynamic_script(context_data)
 
@@ -84,9 +82,7 @@ def generate(
             console.print(f"✅ Script saved to: {output_path}")
         else:
             # Display script with syntax highlighting
-            syntax = Syntax(
-                script_content, "python", theme="monokai", line_numbers=True
-            )
+            syntax = Syntax(script_content, "python", theme="monokai", line_numbers=True)
             console.print(Panel(syntax, title=f"{context} {script_type} Script"))
 
         # Show AI recommendations if enabled
@@ -107,9 +103,7 @@ def templates(category: str | None, context: str | None, search: str | None) -> 
         manager = TemplateManager()
 
         # Get templates with filters
-        all_templates = manager.list_templates(
-            category=category, context=context, search=search
-        )
+        all_templates = manager.list_templates(category=category, context=context, search=search)
 
         if not all_templates:
             console.print("No templates found matching criteria.")
@@ -160,9 +154,7 @@ def template_info(template_name: str) -> None:
             return
 
         # Display template info
-        console.print(
-            Panel(f"[bold]{template['name']}[/bold]", title="Template Information")
-        )
+        console.print(Panel(f"[bold]{template['name']}[/bold]", title="Template Information"))
 
         # Basic info
         console.print(f"📝 Description: {template.get('description', 'N/A')}")
@@ -176,19 +168,13 @@ def template_info(template_name: str) -> None:
             console.print("\n⚙️ Parameters:")
             for param, info in template["parameters"].items():
                 required = "Required" if info.get("required", False) else "Optional"
-                console.print(
-                    f"  • {param} ({required}): {info.get('description', '')}"
-                )
+                console.print(f"  • {param} ({required}): {info.get('description', '')}")
 
         # Code preview
         if template.get("code"):
             console.print("\n📄 Code Preview:")
             syntax = Syntax(
-                (
-                    template["code"][:500] + "..."
-                    if len(template["code"]) > 500
-                    else template["code"]
-                ),
+                (template["code"][:500] + "..." if len(template["code"]) > 500 else template["code"]),
                 "python",
                 theme="monokai",
                 line_numbers=True,
@@ -203,9 +189,7 @@ def template_info(template_name: str) -> None:
 @click.argument("name")
 @click.argument(
     "category",
-    type=click.Choice(
-        ["gateway", "client", "designer", "perspective", "tag", "alarm", "utility"]
-    ),
+    type=click.Choice(["gateway", "client", "designer", "perspective", "tag", "alarm", "utility"]),
 )
 @click.option("--description", "-d", help="Template description")
 @click.option("--code-file", "-f", help="Path to code file")
@@ -296,9 +280,7 @@ def analyze(script_file: str, context: str | None, fix: bool) -> None:
             task = progress.add_task("Running analysis...", total=None)
 
             # Perform analysis
-            analysis_result = intelligence.analyze_script(
-                script_content, context=context, include_suggestions=True
-            )
+            analysis_result = intelligence.analyze_script(script_content, context=context, include_suggestions=True)
 
             progress.update(task, completed=True)
 
@@ -308,9 +290,7 @@ def analyze(script_file: str, context: str | None, fix: bool) -> None:
         # Apply fixes if requested
         if fix and analysis_result.get("suggestions"):
             console.print("\n🔧 Applying suggested fixes...")
-            fixed_content = intelligence.apply_suggestions(
-                script_content, analysis_result["suggestions"]
-            )
+            fixed_content = intelligence.apply_suggestions(script_content, analysis_result["suggestions"])
 
             # Save fixed script
             backup_path = script_path.with_suffix(script_path.suffix + ".bak")
@@ -341,9 +321,7 @@ def search(query: str, limit: int, context: str | None) -> None:
         ) as progress:
             task = progress.add_task("Searching...", total=None)
 
-            results = intelligence.semantic_search(
-                query, limit=limit, context_filter=context
-            )
+            results = intelligence.semantic_search(query, limit=limit, context_filter=context)
 
             progress.update(task, completed=True)
 
@@ -362,24 +340,18 @@ def search(query: str, limit: int, context: str | None) -> None:
 
             # Show code snippet
             if result.get("snippet"):
-                syntax = Syntax(
-                    result["snippet"], "python", theme="monokai", line_numbers=False
-                )
+                syntax = Syntax(result["snippet"], "python", theme="monokai", line_numbers=False)
                 console.print(Panel(syntax, title="Code Snippet"))
 
     except Exception as e:
         console.print(f"❌ Search failed: {e}")
 
 
-def _show_ai_recommendations(
-    context: str, script_type: str, script_content: str
-) -> None:
+def _show_ai_recommendations(context: str, script_type: str, script_content: str) -> None:
     """Display AI-powered recommendations for the generated script."""
     try:
         intelligence = CodeIntelligenceIntegration()
-        recommendations = intelligence.get_recommendations(
-            script_content, context=context, script_type=script_type
-        )
+        recommendations = intelligence.get_recommendations(script_content, context=context, script_type=script_type)
 
         if recommendations:
             console.print("\n🤖 AI Recommendations:")

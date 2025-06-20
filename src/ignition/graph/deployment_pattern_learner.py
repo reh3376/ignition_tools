@@ -130,18 +130,14 @@ class DeploymentPatternLearner:
             "completed_at": completed_at.isoformat() if completed_at else None,
             "duration_seconds": duration_seconds,
             "status": status,
-            "success_metrics": (
-                json.dumps(performance_data) if performance_data else None
-            ),
+            "success_metrics": (json.dumps(performance_data) if performance_data else None),
             "failure_reasons": failure_reasons or [],
             "rollback_triggered": rollback_triggered,
             "rollback_successful": rollback_successful,
             "user_id": user_id,
             "automation_triggered": automation_triggered,
             "execution_log": execution_log,
-            "performance_data": (
-                json.dumps(performance_data) if performance_data else None
-            ),
+            "performance_data": (json.dumps(performance_data) if performance_data else None),
             "lessons_learned": lessons_learned,
         }
 
@@ -230,9 +226,7 @@ class DeploymentPatternLearner:
             logger.info(f"Recorded environment adaptation: {adaptation_id}")
             return adaptation_id
         else:
-            raise Exception(
-                f"Failed to record environment adaptation: {adaptation_name}"
-            )
+            raise Exception(f"Failed to record environment adaptation: {adaptation_name}")
 
     def record_rollback_scenario(
         self,
@@ -390,11 +384,8 @@ class DeploymentPatternLearner:
                     "success_count": record["successes"],
                     "failure_count": record["failures"],
                     "usage_count": record["usage_count"],
-                    "success_rate": record["successes"]
-                    / max(record["successes"] + record["failures"], 1),
-                    "configuration_template": json.loads(
-                        pattern["configuration_template"]
-                    ),
+                    "success_rate": record["successes"] / max(record["successes"] + record["failures"], 1),
+                    "configuration_template": json.loads(pattern["configuration_template"]),
                     "pre_conditions": pattern.get("pre_conditions", []),
                     "post_conditions": pattern.get("post_conditions", []),
                     "pattern_details": pattern_data,
@@ -473,12 +464,8 @@ class DeploymentPatternLearner:
                     "adaptation_name": adaptation["adaptation_name"],
                     "adaptation_type": adaptation["adaptation_type"],
                     "resource_type": adaptation["resource_type"],
-                    "original_configuration": json.loads(
-                        adaptation["original_configuration"]
-                    ),
-                    "adapted_configuration": json.loads(
-                        adaptation["adapted_configuration"]
-                    ),
+                    "original_configuration": json.loads(adaptation["original_configuration"]),
+                    "adapted_configuration": json.loads(adaptation["adapted_configuration"]),
                     "adaptation_rules": adaptation["adaptation_rules"],
                     "trigger_conditions": adaptation["trigger_conditions"],
                     "validation_criteria": adaptation.get("validation_criteria", []),
@@ -523,9 +510,7 @@ class DeploymentPatternLearner:
         }
 
         if resource_types:
-            conditions.append(
-                "ANY(rt IN $resource_types WHERE rt IN rs.resource_types_affected)"
-            )
+            conditions.append("ANY(rt IN $resource_types WHERE rt IN rs.resource_types_affected)")
             params["resource_types"] = resource_types
 
         if rollback_type:
@@ -732,28 +717,17 @@ class DeploymentPatternLearner:
 
             # Generate insights
             if analytics["success_rate"] < 0.8:
-                analytics["insights"].append(
-                    "Success rate is below 80% - consider reviewing deployment patterns"
-                )
+                analytics["insights"].append("Success rate is below 80% - consider reviewing deployment patterns")
 
             if analytics["rollback_rate"] > 0.1:
-                analytics["insights"].append(
-                    "Rollback rate is above 10% - investigate common failure patterns"
-                )
+                analytics["insights"].append("Rollback rate is above 10% - investigate common failure patterns")
 
-            if (
-                deployment_result[0]["avg_duration"]
-                and deployment_result[0]["avg_duration"] > 1800
-            ):  # 30 minutes
-                analytics["insights"].append(
-                    "Average deployment duration is high - consider optimization"
-                )
+            if deployment_result[0]["avg_duration"] and deployment_result[0]["avg_duration"] > 1800:  # 30 minutes
+                analytics["insights"].append("Average deployment duration is high - consider optimization")
 
         return analytics
 
-    def _learn_from_successful_deployment(
-        self, execution_id: str, execution_data: dict[str, Any]
-    ) -> None:
+    def _learn_from_successful_deployment(self, execution_id: str, execution_data: dict[str, Any]) -> None:
         """Learn patterns from successful deployments."""
         try:
             # Extract pattern characteristics
@@ -761,9 +735,7 @@ class DeploymentPatternLearner:
                 "environment_types": [execution_data["target_environment"]],
                 "resource_types": execution_data["resources_deployed"],
                 "deployment_strategy": execution_data["deployment_strategy"],
-                "configuration_template": json.loads(
-                    execution_data["configuration_used"]
-                ),
+                "configuration_template": json.loads(execution_data["configuration_used"]),
                 "success_criteria": {
                     "max_duration": execution_data.get("duration_seconds", 3600),
                     "required_resources": execution_data["resources_deployed"],
@@ -771,32 +743,26 @@ class DeploymentPatternLearner:
             }
 
             # Check if similar pattern exists
-            similar_pattern = self._find_similar_deployment_pattern(
-                pattern_characteristics
-            )
+            similar_pattern = self._find_similar_deployment_pattern(pattern_characteristics)
 
             if similar_pattern:
                 # Update existing pattern
-                self._update_deployment_pattern_success(
-                    similar_pattern["id"], execution_id
-                )
+                self._update_deployment_pattern_success(similar_pattern["id"], execution_id)
             else:
                 # Create new pattern
                 self._create_deployment_pattern(execution_data, pattern_characteristics)
 
         except Exception as e:
-            logger.warning(
-                f"Failed to learn from successful deployment {execution_id}: {e}"
-            )
+            logger.warning(f"Failed to learn from successful deployment {execution_id}: {e}")
 
-    def _learn_from_rollback_scenario(
-        self, execution_id: str, execution_data: dict[str, Any]
-    ) -> None:
+    def _learn_from_rollback_scenario(self, execution_id: str, execution_data: dict[str, Any]) -> None:
         """Learn from rollback scenarios."""
         try:
             if execution_data.get("failure_reasons"):
                 # Create or update rollback scenario
-                scenario_name = f"Rollback for {execution_data['deployment_type']} in {execution_data['target_environment']}"
+                scenario_name = (
+                    f"Rollback for {execution_data['deployment_type']} in {execution_data['target_environment']}"
+                )
 
                 # Check if similar rollback scenario exists
                 existing_scenario = self._find_similar_rollback_scenario(
@@ -813,11 +779,7 @@ class DeploymentPatternLearner:
                     # Create new rollback scenario
                     self.record_rollback_scenario(
                         scenario_name=scenario_name,
-                        rollback_type=(
-                            "automatic"
-                            if execution_data["automation_triggered"]
-                            else "manual"
-                        ),
+                        rollback_type=("automatic" if execution_data["automation_triggered"] else "manual"),
                         trigger_conditions=execution_data["failure_reasons"],
                         failure_patterns=execution_data["failure_reasons"],
                         rollback_strategy="standard_rollback",  # Could be enhanced
@@ -831,13 +793,9 @@ class DeploymentPatternLearner:
                     )
 
         except Exception as e:
-            logger.warning(
-                f"Failed to learn from rollback scenario {execution_id}: {e}"
-            )
+            logger.warning(f"Failed to learn from rollback scenario {execution_id}: {e}")
 
-    def _find_similar_deployment_pattern(
-        self, characteristics: dict[str, Any]
-    ) -> dict[str, Any] | None:
+    def _find_similar_deployment_pattern(self, characteristics: dict[str, Any]) -> dict[str, Any] | None:
         """Find similar deployment patterns."""
         query = """
         MATCH (dp:DeploymentPattern)
@@ -885,9 +843,7 @@ class DeploymentPatternLearner:
 
         return result[0]["rs"] if result else None
 
-    def _create_deployment_pattern(
-        self, execution_data: dict[str, Any], characteristics: dict[str, Any]
-    ) -> str:
+    def _create_deployment_pattern(self, execution_data: dict[str, Any], characteristics: dict[str, Any]) -> str:
         """Create a new deployment pattern from successful execution."""
         pattern_id = str(uuid4())
         pattern_name = f"Pattern for {execution_data['deployment_strategy']} in {execution_data['target_environment']}"
@@ -900,9 +856,7 @@ class DeploymentPatternLearner:
             "resource_types": characteristics["resource_types"],
             "deployment_strategy": characteristics["deployment_strategy"],
             "success_criteria": json.dumps(characteristics["success_criteria"]),
-            "configuration_template": json.dumps(
-                characteristics["configuration_template"]
-            ),
+            "configuration_template": json.dumps(characteristics["configuration_template"]),
             "discovered_date": datetime.now().isoformat(),
             "success_count": 1,
             "failure_count": 0,
@@ -920,9 +874,7 @@ class DeploymentPatternLearner:
         RETURN dp.id as pattern_id
         """
 
-        result = self.client.execute_write_query(
-            query, {"props": pattern_data, "execution_id": execution_data["id"]}
-        )
+        result = self.client.execute_write_query(query, {"props": pattern_data, "execution_id": execution_data["id"]})
 
         if result:
             logger.info(f"Created new deployment pattern: {pattern_id}")
@@ -930,9 +882,7 @@ class DeploymentPatternLearner:
         else:
             raise Exception("Failed to create deployment pattern")
 
-    def _update_deployment_pattern_success(
-        self, pattern_id: str, execution_id: str
-    ) -> None:
+    def _update_deployment_pattern_success(self, pattern_id: str, execution_id: str) -> None:
         """Update deployment pattern with successful execution."""
         query = """
         MATCH (dp:DeploymentPattern {id: $pattern_id})
@@ -948,13 +898,9 @@ class DeploymentPatternLearner:
         CREATE (de)-[:FOLLOWS_DEPLOYMENT_PATTERN]->(dp)
         """
 
-        self.client.execute_write_query(
-            query, {"pattern_id": pattern_id, "execution_id": execution_id}
-        )
+        self.client.execute_write_query(query, {"pattern_id": pattern_id, "execution_id": execution_id})
 
-    def _update_rollback_scenario_execution(
-        self, scenario_id: str, rollback_successful: bool
-    ) -> None:
+    def _update_rollback_scenario_execution(self, scenario_id: str, rollback_successful: bool) -> None:
         """Update rollback scenario with execution results."""
         query = """
         MATCH (rs:RollbackScenario {id: $scenario_id})
@@ -987,22 +933,14 @@ class DeploymentPatternLearner:
         if target_environment in pattern.get("environment_types", []):
             reasons.append(f"Proven successful in {target_environment} environment")
 
-        matching_resources = set(resource_types) & set(
-            pattern.get("resource_types", [])
-        )
+        matching_resources = set(resource_types) & set(pattern.get("resource_types", []))
         if matching_resources:
-            reasons.append(
-                f"Handles similar resources: {', '.join(matching_resources)}"
-            )
+            reasons.append(f"Handles similar resources: {', '.join(matching_resources)}")
 
-        if deployment_strategy and deployment_strategy == pattern.get(
-            "deployment_strategy"
-        ):
+        if deployment_strategy and deployment_strategy == pattern.get("deployment_strategy"):
             reasons.append(f"Uses same deployment strategy: {deployment_strategy}")
 
         if pattern.get("success_count", 0) >= self.min_success_count:
-            reasons.append(
-                f"High success rate: {pattern.get('success_count', 0)} successful deployments"
-            )
+            reasons.append(f"High success rate: {pattern.get('success_count', 0)} successful deployments")
 
         return reasons

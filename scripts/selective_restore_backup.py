@@ -48,9 +48,7 @@ def main():
         print(f"  {i + 1}. {backup['filename']}")
         print(f"     Date: {backup.get('datetime', 'Unknown')}")
         print(f"     Reason: {backup.get('reason', 'Unknown')}")
-        print(
-            f"     Nodes: {backup.get('node_count', 0)}, Relationships: {backup.get('relationship_count', 0)}"
-        )
+        print(f"     Nodes: {backup.get('node_count', 0)}, Relationships: {backup.get('relationship_count', 0)}")
         print()
 
     # Get current database statistics
@@ -72,9 +70,7 @@ def main():
 
     # Ask user which backup to restore
     try:
-        choice = input(
-            f"\nSelect backup to restore (1-{len(backups)}) or 'q' to quit: "
-        ).strip()
+        choice = input(f"\nSelect backup to restore (1-{len(backups)}) or 'q' to quit: ").strip()
 
         if choice.lower() == "q":
             print("Operation cancelled")
@@ -102,9 +98,7 @@ def main():
             final_stats = client.get_database_stats()
             print("\n📊 Final database statistics:")
             print(f"   Total Nodes: {final_stats.get('total_nodes', 0)}")
-            print(
-                f"   Total Relationships: {final_stats.get('total_relationships', 0)}"
-            )
+            print(f"   Total Relationships: {final_stats.get('total_relationships', 0)}")
 
             # Show node breakdown
             if "node_counts" in final_stats:

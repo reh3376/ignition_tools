@@ -78,16 +78,12 @@ def patterns(ctx: click.Context, days: int, pattern_type: str) -> None:
         console.print("[yellow]Learning system not available[/yellow]")
         return
 
-    enhanced_cli.track_cli_usage(
-        "learning", "patterns", {"days": days, "pattern_type": pattern_type}
-    )
+    enhanced_cli.track_cli_usage("learning", "patterns", {"days": days, "pattern_type": pattern_type})
 
     try:
         with console.status("[bold blue]Analyzing patterns..."):
             if pattern_type:
-                patterns = enhanced_cli.manager.get_patterns_by_type(
-                    pattern_type, limit=10
-                )
+                patterns = enhanced_cli.manager.get_patterns_by_type(pattern_type, limit=10)
                 display_specific_patterns(pattern_type, patterns)
             else:
                 stats = enhanced_cli.manager.get_pattern_statistics()
@@ -123,9 +119,7 @@ def display_pattern_overview(stats: dict[str, Any]) -> None:
                 console.print(f"  {level.replace('_', ' ').title()}: {count} {bar}")
 
 
-def display_specific_patterns(
-    pattern_type: str, patterns: builtins.list[dict[str, Any]]
-) -> None:
+def display_specific_patterns(pattern_type: str, patterns: builtins.list[dict[str, Any]]) -> None:
     """Display specific pattern type details."""
     title = f"📊 {pattern_type.replace('_', ' ').title()} Patterns"
     console.print(f"[bold cyan]{title}[/bold cyan]\n")
@@ -157,9 +151,7 @@ def create_pattern_display(pattern: dict[str, Any]) -> str:
         usage = pattern.get("usage_count", 0)
         success = pattern.get("success_rate", 0)
 
-        return (
-            f"Template: {template}\nUsage Count: {usage}\nSuccess Rate: {success:.1%}"
-        )
+        return f"Template: {template}\nUsage Count: {usage}\nSuccess Rate: {success:.1%}"
 
     elif pattern_type == "parameter_combination":
         entity = pattern.get("entity_name", "")

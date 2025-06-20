@@ -15,11 +15,8 @@ from rich.text import Text
 try:
     from prompt_toolkit import Application
     from prompt_toolkit.shortcuts import (
-        input_dialog,
-        message_dialog,
         radiolist_dialog,
     )
-    from prompt_toolkit.styles import Style
 
     PROMPT_TOOLKIT_AVAILABLE = True
 except ImportError:
@@ -74,13 +71,9 @@ class LearningSystemCLI:
                 self.tracker = UsageTracker(self.client)
                 self.analyzer = PatternAnalyzer(self.client)
                 self.manager = PatternManager(self.client)
-                self.generator = (
-                    IgnitionScriptGenerator() if IgnitionScriptGenerator else None
-                )
+                self.generator = IgnitionScriptGenerator() if IgnitionScriptGenerator else None
             except Exception as e:
-                self.console.print(
-                    f"[yellow]Warning: Learning system not available: {e}[/yellow]"
-                )
+                self.console.print(f"[yellow]Warning: Learning system not available: {e}[/yellow]")
 
     def connect_learning_system(self) -> bool:
         """Connect to the learning system database."""
@@ -111,10 +104,9 @@ class LearningSystemCLI:
 
         try:
             # Create a session if none exists
-            if (
-                hasattr(self.tracker, "current_session_id")
-                and not self.tracker.current_session_id
-            ) and hasattr(self.tracker, "start_session"):
+            if (hasattr(self.tracker, "current_session_id") and not self.tracker.current_session_id) and hasattr(
+                self.tracker, "start_session"
+            ):
                 self.tracker.start_session(user_id="cli_user", session_type="cli_usage")
 
             # Track the command usage
@@ -140,9 +132,7 @@ class LearningSystemCLI:
 
         try:
             function_name = f"cli.{current_command}"
-            recommendations = self.analyzer.get_recommendations_for_function(
-                function_name
-            )
+            recommendations = self.analyzer.get_recommendations_for_function(function_name)
 
             # Convert to CLI commands
             cli_recommendations = []
@@ -169,11 +159,7 @@ class LearningSystemCLI:
         title.append(__version__, style="bold green")
 
         # Check learning system status
-        ls_status = (
-            "🧠 Connected"
-            if self.client and self.client.is_connected
-            else "⚠️ Disconnected"
-        )
+        ls_status = "🧠 Connected" if self.client and self.client.is_connected else "⚠️ Disconnected"
 
         welcome_panel = Panel.fit(
             f"{title}\n"

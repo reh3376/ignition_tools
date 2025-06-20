@@ -13,9 +13,7 @@ class SystemAlarmWrapper(IgnitionWrapperBase):
         return ["acknowledge", "query_status", "shelve", "unshelve"]
 
     @wrapper_function
-    def acknowledge(
-        self, alarm_ids: str | list[str], notes: str = ""
-    ) -> dict[str, Any]:
+    def acknowledge(self, alarm_ids: str | list[str], notes: str = "") -> dict[str, Any]:
         """Enhanced alarm acknowledgment with validation and logging."""
         if self.config.validate_inputs:
             if isinstance(alarm_ids, str):
@@ -42,12 +40,10 @@ class SystemAlarmWrapper(IgnitionWrapperBase):
             return result
 
         except Exception as e:
-            raise WrapperError(f"Alarm acknowledgment failed: {e}", original_error=e)
+            raise WrapperError(f"Alarm acknowledgment failed: {e}", original_error=e) from e
 
     @wrapper_function
-    def query_status(
-        self, priority: int | None = None, state: str | None = None
-    ) -> dict[str, Any]:
+    def query_status(self, priority: int | None = None, state: str | None = None) -> dict[str, Any]:
         """Enhanced alarm status query with filtering."""
         try:
             alarms = system.alarm.queryStatus(priority=priority, state=state)
@@ -60,10 +56,8 @@ class SystemAlarmWrapper(IgnitionWrapperBase):
                 "success": True,
             }
 
-            self._log_operation(
-                "Alarm status queried", f"Found {len(alarms) if alarms else 0} alarms"
-            )
+            self._log_operation("Alarm status queried", f"Found {len(alarms) if alarms else 0} alarms")
             return result
 
         except Exception as e:
-            raise WrapperError(f"Alarm status query failed: {e}", original_error=e)
+            raise WrapperError(f"Alarm status query failed: {e}", original_error=e) from e

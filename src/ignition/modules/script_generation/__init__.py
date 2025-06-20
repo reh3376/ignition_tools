@@ -21,21 +21,21 @@ from .template_storage import TemplateStorage
 from .template_versioning import TemplateVersionManager
 
 __all__ = [
+    "CodeIntelligenceIntegration",
     # Main classes
     "DynamicScriptGenerator",
-    "TemplateManager",
-    "CodeIntelligenceIntegration",
-    # Template components
-    "TemplateStorage",
-    "TemplateSearchEngine",
-    "TemplateVersionManager",
-    "TemplateSharingManager",
     # Data classes
     "TemplateCategory",
+    "TemplateManager",
     "TemplateMetadata",
+    "TemplateSearchEngine",
     "TemplateSearchResult",
+    "TemplateSharingManager",
     "TemplateStatus",
+    # Template components
+    "TemplateStorage",
     "TemplateVersion",
+    "TemplateVersionManager",
 ]
 
 __version__ = "1.0.0"

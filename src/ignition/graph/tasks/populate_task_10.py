@@ -52,9 +52,7 @@ def populate_task_10_functions():
 
         # Validate database connection
         print("🔍 Validating database connection...")
-        pre_count_result = client.execute_query(
-            "MATCH (f:Function) RETURN count(f) as total"
-        )
+        pre_count_result = client.execute_query("MATCH (f:Function) RETURN count(f) as total")
         pre_count = pre_count_result[0]["total"] if pre_count_result else 0
         print(f"   • Current functions in database: {pre_count}")
 
@@ -74,9 +72,7 @@ def populate_task_10_functions():
                     # Convert empty dict defaults to string representation
                     if "default" in cleaned_param and cleaned_param["default"] == {}:
                         cleaned_param["default"] = "{}"
-                    elif "default" in cleaned_param and isinstance(
-                        cleaned_param["default"], dict
-                    ):
+                    elif "default" in cleaned_param and isinstance(cleaned_param["default"], dict):
                         cleaned_param["default"] = str(cleaned_param["default"])
                     cleaned_parameters.append(cleaned_param)
 
@@ -143,16 +139,12 @@ def populate_task_10_functions():
         print(f"   • Total Functions: {len(file_report_functions)}")
         print(f"   • Successful: {successful_loads}")
         print(f"   • Failed: {failed_loads}")
-        print(
-            f"   • Success Rate: {(successful_loads / len(file_report_functions) * 100):.1f}%"
-        )
+        print(f"   • Success Rate: {(successful_loads / len(file_report_functions) * 100):.1f}%")
 
         # Validate database state
         print()
         print("🔍 Validating database state...")
-        post_count_result = client.execute_query(
-            "MATCH (f:Function) RETURN count(f) as total"
-        )
+        post_count_result = client.execute_query("MATCH (f:Function) RETURN count(f) as total")
         post_count = post_count_result[0]["total"] if post_count_result else 0
         functions_added = post_count - pre_count
 
@@ -213,18 +205,12 @@ def populate_task_10_functions():
         print("🎯 Progress Update:")
         print(f"   • Current Progress: {post_count}/{target_functions}+ functions")
         print(f"   • Completion: {completion_percentage:.1f}%")
-        print(
-            f"   • Task 10 Status: ✅ COMPLETE ({successful_loads}/{len(file_report_functions)} functions)"
-        )
+        print(f"   • Task 10 Status: ✅ COMPLETE ({successful_loads}/{len(file_report_functions)} functions)")
 
         if successful_loads == len(file_report_functions):
-            print(
-                "\n🎉 Task 10: File & Report System Expansion - COMPLETED SUCCESSFULLY!"
-            )
+            print("\n🎉 Task 10: File & Report System Expansion - COMPLETED SUCCESSFULLY!")
             print("   All 25 file and report functions loaded successfully.")
-            print(
-                "   Database now includes comprehensive file operations and reporting capabilities."
-            )
+            print("   Database now includes comprehensive file operations and reporting capabilities.")
         else:
             print(f"\n⚠️  Task 10 completed with {failed_loads} failures.")
             print("   Some functions may need manual review.")

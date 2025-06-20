@@ -24,9 +24,7 @@ class SFCChartController:
         self.logger = logging.getLogger(__name__)
         self.active_charts: dict[str, dict[str, Any]] = {}
 
-    def start_chart(
-        self, chart_path: str, initial_variables: dict[str, Any] | None = None
-    ) -> bool:
+    def start_chart(self, chart_path: str, initial_variables: dict[str, Any] | None = None) -> bool:
         """Start execution of an SFC chart.
 
         Args:
@@ -62,9 +60,7 @@ class SFCChartController:
             }
 
             self.active_charts[chart_path] = chart_data
-            self.logger.info(
-                f"SFC chart started successfully: {chart_path} (ID: {execution_id})"
-            )
+            self.logger.info(f"SFC chart started successfully: {chart_path} (ID: {execution_id})")
             return True
 
         except Exception as e:
@@ -168,10 +164,7 @@ class SFCChartController:
             # Calculate pause duration
             if "pause_time" in chart_data:
                 pause_duration = datetime.now() - chart_data["pause_time"]
-                chart_data["total_pause_time"] = (
-                    chart_data.get("total_pause_time", 0)
-                    + pause_duration.total_seconds()
-                )
+                chart_data["total_pause_time"] = chart_data.get("total_pause_time", 0) + pause_duration.total_seconds()
 
             self.logger.info(f"SFC chart resumed: {chart_path}")
             return True

@@ -46,7 +46,7 @@ class ArchitectureDiagram:
     target_files: list[str]
     mermaid_code: str
     svg_content: str | None = None
-    created_at: datetime = None
+    created_at: datetime | None = None
 
     def __post_init__(self) -> None:
         if self.created_at is None:
@@ -85,10 +85,16 @@ class RefactoringMetrics:
 class RefactoringTracker:
     """Tracks and documents refactoring operations."""
 
-    def __init__(self) -> None:
-        self.project_root = project_root
+    def __init__(self, project_root: str | None = None, graph_client: Any = None) -> None:
+        """Initialize refactoring tracker.
+
+        Args:
+            project_root: Root directory of the project (defaults to current directory)
+            graph_client: Optional graph client for storing refactoring data
+        """
+        self.project_root = Path(project_root) if project_root else Path.cwd()
         self.graph_client = graph_client
-        self.tracking_dir = project_root / ".refactoring_tracking"
+        self.tracking_dir = self.project_root / ".refactoring_tracking"
         self.tracking_dir.mkdir(exist_ok=True)
 
         # Initialize tracking files
@@ -124,9 +130,7 @@ class RefactoringTracker:
             logger.error(f"Failed to track refactoring operation: {e}")
             return False
 
-    def generate_architecture_diagram(
-        self, operation: RefactoringOperation
-    ) -> ArchitectureDiagram | None:
+    def generate_architecture_diagram(self, operation: RefactoringOperation) -> ArchitectureDiagram | None:
         """Generate architecture diagram for a refactoring operation."""
         try:
             if operation.operation_type == "split_file":
@@ -142,9 +146,7 @@ class RefactoringTracker:
             logger.error(f"Failed to generate architecture diagram: {e}")
             return None
 
-    def _generate_file_split_diagram(
-        self, operation: RefactoringOperation
-    ) -> ArchitectureDiagram:
+    def _generate_file_split_diagram(self, operation: RefactoringOperation) -> ArchitectureDiagram:
         """Generate diagram for file split operation."""
         source_file = operation.source_files[0] if operation.source_files else "unknown"
         target_files = operation.target_files
@@ -186,9 +188,7 @@ graph TD
 
         return diagram
 
-    def _generate_class_extraction_diagram(
-        self, operation: RefactoringOperation
-    ) -> ArchitectureDiagram:
+    def _generate_class_extraction_diagram(self, operation: RefactoringOperation) -> ArchitectureDiagram:
         """Generate diagram for class extraction operation."""
         mermaid_code = f"""
 classDiagram
@@ -220,9 +220,7 @@ classDiagram
         self._save_diagram(diagram)
         return diagram
 
-    def _generate_method_move_diagram(
-        self, operation: RefactoringOperation
-    ) -> ArchitectureDiagram:
+    def _generate_method_move_diagram(self, operation: RefactoringOperation) -> ArchitectureDiagram:
         """Generate diagram for method move operation."""
         mermaid_code = f"""
 sequenceDiagram
@@ -248,9 +246,7 @@ sequenceDiagram
         self._save_diagram(diagram)
         return diagram
 
-    def _generate_generic_diagram(
-        self, operation: RefactoringOperation
-    ) -> ArchitectureDiagram:
+    def _generate_generic_diagram(self, operation: RefactoringOperation) -> ArchitectureDiagram:
         """Generate generic diagram for other refactoring types."""
         mermaid_code = f"""
 graph LR
@@ -277,9 +273,7 @@ graph LR
         self._save_diagram(diagram)
         return diagram
 
-    def create_todo_comments(
-        self, file_path: str, refactoring_context: dict[str, Any]
-    ) -> list[TODOComment]:
+    def create_todo_comments(self, file_path: str, refactoring_context: dict[str, Any]) -> list[TODOComment]:
         """Create TODO comments for manual domain input needs."""
         todos = []
 
@@ -294,10 +288,7 @@ graph LR
             for node in ast.walk(tree):
                 if isinstance(node, ast.FunctionDef):
                     # Check for generic function names that need domain-specific naming
-                    if any(
-                        generic in node.name.lower()
-                        for generic in ["process", "handle", "manage", "execute"]
-                    ):
+                    if any(generic in node.name.lower() for generic in ["process", "handle", "manage", "execute"]):
                         todo = TODOComment(
                             file_path=file_path,
                             line_number=node.lineno,
@@ -310,10 +301,7 @@ graph LR
 
                 elif isinstance(node, ast.ClassDef):
                     # Check for generic class names
-                    if any(
-                        generic in node.name.lower()
-                        for generic in ["manager", "handler", "processor"]
-                    ):
+                    if any(generic in node.name.lower() for generic in ["manager", "handler", "processor"]):
                         todo = TODOComment(
                             file_path=file_path,
                             line_number=node.lineno,
@@ -326,9 +314,7 @@ graph LR
 
                 elif isinstance(node, ast.Constant) and isinstance(node.value, str):
                     # Check for magic strings that might need configuration
-                    if len(node.value) > 10 and any(
-                        char.isdigit() for char in node.value
-                    ):
+                    if len(node.value) > 10 and any(char.isdigit() for char in node.value):
                         todo = TODOComment(
                             file_path=file_path,
                             line_number=node.lineno,
@@ -363,9 +349,7 @@ graph LR
 
         return todos
 
-    def track_refactoring_history_in_graph(
-        self, operation: RefactoringOperation
-    ) -> bool:
+    def track_refactoring_history_in_graph(self, operation: RefactoringOperation) -> bool:
         """Store refactoring history in Neo4j graph database."""
         if not self.graph_client:
             logger.warning("No graph client available for storing refactoring history")
@@ -409,31 +393,23 @@ graph LR
 
             # Link to affected files
             for source_file in operation.source_files:
-                self._link_operation_to_file(
-                    operation.operation_id, source_file, "SOURCE"
-                )
+                self._link_operation_to_file(operation.operation_id, source_file, "SOURCE")
 
             for target_file in operation.target_files:
-                self._link_operation_to_file(
-                    operation.operation_id, target_file, "TARGET"
-                )
+                self._link_operation_to_file(operation.operation_id, target_file, "TARGET")
 
             # Link to git commits
             for commit_hash in operation.git_commits:
                 self._link_operation_to_commit(operation.operation_id, commit_hash)
 
-            logger.info(
-                f"Stored refactoring operation {operation.operation_id} in graph database"
-            )
+            logger.info(f"Stored refactoring operation {operation.operation_id} in graph database")
             return True
 
         except Exception as e:
             logger.error(f"Failed to store refactoring history in graph: {e}")
             return False
 
-    def _link_operation_to_file(
-        self, operation_id: str, file_path: str, relationship_type: str
-    ) -> None:
+    def _link_operation_to_file(self, operation_id: str, file_path: str, relationship_type: str) -> None:
         """Link refactoring operation to a file."""
         cypher = """
         MATCH (ro:RefactoringOperation {operation_id: $operation_id})
@@ -458,13 +434,9 @@ graph LR
         MERGE (ro)-[:IMPLEMENTED_IN]->(gc)
         """
 
-        self.graph_client.execute_query(
-            cypher, {"operation_id": operation_id, "commit_hash": commit_hash}
-        )
+        self.graph_client.execute_query(cypher, {"operation_id": operation_id, "commit_hash": commit_hash})
 
-    def build_refactoring_impact_report(
-        self, operation_id: str | None = None, days: int = 30
-    ) -> dict[str, Any]:
+    def build_refactoring_impact_report(self, operation_id: str | None = None, days: int = 30) -> dict[str, Any]:
         """Build comprehensive refactoring impact report."""
         try:
             if operation_id:
@@ -487,21 +459,14 @@ graph LR
         operation = RefactoringOperation(**operation_data)
 
         # Calculate metrics
-        complexity_improvement = (
-            operation.complexity_before - operation.complexity_after
-        )
-        maintainability_improvement = (
-            operation.maintainability_after - operation.maintainability_before
-        )
+        complexity_improvement = operation.complexity_before - operation.complexity_after
+        maintainability_improvement = operation.maintainability_after - operation.maintainability_before
 
         # Get related TODOs
         related_todos = [
             todo
             for todo in self.todos.values()
-            if any(
-                file_path in todo["file_path"]
-                for file_path in operation.source_files + operation.target_files
-            )
+            if any(file_path in todo["file_path"] for file_path in operation.source_files + operation.target_files)
         ]
 
         # Get architecture diagram
@@ -517,8 +482,7 @@ graph LR
             "timestamp": operation.timestamp.isoformat(),
             "success": operation.success,
             "impact_analysis": {
-                "files_affected": len(operation.source_files)
-                + len(operation.target_files),
+                "files_affected": len(operation.source_files) + len(operation.target_files),
                 "lines_moved": operation.lines_moved,
                 "complexity_improvement": complexity_improvement,
                 "maintainability_improvement": maintainability_improvement,
@@ -541,9 +505,7 @@ graph LR
         cutoff_date = datetime.now().timestamp() - (days * 24 * 60 * 60)
 
         recent_operations = [
-            op
-            for op in self.operations.values()
-            if datetime.fromisoformat(op["timestamp"]).timestamp() > cutoff_date
+            op for op in self.operations.values() if datetime.fromisoformat(op["timestamp"]).timestamp() > cutoff_date
         ]
 
         if not recent_operations:
@@ -555,9 +517,7 @@ graph LR
 
         # Calculate aggregate metrics
         total_lines_moved = sum(op["lines_moved"] for op in recent_operations)
-        total_complexity_reduction = sum(
-            op["complexity_before"] - op["complexity_after"] for op in recent_operations
-        )
+        total_complexity_reduction = sum(op["complexity_before"] - op["complexity_after"] for op in recent_operations)
         successful_operations = sum(1 for op in recent_operations if op["success"])
 
         # Group by operation type
@@ -570,9 +530,7 @@ graph LR
 
         # Get all TODOs from the period
         recent_todos = [
-            todo
-            for todo in self.todos.values()
-            if datetime.fromisoformat(todo["created_at"]).timestamp() > cutoff_date
+            todo for todo in self.todos.values() if datetime.fromisoformat(todo["created_at"]).timestamp() > cutoff_date
         ]
 
         report = {
@@ -584,39 +542,26 @@ graph LR
                 "success_rate": successful_operations / len(recent_operations) * 100,
                 "total_lines_moved": total_lines_moved,
                 "total_complexity_reduction": total_complexity_reduction,
-                "average_impact_score": sum(
-                    op["impact_score"] for op in recent_operations
-                )
-                / len(recent_operations),
+                "average_impact_score": sum(op["impact_score"] for op in recent_operations) / len(recent_operations),
             },
             "operation_types": operation_types,
             "todos_created": len(recent_todos),
             "todos_by_priority": {
                 "high": sum(1 for todo in recent_todos if todo["priority"] == "high"),
-                "medium": sum(
-                    1 for todo in recent_todos if todo["priority"] == "medium"
-                ),
+                "medium": sum(1 for todo in recent_todos if todo["priority"] == "medium"),
                 "low": sum(1 for todo in recent_todos if todo["priority"] == "low"),
             },
-            "recommendations": self._generate_period_recommendations(
-                recent_operations, recent_todos
-            ),
+            "recommendations": self._generate_period_recommendations(recent_operations, recent_todos),
         }
 
         return report
 
-    def _generate_operation_recommendations(
-        self, operation: RefactoringOperation
-    ) -> list[str]:
+    def _generate_operation_recommendations(self, operation: RefactoringOperation) -> list[str]:
         """Generate recommendations based on a specific operation."""
         recommendations = []
 
-        complexity_improvement = (
-            operation.complexity_before - operation.complexity_after
-        )
-        maintainability_improvement = (
-            operation.maintainability_after - operation.maintainability_before
-        )
+        complexity_improvement = operation.complexity_before - operation.complexity_after
+        maintainability_improvement = operation.maintainability_after - operation.maintainability_before
 
         if complexity_improvement > 10:
             recommendations.append(
@@ -638,31 +583,21 @@ graph LR
             )
 
         if not operation.success:
-            recommendations.append(
-                "Operation failed. Review logs and consider rollback if necessary."
-            )
+            recommendations.append("Operation failed. Review logs and consider rollback if necessary.")
 
         if operation.impact_score > 0.8:
-            recommendations.append(
-                "High impact operation. Monitor for any unexpected side effects."
-            )
+            recommendations.append("High impact operation. Monitor for any unexpected side effects.")
 
         return recommendations
 
-    def _generate_period_recommendations(
-        self, operations: list[dict], todos: list[dict]
-    ) -> list[str]:
+    def _generate_period_recommendations(self, operations: list[dict], todos: list[dict]) -> list[str]:
         """Generate recommendations based on period analysis."""
         recommendations = []
 
         if len(operations) > 10:
-            recommendations.append(
-                "High refactoring activity. Ensure adequate testing and code review processes."
-            )
+            recommendations.append("High refactoring activity. Ensure adequate testing and code review processes.")
 
-        success_rate = (
-            sum(1 for op in operations if op["success"]) / len(operations) * 100
-        )
+        success_rate = sum(1 for op in operations if op["success"]) / len(operations) * 100
         if success_rate < 80:
             recommendations.append(
                 f"Success rate is {success_rate:.1f}%. Review failed operations and improve processes."
@@ -670,18 +605,14 @@ graph LR
 
         high_priority_todos = sum(1 for todo in todos if todo["priority"] == "high")
         if high_priority_todos > 5:
-            recommendations.append(
-                f"{high_priority_todos} high-priority TODOs created. Address these promptly."
-            )
+            recommendations.append(f"{high_priority_todos} high-priority TODOs created. Address these promptly.")
 
-        avg_complexity_reduction = sum(
-            op["complexity_before"] - op["complexity_after"] for op in operations
-        ) / len(operations)
+        avg_complexity_reduction = sum(op["complexity_before"] - op["complexity_after"] for op in operations) / len(
+            operations
+        )
 
         if avg_complexity_reduction < 5:
-            recommendations.append(
-                "Low average complexity reduction. Consider more aggressive refactoring strategies."
-            )
+            recommendations.append("Low average complexity reduction. Consider more aggressive refactoring strategies.")
 
         return recommendations
 
@@ -701,9 +632,7 @@ graph LR
         # This calls the method we already implemented
         self.track_refactoring_history_in_graph(operation)
 
-    def _generate_operation_documentation(
-        self, operation: RefactoringOperation
-    ) -> None:
+    def _generate_operation_documentation(self, operation: RefactoringOperation) -> None:
         """Generate documentation for the operation."""
         # Generate architecture diagram
         self.generate_architecture_diagram(operation)
@@ -716,9 +645,7 @@ graph LR
                     {
                         "operation_id": operation.operation_id,
                         "split_type": (
-                            "responsibility_separation"
-                            if operation.operation_type == "split_file"
-                            else "other"
+                            "responsibility_separation" if operation.operation_type == "split_file" else "other"
                         ),
                     },
                 )
@@ -780,30 +707,20 @@ graph LR
     def get_refactoring_statistics(self) -> dict[str, Any]:
         """Get comprehensive refactoring statistics."""
         total_operations = len(self.operations)
-        successful_operations = sum(
-            1 for op in self.operations.values() if op["success"]
-        )
+        successful_operations = sum(1 for op in self.operations.values() if op["success"])
         total_lines_moved = sum(op["lines_moved"] for op in self.operations.values())
 
         # Calculate average improvements
-        complexity_improvements = [
-            op["complexity_before"] - op["complexity_after"]
-            for op in self.operations.values()
-        ]
+        complexity_improvements = [op["complexity_before"] - op["complexity_after"] for op in self.operations.values()]
         avg_complexity_improvement = (
-            sum(complexity_improvements) / len(complexity_improvements)
-            if complexity_improvements
-            else 0
+            sum(complexity_improvements) / len(complexity_improvements) if complexity_improvements else 0
         )
 
         maintainability_improvements = [
-            op["maintainability_after"] - op["maintainability_before"]
-            for op in self.operations.values()
+            op["maintainability_after"] - op["maintainability_before"] for op in self.operations.values()
         ]
         avg_maintainability_improvement = (
-            sum(maintainability_improvements) / len(maintainability_improvements)
-            if maintainability_improvements
-            else 0
+            sum(maintainability_improvements) / len(maintainability_improvements) if maintainability_improvements else 0
         )
 
         # TODO statistics
@@ -814,11 +731,7 @@ graph LR
             "operations": {
                 "total": total_operations,
                 "successful": successful_operations,
-                "success_rate": (
-                    (successful_operations / total_operations * 100)
-                    if total_operations > 0
-                    else 0
-                ),
+                "success_rate": ((successful_operations / total_operations * 100) if total_operations > 0 else 0),
                 "total_lines_moved": total_lines_moved,
             },
             "improvements": {
@@ -828,9 +741,7 @@ graph LR
             "todos": {
                 "total": total_todos,
                 "resolved": resolved_todos,
-                "resolution_rate": (
-                    (resolved_todos / total_todos * 100) if total_todos > 0 else 0
-                ),
+                "resolution_rate": ((resolved_todos / total_todos * 100) if total_todos > 0 else 0),
             },
             "diagrams_generated": len(list(self.diagrams_dir.glob("*.json"))),
         }
@@ -838,7 +749,7 @@ graph LR
 
 def main() -> None:
     """Main function for testing the refactoring tracker."""
-    tracker = RefactoringTracker(Path.cwd())
+    tracker = RefactoringTracker(str(Path.cwd()))
 
     # Example operation
     operation = RefactoringOperation(

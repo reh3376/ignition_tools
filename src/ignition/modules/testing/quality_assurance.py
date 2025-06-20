@@ -137,9 +137,7 @@ def _check_tool_available(tool: str) -> bool:
         True if tool is available
     """
     try:
-        result = subprocess.run(
-            [tool, "--version"], capture_output=True, timeout=10, check=False
-        )
+        result = subprocess.run([tool, "--version"], capture_output=True, timeout=10, check=False)
         return result.returncode == 0
     except (subprocess.TimeoutExpired, FileNotFoundError):
         return False
@@ -159,9 +157,7 @@ def format_qa_error(error: Exception) -> str:
     error_str = str(error).lower()
 
     if "timeout" in error_str:
-        return (
-            "Quality check timed out. Consider increasing timeout or optimizing checks."
-        )
+        return "Quality check timed out. Consider increasing timeout or optimizing checks."
     elif "permission" in error_str or "access" in error_str:
         return "Permission denied. Check file permissions and user access rights."
     elif "not found" in error_str or "command not found" in error_str:
@@ -196,9 +192,7 @@ class QualityAssurancePipeline:
         self.fail_fast = os.getenv("QA_FAIL_FAST", "false").lower() == "true"
 
     @asynccontextmanager
-    async def qa_context(
-        self, module_path: str
-    ) -> AsyncIterator["QualityAssurancePipeline"]:
+    async def qa_context(self, module_path: str) -> AsyncIterator["QualityAssurancePipeline"]:
         """Create QA context with resource management.
 
         Following patterns from crawl_mcp.py for context management.
@@ -304,10 +298,7 @@ class QualityAssurancePipeline:
 
         # Run checks in parallel with semaphore for concurrency control
         semaphore = asyncio.Semaphore(self.parallel_checks)
-        tasks = [
-            asyncio.create_task(self._run_single_check(check, semaphore))
-            for check in self.checks
-        ]
+        tasks = [asyncio.create_task(self._run_single_check(check, semaphore)) for check in self.checks]
 
         try:
             await asyncio.gather(*tasks, return_exceptions=not self.fail_fast)
@@ -326,9 +317,7 @@ class QualityAssurancePipeline:
         self.report = self._generate_report(duration)
         return self.report
 
-    async def _run_single_check(
-        self, check: QualityCheck, semaphore: asyncio.Semaphore
-    ) -> None:
+    async def _run_single_check(self, check: QualityCheck, semaphore: asyncio.Semaphore) -> None:
         """Run a single quality check.
 
         Args:
@@ -351,9 +340,7 @@ class QualityAssurancePipeline:
                     cwd=check.working_dir,
                 )
 
-                stdout, stderr = await asyncio.wait_for(
-                    process.communicate(), timeout=check.timeout
-                )
+                stdout, stderr = await asyncio.wait_for(process.communicate(), timeout=check.timeout)
 
                 check.exit_code = process.returncode
                 check.output = stdout.decode("utf-8") if stdout else ""
@@ -389,27 +376,17 @@ class QualityAssurancePipeline:
         Returns:
             QualityReport with results
         """
-        passed_checks = sum(
-            1 for check in self.checks if check.status == QualityCheckStatus.PASSED
-        )
-        failed_checks = sum(
-            1 for check in self.checks if check.status == QualityCheckStatus.FAILED
-        )
-        skipped_checks = sum(
-            1 for check in self.checks if check.status == QualityCheckStatus.SKIPPED
-        )
-        error_checks = sum(
-            1 for check in self.checks if check.status == QualityCheckStatus.ERROR
-        )
+        passed_checks = sum(1 for check in self.checks if check.status == QualityCheckStatus.PASSED)
+        failed_checks = sum(1 for check in self.checks if check.status == QualityCheckStatus.FAILED)
+        skipped_checks = sum(1 for check in self.checks if check.status == QualityCheckStatus.SKIPPED)
+        error_checks = sum(1 for check in self.checks if check.status == QualityCheckStatus.ERROR)
 
         # Determine overall status
         if error_checks > 0:
             overall_status = "error"
         elif failed_checks > 0:
             required_failures = sum(
-                1
-                for check in self.checks
-                if check.status == QualityCheckStatus.FAILED and check.required
+                1 for check in self.checks if check.status == QualityCheckStatus.FAILED and check.required
             )
             overall_status = "failed" if required_failures > 0 else "warning"
         else:
@@ -441,56 +418,34 @@ class QualityAssurancePipeline:
         """
         recommendations = []
 
-        failed_checks = [
-            check for check in self.checks if check.status == QualityCheckStatus.FAILED
-        ]
-        error_checks = [
-            check for check in self.checks if check.status == QualityCheckStatus.ERROR
-        ]
+        failed_checks = [check for check in self.checks if check.status == QualityCheckStatus.FAILED]
+        error_checks = [check for check in self.checks if check.status == QualityCheckStatus.ERROR]
 
         if failed_checks:
-            recommendations.append(
-                "Fix code quality issues identified by failed checks"
-            )
+            recommendations.append("Fix code quality issues identified by failed checks")
 
             # Specific recommendations based on check types
             for check in failed_checks:
                 if check.check_type == QualityCheckType.CODE_STYLE:
-                    recommendations.append(
-                        "Run 'ruff check --fix' to automatically fix style issues"
-                    )
+                    recommendations.append("Run 'ruff check --fix' to automatically fix style issues")
                 elif check.check_type == QualityCheckType.TYPE_CHECKING:
-                    recommendations.append(
-                        "Add type annotations and fix type-related issues"
-                    )
+                    recommendations.append("Add type annotations and fix type-related issues")
                 elif check.check_type == QualityCheckType.SECURITY_SCAN:
                     recommendations.append("Review and fix security vulnerabilities")
 
         if error_checks:
             recommendations.append("Investigate and resolve errors in quality checks")
-            missing_tools = [
-                check.name
-                for check in error_checks
-                if "not found" in check.error_output.lower()
-            ]
+            missing_tools = [check.name for check in error_checks if "not found" in check.error_output.lower()]
             if missing_tools:
-                recommendations.append(
-                    f"Install missing tools: {', '.join(missing_tools)}"
-                )
+                recommendations.append(f"Install missing tools: {', '.join(missing_tools)}")
 
-        skipped_checks = [
-            check for check in self.checks if check.status == QualityCheckStatus.SKIPPED
-        ]
+        skipped_checks = [check for check in self.checks if check.status == QualityCheckStatus.SKIPPED]
         if skipped_checks:
             tools = [check.command.split()[0] for check in skipped_checks]
-            recommendations.append(
-                f"Install optional tools for comprehensive checks: {', '.join(set(tools))}"
-            )
+            recommendations.append(f"Install optional tools for comprehensive checks: {', '.join(set(tools))}")
 
         if not recommendations:
-            recommendations.append(
-                "All quality checks passed - module meets quality standards"
-            )
+            recommendations.append("All quality checks passed - module meets quality standards")
 
         return recommendations
 

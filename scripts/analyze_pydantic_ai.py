@@ -45,9 +45,7 @@ PYDANTIC_AI_REPO = "https://github.com/pydantic/pydantic-ai.git"
 def main():
     """Main function to analyze Pydantic AI repository."""
     parser = argparse.ArgumentParser(description="Analyze Pydantic AI repository")
-    parser.add_argument(
-        "--branch", default="main", help="Branch to analyze (default: main)"
-    )
+    parser.add_argument("--branch", default="main", help="Branch to analyze (default: main)")
     parser.add_argument(
         "--clear-existing",
         action="store_true",
@@ -98,9 +96,7 @@ def main():
 
             # Clear existing data if requested
             if args.clear_existing:
-                progress.update(
-                    task, description="Clearing existing repository data..."
-                )
+                progress.update(task, description="Clearing existing repository data...")
                 schema = RepositorySchema(client)
                 schema.drop_repository_schema()
                 console.print("🗑️  Cleared existing repository data", style="yellow")

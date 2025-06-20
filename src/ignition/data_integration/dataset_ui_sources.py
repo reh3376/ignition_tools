@@ -153,9 +153,7 @@ class DatasetUISourceConfigurators:
                 help="REST API endpoint",
             )
 
-            st.selectbox(
-                "HTTP Method", options=["GET", "POST"], help="HTTP method to use"
-            )
+            st.selectbox("HTTP Method", options=["GET", "POST"], help="HTTP method to use")
 
         with col2:
             auth_type = st.selectbox(
@@ -165,6 +163,4 @@ class DatasetUISourceConfigurators:
             )
 
             if auth_type != "none":
-                st.text_input(
-                    "Auth Value", type="password", help="Authentication credential"
-                )
+                st.text_input("Auth Value", type="password", help="Authentication credential")

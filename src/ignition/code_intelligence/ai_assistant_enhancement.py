@@ -64,14 +64,10 @@ class AIAssistantEnhancement:
 
                 self.embedder = SentenceTransformer("all-MiniLM-L6-v2")
             except ImportError:
-                logger.warning(
-                    "SentenceTransformer not available - semantic search disabled"
-                )
+                logger.warning("SentenceTransformer not available - semantic search disabled")
                 self.embedder = None
 
-    def get_smart_context(
-        self, file_path: str, context_size: str = "medium"
-    ) -> CodeContext:
+    def get_smart_context(self, file_path: str, context_size: str = "medium") -> CodeContext:
         """Get intelligent context for a file instead of reading entire file.
 
         Args:
@@ -92,9 +88,7 @@ class AIAssistantEnhancement:
             recent_changes = []
             if self.git_integration:
                 try:
-                    changes = self.git_integration.get_recent_changes(
-                        file_path, days=30
-                    )
+                    changes = self.git_integration.get_recent_changes(file_path, days=30)
                     recent_changes = changes[:5]  # Limit to 5 most recent
                 except Exception as e:
                     logger.debug(f"Could not get recent changes: {e}")
@@ -117,8 +111,7 @@ class AIAssistantEnhancement:
                 file_path=file_path,
                 file_metrics=base_context["file"],
                 classes=base_context.get("classes", []),
-                methods=base_context.get("class_methods", [])
-                + base_context.get("file_methods", []),
+                methods=base_context.get("class_methods", []) + base_context.get("file_methods", []),
                 imports=base_context.get("imports", []),
                 dependencies=[],  # Will be populated by dependency analysis
                 dependents=base_context.get("dependents", []),
@@ -138,9 +131,7 @@ class AIAssistantEnhancement:
             logger.error(f"Failed to get smart context for {file_path}: {e}")
             return self._empty_context(file_path)
 
-    def get_relevant_snippets(
-        self, file_path: str, query: str, max_snippets: int = 5
-    ) -> list[dict[str, Any]]:
+    def get_relevant_snippets(self, file_path: str, query: str, max_snippets: int = 5) -> list[dict[str, Any]]:
         """Get relevant code snippets instead of entire file content.
 
         Args:
@@ -161,9 +152,7 @@ class AIAssistantEnhancement:
 
             # Search in classes and methods
             for cls in context.get("classes", []):
-                if self._is_relevant(
-                    cls.get("name", ""), cls.get("docstring", ""), query
-                ):
+                if self._is_relevant(cls.get("name", ""), cls.get("docstring", ""), query):
                     snippets.append(
                         {
                             "type": "class",
@@ -175,12 +164,8 @@ class AIAssistantEnhancement:
                         }
                     )
 
-            for method in context.get("class_methods", []) + context.get(
-                "file_methods", []
-            ):
-                if self._is_relevant(
-                    method.get("name", ""), method.get("docstring", ""), query
-                ):
+            for method in context.get("class_methods", []) + context.get("file_methods", []):
+                if self._is_relevant(method.get("name", ""), method.get("docstring", ""), query):
                     snippets.append(
                         {
                             "type": "method",
@@ -202,9 +187,7 @@ class AIAssistantEnhancement:
             logger.error(f"Failed to get relevant snippets for {file_path}: {e}")
             return []
 
-    def suggest_similar_implementations(
-        self, file_path: str, element_name: str
-    ) -> list[dict[str, Any]]:
+    def suggest_similar_implementations(self, file_path: str, element_name: str) -> list[dict[str, Any]]:
         """Suggest similar implementations from the codebase.
 
         Args:
@@ -221,9 +204,7 @@ class AIAssistantEnhancement:
             similar_files = self.code_manager.find_similar_files(file_path, limit=10)
 
             for similar_file in similar_files:
-                similar_context = self.code_manager.get_file_context(
-                    similar_file["path"]
-                )
+                similar_context = self.code_manager.get_file_context(similar_file["path"])
                 if not similar_context:
                     continue
 
@@ -235,18 +216,14 @@ class AIAssistantEnhancement:
                                 "type": "class",
                                 "name": cls["name"],
                                 "file_path": similar_file["path"],
-                                "similarity_score": similar_file.get(
-                                    "similarity_score", 0
-                                ),
+                                "similarity_score": similar_file.get("similarity_score", 0),
                                 "complexity": cls.get("complexity", 0),
                                 "docstring": cls.get("docstring", ""),
                                 "usage_pattern": "class_implementation",
                             }
                         )
 
-                for method in similar_context.get(
-                    "class_methods", []
-                ) + similar_context.get("file_methods", []):
+                for method in similar_context.get("class_methods", []) + similar_context.get("file_methods", []):
                     if self._names_similar(method["name"], element_name):
                         suggestions.append(
                             {
@@ -254,9 +231,7 @@ class AIAssistantEnhancement:
                                 "name": method["name"],
                                 "class_name": method.get("class_name"),
                                 "file_path": similar_file["path"],
-                                "similarity_score": similar_file.get(
-                                    "similarity_score", 0
-                                ),
+                                "similarity_score": similar_file.get("similarity_score", 0),
                                 "complexity": method.get("complexity", 0),
                                 "signature": method.get("signature", ""),
                                 "usage_pattern": "method_implementation",
@@ -271,9 +246,7 @@ class AIAssistantEnhancement:
             logger.error(f"Failed to suggest similar implementations: {e}")
             return []
 
-    def analyze_change_impact(
-        self, file_path: str, change_description: str = ""
-    ) -> ChangeImpactAnalysis:
+    def analyze_change_impact(self, file_path: str, change_description: str = "") -> ChangeImpactAnalysis:
         """Analyze the potential impact of changes to a file.
 
         Args:
@@ -286,9 +259,7 @@ class AIAssistantEnhancement:
         try:
             # Get dependency graph
             dep_graph = self.code_manager.get_dependency_graph(file_path, depth=3)
-            affected_files = [
-                dep["target"] for dep in dep_graph.get("dependencies", [])
-            ]
+            affected_files = [dep["target"] for dep in dep_graph.get("dependencies", [])]
 
             # Get file context for analysis
             context = self.code_manager.get_file_context(file_path)
@@ -296,9 +267,7 @@ class AIAssistantEnhancement:
                 return self._empty_impact_analysis()
 
             # Predict breaking changes
-            breaking_changes = self._predict_breaking_changes(
-                context, change_description
-            )
+            breaking_changes = self._predict_breaking_changes(context, change_description)
 
             # Identify test coverage gaps
             test_gaps = self._identify_test_coverage_gaps(file_path, affected_files)
@@ -307,9 +276,7 @@ class AIAssistantEnhancement:
             rollback_recs = self._generate_rollback_recommendations(file_path, context)
 
             # Calculate risk level
-            risk_level, confidence = self._calculate_risk_level(
-                context, affected_files, breaking_changes, test_gaps
-            )
+            risk_level, confidence = self._calculate_risk_level(context, affected_files, breaking_changes, test_gaps)
 
             return ChangeImpactAnalysis(
                 affected_files=affected_files[:10],  # Limit to top 10
@@ -378,9 +345,7 @@ class AIAssistantEnhancement:
                 )
 
             # Check for methods with high complexity
-            all_methods = context.get("class_methods", []) + context.get(
-                "file_methods", []
-            )
+            all_methods = context.get("class_methods", []) + context.get("file_methods", [])
             for method in all_methods:
                 if method.get("complexity", 0) > 10:
                     opportunities.append(
@@ -409,16 +374,12 @@ class AIAssistantEnhancement:
 
             # Sort by priority
             priority_order = {"high": 3, "medium": 2, "low": 1}
-            opportunities.sort(
-                key=lambda x: priority_order.get(x["priority"], 0), reverse=True
-            )
+            opportunities.sort(key=lambda x: priority_order.get(x["priority"], 0), reverse=True)
 
             return opportunities
 
         except Exception as e:
-            logger.error(
-                f"Failed to get refactoring opportunities for {file_path}: {e}"
-            )
+            logger.error(f"Failed to get refactoring opportunities for {file_path}: {e}")
             return []
 
     def track_code_evolution(self, file_path: str, days: int = 90) -> dict[str, Any]:
@@ -452,15 +413,12 @@ class AIAssistantEnhancement:
             recent_changes = [
                 change
                 for change in evolution.get("changes", [])
-                if (datetime.now() - datetime.fromisoformat(change["date"])).days
-                <= days
+                if (datetime.now() - datetime.fromisoformat(change["date"])).days <= days
             ]
 
             if len(recent_changes) > 10:
                 trends["change_frequency"] = "high"
-                trends["insights"].append(
-                    "File has high change frequency - consider stability improvements"
-                )
+                trends["insights"].append("File has high change frequency - consider stability improvements")
             elif len(recent_changes) > 5:
                 trends["change_frequency"] = "medium"
 
@@ -504,9 +462,7 @@ class AIAssistantEnhancement:
             confidence_score=0.0,
         )
 
-    def _get_refactoring_suggestions(
-        self, context: dict[str, Any]
-    ) -> list[dict[str, Any]]:
+    def _get_refactoring_suggestions(self, context: dict[str, Any]) -> list[dict[str, Any]]:
         """Generate refactoring suggestions based on context."""
         suggestions = []
 
@@ -614,14 +570,9 @@ class AIAssistantEnhancement:
             return True
 
         # Similar patterns (simple heuristic)
-        return (
-            len(set(name1_lower) & set(name2_lower))
-            > len(min(name1_lower, name2_lower)) * 0.6
-        )
+        return len(set(name1_lower) & set(name2_lower)) > len(min(name1_lower, name2_lower)) * 0.6
 
-    def _predict_breaking_changes(
-        self, context: dict[str, Any], description: str
-    ) -> list[dict[str, Any]]:
+    def _predict_breaking_changes(self, context: dict[str, Any], description: str) -> list[dict[str, Any]]:
         """Predict potential breaking changes."""
         breaking_changes = []
 
@@ -650,9 +601,7 @@ class AIAssistantEnhancement:
 
         return breaking_changes
 
-    def _identify_test_coverage_gaps(
-        self, file_path: str, affected_files: list[str]
-    ) -> list[dict[str, Any]]:
+    def _identify_test_coverage_gaps(self, file_path: str, affected_files: list[str]) -> list[dict[str, Any]]:
         """Identify gaps in test coverage."""
         gaps = []
 
@@ -678,21 +627,15 @@ class AIAssistantEnhancement:
 
         return gaps
 
-    def _generate_rollback_recommendations(
-        self, file_path: str, context: dict[str, Any]
-    ) -> list[str]:
+    def _generate_rollback_recommendations(self, file_path: str, context: dict[str, Any]) -> list[str]:
         """Generate rollback recommendations."""
         recommendations = []
 
         if len(context.get("dependents", [])) > 10:
-            recommendations.append(
-                "Create backup before changes due to high number of dependents"
-            )
+            recommendations.append("Create backup before changes due to high number of dependents")
 
         if context.get("file", {}).get("complexity", 0) > 50:
-            recommendations.append(
-                "Test thoroughly before deployment due to high complexity"
-            )
+            recommendations.append("Test thoroughly before deployment due to high complexity")
 
         recommendations.append("Use feature flags for gradual rollout")
         recommendations.append("Monitor error rates after deployment")

@@ -137,12 +137,8 @@ class ModuleConfigurationManager:
         self._validator.add_optional_key("log_level")
 
         # Add validators
-        self._validator.add_validator(
-            "module_id", lambda x: isinstance(x, str) and len(x) > 0
-        )
-        self._validator.add_validator(
-            "version", lambda x: isinstance(x, str) and len(x) > 0
-        )
+        self._validator.add_validator("module_id", lambda x: isinstance(x, str) and len(x) > 0)
+        self._validator.add_validator("version", lambda x: isinstance(x, str) and len(x) > 0)
         self._validator.add_validator("enabled", lambda x: isinstance(x, bool))
         self._validator.add_validator("debug_mode", lambda x: isinstance(x, bool))
         self._validator.add_validator(
@@ -212,9 +208,7 @@ class ModuleConfigurationManager:
         """
         try:
             if self._config_file.exists():
-                self._module.logger.info(
-                    f"Loading configuration from {self._config_file}"
-                )
+                self._module.logger.info(f"Loading configuration from {self._config_file}")
 
                 with open(self._config_file, encoding="utf-8") as f:
                     file_config = json.load(f)
@@ -231,9 +225,7 @@ class ModuleConfigurationManager:
                 # Validate configuration
                 is_valid, errors = self._validator.validate(self._config)
                 if not is_valid:
-                    self._module.logger.error(
-                        f"Configuration validation failed: {errors}"
-                    )
+                    self._module.logger.error(f"Configuration validation failed: {errors}")
                     return False
 
                 self._config_loaded = True
@@ -337,9 +329,7 @@ class ModuleConfigurationManager:
                 env_overrides[config_key] = parsed_value
 
         if env_overrides:
-            self._module.logger.info(
-                f"Applying environment variable overrides: {list(env_overrides.keys())}"
-            )
+            self._module.logger.info(f"Applying environment variable overrides: {list(env_overrides.keys())}")
             self._config.update(env_overrides)
 
     def get_environment_prefix(self) -> str:
@@ -438,9 +428,7 @@ class ModuleConfigurationManager:
         """Create backup of current configuration."""
         try:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            backup_file = (
-                self._backup_dir / f"{self._module.metadata.id}_{timestamp}.json"
-            )
+            backup_file = self._backup_dir / f"{self._module.metadata.id}_{timestamp}.json"
 
             if self._config_file.exists():
                 import shutil
@@ -483,9 +471,7 @@ class ModuleConfigurationManager:
 
             # Reload configuration
             if self.reload_configuration():
-                self._module.logger.info(
-                    f"Configuration restored from backup: {backup_file}"
-                )
+                self._module.logger.info(f"Configuration restored from backup: {backup_file}")
                 return True
             else:
                 raise ConfigurationError("Failed to load restored configuration")
@@ -549,9 +535,7 @@ class ModuleConfigurationManager:
         """
         try:
             if len(self._config_history) < steps:
-                raise ConfigurationError(
-                    f"Not enough history for {steps} step rollback"
-                )
+                raise ConfigurationError(f"Not enough history for {steps} step rollback")
 
             # Get previous configuration
             target_index = -(steps + 1)
@@ -622,9 +606,7 @@ class ModuleConfigurationManager:
             # Validate imported configuration
             is_valid, errors = self._validator.validate(imported_config)
             if not is_valid:
-                raise ConfigurationError(
-                    f"Imported configuration validation failed: {errors}"
-                )
+                raise ConfigurationError(f"Imported configuration validation failed: {errors}")
 
             # Save imported configuration
             if self.save_configuration(imported_config):
@@ -656,9 +638,7 @@ class ModuleConfigurationManager:
 
     def __str__(self) -> str:
         """String representation of the configuration manager."""
-        return (
-            f"ConfigManager({self._module.metadata.name}, loaded={self._config_loaded})"
-        )
+        return f"ConfigManager({self._module.metadata.name}, loaded={self._config_loaded})"
 
     def __repr__(self) -> str:
         """Detailed string representation of the configuration manager."""

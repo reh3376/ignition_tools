@@ -118,9 +118,7 @@ class ContextProcessor:
         except Exception:
             return False
 
-    def process_batch(
-        self, files: list[Path], progress_task=None, progress=None
-    ) -> dict:
+    def process_batch(self, files: list[Path], progress_task=None, progress=None) -> dict:
         """Process a batch of files."""
         batch_results = {"processed": 0, "successful": 0, "failed": 0, "files": []}
 
@@ -163,23 +161,17 @@ class ContextProcessor:
 
         # Create beautiful header
         header_text = Text("🚀 Automated Context Processing", style="bold cyan")
-        header_panel = Panel(
-            Align.center(header_text), border_style="cyan", padding=(1, 2)
-        )
+        header_panel = Panel(Align.center(header_text), border_style="cyan", padding=(1, 2))
         console.print(header_panel)
 
         # Display configuration
         config_table = Table(show_header=False, box=None, padding=(0, 2))
-        config_table.add_row(
-            "Mode:", "Full Refresh" if force_refresh else "Incremental Update"
-        )
+        config_table.add_row("Mode:", "Full Refresh" if force_refresh else "Incremental Update")
         config_table.add_row("Batch Size:", str(self.batch_size))
         config_table.add_row("Total Files:", str(total_files))
         config_table.add_row("Neo4j Password:", "✓ Configured")
 
-        console.print(
-            Panel(config_table, title="📋 Configuration", border_style="blue")
-        )
+        console.print(Panel(config_table, title="📋 Configuration", border_style="blue"))
 
         # Process files with progress bar
         with Progress(
@@ -206,9 +198,7 @@ class ContextProcessor:
 
         # Calculate final metrics
         processing_time = time.time() - self.start_time
-        success_rate = (
-            (self.successful_files / total_files * 100) if total_files > 0 else 0
-        )
+        success_rate = (self.successful_files / total_files * 100) if total_files > 0 else 0
 
         # Display beautiful summary
         self._display_summary(total_files, processing_time, success_rate)
@@ -225,16 +215,12 @@ class ContextProcessor:
             "embeddings_created": self.embeddings_created,
         }
 
-    def _display_summary(
-        self, total_files: int, processing_time: float, success_rate: float
-    ):
+    def _display_summary(self, total_files: int, processing_time: float, success_rate: float):
         """Display beautiful completion summary."""
 
         # Create metrics table
         metrics_table = Table(show_header=False, box=None, padding=(0, 2))
-        metrics_table.add_row(
-            "📊 Files Processed:", f"{self.successful_files}/{total_files}"
-        )
+        metrics_table.add_row("📊 Files Processed:", f"{self.successful_files}/{total_files}")
         metrics_table.add_row("✅ Success Rate:", f"{success_rate:.1f}%")
         metrics_table.add_row("🔗 Nodes Created:", str(self.nodes_created))
         metrics_table.add_row("🔀 Relationships:", str(self.relationships_created))
@@ -242,12 +228,8 @@ class ContextProcessor:
         metrics_table.add_row("⏱️  Processing Time:", f"{processing_time:.2f}s")
 
         # Success or warning style based on success rate
-        border_style = (
-            "green" if success_rate >= 90 else "yellow" if success_rate >= 70 else "red"
-        )
-        title_emoji = (
-            "✅" if success_rate >= 90 else "⚠️" if success_rate >= 70 else "❌"
-        )
+        border_style = "green" if success_rate >= 90 else "yellow" if success_rate >= 70 else "red"
+        title_emoji = "✅" if success_rate >= 90 else "⚠️" if success_rate >= 70 else "❌"
 
         console.print()
         console.print(
@@ -260,17 +242,11 @@ class ContextProcessor:
 
         # Final message
         if success_rate >= 90:
-            console.print(
-                "🎉 Your codebase context is now up to date!", style="bold green"
-            )
+            console.print("🎉 Your codebase context is now up to date!", style="bold green")
         elif success_rate >= 70:
-            console.print(
-                "⚠️  Context processing completed with some issues", style="bold yellow"
-            )
+            console.print("⚠️  Context processing completed with some issues", style="bold yellow")
         else:
-            console.print(
-                "❌ Context processing encountered significant issues", style="bold red"
-            )
+            console.print("❌ Context processing encountered significant issues", style="bold red")
 
         console.print(
             '💡 Query your code with: [bold cyan]python -m src.core.enhanced_cli code search-code "your query"[/bold cyan]'
@@ -297,13 +273,9 @@ class ContextProcessor:
                 print(f"  Processed {i}/{total_files} files...")
 
         processing_time = time.time() - self.start_time
-        success_rate = (
-            (self.successful_files / total_files * 100) if total_files > 0 else 0
-        )
+        success_rate = (self.successful_files / total_files * 100) if total_files > 0 else 0
 
-        print(
-            f"✅ Complete! {self.successful_files}/{total_files} files processed successfully"
-        )
+        print(f"✅ Complete! {self.successful_files}/{total_files} files processed successfully")
         print(f"   Success Rate: {success_rate:.1f}%")
         print(f"   Processing Time: {processing_time:.2f}s")
 
@@ -319,21 +291,13 @@ class ContextProcessor:
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description="Automated Context Processing")
-    parser.add_argument(
-        "--batch-size", type=int, default=25, help="Batch size for processing"
-    )
-    parser.add_argument(
-        "--force-refresh", action="store_true", help="Force full refresh"
-    )
-    parser.add_argument(
-        "--neo4j-password", default="ignition-graph", help="Neo4j password"
-    )
+    parser.add_argument("--batch-size", type=int, default=25, help="Batch size for processing")
+    parser.add_argument("--force-refresh", action="store_true", help="Force full refresh")
+    parser.add_argument("--neo4j-password", default="ignition-graph", help="Neo4j password")
 
     args = parser.parse_args()
 
-    processor = ContextProcessor(
-        batch_size=args.batch_size, neo4j_password=args.neo4j_password
-    )
+    processor = ContextProcessor(batch_size=args.batch_size, neo4j_password=args.neo4j_password)
 
     try:
         result = processor.run(force_refresh=args.force_refresh)
