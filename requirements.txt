@@ -100,3 +100,7 @@ snyk==1.0.0
 requests==2.31.0
 PyYAML==6.0.1
 python-dateutil==2.8.2
+
+# Repository Analysis Dependencies
+tomli>=2.0.1  # For parsing pyproject.toml files
+gitpython>=3.1.0  # Alternative to subprocess git calls

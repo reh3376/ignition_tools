@@ -61,6 +61,9 @@ Manage connections to Ignition gateways for testing and deployment.
 #### 📦 Import/Export (`import`/`export`)
 Import and export Ignition projects with comprehensive validation.
 
+#### 🧩 Module Script Generation (`module script`)
+Generate scripts using AI assistance and template management.
+
 #### 🗄️ Database Backup (`backup`)
 Manage Neo4j database backups and restore operations.
 
@@ -202,6 +205,160 @@ Discover available endpoints on a gateway.
 ```bash
 # Launch endpoint discovery tool
 python -m src.core.enhanced_cli gateway discover
+
+## 🧩 Module Script Generation Commands ✅ **NEW**
+
+### `ign module script generate`
+Generate Ignition scripts using AI assistance and intelligent template selection.
+
+#### Basic Usage
+```bash
+# Interactive script generation with AI assistance
+python -m src.core.enhanced_cli module script generate
+
+# Generate specific script type
+python -m src.core.enhanced_cli module script generate --type gateway --category startup
+
+# Generate from specific template
+python -m src.core.enhanced_cli module script generate --template basic_timer
+```
+
+#### Features
+- **AI-powered script generation** with context awareness
+- **Template-based generation** with intelligent suggestions
+- **Real-time validation** and parameter checking
+- **Integration with Neo4j knowledge graph** for recommendations
+
+### `ign module script templates`
+List and search available script templates with advanced filtering.
+
+#### Basic Usage
+```bash
+# List all available templates
+python -m src.core.enhanced_cli module script templates
+
+# Search templates by keyword
+python -m src.core.enhanced_cli module script templates --search "timer"
+
+# Filter by category
+python -m src.core.enhanced_cli module script templates --category gateway
+
+# Filter by type
+python -m src.core.enhanced_cli module script templates --type startup
+```
+
+#### Features
+- **Comprehensive template listing** with metadata
+- **Advanced search capabilities** with relevance scoring
+- **Category and type filtering** for focused results
+- **Template statistics** and usage information
+
+### `ign module script template-info`
+View detailed information about specific script templates.
+
+#### Basic Usage
+```bash
+# Get detailed template information
+python -m src.core.enhanced_cli module script template-info basic_timer
+
+# View template with parameters
+python -m src.core.enhanced_cli module script template-info gateway_startup --show-params
+
+# Show template usage examples
+python -m src.core.enhanced_cli module script template-info tag_change --examples
+```
+
+#### Features
+- **Detailed template metadata** including description and parameters
+- **Parameter documentation** with types and validation rules
+- **Usage examples** and best practices
+- **Version history** and compatibility information
+
+### `ign module script create-template`
+Create new script templates from existing scripts or from scratch.
+
+#### Basic Usage
+```bash
+# Create template from existing script
+python -m src.core.enhanced_cli module script create-template --from-file my_script.py
+
+# Create template interactively
+python -m src.core.enhanced_cli module script create-template --interactive
+
+# Create template with metadata
+python -m src.core.enhanced_cli module script create-template --name "Custom Timer" --category gateway
+```
+
+#### Features
+- **Template creation wizard** with guided setup
+- **Script analysis** for automatic parameter detection
+- **Metadata management** with categorization
+- **Version control integration** for template updates
+
+### `ign module script analyze`
+Analyze scripts using code intelligence and provide optimization suggestions.
+
+#### Basic Usage
+```bash
+# Analyze specific script file
+python -m src.core.enhanced_cli module script analyze my_script.py
+
+# Analyze with AI recommendations
+python -m src.core.enhanced_cli module script analyze my_script.py --ai-recommendations
+
+# Batch analysis of multiple scripts
+python -m src.core.enhanced_cli module script analyze --directory scripts/
+```
+
+#### Features
+- **Code quality analysis** with complexity metrics
+- **AI-powered recommendations** for improvements
+- **Best practice validation** against Ignition standards
+- **Performance optimization suggestions**
+
+### `ign module script search`
+Perform semantic search for scripts using vector embeddings.
+
+#### Basic Usage
+```bash
+# Semantic search for scripts
+python -m src.core.enhanced_cli module script search "timer functionality"
+
+# Search with filters
+python -m src.core.enhanced_cli module script search "database connection" --type gateway
+
+# Advanced search with similarity threshold
+python -m src.core.enhanced_cli module script search "alarm processing" --threshold 0.8
+```
+
+#### Features
+- **Semantic search** using 384D vector embeddings
+- **Context-aware results** with relevance scoring
+- **Advanced filtering** by type, category, and metadata
+- **Similar script discovery** for code reuse
+
+#### Sample Output
+```
+🔍 Script Search Results for "timer functionality"
+
+┌─────────────────────────────────────────────────────────┐
+│ 📄 basic_timer.py                                      │
+│ Category: Gateway | Type: Timer                         │
+│ Relevance: 95%                                         │
+│ Description: Basic timer script for periodic tasks     │
+│ Tags: timer, gateway, periodic                         │
+└─────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────┐
+│ 📄 advanced_scheduler.py                               │
+│ Category: Gateway | Type: Startup                      │
+│ Relevance: 87%                                         │
+│ Description: Advanced scheduling with timer management │
+│ Tags: scheduler, timer, advanced                       │
+└─────────────────────────────────────────────────────────┘
+
+Found 2 scripts matching your search criteria
+```
 
 ## 📦 Import/Export Commands ✅ **NEW**
 
