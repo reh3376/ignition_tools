@@ -15,9 +15,18 @@ from .cli_core import enhanced_cli, main
 from .cli_script_commands import script
 from .cli_template_commands import template
 
+# Import refactor commands
+try:
+    from src.ignition.code_intelligence.cli_commands import refactor_commands
+    main.add_command(refactor_commands)
+except ImportError as e:
+    print(f"Refactor commands not available: {e}")
+    pass
+
 # Import module development commands
 try:
     from src.ignition.modules.module_cli import module_group
+
     main.add_command(module_group)
 except ImportError as e:
     # Module development commands not available

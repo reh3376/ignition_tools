@@ -863,7 +863,7 @@ class KnowledgeGraphValidator:
         """Find class information in knowledge graph"""
         if not self.driver:
             return None
-            
+
         async with self.driver.session() as session:
             # First try exact match
             query = """
@@ -1002,7 +1002,7 @@ class KnowledgeGraphValidator:
         """Find attribute information for a class"""
         if not self.driver:
             return None
-            
+
         async with self.driver.session() as session:
             # First try exact match
             query = """
@@ -1056,7 +1056,7 @@ class KnowledgeGraphValidator:
         """Find function information"""
         if not self.driver:
             return None
-            
+
         async with self.driver.session() as session:
             # First try exact match
             query = """
@@ -1126,7 +1126,7 @@ class KnowledgeGraphValidator:
         """Find method information for pydantic_ai result objects"""
         if not self.driver:
             return None
-            
+
         # Look for methods on pydantic_ai classes that could be result objects
         async with self.driver.session() as session:
             # Search for common result methods in pydantic_ai repository
@@ -1162,7 +1162,7 @@ class KnowledgeGraphValidator:
         """Find similar repository names for suggestions"""
         if not self.driver:
             return []
-            
+
         async with self.driver.session() as session:
             query = """
             MATCH (r:Repository)
@@ -1186,7 +1186,7 @@ class KnowledgeGraphValidator:
         """Find similar method names for suggestions"""
         if not self.driver:
             return []
-            
+
         async with self.driver.session() as session:
             # First try exact class match
             query = """

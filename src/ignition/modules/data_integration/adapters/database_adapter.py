@@ -38,18 +38,22 @@ class DatabaseAdapter(BaseDataAdapter):
         """Test database connection."""
         return self._connected
 
-    async def read_data(self, query: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    async def read_data(
+        self, query: dict[str, Any] | None = None
+    ) -> list[dict[str, Any]]:
         """Execute SELECT query and return results."""
         # TODO: Implement actual database query execution
-        return [{
-            "id": 1,
-            "sensor_name": "Temperature_01",
-            "value": 23.4,
-            "unit": "°C",
-            "recorded_at": "2024-01-15T10:30:00Z",
-            "source_type": "database",
-            "source_id": self.config.source_id
-        }]
+        return [
+            {
+                "id": 1,
+                "sensor_name": "Temperature_01",
+                "value": 23.4,
+                "unit": "°C",
+                "recorded_at": "2024-01-15T10:30:00Z",
+                "source_type": "database",
+                "source_id": self.config.source_id,
+            }
+        ]
 
     async def write_data(self, data: list[dict[str, Any]]) -> bool:
         """Execute INSERT/UPDATE operations."""
@@ -57,7 +61,9 @@ class DatabaseAdapter(BaseDataAdapter):
         self.logger.info(f"Wrote {len(data)} records to database")
         return True
 
-    async def stream_data(self, callback: callable, query: dict[str, Any] | None = None) -> None:
+    async def stream_data(
+        self, callback: callable, query: dict[str, Any] | None = None
+    ) -> None:
         """Stream data from database using polling or triggers."""
         # TODO: Implement database change data capture or polling
         pass

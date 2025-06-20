@@ -1,1 +1,1 @@
-# This file makes knowledge_graph a Python package 
+# This file makes knowledge_graph a Python package

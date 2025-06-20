@@ -2,25 +2,23 @@
 
 This package contains all Ignition development modules including:
 - Base module framework
-- Data Integration Module  
+- Data Integration Module
 - AI Assistant Module
 - CLI interface
 """
 
+from .ai_assistant import AIAssistantModule, create_ai_assistant_module
 from .base import AbstractIgnitionModule, ModuleConfig, ModuleContext
-from .data_integration import create_data_integration_module, DataIntegrationModule
-from .ai_assistant import create_ai_assistant_module, AIAssistantModule
+from .data_integration import DataIntegrationModule, create_data_integration_module
 
 __all__ = [
     # Base framework
     "AbstractIgnitionModule",
-    "ModuleConfig", 
+    "ModuleConfig",
     "ModuleContext",
-    
     # Data Integration Module
     "DataIntegrationModule",
     "create_data_integration_module",
-    
     # AI Assistant Module
     "AIAssistantModule",
     "create_ai_assistant_module",

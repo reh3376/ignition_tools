@@ -24,7 +24,9 @@ class OPCUAAdapter(BaseDataAdapter):
         """Connect to OPC-UA server."""
         try:
             # Extract connection parameters
-            url = self.config.connection_params.get("url") or self.config.connection_params.get("endpoint_url")
+            url = self.config.connection_params.get(
+                "url"
+            ) or self.config.connection_params.get("endpoint_url")
             if not url:
                 self.logger.error("OPC-UA URL is required")
                 return False
@@ -39,7 +41,9 @@ class OPCUAAdapter(BaseDataAdapter):
             if "password" in self.config.connection_params:
                 connect_kwargs["password"] = self.config.connection_params["password"]
             if "certificate" in self.config.connection_params:
-                connect_kwargs["certificate"] = self.config.connection_params["certificate"]
+                connect_kwargs["certificate"] = self.config.connection_params[
+                    "certificate"
+                ]
 
             success = await self._client.connect(**connect_kwargs)
             if success:
@@ -81,7 +85,9 @@ class OPCUAAdapter(BaseDataAdapter):
             self.logger.error(f"OPC-UA connection test error: {e}")
             return False
 
-    async def read_data(self, query: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    async def read_data(
+        self, query: dict[str, Any] | None = None
+    ) -> list[dict[str, Any]]:
         """Read data from OPC-UA server."""
         if not self._client or not self._connected:
             self.logger.error("OPC-UA client not connected")
@@ -105,13 +111,15 @@ class OPCUAAdapter(BaseDataAdapter):
 
                 for i, value in enumerate(values):
                     if i < len(node_ids):
-                        data.append({
-                            "node_id": node_ids[i],
-                            "value": value,
-                            "timestamp": asyncio.get_event_loop().time(),
-                            "source_type": "opcua",
-                            "source_id": self.config.source_id
-                        })
+                        data.append(
+                            {
+                                "node_id": node_ids[i],
+                                "value": value,
+                                "timestamp": asyncio.get_event_loop().time(),
+                                "source_type": "opcua",
+                                "source_id": self.config.source_id,
+                            }
+                        )
 
             elif query and "browse_path" in query:
                 # Browse address space
@@ -121,23 +129,27 @@ class OPCUAAdapter(BaseDataAdapter):
                 # Extract node information from browse results
                 if "children" in tree:
                     for child in tree["children"]:
-                        data.append({
-                            "node_id": child.get("node_id", ""),
-                            "display_name": child.get("display_name", ""),
-                            "node_class": child.get("node_class", ""),
-                            "source_type": "opcua",
-                            "source_id": self.config.source_id
-                        })
+                        data.append(
+                            {
+                                "node_id": child.get("node_id", ""),
+                                "display_name": child.get("display_name", ""),
+                                "node_class": child.get("node_class", ""),
+                                "source_type": "opcua",
+                                "source_id": self.config.source_id,
+                            }
+                        )
             else:
                 # Default: get server information
                 server_info = await self._client.get_server_info()
                 if server_info:
-                    data.append({
-                        "server_info": server_info,
-                        "timestamp": asyncio.get_event_loop().time(),
-                        "source_type": "opcua",
-                        "source_id": self.config.source_id
-                    })
+                    data.append(
+                        {
+                            "server_info": server_info,
+                            "timestamp": asyncio.get_event_loop().time(),
+                            "source_type": "opcua",
+                            "source_id": self.config.source_id,
+                        }
+                    )
 
             return data
 
@@ -160,7 +172,9 @@ class OPCUAAdapter(BaseDataAdapter):
                 if "node_id" in record and "value" in record:
                     node_values[record["node_id"]] = record["value"]
                 else:
-                    self.logger.warning("Invalid write data format - missing node_id or value")
+                    self.logger.warning(
+                        "Invalid write data format - missing node_id or value"
+                    )
 
             if node_values:
                 # Use write_values method
@@ -180,7 +194,9 @@ class OPCUAAdapter(BaseDataAdapter):
             self.logger.error(f"OPC-UA write error: {e}")
             return False
 
-    async def stream_data(self, callback: callable, query: dict[str, Any] | None = None) -> None:
+    async def stream_data(
+        self, callback: callable, query: dict[str, Any] | None = None
+    ) -> None:
         """Stream data from OPC-UA server using subscriptions."""
         if not self._client or not self._connected:
             self.logger.error("OPC-UA client not connected")
@@ -204,7 +220,7 @@ class OPCUAAdapter(BaseDataAdapter):
                         "value": value,
                         "timestamp": asyncio.get_event_loop().time(),
                         "source_type": "opcua",
-                        "source_id": self.config.source_id
+                        "source_id": self.config.source_id,
                     }
                     # Schedule the async callback
                     task = asyncio.create_task(callback(data_record))
@@ -216,12 +232,12 @@ class OPCUAAdapter(BaseDataAdapter):
             # Create subscription
             interval = query.get("interval", 1000.0) if query else 1000.0
             subscription_id = await self._client.subscribe_nodes(
-                node_ids,
-                data_change_callback,
-                interval
+                node_ids, data_change_callback, interval
             )
 
-            self.logger.info(f"Created OPC-UA subscription {subscription_id} for {len(node_ids)} nodes")
+            self.logger.info(
+                f"Created OPC-UA subscription {subscription_id} for {len(node_ids)} nodes"
+            )
 
             # Keep streaming until disconnected
             while self._connected:

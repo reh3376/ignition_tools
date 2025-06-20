@@ -19,11 +19,17 @@ class RESTAdapter(BaseDataAdapter):
     async def test_connection(self) -> bool:
         return self._connected
 
-    async def read_data(self, query: dict[str, Any] | None = None) -> list[dict[str, Any]]:
-        return [{"endpoint": "/api/data", "response": {"value": 42}, "source_type": "rest"}]
+    async def read_data(
+        self, query: dict[str, Any] | None = None
+    ) -> list[dict[str, Any]]:
+        return [
+            {"endpoint": "/api/data", "response": {"value": 42}, "source_type": "rest"}
+        ]
 
     async def write_data(self, data: list[dict[str, Any]]) -> bool:
         return True
 
-    async def stream_data(self, callback: callable, query: dict[str, Any] | None = None) -> None:
+    async def stream_data(
+        self, callback: callable, query: dict[str, Any] | None = None
+    ) -> None:
         pass

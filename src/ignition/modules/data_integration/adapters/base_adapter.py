@@ -58,7 +58,9 @@ class BaseDataAdapter(ABC):
         pass
 
     @abstractmethod
-    async def read_data(self, query: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    async def read_data(
+        self, query: dict[str, Any] | None = None
+    ) -> list[dict[str, Any]]:
         """Read data from the data source.
 
         Args:
@@ -82,7 +84,9 @@ class BaseDataAdapter(ABC):
         pass
 
     @abstractmethod
-    async def stream_data(self, callback: callable, query: dict[str, Any] | None = None) -> None:
+    async def stream_data(
+        self, callback: callable, query: dict[str, Any] | None = None
+    ) -> None:
         """Stream data from the data source.
 
         Args:
@@ -131,7 +135,14 @@ class BaseDataAdapter(ABC):
             "source_type": self.config.source_type,
             "connected": self._connected,
             "connection_params": {
-                k: v for k, v in self.config.connection_params.items()
-                if k not in ["password", "api_key", "secret", "token"]  # Exclude sensitive info
-            }
+                k: v
+                for k, v in self.config.connection_params.items()
+                if k
+                not in [
+                    "password",
+                    "api_key",
+                    "secret",
+                    "token",
+                ]  # Exclude sensitive info
+            },
         }

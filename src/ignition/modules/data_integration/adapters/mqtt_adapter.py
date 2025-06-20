@@ -39,16 +39,20 @@ class MQTTAdapter(BaseDataAdapter):
         """Test MQTT broker connection."""
         return self._connected
 
-    async def read_data(self, query: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    async def read_data(
+        self, query: dict[str, Any] | None = None
+    ) -> list[dict[str, Any]]:
         """Read data from MQTT topics."""
         # TODO: Implement actual MQTT data reading
-        return [{
-            "topic": "sensor/data",
-            "value": 42.5,
-            "timestamp": asyncio.get_event_loop().time(),
-            "source_type": "mqtt",
-            "source_id": self.config.source_id
-        }]
+        return [
+            {
+                "topic": "sensor/data",
+                "value": 42.5,
+                "timestamp": asyncio.get_event_loop().time(),
+                "source_type": "mqtt",
+                "source_id": self.config.source_id,
+            }
+        ]
 
     async def write_data(self, data: list[dict[str, Any]]) -> bool:
         """Publish data to MQTT topics."""
@@ -56,7 +60,9 @@ class MQTTAdapter(BaseDataAdapter):
         self.logger.info(f"Published {len(data)} messages to MQTT")
         return True
 
-    async def stream_data(self, callback: callable, query: dict[str, Any] | None = None) -> None:
+    async def stream_data(
+        self, callback: callable, query: dict[str, Any] | None = None
+    ) -> None:
         """Stream data from MQTT subscriptions."""
         # TODO: Implement actual MQTT streaming
         pass

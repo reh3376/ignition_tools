@@ -18,7 +18,12 @@ from typing import Any
 
 from dotenv import load_dotenv
 
-from ignition.modules.core.abstract_module import AbstractIgnitionModule, ModuleContext, ModuleMetadata, ModuleScope
+from ignition.modules.core.abstract_module import (
+    AbstractIgnitionModule,
+    ModuleContext,
+    ModuleMetadata,
+    ModuleScope,
+)
 
 # Load environment variables
 load_dotenv()
@@ -89,10 +94,10 @@ class DataSourceType(Enum):
 class VariableType(Enum):
     """Industrial variable types for metadata classification."""
 
-    PV = "process_variable"      # Process Variables
-    CV = "control_variable"      # Control Variables
+    PV = "process_variable"  # Process Variables
+    CV = "control_variable"  # Control Variables
     DV = "disturbance_variable"  # Disturbance Variables
-    SP = "setpoint"              # Setpoints
+    SP = "setpoint"  # Setpoints
     PROCESS_STATE = "process_state"  # Process State
 
 
@@ -112,7 +117,9 @@ class VariableMetadata:
     is_secondary_pv: bool = False  # SPC
 
     # Process state metadata
-    state_values: list[str] = field(default_factory=list)  # For Process_State enumeration
+    state_values: list[str] = field(
+        default_factory=list
+    )  # For Process_State enumeration
 
     def to_dict(self) -> dict[str, Any]:
         """Convert metadata to dictionary for JSON serialization."""
@@ -125,7 +132,7 @@ class VariableMetadata:
             "max_value": self.max_value,
             "is_primary_pv": self.is_primary_pv,
             "is_secondary_pv": self.is_secondary_pv,
-            "state_values": self.state_values
+            "state_values": self.state_values,
         }
 
 
@@ -154,7 +161,9 @@ class DataSourceConfig:
             "batch_size": self.batch_size,
             "timeout": self.timeout,
             "retry_attempts": self.retry_attempts,
-            "variable_mappings": {k: v.to_dict() for k, v in self.variable_mappings.items()}
+            "variable_mappings": {
+                k: v.to_dict() for k, v in self.variable_mappings.items()
+            },
         }
 
 
@@ -181,7 +190,7 @@ class DataIntegrationStats:
             "failed_reads": self.failed_reads,
             "last_update": self.last_update.isoformat() if self.last_update else None,
             "processing_rate": self.processing_rate,
-            "error_rate": self.error_rate
+            "error_rate": self.error_rate,
         }
 
 
@@ -229,26 +238,26 @@ class DataIntegrationModule(AbstractIgnitionModule):
                 "encryption_enabled": True,
                 "certificate_validation": True,
                 "max_retry_attempts": 3,
-                "connection_timeout": 30
+                "connection_timeout": 30,
             },
             "performance": {
                 "max_concurrent_connections": 50,
                 "default_batch_size": 1000,
                 "connection_pool_size": 10,
-                "message_buffer_size": 10000
+                "message_buffer_size": 10000,
             },
             "data_processing": {
                 "enable_metadata_injection": True,
                 "normalize_timestamps": True,
                 "validate_data_quality": True,
-                "auto_detect_variable_types": True
+                "auto_detect_variable_types": True,
             },
             "json_output": {
                 "include_metadata": True,
                 "timestamp_format": "iso8601",
                 "normalize_values": True,
-                "include_quality_codes": True
-            }
+                "include_quality_codes": True,
+            },
         }
 
     # Abstract method implementations
@@ -263,7 +272,7 @@ class DataIntegrationModule(AbstractIgnitionModule):
             "supported_variable_types": [t.value for t in VariableType],
             "statistics": self._stats.to_dict(),
             "active_sources": len(self._data_sources),
-            "active_connections": len(self._active_connections)
+            "active_connections": len(self._active_connections),
         }
 
     def validate_configuration(self) -> bool:
@@ -272,10 +281,17 @@ class DataIntegrationModule(AbstractIgnitionModule):
             config = self.config_manager.config
 
             # Validate required configuration sections
-            required_sections = ["security", "performance", "data_processing", "json_output"]
+            required_sections = [
+                "security",
+                "performance",
+                "data_processing",
+                "json_output",
+            ]
             for section in required_sections:
                 if section not in config:
-                    self.logger.error(f"Missing required configuration section: {section}")
+                    self.logger.error(
+                        f"Missing required configuration section: {section}"
+                    )
                     return False
 
             # Validate performance settings
@@ -437,7 +453,7 @@ class DataIntegrationModule(AbstractIgnitionModule):
                 "source_type": config.source_type.value,
                 "response_time": 0.1,  # seconds
                 "status": "Connected",
-                "timestamp": datetime.now(UTC).isoformat()
+                "timestamp": datetime.now(UTC).isoformat(),
             }
 
             self.logger.info(f"Connection test successful for {source_id}")
@@ -447,7 +463,9 @@ class DataIntegrationModule(AbstractIgnitionModule):
             self.logger.error(f"Connection test failed for {source_id}: {e}")
             return {"success": False, "error": str(e)}
 
-    def read_data(self, source_id: str, query: dict[str, Any] | None = None) -> dict[str, Any]:
+    def read_data(
+        self, source_id: str, query: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Read data from a specific data source."""
         try:
             if source_id not in self._data_sources:
@@ -479,8 +497,10 @@ class DataIntegrationModule(AbstractIgnitionModule):
                 "metadata": {
                     "record_count": len(processed_data),
                     "timestamp": datetime.now(UTC).isoformat(),
-                    "variable_types": self._get_variable_type_summary(config.variable_mappings)
-                }
+                    "variable_types": self._get_variable_type_summary(
+                        config.variable_mappings
+                    ),
+                },
             }
 
         except Exception as e:
@@ -506,7 +526,7 @@ class DataIntegrationModule(AbstractIgnitionModule):
                 "success": True,
                 "source_id": source_id,
                 "records_written": len(data.get("records", [])),
-                "timestamp": datetime.now(UTC).isoformat()
+                "timestamp": datetime.now(UTC).isoformat(),
             }
 
         except Exception as e:
@@ -522,7 +542,9 @@ class DataIntegrationModule(AbstractIgnitionModule):
         if self._stats.total_data_points > 0:
             total_operations = self._stats.successful_reads + self._stats.failed_reads
             if total_operations > 0:
-                self._stats.error_rate = (self._stats.failed_reads / total_operations) * 100
+                self._stats.error_rate = (
+                    self._stats.failed_reads / total_operations
+                ) * 100
 
         return self._stats.to_dict()
 
@@ -590,7 +612,9 @@ class DataIntegrationModule(AbstractIgnitionModule):
         except Exception as e:
             self.logger.error(f"Message processing error for {source_id}: {e}")
 
-    def _simulate_data_read(self, _config: DataSourceConfig, _query: dict[str, Any] | None) -> list[dict[str, Any]]:
+    def _simulate_data_read(
+        self, _config: DataSourceConfig, _query: dict[str, Any] | None
+    ) -> list[dict[str, Any]]:
         """Simulate data reading for demonstration purposes."""
         # In a real implementation, this would perform actual data retrieval
         return [
@@ -599,14 +623,12 @@ class DataIntegrationModule(AbstractIgnitionModule):
                 "variable1": 75.5,
                 "variable2": 150.2,
                 "variable3": "steady_state",
-                "quality": "good"
+                "quality": "good",
             }
         ]
 
     def _inject_metadata(
-        self,
-        data: list[dict[str, Any]],
-        variable_mappings: dict[str, VariableMetadata]
+        self, data: list[dict[str, Any]], variable_mappings: dict[str, VariableMetadata]
     ) -> list[dict[str, Any]]:
         """Inject metadata into data points."""
         enhanced_data = []
@@ -625,17 +647,23 @@ class DataIntegrationModule(AbstractIgnitionModule):
                         "engineering_units": metadata.engineering_units,
                         "range_high": metadata.range_high,
                         "range_low": metadata.range_low,
-                        "max_value": metadata.max_value
+                        "max_value": metadata.max_value,
                     }
 
                     # Add PV-specific metadata
                     if metadata.variable_type == VariableType.PV:
-                        enhanced_record["metadata"][variable_name]["is_primary_pv"] = metadata.is_primary_pv
-                        enhanced_record["metadata"][variable_name]["is_secondary_pv"] = metadata.is_secondary_pv
+                        enhanced_record["metadata"][variable_name][
+                            "is_primary_pv"
+                        ] = metadata.is_primary_pv
+                        enhanced_record["metadata"][variable_name][
+                            "is_secondary_pv"
+                        ] = metadata.is_secondary_pv
 
                     # Add normalization if max_value is available
                     if metadata.max_value and isinstance(value, int | float):
-                        enhanced_record[f"{variable_name}_normalized"] = value / metadata.max_value
+                        enhanced_record[f"{variable_name}_normalized"] = (
+                            value / metadata.max_value
+                        )
 
             enhanced_data.append(enhanced_record)
 
@@ -651,16 +679,18 @@ class DataIntegrationModule(AbstractIgnitionModule):
                 "timestamp": datetime.now(UTC).isoformat(),
                 "include_metadata": config.get("include_metadata", True),
                 "normalize_values": config.get("normalize_values", True),
-                "records": data
+                "records": data,
             },
             "schema": {
                 "variable_types": ["PV", "CV", "DV", "SP", "PROCESS_STATE"],
                 "normalization": "min_max",
-                "timestamp_format": config.get("timestamp_format", "iso8601")
-            }
+                "timestamp_format": config.get("timestamp_format", "iso8601"),
+            },
         }
 
-    def _get_variable_type_summary(self, variable_mappings: dict[str, VariableMetadata]) -> dict[str, int]:
+    def _get_variable_type_summary(
+        self, variable_mappings: dict[str, VariableMetadata]
+    ) -> dict[str, int]:
         """Get summary of variable types."""
         summary = {}
         for metadata in variable_mappings.values():
@@ -672,7 +702,7 @@ class DataIntegrationModule(AbstractIgnitionModule):
 def create_data_integration_module(
     context: ModuleContext,
     module_name: str = "Data Integration",
-    version: str = "1.0.0"
+    version: str = "1.0.0",
 ) -> DataIntegrationModule:
     """Factory function to create a DataIntegrationModule instance.
 
@@ -692,7 +722,7 @@ def create_data_integration_module(
         vendor="IGN Scripts Development Team",
         scopes=[ModuleScope.GATEWAY, ModuleScope.DESIGNER],
         min_ignition_version="8.1.0",
-        dependencies=[]
+        dependencies=[],
     )
 
     return DataIntegrationModule(metadata, context)

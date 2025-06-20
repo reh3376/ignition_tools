@@ -13,7 +13,7 @@ from .knowledge_validator import KnowledgeValidator
 
 __all__ = [
     "AIAssistantModule",
-    "create_ai_assistant_module",
-    "CodeAnalyzer", 
+    "CodeAnalyzer",
     "KnowledgeValidator",
-] 
+    "create_ai_assistant_module",
+]

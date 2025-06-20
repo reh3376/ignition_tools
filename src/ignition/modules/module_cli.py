@@ -6,13 +6,13 @@ import click
 from rich.console import Console
 from rich.table import Table
 
+from .cli.ai_assistant_commands import ai_assistant_commands
 from .cli.core_commands import core_group
+from .cli.data_integration_commands import data_integration_group
 from .cli.script_commands import script_group
 from .module_builder import ModuleBuilder
 from .module_generator import ModuleGenerator
 from .sdk_manager import IgnitionSDKManager
-from .cli.data_integration_commands import data_integration_group
-from .cli.ai_assistant_commands import ai_assistant_commands
 
 console = Console()
 
