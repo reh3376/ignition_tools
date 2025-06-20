@@ -11,6 +11,8 @@ from .cli.script_commands import script_group
 from .module_builder import ModuleBuilder
 from .module_generator import ModuleGenerator
 from .sdk_manager import IgnitionSDKManager
+from .cli.data_integration_commands import data_integration_group
+from .cli.ai_assistant_commands import ai_assistant_commands
 
 console = Console()
 
@@ -39,6 +41,12 @@ module_group.add_command(core_group)
 
 # Add script generation commands as subgroup
 module_group.add_command(script_group)
+
+# Add data integration commands as subgroup
+module_group.add_command(data_integration_group)
+
+# Add AI assistant commands
+module_group.add_command(ai_assistant_commands)
 
 
 @module_group.command()

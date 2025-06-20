@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ign-scripts"
-version = "0.1.0"
+version = "0.2.2"
 description = "IGN Scripts - Data processing, automation, and analytics workflows"
 authors = [
     {name = "Your Name", email = "your.email@example.com"}
@@ -35,6 +35,10 @@ dependencies = [
     "streamlit>=1.28.0",
     "prompt-toolkit>=3.0.0",
     "ruff>=0.11.13",
+    "faker>=37.4.0",
+    "crawl4ai>=0.6.3",
+    "supabase>=2.15.3",
+    "mcp>=1.9.4",
 ]
 
 [project.optional-dependencies]

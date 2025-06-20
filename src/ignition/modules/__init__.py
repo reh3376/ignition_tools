@@ -1,18 +1,29 @@
-"""Ignition Module Development Framework.
+"""Ignition Modules Package
 
-This package provides tools and utilities for developing custom Ignition modules
-using the official Inductive Automation SDK, enhanced with code intelligence
-and automated generation capabilities.
+This package contains all Ignition development modules including:
+- Base module framework
+- Data Integration Module  
+- AI Assistant Module
+- CLI interface
 """
 
-from .module_builder import ModuleBuilder
-from .module_generator import ModuleGenerator
-from .sdk_manager import IgnitionSDKManager
+from .base import AbstractIgnitionModule, ModuleConfig, ModuleContext
+from .data_integration import create_data_integration_module, DataIntegrationModule
+from .ai_assistant import create_ai_assistant_module, AIAssistantModule
 
 __all__ = [
-    "IgnitionSDKManager",
-    "ModuleBuilder",
-    "ModuleGenerator",
+    # Base framework
+    "AbstractIgnitionModule",
+    "ModuleConfig", 
+    "ModuleContext",
+    
+    # Data Integration Module
+    "DataIntegrationModule",
+    "create_data_integration_module",
+    
+    # AI Assistant Module
+    "AIAssistantModule",
+    "create_ai_assistant_module",
 ]
 
 __version__ = "1.0.0"

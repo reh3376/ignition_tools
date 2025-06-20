@@ -1,8 +1,8 @@
 # Repository Analysis System
 
-**Version**: 1.0.0  
-**Date**: January 28, 2025  
-**Status**: Production Ready  
+**Version**: 1.0.0
+**Date**: January 28, 2025
+**Status**: Production Ready
 
 ## Overview
 
@@ -169,7 +169,7 @@ ign repo clear --confirm
 
 ```cypher
 // List all repositories
-MATCH (r:Repository) 
+MATCH (r:Repository)
 RETURN r.name, r.description, r.stars, r.language
 ORDER BY r.stars DESC
 
@@ -178,9 +178,9 @@ MATCH (r:Repository {name: "pydantic-ai"})
 OPTIONAL MATCH (r)-[:CONTAINS*]->(f:File)
 OPTIONAL MATCH (r)-[:CONTAINS*]->(c:Class)
 OPTIONAL MATCH (r)-[:CONTAINS*]->(fn:Function)
-RETURN r.name, 
+RETURN r.name,
        count(DISTINCT f) as files,
-       count(DISTINCT c) as classes, 
+       count(DISTINCT c) as classes,
        count(DISTINCT fn) as functions
 ```
 
@@ -455,4 +455,4 @@ pytest tests/integration/test_full_analysis.py
 
 The Repository Analysis System provides a powerful foundation for creating LLM agents with deep understanding of code repositories. By combining AST analysis, vector embeddings, and graph database storage, it enables sophisticated code intelligence and semantic search capabilities.
 
-The system is production-ready and has been successfully tested with the [Pydantic AI repository](https://github.com/pydantic/pydantic-ai.git), demonstrating its ability to handle real-world, complex codebases and extract meaningful patterns for AI agent development. 
+The system is production-ready and has been successfully tested with the [Pydantic AI repository](https://github.com/pydantic/pydantic-ai.git), demonstrating its ability to handle real-world, complex codebases and extract meaningful patterns for AI agent development.

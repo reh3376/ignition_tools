@@ -15,6 +15,15 @@ from .cli_core import enhanced_cli, main
 from .cli_script_commands import script
 from .cli_template_commands import template
 
+# Import module development commands
+try:
+    from src.ignition.modules.module_cli import module_group
+    main.add_command(module_group)
+except ImportError as e:
+    # Module development commands not available
+    print(f"Module development commands not available: {e}")
+    pass
+
 # Register command groups with main CLI
 main.add_command(script)
 main.add_command(template)

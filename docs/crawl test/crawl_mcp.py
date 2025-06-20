@@ -37,6 +37,7 @@ try:
     from knowledge_graph.hallucination_reporter import HallucinationReporter
     from knowledge_graph.knowledge_graph_validator import KnowledgeGraphValidator
     from knowledge_graph.parse_repo_into_neo4j import DirectNeo4jExtractor
+
     KNOWLEDGE_GRAPH_AVAILABLE = True
 except ImportError as e:
     print(f"Warning: Knowledge graph modules not available: {e}")
@@ -334,7 +335,9 @@ def parse_sitemap(sitemap_url: str) -> list[str]:
     if resp.status_code == 200:
         try:
             tree = ElementTree.fromstring(resp.content)
-            urls = [loc.text for loc in tree.findall(".//{*}loc") if loc.text is not None]
+            urls = [
+                loc.text for loc in tree.findall(".//{*}loc") if loc.text is not None
+            ]
         except Exception as e:
             print(f"Error parsing sitemap XML: {e}")
 
@@ -450,12 +453,14 @@ async def crawl_single_page(ctx: Context, url: str) -> str:
         async for result in crawler.arun(url=url, config=run_config):
             if not result.success or not result.markdown:
                 return json.dumps(
-                    {"success": False, "url": url, "error": result.error_message}, indent=2
+                    {"success": False, "url": url, "error": result.error_message},
+                    indent=2,
                 )
             break  # Take the first successful result
         else:
             return json.dumps(
-                {"success": False, "url": url, "error": "No successful crawl results"}, indent=2
+                {"success": False, "url": url, "error": "No successful crawl results"},
+                indent=2,
             )
 
         if result.success and result.markdown:
@@ -1615,7 +1620,9 @@ async def _handle_explore_command(session, command: str, repo_name: str) -> str:
     )
 
 
-async def _handle_classes_command(session, command: str, repo_name: str | None = None) -> str:
+async def _handle_classes_command(
+    session, command: str, repo_name: str | None = None
+) -> str:
     """Handle 'classes [repo]' command - list classes"""
     limit = 20
 
