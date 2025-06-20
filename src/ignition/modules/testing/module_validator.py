@@ -585,7 +585,7 @@ class ModuleValidator:
             return ["No validation results available for recommendations"]
 
         # Analyze common issues
-        common_errors = {}
+        common_errors: dict[str, int] = {}
         for result in self.validation_results:
             for error in result.errors:
                 common_errors[error] = common_errors.get(error, 0) + 1

@@ -1,17 +1,19 @@
-"""Quality Assurance Pipeline for Module Testing.
+"""Quality Assurance Pipeline for Ignition Module Testing.
 
-This module provides comprehensive quality assurance processes for Ignition modules,
-including automated code quality checks, security scanning, and documentation generation.
-Following patterns from crawl_mcp.py for robust QA processing.
+Provides comprehensive code quality checks, security scanning, and
+quality assurance pipeline management following patterns from crawl_mcp.py
+for validation, error handling, and resource management.
 """
 
 import asyncio
 import json
+import os
 import subprocess
 import tempfile
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
+from enum import Enum
 from pathlib import Path
 from typing import Any
 
@@ -21,33 +23,67 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+class QualityCheckStatus(Enum):
+    """Status of quality check."""
+
+    PENDING = "pending"
+    RUNNING = "running"
+    PASSED = "passed"
+    FAILED = "failed"
+    SKIPPED = "skipped"
+    ERROR = "error"
+
+
+class QualityCheckType(Enum):
+    """Type of quality check."""
+
+    CODE_STYLE = "code_style"
+    TYPE_CHECKING = "type_checking"
+    SECURITY_SCAN = "security_scan"
+    COMPLEXITY_ANALYSIS = "complexity_analysis"
+    DOCUMENTATION = "documentation"
+    LICENSING = "licensing"
+    DEPENDENCY_AUDIT = "dependency_audit"
+    PERFORMANCE = "performance"
+
+
 @dataclass
 class QualityCheck:
-    """Result of a quality assurance check."""
+    """Quality check configuration and results."""
 
     name: str
-    category: str  # "code_quality", "security", "documentation", "performance"
-    status: str  # "passed", "failed", "warning", "skipped"
-    score: float = 0.0  # 0-100
-    details: dict[str, Any] = field(default_factory=dict)
-    errors: list[str] = field(default_factory=list)
-    warnings: list[str] = field(default_factory=list)
-    recommendations: list[str] = field(default_factory=list)
+    check_type: QualityCheckType
+    command: str
+    working_dir: str | None = None
+    timeout: int = 300
+    required: bool = True
+    status: QualityCheckStatus = QualityCheckStatus.PENDING
+    output: str = ""
+    error_output: str = ""
+    exit_code: int | None = None
+    duration: float = 0.0
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class QualityReport:
-    """Comprehensive quality assurance report."""
+    """Quality assurance report."""
 
     module_path: str
-    overall_score: float
+    total_checks: int
+    passed_checks: int
+    failed_checks: int
+    skipped_checks: int
+    error_checks: int
+    overall_status: str
+    duration: float
     checks: list[QualityCheck] = field(default_factory=list)
-    summary: dict[str, Any] = field(default_factory=dict)
-    generated_at: str = ""
+    recommendations: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 def validate_qa_environment() -> dict[str, Any]:
-    """Validate quality assurance environment configuration.
+    """Validate QA environment configuration.
 
     Following patterns from crawl_mcp.py for environment validation.
 
@@ -55,417 +91,92 @@ def validate_qa_environment() -> dict[str, Any]:
         Dictionary with validation results
     """
     required_tools = {
-        "java": "Java runtime for module analysis",
-        "python": "Python for analysis scripts",
+        "ruff": "Python linting and formatting",
+        "mypy": "Static type checking",
+        "bandit": "Security vulnerability scanning",
     }
 
     optional_tools = {
-        "docker": "Docker for containerized analysis",
-        "bandit": "Python security analysis",
-        "sonar-scanner": "SonarQube analysis",
+        "black": "Code formatting",
+        "isort": "Import sorting",
+        "pytest": "Testing framework",
+        "coverage": "Code coverage analysis",
+        "safety": "Dependency vulnerability scanning",
     }
 
-    missing_tools = []
+    missing_required = []
     available_tools = {}
 
     for tool, description in required_tools.items():
         if _check_tool_available(tool):
             available_tools[tool] = description
         else:
-            missing_tools.append(f"{tool} ({description})")
+            missing_required.append(f"{tool} ({description})")
 
     for tool, description in optional_tools.items():
         if _check_tool_available(tool):
             available_tools[tool] = description
 
-    if missing_tools:
+    if missing_required:
         return {
             "valid": False,
-            "error": f"Missing required tools: {', '.join(missing_tools)}",
+            "error": f"Missing required tools: {', '.join(missing_required)}",
             "available": available_tools,
         }
 
     return {"valid": True, "tools": available_tools}
 
 
-def _check_tool_available(tool_name: str) -> bool:
-    """Check if a tool is available in the system PATH.
+def _check_tool_available(tool: str) -> bool:
+    """Check if a tool is available in the system.
 
     Args:
-        tool_name: Name of the tool to check
+        tool: Name of the tool
 
     Returns:
-        True if tool is available, False otherwise
+        True if tool is available
     """
     try:
         result = subprocess.run(
-            [tool_name, "--version"], capture_output=True, text=True, timeout=5
+            [tool, "--version"], capture_output=True, timeout=10, check=False
         )
         return result.returncode == 0
     except (subprocess.TimeoutExpired, FileNotFoundError):
         return False
 
 
-class CodeQualityChecker:
-    """Code quality analysis for Ignition modules.
+def format_qa_error(error: Exception) -> str:
+    """Format QA errors for user-friendly messages.
 
-    Following patterns from crawl_mcp.py for comprehensive analysis.
+    Following patterns from crawl_mcp.py for error formatting.
+
+    Args:
+        error: The exception to format
+
+    Returns:
+        Formatted error message
     """
+    error_str = str(error).lower()
 
-    def __init__(self, config: dict[str, Any] | None = None):
-        """Initialize the code quality checker.
-
-        Args:
-            config: Optional configuration overrides
-        """
-        self.config = config or {}
-        self.temp_dir: Path | None = None
-
-    async def analyze_module(self, module_path: str) -> QualityCheck:
-        """Analyze code quality of a module.
-
-        Args:
-            module_path: Path to the module to analyze
-
-        Returns:
-            QualityCheck with code quality results
-        """
-        check = QualityCheck(
-            name="Code Quality Analysis", category="code_quality", status="passed"
+    if "timeout" in error_str:
+        return (
+            "Quality check timed out. Consider increasing timeout or optimizing checks."
         )
-
-        try:
-            # Extract module for analysis
-            with tempfile.TemporaryDirectory() as temp_dir:
-                self.temp_dir = Path(temp_dir)
-
-                # Basic code quality checks
-                await self._analyze_module_structure(module_path, check)
-                await self._analyze_code_complexity(module_path, check)
-                await self._check_coding_standards(module_path, check)
-
-                # Calculate overall score
-                check.score = self._calculate_quality_score(check)
-
-                if check.score < 70:
-                    check.status = "failed"
-                elif check.score < 85:
-                    check.status = "warning"
-
-        except Exception as e:
-            check.status = "failed"
-            check.errors.append(f"Code quality analysis failed: {e!s}")
-            check.score = 0.0
-
-        return check
-
-    async def _analyze_module_structure(
-        self, module_path: str, check: QualityCheck
-    ) -> None:
-        """Analyze module structure and organization."""
-        try:
-            module_file = Path(module_path)
-            file_size = module_file.stat().st_size
-
-            # Basic structure analysis
-            structure_score = 100.0
-
-            if file_size > 50 * 1024 * 1024:  # > 50MB
-                check.warnings.append("Module file is very large (>50MB)")
-                structure_score -= 20
-
-            if file_size < 1024:  # < 1KB
-                check.warnings.append("Module file is very small (<1KB)")
-                structure_score -= 10
-
-            check.details["structure_score"] = max(0, structure_score)
-            check.details["file_size"] = file_size
-
-        except Exception as e:
-            check.errors.append(f"Structure analysis failed: {e!s}")
-
-    async def _analyze_code_complexity(
-        self, module_path: str, check: QualityCheck
-    ) -> None:
-        """Analyze code complexity metrics."""
-        try:
-            # Simulate complexity analysis
-            # In a real implementation, this would extract and analyze Java code
-            complexity_score = 85.0  # Simulated score
-
-            check.details["complexity_score"] = complexity_score
-            check.details["cyclomatic_complexity"] = 5.2  # Simulated
-            check.details["maintainability_index"] = 78.5  # Simulated
-
-            if complexity_score < 70:
-                check.warnings.append("Code complexity is high")
-
-        except Exception as e:
-            check.errors.append(f"Complexity analysis failed: {e!s}")
-
-    async def _check_coding_standards(
-        self, module_path: str, check: QualityCheck
-    ) -> None:
-        """Check adherence to coding standards."""
-        try:
-            # Simulate coding standards check
-            standards_score = 90.0  # Simulated score
-
-            check.details["standards_score"] = standards_score
-            check.details["style_violations"] = 2  # Simulated
-
-            if standards_score < 80:
-                check.warnings.append("Some coding standard violations found")
-
-        except Exception as e:
-            check.errors.append(f"Standards check failed: {e!s}")
-
-    def _calculate_quality_score(self, check: QualityCheck) -> float:
-        """Calculate overall quality score."""
-        scores = []
-
-        if "structure_score" in check.details:
-            scores.append(check.details["structure_score"])
-        if "complexity_score" in check.details:
-            scores.append(check.details["complexity_score"])
-        if "standards_score" in check.details:
-            scores.append(check.details["standards_score"])
-
-        return sum(scores) / len(scores) if scores else 0.0
-
-
-class SecurityScanner:
-    """Security scanning for Ignition modules.
-
-    Following patterns from crawl_mcp.py for security analysis.
-    """
-
-    def __init__(self, config: dict[str, Any] | None = None):
-        """Initialize the security scanner.
-
-        Args:
-            config: Optional configuration overrides
-        """
-        self.config = config or {}
-
-    async def scan_module(self, module_path: str) -> QualityCheck:
-        """Perform security scan of a module.
-
-        Args:
-            module_path: Path to the module to scan
-
-        Returns:
-            QualityCheck with security scan results
-        """
-        check = QualityCheck(name="Security Scan", category="security", status="passed")
-
-        try:
-            # Perform security checks
-            await self._check_vulnerabilities(module_path, check)
-            await self._analyze_permissions(module_path, check)
-            await self._check_dependencies(module_path, check)
-
-            # Calculate security score
-            check.score = self._calculate_security_score(check)
-
-            if check.score < 70:
-                check.status = "failed"
-            elif check.score < 85:
-                check.status = "warning"
-
-        except Exception as e:
-            check.status = "failed"
-            check.errors.append(f"Security scan failed: {e!s}")
-            check.score = 0.0
-
-        return check
-
-    async def _check_vulnerabilities(
-        self, module_path: str, check: QualityCheck
-    ) -> None:
-        """Check for known vulnerabilities."""
-        try:
-            # Simulate vulnerability scanning
-            vulnerabilities_found = 0  # Simulated
-
-            check.details["vulnerabilities"] = vulnerabilities_found
-            check.details["vulnerability_score"] = (
-                100.0
-                if vulnerabilities_found == 0
-                else max(0, 100 - vulnerabilities_found * 20)
-            )
-
-            if vulnerabilities_found > 0:
-                check.warnings.append(
-                    f"Found {vulnerabilities_found} potential vulnerabilities"
-                )
-
-        except Exception as e:
-            check.errors.append(f"Vulnerability check failed: {e!s}")
-
-    async def _analyze_permissions(self, module_path: str, check: QualityCheck) -> None:
-        """Analyze module permissions and access patterns."""
-        try:
-            # Simulate permission analysis
-            permission_score = 90.0  # Simulated
-
-            check.details["permission_score"] = permission_score
-            check.details["excessive_permissions"] = False  # Simulated
-
-            if permission_score < 80:
-                check.warnings.append("Some permission concerns found")
-
-        except Exception as e:
-            check.errors.append(f"Permission analysis failed: {e!s}")
-
-    async def _check_dependencies(self, module_path: str, check: QualityCheck) -> None:
-        """Check dependencies for security issues."""
-        try:
-            # Simulate dependency security check
-            dependency_score = 95.0  # Simulated
-
-            check.details["dependency_score"] = dependency_score
-            check.details["outdated_dependencies"] = 1  # Simulated
-
-            if dependency_score < 90:
-                check.warnings.append("Some dependency security concerns found")
-
-        except Exception as e:
-            check.errors.append(f"Dependency check failed: {e!s}")
-
-    def _calculate_security_score(self, check: QualityCheck) -> float:
-        """Calculate overall security score."""
-        scores = []
-
-        if "vulnerability_score" in check.details:
-            scores.append(check.details["vulnerability_score"])
-        if "permission_score" in check.details:
-            scores.append(check.details["permission_score"])
-        if "dependency_score" in check.details:
-            scores.append(check.details["dependency_score"])
-
-        return sum(scores) / len(scores) if scores else 0.0
-
-
-class DocumentationGenerator:
-    """Documentation generation and validation for modules.
-
-    Following patterns from crawl_mcp.py for documentation processing.
-    """
-
-    def __init__(self, config: dict[str, Any] | None = None):
-        """Initialize the documentation generator.
-
-        Args:
-            config: Optional configuration overrides
-        """
-        self.config = config or {}
-
-    async def validate_documentation(self, module_path: str) -> QualityCheck:
-        """Validate and generate documentation for a module.
-
-        Args:
-            module_path: Path to the module
-
-        Returns:
-            QualityCheck with documentation validation results
-        """
-        check = QualityCheck(
-            name="Documentation Validation", category="documentation", status="passed"
-        )
-
-        try:
-            # Check documentation completeness
-            await self._check_documentation_completeness(module_path, check)
-            await self._validate_documentation_quality(module_path, check)
-            await self._generate_documentation(module_path, check)
-
-            # Calculate documentation score
-            check.score = self._calculate_documentation_score(check)
-
-            if check.score < 70:
-                check.status = "failed"
-            elif check.score < 85:
-                check.status = "warning"
-
-        except Exception as e:
-            check.status = "failed"
-            check.errors.append(f"Documentation validation failed: {e!s}")
-            check.score = 0.0
-
-        return check
-
-    async def _check_documentation_completeness(
-        self, module_path: str, check: QualityCheck
-    ) -> None:
-        """Check completeness of module documentation."""
-        try:
-            # Simulate documentation completeness check
-            completeness_score = 80.0  # Simulated
-
-            check.details["completeness_score"] = completeness_score
-            check.details["missing_sections"] = ["Installation Guide"]  # Simulated
-
-            if completeness_score < 90:
-                check.recommendations.append(
-                    "Consider adding missing documentation sections"
-                )
-
-        except Exception as e:
-            check.errors.append(f"Documentation completeness check failed: {e!s}")
-
-    async def _validate_documentation_quality(
-        self, module_path: str, check: QualityCheck
-    ) -> None:
-        """Validate quality of existing documentation."""
-        try:
-            # Simulate documentation quality validation
-            quality_score = 85.0  # Simulated
-
-            check.details["quality_score"] = quality_score
-            check.details["readability_score"] = 78.5  # Simulated
-
-            if quality_score < 80:
-                check.warnings.append("Documentation quality could be improved")
-
-        except Exception as e:
-            check.errors.append(f"Documentation quality validation failed: {e!s}")
-
-    async def _generate_documentation(
-        self, module_path: str, check: QualityCheck
-    ) -> None:
-        """Generate additional documentation if needed."""
-        try:
-            # Simulate documentation generation
-            generated_docs = ["API Reference", "Quick Start Guide"]  # Simulated
-
-            check.details["generated_docs"] = generated_docs
-            check.details["generation_success"] = True
-
-            if generated_docs:
-                check.recommendations.append(
-                    "Generated additional documentation sections"
-                )
-
-        except Exception as e:
-            check.errors.append(f"Documentation generation failed: {e!s}")
-
-    def _calculate_documentation_score(self, check: QualityCheck) -> float:
-        """Calculate overall documentation score."""
-        scores = []
-
-        if "completeness_score" in check.details:
-            scores.append(check.details["completeness_score"])
-        if "quality_score" in check.details:
-            scores.append(check.details["quality_score"])
-
-        return sum(scores) / len(scores) if scores else 0.0
+    elif "permission" in error_str or "access" in error_str:
+        return "Permission denied. Check file permissions and user access rights."
+    elif "not found" in error_str or "command not found" in error_str:
+        return "Required tool not found. Install missing quality assurance tools."
+    elif "syntax error" in error_str or "parse error" in error_str:
+        return "Code syntax error detected. Fix syntax issues before running QA checks."
+    else:
+        return f"Quality assurance error: {error!s}"
 
 
 class QualityAssurancePipeline:
-    """Comprehensive quality assurance pipeline for module testing.
+    """Quality assurance pipeline for Ignition modules.
 
-    Following patterns from crawl_mcp.py for pipeline management and execution.
+    Following patterns from crawl_mcp.py for robust validation,
+    error handling, and resource management.
     """
 
     def __init__(self, config: dict[str, Any] | None = None):
@@ -475,223 +186,360 @@ class QualityAssurancePipeline:
             config: Optional configuration overrides
         """
         self.config = config or {}
-        self.code_checker = CodeQualityChecker(config)
-        self.security_scanner = SecurityScanner(config)
-        self.doc_generator = DocumentationGenerator(config)
+        self.temp_dir: Path | None = None
+        self.checks: list[QualityCheck] = []
+        self.report: QualityReport | None = None
+
+        # Load configuration from environment
+        self.timeout = int(os.getenv("QA_TIMEOUT", "600"))
+        self.parallel_checks = int(os.getenv("QA_PARALLEL_CHECKS", "4"))
+        self.fail_fast = os.getenv("QA_FAIL_FAST", "false").lower() == "true"
 
     @asynccontextmanager
-    async def qa_context(self, module_path: str) -> AsyncIterator[dict[str, Any]]:
-        """Create a QA context with resource management.
+    async def qa_context(
+        self, module_path: str
+    ) -> AsyncIterator["QualityAssurancePipeline"]:
+        """Create QA context with resource management.
 
         Following patterns from crawl_mcp.py for context management.
 
         Args:
-            module_path: Path to the module for QA analysis
+            module_path: Path to the module
 
         Yields:
-            Dictionary with QA context information
+            QualityAssurancePipeline instance
         """
-        context = {
-            "module_path": module_path,
-            "start_time": asyncio.get_event_loop().time(),
-            "temp_resources": [],
-        }
-
-        try:
-            yield context
-        finally:
-            # Cleanup any temporary resources
-            for resource in context.get("temp_resources", []):
-                try:
-                    if isinstance(resource, Path) and resource.exists():
-                        if resource.is_dir():
-                            import shutil
-
-                            shutil.rmtree(resource)
-                        else:
-                            resource.unlink()
-                except Exception:
-                    pass  # Ignore cleanup errors
-
-    async def run_full_qa(self, module_path: str) -> QualityReport:
-        """Run comprehensive quality assurance on a module.
-
-        Args:
-            module_path: Path to the module to analyze
-
-        Returns:
-            QualityReport with complete QA results
-        """
-        async with self.qa_context(module_path) as context:
-            report = QualityReport(
-                module_path=module_path,
-                overall_score=0.0,
-                generated_at=str(asyncio.get_event_loop().time()),
-            )
+        with tempfile.TemporaryDirectory() as temp_dir:
+            self.temp_dir = Path(temp_dir)
 
             try:
-                # Run all QA checks in parallel for efficiency
-                checks = await asyncio.gather(
-                    self.code_checker.analyze_module(module_path),
-                    self.security_scanner.scan_module(module_path),
-                    self.doc_generator.validate_documentation(module_path),
-                    return_exceptions=True,
+                await self.initialize_checks(module_path)
+                yield self
+            finally:
+                self.temp_dir = None
+
+    async def initialize_checks(self, module_path: str) -> None:
+        """Initialize quality checks for the module.
+
+        Args:
+            module_path: Path to the module
+        """
+        module_file = Path(module_path)
+        working_dir = str(module_file.parent)
+
+        # Define standard quality checks
+        self.checks = [
+            QualityCheck(
+                name="Code Style Check",
+                check_type=QualityCheckType.CODE_STYLE,
+                command=f"ruff check {module_path}",
+                working_dir=working_dir,
+                timeout=120,
+                required=True,
+            ),
+            QualityCheck(
+                name="Type Checking",
+                check_type=QualityCheckType.TYPE_CHECKING,
+                command=f"mypy {module_path}",
+                working_dir=working_dir,
+                timeout=180,
+                required=True,
+            ),
+            QualityCheck(
+                name="Security Scan",
+                check_type=QualityCheckType.SECURITY_SCAN,
+                command=f"bandit -r {module_path}",
+                working_dir=working_dir,
+                timeout=120,
+                required=True,
+            ),
+            QualityCheck(
+                name="Complexity Analysis",
+                check_type=QualityCheckType.COMPLEXITY_ANALYSIS,
+                command=f"radon cc {module_path} --min B",
+                working_dir=working_dir,
+                timeout=60,
+                required=False,
+            ),
+            QualityCheck(
+                name="Documentation Check",
+                check_type=QualityCheckType.DOCUMENTATION,
+                command=f"pydocstyle {module_path}",
+                working_dir=working_dir,
+                timeout=60,
+                required=False,
+            ),
+            QualityCheck(
+                name="Dependency Audit",
+                check_type=QualityCheckType.DEPENDENCY_AUDIT,
+                command="safety check",
+                working_dir=working_dir,
+                timeout=120,
+                required=False,
+            ),
+        ]
+
+        # Filter checks based on available tools
+        available_checks = []
+        for check in self.checks:
+            tool_name = check.command.split()[0]
+            if _check_tool_available(tool_name):
+                available_checks.append(check)
+            else:
+                check.status = QualityCheckStatus.SKIPPED
+                check.output = f"Tool '{tool_name}' not available"
+
+        self.checks = available_checks
+
+    async def run_checks(self) -> QualityReport:
+        """Run all quality checks.
+
+        Returns:
+            QualityReport with results
+        """
+        if not self.checks:
+            raise RuntimeError("No quality checks initialized")
+
+        start_time = asyncio.get_event_loop().time()
+
+        # Run checks in parallel with semaphore for concurrency control
+        semaphore = asyncio.Semaphore(self.parallel_checks)
+        tasks = [
+            asyncio.create_task(self._run_single_check(check, semaphore))
+            for check in self.checks
+        ]
+
+        try:
+            await asyncio.gather(*tasks, return_exceptions=not self.fail_fast)
+        except Exception as e:
+            if self.fail_fast:
+                # Cancel running tasks
+                for task in tasks:
+                    if not task.done():
+                        task.cancel()
+                raise RuntimeError(format_qa_error(e)) from e
+
+        end_time = asyncio.get_event_loop().time()
+        duration = end_time - start_time
+
+        # Generate report
+        self.report = self._generate_report(duration)
+        return self.report
+
+    async def _run_single_check(
+        self, check: QualityCheck, semaphore: asyncio.Semaphore
+    ) -> None:
+        """Run a single quality check.
+
+        Args:
+            check: QualityCheck to run
+            semaphore: Semaphore for concurrency control
+        """
+        async with semaphore:
+            if check.status == QualityCheckStatus.SKIPPED:
+                return
+
+            check.status = QualityCheckStatus.RUNNING
+            start_time = asyncio.get_event_loop().time()
+
+            try:
+                # Run the check command
+                process = await asyncio.create_subprocess_shell(
+                    check.command,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                    cwd=check.working_dir,
                 )
 
-                # Process results
-                valid_checks = []
-                for check in checks:
-                    if isinstance(check, QualityCheck):
-                        valid_checks.append(check)
-                        report.checks.append(check)
-                    else:
-                        # Handle exceptions
-                        error_check = QualityCheck(
-                            name="QA Pipeline Error",
-                            category="pipeline",
-                            status="failed",
-                            errors=[str(check)],
-                        )
-                        report.checks.append(error_check)
+                stdout, stderr = await asyncio.wait_for(
+                    process.communicate(), timeout=check.timeout
+                )
 
-                # Calculate overall score
-                if valid_checks:
-                    report.overall_score = sum(
-                        check.score for check in valid_checks
-                    ) / len(valid_checks)
+                check.exit_code = process.returncode
+                check.output = stdout.decode("utf-8") if stdout else ""
+                check.error_output = stderr.decode("utf-8") if stderr else ""
 
-                # Generate summary
-                report.summary = self._generate_summary(report)
+                # Determine status based on exit code
+                if check.exit_code == 0:
+                    check.status = QualityCheckStatus.PASSED
+                else:
+                    check.status = QualityCheckStatus.FAILED
+
+            except TimeoutError:
+                check.status = QualityCheckStatus.ERROR
+                check.error_output = f"Check timed out after {check.timeout} seconds"
+                if process:
+                    process.kill()
+                    await process.wait()
 
             except Exception as e:
-                error_check = QualityCheck(
-                    name="QA Pipeline Critical Error",
-                    category="pipeline",
-                    status="failed",
-                    errors=[f"Critical QA pipeline error: {e!s}"],
-                )
-                report.checks.append(error_check)
-                report.overall_score = 0.0
+                check.status = QualityCheckStatus.ERROR
+                check.error_output = format_qa_error(e)
 
-            return report
+            finally:
+                end_time = asyncio.get_event_loop().time()
+                check.duration = end_time - start_time
 
-    def _generate_summary(self, report: QualityReport) -> dict[str, Any]:
-        """Generate summary statistics for the QA report.
+    def _generate_report(self, total_duration: float) -> QualityReport:
+        """Generate quality assurance report.
 
         Args:
-            report: QualityReport to summarize
+            total_duration: Total time taken for all checks
 
         Returns:
-            Dictionary with summary information
+            QualityReport with results
         """
-        summary = {
-            "total_checks": len(report.checks),
-            "passed_checks": sum(
-                1 for check in report.checks if check.status == "passed"
-            ),
-            "failed_checks": sum(
-                1 for check in report.checks if check.status == "failed"
-            ),
-            "warning_checks": sum(
-                1 for check in report.checks if check.status == "warning"
-            ),
-            "categories": {},
-            "recommendations": [],
-        }
+        passed_checks = sum(
+            1 for check in self.checks if check.status == QualityCheckStatus.PASSED
+        )
+        failed_checks = sum(
+            1 for check in self.checks if check.status == QualityCheckStatus.FAILED
+        )
+        skipped_checks = sum(
+            1 for check in self.checks if check.status == QualityCheckStatus.SKIPPED
+        )
+        error_checks = sum(
+            1 for check in self.checks if check.status == QualityCheckStatus.ERROR
+        )
 
-        # Categorize checks
-        for check in report.checks:
-            if check.category not in summary["categories"]:
-                summary["categories"][check.category] = {
-                    "total": 0,
-                    "passed": 0,
-                    "failed": 0,
-                    "warnings": 0,
-                    "average_score": 0.0,
-                }
+        # Determine overall status
+        if error_checks > 0:
+            overall_status = "error"
+        elif failed_checks > 0:
+            required_failures = sum(
+                1
+                for check in self.checks
+                if check.status == QualityCheckStatus.FAILED and check.required
+            )
+            overall_status = "failed" if required_failures > 0 else "warning"
+        else:
+            overall_status = "passed"
 
-            cat = summary["categories"][check.category]
-            cat["total"] += 1
+        return QualityReport(
+            module_path="",  # Will be set by caller
+            total_checks=len(self.checks),
+            passed_checks=passed_checks,
+            failed_checks=failed_checks,
+            skipped_checks=skipped_checks,
+            error_checks=error_checks,
+            overall_status=overall_status,
+            duration=total_duration,
+            checks=self.checks.copy(),
+            recommendations=self._generate_recommendations(),
+            metadata={
+                "parallel_checks": self.parallel_checks,
+                "fail_fast": self.fail_fast,
+                "timeout": self.timeout,
+            },
+        )
 
-            if check.status == "passed":
-                cat["passed"] += 1
-            elif check.status == "failed":
-                cat["failed"] += 1
-            elif check.status == "warning":
-                cat["warnings"] += 1
+    def _generate_recommendations(self) -> list[str]:
+        """Generate recommendations based on check results.
 
-        # Calculate average scores per category
-        for category, data in summary["categories"].items():
-            category_checks = [
-                check for check in report.checks if check.category == category
+        Returns:
+            List of recommendations
+        """
+        recommendations = []
+
+        failed_checks = [
+            check for check in self.checks if check.status == QualityCheckStatus.FAILED
+        ]
+        error_checks = [
+            check for check in self.checks if check.status == QualityCheckStatus.ERROR
+        ]
+
+        if failed_checks:
+            recommendations.append(
+                "Fix code quality issues identified by failed checks"
+            )
+
+            # Specific recommendations based on check types
+            for check in failed_checks:
+                if check.check_type == QualityCheckType.CODE_STYLE:
+                    recommendations.append(
+                        "Run 'ruff check --fix' to automatically fix style issues"
+                    )
+                elif check.check_type == QualityCheckType.TYPE_CHECKING:
+                    recommendations.append(
+                        "Add type annotations and fix type-related issues"
+                    )
+                elif check.check_type == QualityCheckType.SECURITY_SCAN:
+                    recommendations.append("Review and fix security vulnerabilities")
+
+        if error_checks:
+            recommendations.append("Investigate and resolve errors in quality checks")
+            missing_tools = [
+                check.name
+                for check in error_checks
+                if "not found" in check.error_output.lower()
             ]
-            if category_checks:
-                data["average_score"] = sum(
-                    check.score for check in category_checks
-                ) / len(category_checks)
+            if missing_tools:
+                recommendations.append(
+                    f"Install missing tools: {', '.join(missing_tools)}"
+                )
 
-        # Collect all recommendations
-        for check in report.checks:
-            summary["recommendations"].extend(check.recommendations)
+        skipped_checks = [
+            check for check in self.checks if check.status == QualityCheckStatus.SKIPPED
+        ]
+        if skipped_checks:
+            tools = [check.command.split()[0] for check in skipped_checks]
+            recommendations.append(
+                f"Install optional tools for comprehensive checks: {', '.join(set(tools))}"
+            )
 
-        return summary
+        if not recommendations:
+            recommendations.append(
+                "All quality checks passed - module meets quality standards"
+            )
 
-    async def generate_qa_report(
-        self, report: QualityReport, output_path: str | None = None
-    ) -> dict[str, Any]:
-        """Generate a formatted QA report.
+        return recommendations
+
+    def export_report(self, output_path: str | None = None) -> dict[str, Any]:
+        """Export quality report to file or return as dict.
 
         Args:
-            report: QualityReport to format
-            output_path: Optional path to save the report
+            output_path: Optional path to save report
 
         Returns:
-            Dictionary with formatted report data
+            Report data as dictionary
         """
-        formatted_report = {
-            "module_path": report.module_path,
-            "overall_score": report.overall_score,
-            "grade": self._calculate_grade(report.overall_score),
-            "generated_at": report.generated_at,
-            "summary": report.summary,
+        if not self.report:
+            raise RuntimeError("No report available - run checks first")
+
+        report_data = {
+            "module_path": self.report.module_path,
+            "timestamp": asyncio.get_event_loop().time(),
+            "summary": {
+                "overall_status": self.report.overall_status,
+                "total_checks": self.report.total_checks,
+                "passed_checks": self.report.passed_checks,
+                "failed_checks": self.report.failed_checks,
+                "skipped_checks": self.report.skipped_checks,
+                "error_checks": self.report.error_checks,
+                "duration": self.report.duration,
+            },
             "checks": [
                 {
                     "name": check.name,
-                    "category": check.category,
-                    "status": check.status,
-                    "score": check.score,
-                    "errors": check.errors,
-                    "warnings": check.warnings,
-                    "recommendations": check.recommendations,
-                    "details": check.details,
+                    "type": check.check_type.value,
+                    "status": check.status.value,
+                    "command": check.command,
+                    "duration": check.duration,
+                    "exit_code": check.exit_code,
+                    "output": check.output,
+                    "error_output": check.error_output,
+                    "required": check.required,
                 }
-                for check in report.checks
+                for check in self.report.checks
             ],
+            "recommendations": self.report.recommendations,
+            "metadata": self.report.metadata,
         }
 
-        # Save report if path provided
         if output_path:
-            with open(output_path, "w") as f:
-                json.dump(formatted_report, f, indent=2)
+            output_file = Path(output_path)
+            output_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(output_file, "w") as f:
+                json.dump(report_data, f, indent=2)
 
-        return formatted_report
-
-    def _calculate_grade(self, score: float) -> str:
-        """Calculate letter grade from numeric score.
-
-        Args:
-            score: Numeric score (0-100)
-
-        Returns:
-            Letter grade (A-F)
-        """
-        if score >= 90:
-            return "A"
-        elif score >= 80:
-            return "B"
-        elif score >= 70:
-            return "C"
-        elif score >= 60:
-            return "D"
-        else:
-            return "F"
+        return report_data

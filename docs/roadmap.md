@@ -816,6 +816,7 @@ Implement a comprehensive Ignition Module development framework using the offici
 - [ ] **Create module distribution system**
   - [ ] Build automated module signing and packaging
   - [ ] Create module repository and update mechanisms
+  - [ ] Create module CI/CD pipeline in github
   - [ ] Implement module licensing and activation system
   - [ ] Build module installation and update tools
 

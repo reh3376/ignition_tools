@@ -1,47 +1,58 @@
-"""Test Environment Management for Module Testing.
+"""Test Environment Management for Ignition Module Testing.
 
-This module provides comprehensive test environment management,
-including Docker-based testing environments and local testing setups.
-Following patterns from crawl_mcp.py for robust environment handling.
+Provides Docker-based and local test environments following patterns from
+crawl_mcp.py for validation, error handling, and resource management.
 """
 
 import asyncio
 import os
+import tempfile
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
-from typing import Any
+from enum import Enum
+from pathlib import Path
+from typing import Any, cast
 
+import docker
+import docker.errors
+import docker.models.containers
+import docker.models.networks
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
 
 
+class TestEnvironmentStatus(Enum):
+    """Status of test environment."""
+
+    NOT_INITIALIZED = "not_initialized"
+    INITIALIZING = "initializing"
+    READY = "ready"
+    RUNNING = "running"
+    STOPPING = "stopping"
+    STOPPED = "stopped"
+    ERROR = "error"
+
+
 @dataclass
 class TestEnvironmentConfig:
-    """Configuration for test environments."""
+    """Configuration for test environment."""
 
-    ignition_version: str = "8.1.0"
+    ignition_version: str
+    gateway_url: str
+    docker_image: str = "inductiveautomation/ignition:latest"
     gateway_port: int = 8088
     designer_port: int = 8043
-    docker_enabled: bool = False
-    test_timeout: int = 300
-    environment_variables: dict[str, str] = field(default_factory=dict)
-    volume_mounts: list[str] = field(default_factory=list)
-
-
-@dataclass
-class TestEnvironmentStatus:
-    """Status information for test environments."""
-
-    name: str
-    type: str  # "docker" or "local"
-    status: str  # "running", "stopped", "error"
-    gateway_url: str | None = None
-    designer_url: str | None = None
-    container_id: str | None = None
-    error_message: str | None = None
+    mqtt_port: int = 1883
+    opc_port: int = 62541
+    memory_limit: str = "2g"
+    cpu_limit: str = "2.0"
+    timeout: int = 300
+    environment_vars: dict[str, str] = field(default_factory=dict)
+    volumes: dict[str, str] = field(default_factory=dict)
+    network_name: str | None = None
 
 
 def validate_test_environment_config() -> dict[str, Any]:
@@ -58,9 +69,12 @@ def validate_test_environment_config() -> dict[str, Any]:
     }
 
     optional_vars = {
-        "DOCKER_TEST_ENABLED": "Enable Docker-based testing",
+        "DOCKER_TEST_IMAGE": "Docker image for testing",
+        "TEST_GATEWAY_PORT": "Gateway port",
+        "TEST_DESIGNER_PORT": "Designer port",
         "TEST_TIMEOUT": "Test timeout in seconds",
-        "IGNITION_DOCKER_IMAGE": "Docker image for Ignition testing",
+        "TEST_CONTAINER_MEMORY": "Container memory limit",
+        "TEST_CONTAINER_CPU": "Container CPU limit",
     }
 
     missing_required = []
@@ -88,441 +102,386 @@ def validate_test_environment_config() -> dict[str, Any]:
     return {"valid": True, "variables": available_vars}
 
 
+def format_docker_error(error: Exception) -> str:
+    """Format Docker errors for user-friendly messages.
+
+    Following patterns from crawl_mcp.py for error formatting.
+
+    Args:
+        error: The exception to format
+
+    Returns:
+        Formatted error message
+    """
+    error_str = str(error).lower()
+
+    if "permission denied" in error_str:
+        return "Docker permission denied. Add user to docker group or run with sudo."
+    elif "connection refused" in error_str or "daemon" in error_str:
+        return "Docker daemon not running. Start Docker service and try again."
+    elif "no such image" in error_str:
+        return "Docker image not found. Check image name and availability."
+    elif "port" in error_str and "already" in error_str:
+        return (
+            "Port already in use. Stop other containers or change port configuration."
+        )
+    elif "memory" in error_str or "resources" in error_str:
+        return "Insufficient system resources. Free up memory and try again."
+    else:
+        return f"Docker error: {error!s}"
+
+
 class TestEnvironment:
-    """Base class for test environments."""
+    """Base class for test environments.
+
+    Following patterns from crawl_mcp.py for context management
+    and resource cleanup.
+    """
 
     def __init__(self, config: TestEnvironmentConfig):
-        """Initialize the test environment.
+        """Initialize test environment.
 
         Args:
             config: Test environment configuration
         """
         self.config = config
-        self.status = TestEnvironmentStatus(name="base", type="base", status="stopped")
+        self.status = TestEnvironmentStatus.NOT_INITIALIZED
+        self.temp_dir: Path | None = None
 
-    async def start(self) -> bool:
-        """Start the test environment.
+    @asynccontextmanager
+    async def environment_context(self) -> AsyncIterator["TestEnvironment"]:
+        """Create environment context with resource management.
 
-        Returns:
-            True if started successfully, False otherwise
+        Yields:
+            TestEnvironment instance
         """
-        raise NotImplementedError("Subclasses must implement start()")
+        try:
+            await self.initialize()
+            yield self
+        finally:
+            await self.cleanup()
 
-    async def stop(self) -> bool:
-        """Stop the test environment.
+    async def initialize(self) -> None:
+        """Initialize the test environment."""
+        self.status = TestEnvironmentStatus.INITIALIZING
 
-        Returns:
-            True if stopped successfully, False otherwise
-        """
-        raise NotImplementedError("Subclasses must implement stop()")
+        # Create temporary directory
+        self.temp_dir = Path(tempfile.mkdtemp(prefix="ignition_test_"))
 
-    async def is_ready(self) -> bool:
-        """Check if the test environment is ready for testing.
+        self.status = TestEnvironmentStatus.READY
 
-        Returns:
-            True if ready, False otherwise
-        """
-        raise NotImplementedError("Subclasses must implement is_ready()")
+    async def start(self) -> None:
+        """Start the test environment."""
+        if self.status != TestEnvironmentStatus.READY:
+            raise RuntimeError(f"Environment not ready, status: {self.status}")
+
+        self.status = TestEnvironmentStatus.RUNNING
+
+    async def stop(self) -> None:
+        """Stop the test environment."""
+        self.status = TestEnvironmentStatus.STOPPING
+        self.status = TestEnvironmentStatus.STOPPED
+
+    async def cleanup(self) -> None:
+        """Clean up test environment resources."""
+        await self.stop()
+
+        # Clean up temporary directory
+        if self.temp_dir and self.temp_dir.exists():
+            import shutil
+
+            shutil.rmtree(self.temp_dir)
+            self.temp_dir = None
 
     def get_status(self) -> TestEnvironmentStatus:
-        """Get the current status of the test environment.
-
-        Returns:
-            TestEnvironmentStatus with current status information
-        """
+        """Get current environment status."""
         return self.status
+
+    def is_ready(self) -> bool:
+        """Check if environment is ready for testing."""
+        return self.status == TestEnvironmentStatus.RUNNING
 
 
 class DockerTestEnvironment(TestEnvironment):
-    """Docker-based test environment for comprehensive module testing.
+    """Docker-based test environment for Ignition modules.
 
-    Following patterns from crawl_mcp.py for Docker integration and management.
+    Following patterns from crawl_mcp.py for Docker integration
+    and error handling.
     """
 
     def __init__(self, config: TestEnvironmentConfig):
-        """Initialize the Docker test environment.
+        """Initialize Docker test environment.
 
         Args:
             config: Test environment configuration
         """
         super().__init__(config)
-        self.status.name = "docker-ignition"
-        self.status.type = "docker"
+        self.docker_client: docker.DockerClient | None = None
+        self.container: docker.models.containers.Container | None = None
+        self.network: docker.models.networks.Network | None = None
 
-        # Docker configuration
-        self.docker_image = os.getenv(
-            "IGNITION_DOCKER_IMAGE", "inductiveautomation/ignition:latest"
-        )
-        self.container_name = f"ignition-test-{self.config.ignition_version}"
-
-    async def start(self) -> bool:
-        """Start the Docker test environment.
-
-        Following patterns from crawl_mcp.py for robust Docker management.
-
-        Returns:
-            True if started successfully, False otherwise
-        """
-        try:
-            # Check if Docker is available
-            if not await self._check_docker_available():
-                self.status.status = "error"
-                self.status.error_message = "Docker is not available"
-                return False
-
-            # Stop existing container if running
-            await self._stop_existing_container()
-
-            # Start new container
-            docker_cmd = [
-                "docker",
-                "run",
-                "-d",
-                "--name",
-                self.container_name,
-                "-p",
-                f"{self.config.gateway_port}:8088",
-                "-p",
-                f"{self.config.designer_port}:8043",
-            ]
-
-            # Add environment variables
-            for key, value in self.config.environment_variables.items():
-                docker_cmd.extend(["-e", f"{key}={value}"])
-
-            # Add volume mounts
-            for mount in self.config.volume_mounts:
-                docker_cmd.extend(["-v", mount])
-
-            docker_cmd.append(self.docker_image)
-
-            result = await asyncio.create_subprocess_exec(
-                *docker_cmd,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-            stdout, stderr = await result.communicate()
-
-            if result.returncode == 0:
-                self.status.container_id = stdout.decode().strip()
-                self.status.status = "running"
-                self.status.gateway_url = f"http://localhost:{self.config.gateway_port}"
-                self.status.designer_url = (
-                    f"http://localhost:{self.config.designer_port}"
-                )
-
-                # Wait for container to be ready
-                if await self._wait_for_ready():
-                    return True
-                else:
-                    self.status.status = "error"
-                    self.status.error_message = "Container failed to become ready"
-                    return False
-            else:
-                self.status.status = "error"
-                self.status.error_message = stderr.decode()
-                return False
-
-        except Exception as e:
-            self.status.status = "error"
-            self.status.error_message = str(e)
-            return False
-
-    async def stop(self) -> bool:
-        """Stop the Docker test environment.
-
-        Returns:
-            True if stopped successfully, False otherwise
-        """
-        try:
-            if self.status.container_id:
-                # Stop container
-                result = await asyncio.create_subprocess_exec(
-                    "docker",
-                    "stop",
-                    self.status.container_id,
-                    stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE,
-                )
-                await result.communicate()
-
-                # Remove container
-                result = await asyncio.create_subprocess_exec(
-                    "docker",
-                    "rm",
-                    self.status.container_id,
-                    stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE,
-                )
-                await result.communicate()
-
-            self.status.status = "stopped"
-            self.status.container_id = None
-            return True
-
-        except Exception as e:
-            self.status.error_message = str(e)
-            return False
-
-    async def is_ready(self) -> bool:
-        """Check if the Docker environment is ready for testing.
-
-        Returns:
-            True if ready, False otherwise
-        """
-        if self.status.status != "running" or not self.status.gateway_url:
-            return False
-
-        try:
-            # Simple health check - try to connect to gateway
-            result = await asyncio.create_subprocess_exec(
-                "curl",
-                "-f",
-                "-s",
-                f"{self.status.gateway_url}/main/web/status",
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-            await result.communicate()
-            return result.returncode == 0
-
-        except Exception:
-            return False
-
-    async def _check_docker_available(self) -> bool:
+    def _check_docker_available(self) -> bool:
         """Check if Docker is available.
 
-        Following patterns from crawl_mcp.py for environment checking.
+        Following patterns from crawl_mcp.py for availability checks.
 
         Returns:
-            True if Docker is available, False otherwise
+            True if Docker is available
         """
         try:
-            result = await asyncio.create_subprocess_exec(
-                "docker",
-                "--version",
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-            await result.communicate()
-            return result.returncode == 0
+            client = docker.from_env()
+            client.ping()
+            return True
         except Exception:
             return False
 
-    async def _stop_existing_container(self) -> None:
-        """Stop any existing container with the same name."""
+    async def initialize(self) -> None:
+        """Initialize Docker test environment."""
+        await super().initialize()
+
+        if not self._check_docker_available():
+            self.status = TestEnvironmentStatus.ERROR
+            raise RuntimeError("Docker is not available")
+
         try:
-            # Check if container exists
-            result = await asyncio.create_subprocess_exec(
-                "docker",
-                "ps",
-                "-a",
-                "-q",
-                "-f",
-                f"name={self.container_name}",
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-            stdout, _ = await result.communicate()
+            self.docker_client = docker.from_env()
 
-            if stdout.strip():
-                # Stop and remove existing container
-                await asyncio.create_subprocess_exec(
-                    "docker",
-                    "stop",
-                    self.container_name,
-                    stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE,
-                )
-                await asyncio.create_subprocess_exec(
-                    "docker",
-                    "rm",
-                    self.container_name,
-                    stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE,
-                )
-        except Exception:
-            pass  # Ignore errors when cleaning up
-
-    async def _wait_for_ready(self, max_wait: int = 60) -> bool:
-        """Wait for the container to be ready.
-
-        Args:
-            max_wait: Maximum time to wait in seconds
-
-        Returns:
-            True if ready within timeout, False otherwise
-        """
-        for _ in range(max_wait):
-            if await self.is_ready():
-                return True
-            await asyncio.sleep(1)
-        return False
-
-
-class LocalTestEnvironment(TestEnvironment):
-    """Local test environment using existing Ignition installation."""
-
-    def __init__(self, config: TestEnvironmentConfig):
-        """Initialize the local test environment.
-
-        Args:
-            config: Test environment configuration
-        """
-        super().__init__(config)
-        self.status.name = "local-ignition"
-        self.status.type = "local"
-
-        # Use configured gateway URL or default
-        self.gateway_url = os.getenv(
-            "TEST_GATEWAY_URL", f"http://localhost:{config.gateway_port}"
-        )
-
-    async def start(self) -> bool:
-        """Start the local test environment.
-
-        For local environments, this mainly validates connectivity.
-
-        Returns:
-            True if environment is accessible, False otherwise
-        """
-        try:
-            self.status.gateway_url = self.gateway_url
-            self.status.designer_url = self.gateway_url.replace(
-                str(self.config.gateway_port), str(self.config.designer_port)
-            )
-
-            if await self.is_ready():
-                self.status.status = "running"
-                return True
-            else:
-                self.status.status = "error"
-                self.status.error_message = "Cannot connect to local Ignition gateway"
-                return False
+            # Create network if specified
+            if self.config.network_name:
+                try:
+                    self.network = self.docker_client.networks.get(
+                        self.config.network_name
+                    )
+                except docker.errors.NotFound:
+                    self.network = self.docker_client.networks.create(
+                        self.config.network_name
+                    )
 
         except Exception as e:
-            self.status.status = "error"
-            self.status.error_message = str(e)
-            return False
+            self.status = TestEnvironmentStatus.ERROR
+            raise RuntimeError(format_docker_error(e)) from e
 
-    async def stop(self) -> bool:
-        """Stop the local test environment.
+    async def start(self) -> None:
+        """Start Docker container."""
+        await super().start()
 
-        For local environments, this is a no-op.
+        if not self.docker_client:
+            raise RuntimeError("Docker client not initialized")
 
-        Returns:
-            True always (local environment is managed externally)
-        """
-        self.status.status = "stopped"
-        return True
-
-    async def is_ready(self) -> bool:
-        """Check if the local environment is ready for testing.
-
-        Returns:
-            True if ready, False otherwise
-        """
         try:
-            # Simple connectivity check
-            result = await asyncio.create_subprocess_exec(
-                "curl",
-                "-f",
-                "-s",
-                "--connect-timeout",
-                "5",
-                f"{self.gateway_url}/main/web/status",
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-            await result.communicate()
-            return result.returncode == 0
+            # Pull image if not available
+            try:
+                self.docker_client.images.get(self.config.docker_image)
+            except docker.errors.ImageNotFound:
+                print(f"Pulling Docker image: {self.config.docker_image}")
+                self.docker_client.images.pull(self.config.docker_image)
 
-        except Exception:
-            return False
+            # Prepare container configuration
+            container_config = {
+                "image": self.config.docker_image,
+                "ports": {
+                    f"{self.config.gateway_port}/tcp": self.config.gateway_port,
+                    f"{self.config.designer_port}/tcp": self.config.designer_port,
+                    f"{self.config.mqtt_port}/tcp": self.config.mqtt_port,
+                    f"{self.config.opc_port}/tcp": self.config.opc_port,
+                },
+                "environment": self.config.environment_vars,
+                "volumes": self.config.volumes,
+                "mem_limit": self.config.memory_limit,
+                "cpu_period": 100000,
+                "cpu_quota": int(float(self.config.cpu_limit) * 100000),
+                "detach": True,
+                "remove": True,
+            }
+
+            if self.network:
+                container_config["network"] = self.network.name
+
+            # Start container
+            self.container = self.docker_client.containers.run(**container_config)
+
+            # Wait for container to be ready
+            await self._wait_for_container_ready()
+
+        except Exception as e:
+            self.status = TestEnvironmentStatus.ERROR
+            raise RuntimeError(format_docker_error(e)) from e
+
+    async def _wait_for_container_ready(self) -> None:
+        """Wait for container to be ready."""
+        if not self.container:
+            return
+
+        max_wait = self.config.timeout
+        wait_interval = 5
+        waited = 0
+
+        while waited < max_wait:
+            try:
+                self.container.reload()
+                if self.container.status == "running":
+                    # Additional check for Ignition Gateway availability
+                    import aiohttp
+
+                    async with aiohttp.ClientSession() as session:
+                        try:
+                            async with session.get(
+                                f"{self.config.gateway_url}/StatusPing",
+                                timeout=aiohttp.ClientTimeout(total=10),
+                            ) as response:
+                                if response.status == 200:
+                                    return
+                        except (aiohttp.ClientError, TimeoutError):
+                            pass
+
+                await asyncio.sleep(wait_interval)
+                waited += wait_interval
+
+            except Exception:
+                await asyncio.sleep(wait_interval)
+                waited += wait_interval
+
+        raise RuntimeError(f"Container not ready after {max_wait} seconds")
+
+    async def stop(self) -> None:
+        """Stop Docker container."""
+        await super().stop()
+
+        if self.container:
+            try:
+                self.container.stop(timeout=30)
+                self.container = None
+            except Exception as e:
+                print(f"Warning: Error stopping container: {e}")
+
+    async def cleanup(self) -> None:
+        """Clean up Docker resources."""
+        await super().cleanup()
+
+        # Clean up network if created
+        if self.network and self.config.network_name:
+            try:
+                self.network.remove()
+                self.network = None
+            except Exception as e:
+                print(f"Warning: Error removing network: {e}")
+
+        if self.docker_client:
+            self.docker_client.close()
+            self.docker_client = None
+
+    def get_container_logs(self) -> str:
+        """Get container logs."""
+        if not self.container:
+            return "No container available"
+
+        try:
+            logs = self.container.logs(tail=100)
+            return cast("str", logs.decode("utf-8"))
+        except Exception as e:
+            return f"Error getting logs: {e}"
+
+    def execute_command(self, command: str) -> tuple[int, str]:
+        """Execute command in container.
+
+        Args:
+            command: Command to execute
+
+        Returns:
+            Tuple of (exit_code, output)
+        """
+        if not self.container:
+            return 1, "No container available"
+
+        try:
+            result = self.container.exec_run(command)
+            return result.exit_code, result.output.decode("utf-8")
+        except Exception as e:
+            return 1, f"Error executing command: {e}"
 
 
 class TestEnvironmentManager:
-    """Manager for test environments with context management.
+    """Manager for test environments.
 
-    Following patterns from crawl_mcp.py for resource management and cleanup.
+    Following patterns from crawl_mcp.py for resource management
+    and configuration.
     """
 
     def __init__(self):
-        """Initialize the test environment manager."""
+        """Initialize test environment manager."""
         self.environments: dict[str, TestEnvironment] = {}
-        self.active_environment: TestEnvironment | None = None
+        self.config = self._load_config()
 
-    @asynccontextmanager
-    async def test_environment(
-        self, config: TestEnvironmentConfig
-    ) -> AsyncIterator[TestEnvironment]:
-        """Create and manage a test environment with automatic cleanup.
+    def _load_config(self) -> TestEnvironmentConfig:
+        """Load configuration from environment variables."""
+        return TestEnvironmentConfig(
+            ignition_version=os.getenv("IGNITION_TEST_VERSION", "8.1.0"),
+            gateway_url=os.getenv("TEST_GATEWAY_URL", "http://localhost:8088"),
+            docker_image=os.getenv(
+                "DOCKER_TEST_IMAGE", "inductiveautomation/ignition:latest"
+            ),
+            gateway_port=int(os.getenv("TEST_GATEWAY_PORT", "8088")),
+            designer_port=int(os.getenv("TEST_DESIGNER_PORT", "8043")),
+            mqtt_port=int(os.getenv("TEST_MQTT_PORT", "1883")),
+            opc_port=int(os.getenv("TEST_OPC_PORT", "62541")),
+            memory_limit=os.getenv("TEST_CONTAINER_MEMORY", "2g"),
+            cpu_limit=os.getenv("TEST_CONTAINER_CPU", "2.0"),
+            timeout=int(os.getenv("TEST_TIMEOUT", "300")),
+        )
 
-        Following patterns from crawl_mcp.py for context management.
+    async def create_environment(
+        self,
+        name: str,
+        environment_type: str = "docker",
+        config_override: dict[str, Any] | None = None,
+    ) -> TestEnvironment:
+        """Create a test environment.
 
         Args:
-            config: Test environment configuration
-
-        Yields:
-            TestEnvironment instance ready for testing
-        """
-        # Create appropriate environment type
-        if config.docker_enabled:
-            env = DockerTestEnvironment(config)
-        else:
-            env = LocalTestEnvironment(config)
-
-        try:
-            # Start the environment
-            if await env.start():
-                self.active_environment = env
-                self.environments[env.status.name] = env
-                yield env
-            else:
-                raise RuntimeError(
-                    f"Failed to start test environment: {env.status.error_message}"
-                )
-
-        finally:
-            # Cleanup
-            if env in self.environments.values():
-                await env.stop()
-                if env.status.name in self.environments:
-                    del self.environments[env.status.name]
-            if self.active_environment == env:
-                self.active_environment = None
-
-    async def get_environment_status(self) -> dict[str, Any]:
-        """Get status of all managed environments.
+            name: Name for the environment
+            environment_type: Type of environment ("docker" or "local")
+            config_override: Configuration overrides
 
         Returns:
-            Dictionary with environment status information
+            TestEnvironment instance
         """
-        status = {
-            "total_environments": len(self.environments),
-            "active_environment": (
-                self.active_environment.status.name if self.active_environment else None
-            ),
-            "environments": [],
-        }
+        # Apply config overrides
+        config = self.config
+        if config_override:
+            for key, value in config_override.items():
+                if hasattr(config, key):
+                    setattr(config, key, value)
 
-        for env in self.environments.values():
-            status["environments"].append(
-                {
-                    "name": env.status.name,
-                    "type": env.status.type,
-                    "status": env.status.status,
-                    "gateway_url": env.status.gateway_url,
-                    "designer_url": env.status.designer_url,
-                    "error": env.status.error_message,
-                }
-            )
+        environment = (
+            DockerTestEnvironment(config)
+            if environment_type == "docker"
+            else TestEnvironment(config)
+        )
 
-        return status
+        self.environments[name] = environment
+        return environment
+
+    async def get_environment(self, name: str) -> TestEnvironment | None:
+        """Get existing test environment.
+
+        Args:
+            name: Name of the environment
+
+        Returns:
+            TestEnvironment instance or None
+        """
+        return self.environments.get(name)
 
     async def cleanup_all(self) -> None:
-        """Clean up all managed environments."""
-        for env in list(self.environments.values()):
-            await env.stop()
+        """Clean up all test environments."""
+        for environment in self.environments.values():
+            await environment.cleanup()
         self.environments.clear()
-        self.active_environment = None
+
+    def list_environments(self) -> dict[str, TestEnvironmentStatus]:
+        """List all environments and their status.
+
+        Returns:
+            Dictionary mapping environment names to status
+        """
+        return {name: env.get_status() for name, env in self.environments.items()}

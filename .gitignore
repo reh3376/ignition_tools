@@ -191,6 +191,8 @@ secrets.env
 # Backup files
 *.bak
 *.backup
+*.bundle
+.supabase-data/backups/*.bundle
 
 # OS generated files
 .directory
