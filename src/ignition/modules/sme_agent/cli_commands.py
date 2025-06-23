@@ -1034,7 +1034,6 @@ def deploy_llm_infrastructure(model: str, complexity: str, use_docker: bool, gpu
     """Deploy 8B parameter LLM infrastructure."""
     try:
         from rich.console import Console
-        from rich.panel import Panel
         from rich.progress import Progress, SpinnerColumn, TextColumn
 
         console = Console()
@@ -1047,7 +1046,11 @@ def deploy_llm_infrastructure(model: str, complexity: str, use_docker: bool, gpu
             task = progress.add_task("Deploying LLM infrastructure...", total=None)
 
             # Import LLM infrastructure
-            from .llm_infrastructure import create_llm_infrastructure, LLMComplexityLevel, ModelType
+            from .llm_infrastructure import (
+                LLMComplexityLevel,
+                ModelType,
+                create_llm_infrastructure,
+            )
 
             # Map CLI options to enums
             complexity_map = {
@@ -1065,13 +1068,13 @@ def deploy_llm_infrastructure(model: str, complexity: str, use_docker: bool, gpu
 
             # Create LLM infrastructure
             import asyncio
-            
+
             async def deploy():
                 llm_infra = await create_llm_infrastructure(
                     complexity_level=complexity,
                     model_type=model,
                     use_docker=use_docker,
-                    device="cuda" if gpu else "auto"
+                    device="cuda" if gpu else "auto",
                 )
                 return await llm_infra.initialize()
 
@@ -1079,7 +1082,7 @@ def deploy_llm_infrastructure(model: str, complexity: str, use_docker: bool, gpu
 
         if result["success"]:
             console.print("[green]✅ LLM infrastructure deployed successfully![/green]")
-            
+
             # Display deployment info
             deployment_table = Table(title="LLM Deployment Information")
             deployment_table.add_column("Property", style="cyan")
@@ -1087,9 +1090,13 @@ def deploy_llm_infrastructure(model: str, complexity: str, use_docker: bool, gpu
 
             deployment_table.add_row("Model", result["model_name"])
             deployment_table.add_row("Complexity Level", complexity.title())
-            deployment_table.add_row("Deployment Mode", "Docker" if use_docker else "Local")
+            deployment_table.add_row(
+                "Deployment Mode", "Docker" if use_docker else "Local"
+            )
             deployment_table.add_row("GPU Enabled", "Yes" if gpu else "No")
-            deployment_table.add_row("Initialization Time", f"{result['initialization_time']:.2f}s")
+            deployment_table.add_row(
+                "Initialization Time", f"{result['initialization_time']:.2f}s"
+            )
 
             console.print(deployment_table)
 
@@ -1107,7 +1114,9 @@ def deploy_llm_infrastructure(model: str, complexity: str, use_docker: bool, gpu
 @click.option(
     "--types",
     multiple=True,
-    type=click.Choice(["functions", "components", "patterns", "troubleshooting", "workflows", "all"]),
+    type=click.Choice(
+        ["functions", "components", "patterns", "troubleshooting", "workflows", "all"]
+    ),
     default=["all"],
     help="Types of knowledge to extract",
 )
@@ -1120,12 +1129,13 @@ def deploy_llm_infrastructure(model: str, complexity: str, use_docker: bool, gpu
     help="Output format for dataset",
 )
 @handle_sme_agent_error
-def extract_knowledge_dataset(types: tuple[str], max_records: int | None, output_format: str):
+def extract_knowledge_dataset(
+    types: tuple[str], max_records: int | None, output_format: str
+):
     """Extract knowledge dataset from Neo4j for fine-tuning."""
     try:
         from rich.console import Console
-        from rich.panel import Panel
-        from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
+        from rich.progress import BarColumn, Progress, SpinnerColumn, TextColumn
 
         console = Console()
 
@@ -1138,7 +1148,10 @@ def extract_knowledge_dataset(types: tuple[str], max_records: int | None, output
             task = progress.add_task("Extracting knowledge dataset...", total=None)
 
             # Import knowledge graph pipeline
-            from .knowledge_graph_pipeline import create_knowledge_dataset, KnowledgeExtractionType
+            from .knowledge_graph_pipeline import (
+                KnowledgeExtractionType,
+                create_knowledge_dataset,
+            )
 
             # Map CLI types to enum
             type_map = {
@@ -1154,12 +1167,12 @@ def extract_knowledge_dataset(types: tuple[str], max_records: int | None, output
 
             # Create dataset
             import asyncio
-            
+
             async def extract():
                 return await create_knowledge_dataset(
                     extraction_types=[t.value for t in extraction_types],
                     output_format=output_format,
-                    max_records=max_records
+                    max_records=max_records,
                 )
 
             output_path = asyncio.run(extract())
@@ -1174,7 +1187,9 @@ def extract_knowledge_dataset(types: tuple[str], max_records: int | None, output
 
         extraction_table.add_row("Types Extracted", ", ".join(types))
         extraction_table.add_row("Output Format", output_format.upper())
-        extraction_table.add_row("Max Records", str(max_records) if max_records else "No limit")
+        extraction_table.add_row(
+            "Max Records", str(max_records) if max_records else "No limit"
+        )
         extraction_table.add_row("Output Path", output_path)
 
         console.print(extraction_table)
@@ -1186,7 +1201,14 @@ def extract_knowledge_dataset(types: tuple[str], max_records: int | None, output
 @sme_agent_cli.command("vector-enhance")
 @click.option(
     "--model",
-    type=click.Choice(["all-MiniLM-L6-v2", "all-mpnet-base-v2", "bge-small-en-v1.5", "bge-base-en-v1.5"]),
+    type=click.Choice(
+        [
+            "all-MiniLM-L6-v2",
+            "all-mpnet-base-v2",
+            "bge-small-en-v1.5",
+            "bge-base-en-v1.5",
+        ]
+    ),
     default="all-MiniLM-L6-v2",
     help="Embedding model to use",
 )
@@ -1199,11 +1221,12 @@ def extract_knowledge_dataset(types: tuple[str], max_records: int | None, output
 @click.option("--enable-gpu", is_flag=True, help="Enable GPU acceleration for FAISS")
 @click.option("--rerank", is_flag=True, help="Enable result reranking")
 @handle_sme_agent_error
-def enhance_vector_embeddings(model: str, search_mode: str, enable_gpu: bool, rerank: bool):
+def enhance_vector_embeddings(
+    model: str, search_mode: str, enable_gpu: bool, rerank: bool
+):
     """Enhance vector embeddings with domain-specific knowledge."""
     try:
         from rich.console import Console
-        from rich.panel import Panel
         from rich.progress import Progress, SpinnerColumn, TextColumn
 
         console = Console()
@@ -1216,7 +1239,11 @@ def enhance_vector_embeddings(model: str, search_mode: str, enable_gpu: bool, re
             task = progress.add_task("Enhancing vector embeddings...", total=None)
 
             # Import vector enhancement
-            from .vector_embedding_enhancement import create_enhanced_vector_search, EmbeddingModel, SearchMode
+            from .vector_embedding_enhancement import (
+                EmbeddingModel,
+                SearchMode,
+                create_enhanced_vector_search,
+            )
 
             # Map CLI options to enums
             model_map = {
@@ -1235,26 +1262,26 @@ def enhance_vector_embeddings(model: str, search_mode: str, enable_gpu: bool, re
 
             # Create enhanced vector search
             import asyncio
-            
+
             async def enhance():
                 # Get documents from Neo4j (placeholder for now)
                 documents = []  # This would be populated from Neo4j
-                
+
                 vector_enhancement = await create_enhanced_vector_search(
                     documents=documents,
                     embedding_model=model_map[model].value,
                     search_mode=search_mode_map[search_mode].value,
                     enable_gpu=enable_gpu,
-                    enable_reranking=rerank
+                    enable_reranking=rerank,
                 )
-                
+
                 return await vector_enhancement.initialize()
 
             result = asyncio.run(enhance())
 
         if result["success"]:
             console.print("[green]✅ Vector embeddings enhanced successfully![/green]")
-            
+
             # Display enhancement info
             enhancement_table = Table(title="Vector Enhancement Summary")
             enhancement_table.add_column("Property", style="cyan")
@@ -1264,7 +1291,9 @@ def enhance_vector_embeddings(model: str, search_mode: str, enable_gpu: bool, re
             enhancement_table.add_row("Search Mode", search_mode.title())
             enhancement_table.add_row("GPU Enabled", "Yes" if enable_gpu else "No")
             enhancement_table.add_row("Reranking Enabled", "Yes" if rerank else "No")
-            enhancement_table.add_row("Initialization Time", f"{result['initialization_time']:.2f}s")
+            enhancement_table.add_row(
+                "Initialization Time", f"{result['initialization_time']:.2f}s"
+            )
 
             console.print(enhancement_table)
 
@@ -1283,18 +1312,20 @@ def enhance_vector_embeddings(model: str, search_mode: str, enable_gpu: bool, re
 def infrastructure_status():
     """Display comprehensive infrastructure status for all SME Agent components."""
     try:
+        from rich.columns import Columns
         from rich.console import Console
         from rich.panel import Panel
         from rich.table import Table
-        from rich.columns import Columns
 
         console = Console()
 
         with console.status("[bold blue]Checking infrastructure status..."):
             # Import all validation functions
-            from .llm_infrastructure import validate_llm_infrastructure_environment
             from .knowledge_graph_pipeline import validate_knowledge_graph_environment
-            from .vector_embedding_enhancement import validate_vector_embedding_environment
+            from .llm_infrastructure import validate_llm_infrastructure_environment
+            from .vector_embedding_enhancement import (
+                validate_vector_embedding_environment,
+            )
 
             # Run all validations
             llm_validation = validate_llm_infrastructure_environment()
@@ -1305,58 +1336,80 @@ def infrastructure_status():
         tables = []
 
         # LLM Infrastructure Status
-        llm_table = Table(title="LLM Infrastructure", show_header=True, header_style="bold blue")
+        llm_table = Table(
+            title="LLM Infrastructure", show_header=True, header_style="bold blue"
+        )
         llm_table.add_column("Component", style="cyan")
         llm_table.add_column("Status", justify="center")
-        
+
         for component, info in llm_validation["components"].items():
             status = "✅" if info.get("available", False) else "❌"
             llm_table.add_row(component.title(), status)
-        
+
         tables.append(llm_table)
 
         # Knowledge Graph Status
-        kg_table = Table(title="Knowledge Graph Pipeline", show_header=True, header_style="bold green")
+        kg_table = Table(
+            title="Knowledge Graph Pipeline",
+            show_header=True,
+            header_style="bold green",
+        )
         kg_table.add_column("Component", style="cyan")
         kg_table.add_column("Status", justify="center")
-        
+
         for component, info in kg_validation["components"].items():
             status = "✅" if info.get("available", False) else "❌"
             kg_table.add_row(component.title(), status)
-        
+
         tables.append(kg_table)
 
         # Vector Enhancement Status
-        vector_table = Table(title="Vector Enhancement", show_header=True, header_style="bold magenta")
+        vector_table = Table(
+            title="Vector Enhancement", show_header=True, header_style="bold magenta"
+        )
         vector_table.add_column("Component", style="cyan")
         vector_table.add_column("Status", justify="center")
-        
+
         for component, info in vector_validation["components"].items():
             status = "✅" if info.get("available", False) else "❌"
             vector_table.add_row(component.title(), status)
-        
+
         tables.append(vector_table)
 
         # Display tables in columns
         console.print(Columns(tables, equal=True, expand=True))
 
         # Overall summary
-        total_score = llm_validation["validation_score"] + kg_validation["validation_score"] + vector_validation["validation_score"]
-        total_checks = llm_validation["total_checks"] + kg_validation["total_checks"] + vector_validation["total_checks"]
-        overall_percentage = (total_score / total_checks) * 100 if total_checks > 0 else 0
+        total_score = (
+            llm_validation["validation_score"]
+            + kg_validation["validation_score"]
+            + vector_validation["validation_score"]
+        )
+        total_checks = (
+            llm_validation["total_checks"]
+            + kg_validation["total_checks"]
+            + vector_validation["total_checks"]
+        )
+        overall_percentage = (
+            (total_score / total_checks) * 100 if total_checks > 0 else 0
+        )
 
         summary_panel = Panel(
             f"Overall Infrastructure Health: {overall_percentage:.1f}% ({total_score}/{total_checks} components available)",
             title="Infrastructure Summary",
-            border_style="blue" if overall_percentage >= 80 else "yellow" if overall_percentage >= 60 else "red"
+            border_style=(
+                "blue"
+                if overall_percentage >= 80
+                else "yellow" if overall_percentage >= 60 else "red"
+            ),
         )
         console.print(summary_panel)
 
         # Recommendations
         all_recommendations = (
-            llm_validation.get("recommendations", []) +
-            kg_validation.get("recommendations", []) +
-            vector_validation.get("recommendations", [])
+            llm_validation.get("recommendations", [])
+            + kg_validation.get("recommendations", [])
+            + vector_validation.get("recommendations", [])
         )
 
         if all_recommendations:

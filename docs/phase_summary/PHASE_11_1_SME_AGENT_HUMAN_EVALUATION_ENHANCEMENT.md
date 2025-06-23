@@ -566,7 +566,7 @@ The vector embedding enhancement provides advanced semantic search capabilities:
 ```bash
 # Overall Infrastructure Health: 64.7% (22/34 components available)
 # LLM Infrastructure: 2/3 components (Transformers ✅, Torch ✅, Docker ❌)
-# Knowledge Graph Pipeline: 3/3 components (Neo4j ✅, Pandas ✅, Transformers ✅) 
+# Knowledge Graph Pipeline: 3/3 components (Neo4j ✅, Pandas ✅, Transformers ✅)
 # Vector Enhancement: 3/4 components (NumPy ✅, Transformers ✅, Neo4j ✅, FAISS ❌)
 ```
 
