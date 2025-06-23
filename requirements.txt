@@ -104,3 +104,7 @@ python-dateutil==2.8.2
 # Repository Analysis Dependencies
 tomli>=2.0.1  # For parsing pyproject.toml files
 gitpython>=3.1.0  # Alternative to subprocess git calls
+
+# Phase 10: Enterprise Integration & Deployment - API Testing and Documentation
+fastapi>=0.104.0
+uvicorn>=0.24.0

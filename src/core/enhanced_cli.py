@@ -44,6 +44,18 @@ except ImportError as e:
     print(f"Deployment commands not available: {e}")
     pass
 
+# Import Phase 9.8 advanced features commands
+try:
+    from src.ignition.modules.advanced_features.cli_commands import (
+        advanced_features_cli,
+    )
+
+    main.add_command(advanced_features_cli)
+except ImportError as e:
+    # Advanced features commands not available
+    print(f"Advanced features commands not available: {e}")
+    pass
+
 # Register command groups with main CLI
 main.add_command(script)
 main.add_command(template)
