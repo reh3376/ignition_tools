@@ -11,10 +11,11 @@ import os
 import sys
 from pathlib import Path
 
-from ai_script_analyzer import AIScriptAnalyzer
 from dotenv import load_dotenv
-from hallucination_reporter import HallucinationReporter
-from knowledge_graph_validator import KnowledgeGraphValidator
+
+from .ai_script_analyzer import AIScriptAnalyzer
+from .hallucination_reporter import HallucinationReporter
+from .knowledge_graph_validator import KnowledgeGraphValidator
 
 # Configure logging
 logging.basicConfig(
@@ -97,7 +98,9 @@ class AIHallucinationDetector:
             logger.info("Step 2: Validating against knowledge graph...")
             validation_result = await self.validator.validate_script(analysis_result)
 
-            logger.info(f"Validation complete. Overall confidence: {validation_result.overall_confidence:.1%}")
+            logger.info(
+                f"Validation complete. Overall confidence: {validation_result.overall_confidence:.1%}"
+            )
 
             # Step 3: Generate comprehensive report
             logger.info("Step 3: Generating reports...")
@@ -107,11 +110,15 @@ class AIHallucinationDetector:
             script_name = Path(script_path).stem
 
             if save_json:
-                json_path = os.path.join(output_dir, f"{script_name}_hallucination_report.json")
+                json_path = os.path.join(
+                    output_dir, f"{script_name}_hallucination_report.json"
+                )
                 self.reporter.save_json_report(report, json_path)
 
             if save_markdown:
-                md_path = os.path.join(output_dir, f"{script_name}_hallucination_report.md")
+                md_path = os.path.join(
+                    output_dir, f"{script_name}_hallucination_report.md"
+                )
                 self.reporter.save_markdown_report(report, md_path)
 
             # Step 5: Print summary
@@ -125,7 +132,9 @@ class AIHallucinationDetector:
             logger.error(f"Error during hallucination detection: {e!s}")
             raise
 
-    async def batch_detect(self, script_paths: list[str], output_dir: str | None = None) -> list[dict]:
+    async def batch_detect(
+        self, script_paths: list[str], output_dir: str | None = None
+    ) -> list[dict]:
         """Detect hallucinations in multiple scripts.
 
         Args:
@@ -170,13 +179,20 @@ class AIHallucinationDetector:
         print("=" * 80)
 
         total_scripts = len(results)
-        total_validations = sum(r["validation_summary"]["total_validations"] for r in results)
+        total_validations = sum(
+            r["validation_summary"]["total_validations"] for r in results
+        )
         total_valid = sum(r["validation_summary"]["valid_count"] for r in results)
         total_invalid = sum(r["validation_summary"]["invalid_count"] for r in results)
-        total_not_found = sum(r["validation_summary"]["not_found_count"] for r in results)
+        total_not_found = sum(
+            r["validation_summary"]["not_found_count"] for r in results
+        )
         total_hallucinations = sum(len(r["hallucinations_detected"]) for r in results)
 
-        avg_confidence = sum(r["validation_summary"]["overall_confidence"] for r in results) / total_scripts
+        avg_confidence = (
+            sum(r["validation_summary"]["overall_confidence"] for r in results)
+            / total_scripts
+        )
 
         print(f"Scripts Processed: {total_scripts}")
         print(f"Total Validations: {total_validations}")
@@ -185,17 +201,25 @@ class AIHallucinationDetector:
 
         print("\nAggregated Results:")
         print(f"  ✅ Valid: {total_valid} ({total_valid / total_validations:.1%})")
-        print(f"  ❌ Invalid: {total_invalid} ({total_invalid / total_validations:.1%})")
-        print(f"  🔍 Not Found: {total_not_found} ({total_not_found / total_validations:.1%})")
+        print(
+            f"  ❌ Invalid: {total_invalid} ({total_invalid / total_validations:.1%})"
+        )
+        print(
+            f"  🔍 Not Found: {total_not_found} ({total_not_found / total_validations:.1%})"
+        )
 
         # Show worst performing scripts
         print("\n🚨 Scripts with Most Hallucinations:")
-        sorted_results = sorted(results, key=lambda x: len(x["hallucinations_detected"]), reverse=True)
+        sorted_results = sorted(
+            results, key=lambda x: len(x["hallucinations_detected"]), reverse=True
+        )
         for result in sorted_results[:5]:
             script_name = Path(result["analysis_metadata"]["script_path"]).name
             hall_count = len(result["hallucinations_detected"])
             confidence = result["validation_summary"]["overall_confidence"]
-            print(f"  - {script_name}: {hall_count} hallucinations ({confidence:.1%} confidence)")
+            print(
+                f"  - {script_name}: {hall_count} hallucinations ({confidence:.1%} confidence)"
+            )
 
         print("=" * 80)
 
@@ -221,15 +245,25 @@ Examples:
         """,
     )
 
-    parser.add_argument("scripts", nargs="+", help="Python script(s) to analyze for hallucinations")
+    parser.add_argument(
+        "scripts", nargs="+", help="Python script(s) to analyze for hallucinations"
+    )
 
-    parser.add_argument("--output-dir", help="Directory to save reports (defaults to script directory)")
+    parser.add_argument(
+        "--output-dir", help="Directory to save reports (defaults to script directory)"
+    )
 
-    parser.add_argument("--no-json", action="store_true", help="Skip JSON report generation")
+    parser.add_argument(
+        "--no-json", action="store_true", help="Skip JSON report generation"
+    )
 
-    parser.add_argument("--no-markdown", action="store_true", help="Skip Markdown report generation")
+    parser.add_argument(
+        "--no-markdown", action="store_true", help="Skip Markdown report generation"
+    )
 
-    parser.add_argument("--no-summary", action="store_true", help="Skip printing summary to console")
+    parser.add_argument(
+        "--no-summary", action="store_true", help="Skip printing summary to console"
+    )
 
     parser.add_argument(
         "--neo4j-uri",
@@ -269,7 +303,9 @@ Examples:
     neo4j_password = args.neo4j_password or os.environ.get("NEO4J_PASSWORD", "password")
 
     if not neo4j_password or neo4j_password == "password":
-        logger.error("Please set NEO4J_PASSWORD environment variable or use --neo4j-password")
+        logger.error(
+            "Please set NEO4J_PASSWORD environment variable or use --neo4j-password"
+        )
         sys.exit(1)
 
     # Initialize detector
@@ -290,7 +326,9 @@ Examples:
             )
         else:
             # Batch mode
-            await detector.batch_detect(script_paths=args.scripts, output_dir=args.output_dir)
+            await detector.batch_detect(
+                script_paths=args.scripts, output_dir=args.output_dir
+            )
 
     except KeyboardInterrupt:
         logger.info("Detection interrupted by user")
