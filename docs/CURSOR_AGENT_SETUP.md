@@ -12,7 +12,7 @@ Add the following to your Cursor settings in the **Indexing & Docs** section:
 #### **Project Context Instructions:**
 ```
 This is the IGN Scripts project with a comprehensive Code Intelligence System.
-Phase 8.2 has been completed, providing automated refactoring capabilities with vector embeddings.
+Phase 11.1 has been completed, providing SME Agent infrastructure with human evaluation capabilities.
 
 IMPORTANT: All new agents/chat sessions MUST initialize the knowledge discovery system:
 
@@ -27,13 +27,14 @@ Available knowledge bases:
 - Neo4j Graph Database (3,691+ nodes) for code structure analysis
 - Vector Embeddings System (384D) for semantic code search
 - Git History Integration (65+ commits) for evolution tracking
-- Refactoring Tracking System for operation documentation
+- SME Agent System with human evaluation and reinforcement learning
 
 Key capabilities: automated refactoring, semantic code search, large file detection,
-git integration, architecture diagram generation, comprehensive impact analysis.
+git integration, architecture diagram generation, comprehensive impact analysis,
+SME Agent with human evaluation system.
 
-CLI commands available with 'refactor' prefix (12 total commands).
-Current phase: 8.2 (Completed). Project root: /Users/reh3376/repos/IGN_scripts
+CLI commands available: 'refactor' prefix (12 commands) + 'ign module sme' (11 commands).
+Current phase: 11.1 (Completed). Project root: /Users/reh3376/repos/IGN_scripts
 ```
 
 #### **Additional Documentation Paths:**

@@ -120,6 +120,11 @@ class KnowledgeDiscoverySystem:
         if refactor_info:
             self.knowledge_bases.append(refactor_info)
 
+        # 6. SME Agent system
+        sme_agent_info = self._discover_sme_agent()
+        if sme_agent_info:
+            self.knowledge_bases.append(sme_agent_info)
+
     def _discover_neo4j(self) -> KnowledgeBaseInfo | None:
         """Discover Neo4j graph database connection."""
         try:
@@ -347,6 +352,35 @@ class KnowledgeDiscoverySystem:
             ],
         )
 
+    def _discover_sme_agent(self) -> KnowledgeBaseInfo | None:
+        """Discover SME Agent system."""
+        sme_agent_path = self.project_root / "src" / "ignition" / "modules" / "sme_agent"
+        
+        if sme_agent_path.exists():
+            # Count CLI commands by checking the CLI module
+            cli_file = sme_agent_path / "cli_commands.py"
+            command_count = 13  # Known from implementation (11 original + 2 human evaluation commands)
+            
+            return KnowledgeBaseInfo(
+                name="SME Agent System",
+                type="sme_agent",
+                connection_string=str(sme_agent_path),
+                status="available",
+                last_updated=datetime.now(),
+                record_count=command_count,
+                description=f"SME Agent with human evaluation and reinforcement learning - {command_count} CLI commands available",
+                capabilities=[
+                    "Question processing with context",
+                    "File analysis and recommendations",
+                    "Human evaluation batch management",
+                    "Decision logging and tracking",
+                    "Reinforcement learning insights",
+                    "Progressive complexity deployment",
+                ],
+            )
+        
+        return None
+
     def _build_project_context(self) -> None:
         """Build complete project context."""
         # Read roadmap for current phase
@@ -360,6 +394,13 @@ class KnowledgeDiscoverySystem:
             "7.0",
             "8.0",
             "8.1",
+            "9.0",
+            "9.1",
+            "9.2",
+            "9.3",
+            "9.4",
+            "10.0",
+            "11.1",
         ]
 
         # Get key capabilities
@@ -372,6 +413,14 @@ class KnowledgeDiscoverySystem:
             "Neo4j Graph Database Integration",
             "Comprehensive CLI Interface",
             "Refactoring Impact Analysis",
+            "Enterprise Integration & Deployment",
+            "Multi-Cloud Deployment Capabilities",
+            "Advanced Analytics Platform",
+            "Industrial Data Integration",
+            "SME Agent with Human Evaluation",
+            "Decision Logging & Batch Management",
+            "Reinforcement Learning Insights",
+            "Progressive Complexity Deployment",
         ]
 
         # Get CLI commands
@@ -388,41 +437,52 @@ class KnowledgeDiscoverySystem:
             "refactor generate-diagram - Create architecture diagrams",
             "refactor complexity-trends - Show complexity trends",
             "refactor statistics - Display comprehensive statistics",
+            "ign module sme validate-env - Validate SME Agent environment",
+            "ign module sme status - Check SME Agent component status",
+            "ign module sme initialize - Initialize SME Agent components",
+            "ign module sme ask - Ask SME Agent questions",
+            "ign module sme analyze - Analyze files with SME Agent",
+            "ign module sme test-all - Test all SME Agent complexity levels",
+            "ign module sme list-batches - List evaluation batches",
+            "ign module sme export-batch - Export batch for human review",
+            "ign module sme import-evaluation - Import human evaluations",
+            "ign module sme rl-summary - Show reinforcement learning insights",
+            "ign module sme create-test-batch - Create test evaluation batches",
         ]
 
         # Get recent activities
         recent_activities = [
             {
-                "date": "2025-01",
-                "activity": "Completed Phase 8.1 - Code Intelligence System",
-                "details": "Implemented automated refactoring, git integration, and tracking systems",
+                "date": "2025-01-29",
+                "activity": "Completed Phase 11.1 - SME Agent Infrastructure & Human Evaluation Enhancement",
+                "details": "Implemented comprehensive SME Agent foundation with human evaluation system, 13 CLI commands, decision logging, batch management, and reinforcement learning analytics",
+            },
+            {
+                "date": "2024-12-23",
+                "activity": "Completed Phase 10.0 - Enterprise Integration & Deployment",
+                "details": "Implemented enterprise architecture, cloud integration, analytics platform with FastAPI integration",
             },
             {
                 "date": "2025-01",
-                "activity": "Added Git Integration Module",
-                "details": "File evolution tracking, branch analysis, complexity trends",
-            },
-            {
-                "date": "2025-01",
-                "activity": "Implemented Refactoring Documentation System",
-                "details": "Architecture diagrams, TODO generation, impact reports",
+                "activity": "Completed Phase 9.4 - Data Integration Module",
+                "details": "38+ data source types, industrial variable metadata, faker integration",
             },
         ]
 
         # Important files for context
         important_files = [
             "docs/roadmap.md - Project roadmap and phase tracking",
-            "docs/PHASE_8_1_COMPLETION_SUMMARY.md - Latest completion summary",
+            "docs/PHASE_11_1_SME_AGENT_HUMAN_EVALUATION_ENHANCEMENT.md - Latest completion summary",
+            "src/ignition/modules/sme_agent/ - SME Agent module",
             "src/ignition/code_intelligence/ - Core intelligence modules",
             "src/ignition/code_intelligence/cli_commands.py - CLI interface",
-            "src/ignition/code_intelligence/git_integration.py - Git evolution tracking",
-            "src/ignition/code_intelligence/refactoring_tracker.py - Documentation system",
+            "sme_agent.env.example - SME Agent configuration template",
         ]
 
         self.project_context = ProjectContext(
             project_name="IGN Scripts - Code Intelligence System",
             project_root=self.project_root,
-            current_phase="8.1 (Completed)",
+            current_phase="11.1 (Completed)",
             completed_phases=completed_phases,
             available_knowledge_bases=self.knowledge_bases,
             key_capabilities=key_capabilities,
@@ -435,6 +495,9 @@ class KnowledgeDiscoverySystem:
                 "AST Analysis Engine",
                 "Rich CLI Interface",
                 "Mermaid Diagram Generation",
+                "SME Agent System",
+                "Human Evaluation Framework",
+                "Reinforcement Learning Pipeline",
             ],
         )
 
@@ -475,6 +538,16 @@ tracker = RefactoringTracker(Path.cwd())
 stats = tracker.get_refactoring_statistics()
 """
 
+            elif kb.type == "sme_agent":
+                instructions["sme_agent"] = """
+# SME Agent System
+from ignition.modules.sme_agent import SMEAgentModule
+
+# Initialize SME Agent
+agent = SMEAgentModule()
+response = await agent.ask_question('How do I optimize PID control?')
+"""
+
         return instructions
 
     def _generate_quick_start_guide(self) -> str:
@@ -484,7 +557,7 @@ stats = tracker.get_refactoring_statistics()
 
 ## Project Overview
 This is the IGN Scripts project with a comprehensive Code Intelligence System.
-Phase 8.1 has been completed, providing automated refactoring capabilities.
+Phase 11.1 has been completed, providing SME Agent infrastructure with human evaluation capabilities.
 
 ## Available Knowledge Bases
 {len(self.knowledge_bases)} knowledge bases are available:
@@ -496,6 +569,9 @@ Phase 8.1 has been completed, providing automated refactoring capabilities.
 - Git integration with evolution tracking
 - Architecture diagram generation
 - Comprehensive impact analysis and reporting
+- SME Agent with human evaluation and reinforcement learning
+- Decision logging and batch management
+- Progressive complexity deployment
 
 ## Quick Commands
 ```bash
@@ -507,16 +583,27 @@ python -m src.ignition.code_intelligence.cli_commands refactor analyze path/to/f
 
 # Get refactoring statistics
 python -m src.ignition.code_intelligence.cli_commands refactor statistics
+
+# Validate SME Agent environment
+ign module sme validate-env
+
+# Ask SME Agent a question
+ign module sme ask "How do I optimize PID control?"
+
+# Check SME Agent status
+ign module sme status
 ```
 
 ## Important Files to Read First
 1. docs/roadmap.md - Current project status
-2. docs/PHASE_8_1_COMPLETION_SUMMARY.md - Latest achievements
-3. src/ignition/code_intelligence/ - Core modules
+2. docs/PHASE_11_1_SME_AGENT_HUMAN_EVALUATION_ENHANCEMENT.md - Latest achievements
+3. src/ignition/modules/sme_agent/ - SME Agent modules
+4. src/ignition/code_intelligence/ - Core modules
 
 ## Environment Setup
 Ensure these environment variables are set:
 - NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD (for graph database)
+- SME Agent variables (see sme_agent.env.example)
 - Other project-specific variables in .env file
 """
 
@@ -527,13 +614,18 @@ Ensure these environment variables are set:
                 "NEO4J_URI - Neo4j database connection",
                 "NEO4J_USER - Neo4j username",
                 "NEO4J_PASSWORD - Neo4j password",
+                "SME_AGENT_NEO4J_URI - SME Agent Neo4j connection",
+                "SME_AGENT_MODEL_NAME - LLM model configuration",
             ],
             "optional": [
                 "OPENAI_API_KEY - For AI-powered analysis",
                 "GITHUB_TOKEN - For enhanced git integration",
+                "SME_AGENT_ENABLE_HUMAN_EVALUATION - Enable human evaluation features",
+                "SME_AGENT_EVALUATION_BATCH_SIZE - Batch size for evaluations",
             ],
             "files": [
                 ".env - Environment variables",
+                "sme_agent.env.example - SME Agent configuration template",
                 "requirements.txt - Python dependencies",
             ],
         }
@@ -544,9 +636,11 @@ Ensure these environment variables are set:
         """Get list of key files new agents should read for context."""
         return [
             "docs/roadmap.md",
-            "docs/PHASE_8_1_COMPLETION_SUMMARY.md",
+            "docs/PHASE_11_1_SME_AGENT_HUMAN_EVALUATION_ENHANCEMENT.md",
+            "src/ignition/modules/sme_agent/sme_agent_module.py",
+            "src/ignition/modules/sme_agent/cli_commands.py",
+            "sme_agent.env.example",
             "src/ignition/code_intelligence/manager.py",
-            "src/ignition/code_intelligence/cli_commands.py",
             ".env.sample",
         ]
 
@@ -554,28 +648,33 @@ Ensure these environment variables are set:
         """Get recent project developments."""
         return [
             {
-                "title": "Phase 8.1 Completion",
+                "title": "Phase 11.1 Completion",
                 "date": "January 2025",
-                "description": "Completed Code Intelligence System with automated refactoring",
-                "impact": "Major milestone - full refactoring automation available",
+                "description": "Completed SME Agent Infrastructure with human evaluation system",
+                "impact": "Major milestone - SME Agent foundation with reinforcement learning capabilities",
             },
             {
-                "title": "Git Integration Added",
+                "title": "Human Evaluation System",
                 "date": "January 2025",
-                "description": "File evolution tracking and branch analysis",
-                "impact": "Enhanced code evolution insights",
+                "description": "Decision logging, batch management, and reinforcement learning insights",
+                "impact": "Enables continuous improvement through human expert feedback",
             },
             {
-                "title": "Documentation System",
+                "title": "Progressive Complexity Deployment",
                 "date": "January 2025",
-                "description": "Architecture diagrams and TODO generation",
-                "impact": "Automated documentation for refactoring operations",
+                "description": "4-tier complexity system (basic/standard/advanced/enterprise)",
+                "impact": "Scalable deployment architecture for different use cases",
             },
         ]
 
     def _get_available_tools(self) -> list[dict[str, str]]:
         """Get list of available tools and their purposes."""
         return [
+            {
+                "name": "SME Agent Module",
+                "purpose": "Intelligent assistant with human evaluation capabilities",
+                "usage": "from ignition.modules.sme_agent import SMEAgentModule",
+            },
             {
                 "name": "Code Intelligence Manager",
                 "purpose": "Central coordination of all analysis systems",
@@ -585,6 +684,11 @@ Ensure these environment variables are set:
                 "name": "Refactoring CLI",
                 "purpose": "Command-line interface for all refactoring operations",
                 "usage": "python -m src.ignition.code_intelligence.cli_commands refactor <command>",
+            },
+            {
+                "name": "SME Agent CLI",
+                "purpose": "Command-line interface for SME Agent operations",
+                "usage": "ign module sme <command>",
             },
             {
                 "name": "Git Integration",

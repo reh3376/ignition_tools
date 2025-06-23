@@ -10,10 +10,10 @@ context = initialize_agent_knowledge()
 
 ## Project Context
 - Name: IGN Scripts - Code Intelligence System
-- Phase: 8.3 (Completed)
-- Knowledge Bases: Neo4j (3,691+ nodes), Vector Embeddings (384D), Git (65+ commits)
-- CLI: 16 commands available (12 refactor + 4 AI assistant commands)
-- Key Files: docs/roadmap.md, docs/PHASE_8_3_AI_ASSISTANT_ENHANCEMENT_COMPLETION_SUMMARY.md
+- Phase: 11.1 (Completed)
+- Knowledge Bases: Neo4j (3,691+ nodes), Vector Embeddings (384D), Git (65+ commits), SME Agent System
+- CLI: 27 commands available (12 refactor + 4 AI assistant + 11 SME agent commands)
+- Key Files: docs/roadmap.md, docs/PHASE_11_1_SME_AGENT_HUMAN_EVALUATION_ENHANCEMENT.md
 
 ## Available Tools
 - Automated refactoring with safety guarantees
@@ -21,11 +21,17 @@ context = initialize_agent_knowledge()
 - Git integration with evolution tracking
 - Architecture diagram generation
 - Comprehensive impact analysis and reporting
+- SME Agent with human evaluation and reinforcement learning
+- Decision logging and batch management for human expert review
+- Progressive complexity deployment (basic/standard/advanced/enterprise)
 
 ## Quick Commands
 - `refactor detect` - Scan for oversized files
 - `refactor analyze <file>` - Detailed file analysis
 - `refactor statistics` - Show refactoring stats
+- `ign module sme validate-env` - Validate SME Agent environment
+- `ign module sme status` - Check SME Agent component status
+- `ign module sme ask "<question>"` - Ask SME Agent a question
 - See docs/AGENT_KNOWLEDGE_SYSTEM.md for full list
 
 ## Important

@@ -13,6 +13,7 @@ from .cli.script_commands import script_group
 from .module_builder import ModuleBuilder
 from .module_generator import ModuleGenerator
 from .sdk_manager import IgnitionSDKManager
+from .sme_agent.cli_commands import sme_agent_cli
 
 console = Console()
 
@@ -47,6 +48,9 @@ module_group.add_command(data_integration_group)
 
 # Add AI assistant commands
 module_group.add_command(ai_assistant_commands)
+
+# Add SME Agent commands (Phase 11)
+module_group.add_command(sme_agent_cli)
 
 
 @module_group.command()
