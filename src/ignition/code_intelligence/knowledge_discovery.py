@@ -61,7 +61,9 @@ class KnowledgeDiscoverySystem:
     def get_agent_initialization_info(self) -> dict[str, Any]:
         """Get complete initialization information for new agents."""
         init_info = {
-            "project_context": (asdict(self.project_context) if self.project_context else {}),
+            "project_context": (
+                asdict(self.project_context) if self.project_context else {}
+            ),
             "connection_instructions": self._generate_connection_instructions(),
             "quick_start_guide": self._generate_quick_start_guide(),
             "knowledge_base_status": [asdict(kb) for kb in self.knowledge_bases],
@@ -147,7 +149,9 @@ class KnowledgeDiscoverySystem:
             try:
                 from neo4j import GraphDatabase
 
-                driver = GraphDatabase.driver(neo4j_uri, auth=(neo4j_user, neo4j_password))
+                driver = GraphDatabase.driver(
+                    neo4j_uri, auth=(neo4j_user, neo4j_password)
+                )
 
                 with driver.session() as session:
                     # Get node counts
@@ -155,7 +159,9 @@ class KnowledgeDiscoverySystem:
                     node_count = result.single()["node_count"]
 
                     # Get relationship counts
-                    result = session.run("MATCH ()-[r]->() RETURN count(r) as rel_count")
+                    result = session.run(
+                        "MATCH ()-[r]->() RETURN count(r) as rel_count"
+                    )
                     rel_count = result.single()["rel_count"]
 
                 driver.close()
@@ -333,7 +339,9 @@ class KnowledgeDiscoverySystem:
 
         # Count diagrams
         diagrams_dir = tracking_dir / "diagrams"
-        diagram_count = len(list(diagrams_dir.glob("*.json"))) if diagrams_dir.exists() else 0
+        diagram_count = (
+            len(list(diagrams_dir.glob("*.json"))) if diagrams_dir.exists() else 0
+        )
 
         return KnowledgeBaseInfo(
             name="Refactoring Tracking System",
@@ -354,13 +362,15 @@ class KnowledgeDiscoverySystem:
 
     def _discover_sme_agent(self) -> KnowledgeBaseInfo | None:
         """Discover SME Agent system."""
-        sme_agent_path = self.project_root / "src" / "ignition" / "modules" / "sme_agent"
-        
+        sme_agent_path = (
+            self.project_root / "src" / "ignition" / "modules" / "sme_agent"
+        )
+
         if sme_agent_path.exists():
             # Count CLI commands by checking the CLI module
             cli_file = sme_agent_path / "cli_commands.py"
             command_count = 13  # Known from implementation (11 original + 2 human evaluation commands)
-            
+
             return KnowledgeBaseInfo(
                 name="SME Agent System",
                 type="sme_agent",
@@ -378,7 +388,7 @@ class KnowledgeDiscoverySystem:
                     "Progressive complexity deployment",
                 ],
             )
-        
+
         return None
 
     def _build_project_context(self) -> None:
@@ -507,7 +517,9 @@ class KnowledgeDiscoverySystem:
 
         for kb in self.knowledge_bases:
             if kb.type == "neo4j" and kb.status == "available":
-                instructions["neo4j"] = """
+                instructions[
+                    "neo4j"
+                ] = """
 # Neo4j Connection
 from ignition.code_intelligence.manager import CodeIntelligenceManager
 
@@ -519,7 +531,9 @@ if manager.client.is_connected():
 """
 
             elif kb.type == "git_history":
-                instructions["git"] = """
+                instructions[
+                    "git"
+                ] = """
 # Git Integration
 from ignition.code_intelligence.git_integration import GitIntegration
 from pathlib import Path
@@ -529,7 +543,9 @@ evolution = git_integration.track_file_evolution("path/to/file.py")
 """
 
             elif kb.type == "refactoring_tracking":
-                instructions["refactoring"] = """
+                instructions[
+                    "refactoring"
+                ] = """
 # Refactoring Tracking
 from ignition.code_intelligence.refactoring_tracker import RefactoringTracker
 from pathlib import Path
@@ -539,7 +555,9 @@ stats = tracker.get_refactoring_statistics()
 """
 
             elif kb.type == "sme_agent":
-                instructions["sme_agent"] = """
+                instructions[
+                    "sme_agent"
+                ] = """
 # SME Agent System
 from ignition.modules.sme_agent import SMEAgentModule
 
@@ -749,7 +767,9 @@ def initialize_agent_knowledge() -> dict[str, Any]:
     # Display quick summary
     print("\n📋 AVAILABLE KNOWLEDGE BASES:")
     for kb in discovery.knowledge_bases:
-        status_emoji = "✅" if kb.status == "available" else "❌" if kb.status == "error" else "⚠️"
+        status_emoji = (
+            "✅" if kb.status == "available" else "❌" if kb.status == "error" else "⚠️"
+        )
         print(f"  {status_emoji} {kb.name} ({kb.type})")
         if kb.record_count:
             print(f"     Records: {kb.record_count:,}")

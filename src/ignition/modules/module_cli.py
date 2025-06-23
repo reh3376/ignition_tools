@@ -73,7 +73,11 @@ def status() -> None:
     table.add_row("Workspace", workspace_status, status["workspace_path"])
 
     # Tools status
-    tools_status = "✅ Ready" if status["tools_cloned"] and status["tools_built"] else "❌ Not ready"
+    tools_status = (
+        "✅ Ready"
+        if status["tools_cloned"] and status["tools_built"]
+        else "❌ Not ready"
+    )
     tools_details = "Cloned and built" if status["tools_built"] else "Need setup"
     table.add_row("Module Tools", tools_status, tools_details)
 
@@ -87,7 +91,9 @@ def status() -> None:
     git_details = prereqs.get("git_version", "Not found")
     table.add_row("Git", git_status, git_details)
 
-    gradle_status = "✅ Available" if prereqs.get("gradle", False) else "⚠️ Using wrapper"
+    gradle_status = (
+        "✅ Available" if prereqs.get("gradle", False) else "⚠️ Using wrapper"
+    )
     gradle_details = prereqs.get("gradle_version", "Will use wrapper")
     table.add_row("Gradle", gradle_status, gradle_details)
 
@@ -103,7 +109,9 @@ def status() -> None:
         console.print("\n📦 Module Projects:")
         for project in status["projects"]:
             project_status = "✅" if project["exists"] else "❌"
-            console.print(f"  {project_status} {project['name']} ({project['build_file'] or 'no build file'})")
+            console.print(
+                f"  {project_status} {project['name']} ({project['build_file'] or 'no build file'})"
+            )
 
 
 @module_group.command()
@@ -158,7 +166,9 @@ def setup(force: bool) -> None:
 @click.option("--package", default="com.ignscripts.modules", help="Root package name")
 @click.option("--scopes", default="", help="Module scopes (G, C, D)")
 @click.option("--description", default="", help="Module description")
-def create(name: str, template: str, package: str, scopes: str, description: str) -> None:
+def create(
+    name: str, template: str, package: str, scopes: str, description: str
+) -> None:
     """Create a new Ignition module project."""
     sdk_manager, generator, _ = _initialize_module_systems()
     if not sdk_manager or not generator:
@@ -167,7 +177,9 @@ def create(name: str, template: str, package: str, scopes: str, description: str
     # Check if environment is set up
     status = sdk_manager.get_environment_status()
     if not (status["tools_cloned"] and status["tools_built"]):
-        console.print("❌ Module development environment not set up. Run 'ign module setup' first.")
+        console.print(
+            "❌ Module development environment not set up. Run 'ign module setup' first."
+        )
         return
 
     console.print(f"🚀 Creating module project: {name}")
@@ -382,7 +394,9 @@ def list() -> None:
     console.print(f"\n🎨 Available Templates ({len(templates)}):")
     for name, template in templates.items():
         console.print(f"  • {name}: {template.description}")
-        console.print(f"    Scopes: {template.scopes}, Functions: {len(template.required_functions)}")
+        console.print(
+            f"    Scopes: {template.scopes}, Functions: {len(template.required_functions)}"
+        )
 
 
 @module_group.command()
