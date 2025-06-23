@@ -34,6 +34,16 @@ except ImportError as e:
     print(f"Module development commands not available: {e}")
     pass
 
+# Import Phase 9.7 deployment commands
+try:
+    from src.ignition.modules.deployment.cli_commands import deployment_cli
+
+    main.add_command(deployment_cli)
+except ImportError as e:
+    # Deployment commands not available
+    print(f"Deployment commands not available: {e}")
+    pass
+
 # Register command groups with main CLI
 main.add_command(script)
 main.add_command(template)

@@ -166,7 +166,7 @@ class ModuleSigner:
         self.console = console
 
     def validate_environment(self) -> dict[str, bool]:
-        """Validate signing environment following crawl_mcp.py patterns."""
+        """Validate signing environment and dependencies."""
         validation_results = {
             "certificate_exists": bool(
                 self.config.certificate_path

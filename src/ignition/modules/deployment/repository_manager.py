@@ -55,7 +55,7 @@ class RepositoryConfig:
     username: str = field(default_factory=lambda: os.getenv("REPOSITORY_USERNAME", ""))
     password: str = field(default_factory=lambda: os.getenv("REPOSITORY_PASSWORD", ""))
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate configuration after initialization."""
         self.download_directory.mkdir(parents=True, exist_ok=True)
         self.cache_directory.mkdir(parents=True, exist_ok=True)
@@ -204,7 +204,7 @@ class RepositoryManager:
         try:
             with console.status(
                 f"[bold green]Uploading {package_path.name}...", spinner="dots"
-            ) as status:
+            ):
                 # Prepare upload data
                 upload_data = {
                     "name": package_path.stem,
@@ -292,9 +292,7 @@ class RepositoryManager:
                 TextColumn("[progress.description]{task.description}"),
                 console=self.console,
             ) as progress:
-                download_task = progress.add_task(
-                    f"Downloading {module_name}...", total=None
-                )
+                progress.add_task(f"Downloading {module_name}...", total=None)
 
                 # Get module information
                 module_info = self.get_module_info(module_name, version)
