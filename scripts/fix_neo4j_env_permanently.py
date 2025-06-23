@@ -30,7 +30,7 @@ class Neo4jEnvironmentFixer:
             "NEO4J_URI": "bolt://localhost:7687",
             "NEO4J_USERNAME": "neo4j",
             "NEO4J_USER": "neo4j",  # Keep both for compatibility
-            "NEO4J_PASSWORD": "ignition-graph"
+            "NEO4J_PASSWORD": "ignition-graph",
         }
 
     def step_1_backup_current_state(self) -> None:
@@ -43,6 +43,7 @@ class Neo4jEnvironmentFixer:
         # Backup .env file with timestamp
         if self.env_file.exists():
             import datetime
+
             timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
             backup_file = self.backup_dir / f".env.backup.{timestamp}"
             shutil.copy2(self.env_file, backup_file)
@@ -163,7 +164,9 @@ class Neo4jEnvironmentFixer:
         print(f"📊 Found {len(inconsistent_files)} files with inconsistent variables")
         return inconsistent_files
 
-    def step_5_update_python_files(self, inconsistent_files: list[tuple[Path, list[str]]]) -> None:
+    def step_5_update_python_files(
+        self, inconsistent_files: list[tuple[Path, list[str]]]
+    ) -> None:
         """Step 5: Update Python files to support both variable names."""
         print("🔧 Step 5: Updating Python files for consistency...")
 
@@ -184,11 +187,11 @@ class Neo4jEnvironmentFixer:
                 patterns_replacements = [
                     (
                         r'os\.getenv\(["\']NEO4J_USER["\']\s*,\s*([^)]+)\)',
-                        r'os.getenv("NEO4J_USER", os.getenv("NEO4J_USERNAME", os.getenv("NEO4J_USERNAME", \1)))'
+                        r'os.getenv("NEO4J_USER", os.getenv("NEO4J_USERNAME", os.getenv("NEO4J_USERNAME", \1)))',
                     ),
                     (
                         r'os\.environ\.get\(["\']NEO4J_USER["\']\s*,\s*([^)]+)\)',
-                        r'os.environ.get("NEO4J_USER", os.environ.get("NEO4J_USERNAME", os.environ.get("NEO4J_USERNAME", \1)))'
+                        r'os.environ.get("NEO4J_USER", os.environ.get("NEO4J_USERNAME", os.environ.get("NEO4J_USERNAME", \1)))',
                     ),
                 ]
 
@@ -214,6 +217,7 @@ class Neo4jEnvironmentFixer:
         try:
             # Test environment variable loading
             from dotenv import load_dotenv
+
             load_dotenv(self.env_file, override=True)
 
             # Check all required variables are present
@@ -236,6 +240,7 @@ class Neo4jEnvironmentFixer:
 
             # Import and test the main client
             import sys
+
             sys.path.append(str(self.project_root / "src"))
 
             from ignition.graph.client import IgnitionGraphClient
@@ -282,21 +287,21 @@ def main():
     """Validate Neo4j environment configuration."""
     project_root = Path(__file__).parent.parent
     env_file = project_root / ".env"
-    
+
     print("🔍 Validating Neo4j Environment Configuration...")
-    
+
     # Load environment variables
     load_dotenv(env_file, override=True)
-    
+
     # Check required variables
     required_vars = {
         "NEO4J_URI": "bolt://localhost:7687",
-        "NEO4J_USERNAME": "neo4j", 
+        "NEO4J_USERNAME": "neo4j",
         "NEO4J_PASSWORD": "ignition-graph"
     }
-    
+
     all_good = True
-    
+
     for var, expected in required_vars.items():
         value = os.getenv(var)
         if not value:
@@ -306,28 +311,28 @@ def main():
             print(f"⚠️  {var} = {value} (expected: {expected})")
         else:
             print(f"✅ {var} = {value}")
-    
+
     # Test connection if all variables present
     if all_good:
         try:
             sys.path.append(str(project_root / "src"))
             from ignition.graph.client import IgnitionGraphClient
-            
+
             client = IgnitionGraphClient()
             client.connect()
             result = client.execute_query("RETURN 1 as test")
             client.disconnect()
-            
+
             if result and result[0]["test"] == 1:
                 print("✅ Neo4j connection successful!")
             else:
                 print("❌ Neo4j connection failed!")
                 all_good = False
-                
+
         except Exception as e:
             print(f"❌ Connection test failed: {e}")
             all_good = False
-    
+
     if all_good:
         print("\n🎉 All Neo4j environment variables are properly configured!")
     else:

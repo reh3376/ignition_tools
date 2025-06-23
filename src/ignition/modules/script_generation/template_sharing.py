@@ -193,7 +193,7 @@ class TemplateSharingManager:
         """Create a package containing multiple templates.
 
         Args:
-            template_paths: List of template paths to include
+            template_paths: list of template paths to include
             package_name: Name for the package
             output_dir: Directory for output package
 
@@ -227,7 +227,9 @@ class TemplateSharingManager:
 
                 for i, template_path in enumerate(template_paths):
                     template_bundle = templates_dir / f"template_{i}.zip"
-                    if self.export_template(template_path, template_bundle, include_metadata=True):
+                    if self.export_template(
+                        template_path, template_bundle, include_metadata=True
+                    ):
                         package_info["templates"].append(
                             {
                                 "index": i,
@@ -259,7 +261,7 @@ class TemplateSharingManager:
         """List all shared templates.
 
         Returns:
-            List of shared template information
+            list of shared template information
         """
         shared_templates = []
 
@@ -283,7 +285,9 @@ class TemplateSharingManager:
 
         return shared_templates
 
-    def _save_metadata_to_file(self, file_path: Path, metadata: TemplateMetadata) -> None:
+    def _save_metadata_to_file(
+        self, file_path: Path, metadata: TemplateMetadata
+    ) -> None:
         """Save metadata to a JSON file.
 
         Args:

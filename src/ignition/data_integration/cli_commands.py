@@ -25,7 +25,9 @@ def database() -> None:
 
 
 @database.command()
-@click.option("--config-name", default="neo4j_default", help="Database configuration name")
+@click.option(
+    "--config-name", default="neo4j_default", help="Database configuration name"
+)
 def test_connection(config_name: str) -> None:
     """Test database connection."""
     try:
@@ -36,7 +38,9 @@ def test_connection(config_name: str) -> None:
             result = manager.test_connection(config_name)
 
         if result["success"]:
-            console.print(f"✅ Connection successful to {result['db_type']}", style="green")
+            console.print(
+                f"✅ Connection successful to {result['db_type']}", style="green"
+            )
             console.print(f"   Host: {result['host']}")
             console.print(f"   Database: {result['database']}")
             console.print(f"   Connection time: {result['connection_time_ms']:.2f}ms")
@@ -107,7 +111,9 @@ def query(config_name: str, query: str, limit: int) -> None:
 
         # Display results in table format
         if isinstance(results[0], dict):
-            table = Table(title=f"Query Results (showing first {min(limit, len(results))} rows)")
+            table = Table(
+                title=f"Query Results (showing first {min(limit, len(results))} rows)"
+            )
 
             # Add columns from first result
             for key in results[0]:
@@ -239,9 +245,13 @@ def query_aggregated(
         time_range = generator.create_time_range_from_duration(hours)
 
         # Generate aggregated query
-        query = generator.generate_aggregated_query(tag_list, time_range, agg_type, interval, time_unit, limit=100)
+        query = generator.generate_aggregated_query(
+            tag_list, time_range, agg_type, interval, time_unit, limit=100
+        )
 
-        console.print(Panel(query, title=f"Generated {historian_type.upper()} Aggregated Query"))
+        console.print(
+            Panel(query, title=f"Generated {historian_type.upper()} Aggregated Query")
+        )
 
         # Show query details
         details = Table(title="Query Details")
@@ -252,7 +262,9 @@ def query_aggregated(
         details.add_row("Tags", tags)
         details.add_row("Aggregation", f"{aggregation} every {interval}{unit}")
         details.add_row("Time Range", f"Last {hours} hours")
-        details.add_row("Start Time", time_range.start_time.strftime("%Y-%m-%d %H:%M:%S"))
+        details.add_row(
+            "Start Time", time_range.start_time.strftime("%Y-%m-%d %H:%M:%S")
+        )
         details.add_row("End Time", time_range.end_time.strftime("%Y-%m-%d %H:%M:%S"))
 
         console.print(details)
@@ -322,7 +334,9 @@ def browse(path: str, provider: str) -> None:
 
 
 @tags.command()
-@click.option("--tag-paths", required=True, help="Comma-separated list of tag paths to read")
+@click.option(
+    "--tag-paths", required=True, help="Comma-separated list of tag paths to read"
+)
 @click.option("--provider", default="default", help="Tag provider name")
 def read(tag_paths: str, provider: str) -> None:
     """Read OPC tag values."""
@@ -398,7 +412,9 @@ def create(
             result = manager.create_tag(tag_def)
 
         if result["success"]:
-            console.print(f"✅ Tag created successfully: {result['tag_path']}", style="green")
+            console.print(
+                f"✅ Tag created successfully: {result['tag_path']}", style="green"
+            )
             console.print(f"   Message: {result['message']}")
         else:
             console.print(f"❌ Tag creation failed: {result['error']}", style="red")
@@ -441,7 +457,9 @@ def production(hours: int, output_format: str, output: str | None) -> None:
         tags = ["Line_A_Production", "Line_B_Production", "Line_C_Production"]
 
         with console.status("[bold blue]Generating production report..."):
-            result = generator.generate_production_report(start_time, end_time, tags, ReportFormat(output_format))
+            result = generator.generate_production_report(
+                start_time, end_time, tags, ReportFormat(output_format)
+            )
 
         if result["success"]:
             console.print("✅ Production report generated successfully", style="green")
@@ -454,9 +472,15 @@ def production(hours: int, output_format: str, output: str | None) -> None:
                 console.print(f"   Saved to: {output}")
             else:
                 console.print("\n📄 Report Content:")
-                console.print(result["content"][:500] + "..." if len(result["content"]) > 500 else result["content"])
+                console.print(
+                    result["content"][:500] + "..."
+                    if len(result["content"]) > 500
+                    else result["content"]
+                )
         else:
-            console.print(f"❌ Report generation failed: {result['error']}", style="red")
+            console.print(
+                f"❌ Report generation failed: {result['error']}", style="red"
+            )
 
     except ImportError:
         console.print("❌ Report generator not available", style="red")
@@ -486,7 +510,9 @@ def alarms(hours: int, output_format: str, output: str | None) -> None:
         start_time = end_time - timedelta(hours=hours)
 
         with console.status("[bold blue]Generating alarm report..."):
-            result = generator.generate_alarm_report(start_time, end_time, format_type=ReportFormat(output_format))
+            result = generator.generate_alarm_report(
+                start_time, end_time, format_type=ReportFormat(output_format)
+            )
 
         if result["success"]:
             console.print("✅ Alarm report generated successfully", style="green")
@@ -499,9 +525,15 @@ def alarms(hours: int, output_format: str, output: str | None) -> None:
                 console.print(f"   Saved to: {output}")
             else:
                 console.print("\n📄 Report Content:")
-                console.print(result["content"][:500] + "..." if len(result["content"]) > 500 else result["content"])
+                console.print(
+                    result["content"][:500] + "..."
+                    if len(result["content"]) > 500
+                    else result["content"]
+                )
         else:
-            console.print(f"❌ Report generation failed: {result['error']}", style="red")
+            console.print(
+                f"❌ Report generation failed: {result['error']}", style="red"
+            )
 
     except ImportError:
         console.print("❌ Report generator not available", style="red")

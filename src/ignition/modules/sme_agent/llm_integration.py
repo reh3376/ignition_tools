@@ -519,7 +519,7 @@ def validate_llm_environment() -> dict[str, Any]:
     Validate LLM environment and dependencies.
 
     Returns:
-        Dict containing validation results
+        dict containing validation results
     """
     validation_result = {
         "valid": True,

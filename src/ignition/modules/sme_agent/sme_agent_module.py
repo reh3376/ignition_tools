@@ -340,7 +340,7 @@ class SMEAgentModule:
         """Step 1: Environment Validation First
 
         Returns:
-            Dict containing validation results
+            dict containing validation results
         """
         if self.validation_result is None:
             self.validation_result = validate_sme_agent_environment()
@@ -356,7 +356,7 @@ class SMEAgentModule:
             complexity_level: "basic", "standard", "advanced", or "enterprise"
 
         Returns:
-            Dict containing initialization results
+            dict containing initialization results
         """
         start_time = time.time()
 
@@ -708,7 +708,7 @@ class SMEAgentModule:
             export_format: Export format ("json", "csv", "xlsx")
 
         Returns:
-            Dict with export information
+            dict with export information
         """
         # Find the batch
         batch = None
@@ -743,7 +743,7 @@ class SMEAgentModule:
                         "evaluation_fields": [
                             "rating: Required integer 1-5",
                             "correct_response: Optional better response if needed",
-                            "improvement_suggestions: List of specific improvements",
+                            "improvement_suggestions: list of specific improvements",
                             "human_evaluation: Any additional notes or context",
                         ],
                     },
@@ -765,7 +765,7 @@ class SMEAgentModule:
                         "human_evaluation": {
                             "rating": None,  # 1-5 scale
                             "correct_response": None,  # Optional better response
-                            "improvement_suggestions": [],  # List of improvements
+                            "improvement_suggestions": [],  # list of improvements
                             "notes": None,  # Additional notes
                         },
                     }
@@ -852,7 +852,7 @@ class SMEAgentModule:
             human_sme_id: ID of the human SME who performed the evaluation
 
         Returns:
-            Dict with import and processing results
+            dict with import and processing results
         """
         try:
             # Find the batch

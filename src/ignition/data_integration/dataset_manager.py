@@ -186,9 +186,13 @@ class DatasetManager:
                 data = self._extract_from_source(source)
                 if data is not None and not data.empty:
                     all_data.append(data)
-                    self.logger.info(f"Extracted {len(data)} rows from source {source.source_id}")
+                    self.logger.info(
+                        f"Extracted {len(data)} rows from source {source.source_id}"
+                    )
             except Exception as e:
-                self.logger.error(f"Failed to extract from source {source.source_id}: {e}")
+                self.logger.error(
+                    f"Failed to extract from source {source.source_id}: {e}"
+                )
 
         if not all_data:
             return pd.DataFrame()
@@ -227,7 +231,11 @@ class DatasetManager:
         try:
             manager = DatabaseConnectionManager()
             config_name = source.connection_config.get("config_name")
-            query = source.query_config.get("query") if source.query_config else "SELECT * FROM data LIMIT 1000"
+            query = (
+                source.query_config.get("query")
+                if source.query_config
+                else "SELECT * FROM data LIMIT 1000"
+            )
 
             with manager.get_connection(config_name) as conn_id:
                 results = manager.execute_query(conn_id, query)
@@ -264,7 +272,9 @@ class DatasetManager:
         from .historian_queries import HistorianQueryGenerator, HistorianType
 
         try:
-            historian_type = HistorianType(source.connection_config.get("historian_type", "influxdb"))
+            historian_type = HistorianType(
+                source.connection_config.get("historian_type", "influxdb")
+            )
             HistorianQueryGenerator(historian_type)
 
             # Generate sample data for now
@@ -286,7 +296,9 @@ class DatasetManager:
 
         try:
             OPCTagManager()
-            tag_paths = source.query_config.get("tag_paths", []) if source.query_config else []
+            tag_paths = (
+                source.query_config.get("tag_paths", []) if source.query_config else []
+            )
 
             # Generate sample data for now
             # In production, this would read actual OPC tags
@@ -319,12 +331,16 @@ class DatasetManager:
         # Update dataset statistics
         dataset.row_count = len(processed_data)
         dataset.column_count = len(processed_data.columns)
-        dataset.file_size_mb = processed_data.memory_usage(deep=True).sum() / (1024 * 1024)
+        dataset.file_size_mb = processed_data.memory_usage(deep=True).sum() / (
+            1024 * 1024
+        )
         dataset.status = ProcessingStatus.IN_PROGRESS
         dataset.updated_at = datetime.now()
 
         # Save processed data
-        processed_file = self.storage_path / "processed" / f"{dataset_id}_processed.parquet"
+        processed_file = (
+            self.storage_path / "processed" / f"{dataset_id}_processed.parquet"
+        )
         processed_data.to_parquet(processed_file, index=False)
 
         # Generate quality report
@@ -337,23 +353,31 @@ class DatasetManager:
 
         self._save_dataset_metadata(dataset)
 
-        self.logger.info(f"Processed dataset {dataset_id}: {dataset.row_count} rows, {dataset.column_count} columns")
+        self.logger.info(
+            f"Processed dataset {dataset_id}: {dataset.row_count} rows, {dataset.column_count} columns"
+        )
         return processed_data
 
-    def _apply_feature_transformations(self, data: pd.DataFrame, schema: DatasetSchema) -> pd.DataFrame:
+    def _apply_feature_transformations(
+        self, data: pd.DataFrame, schema: DatasetSchema
+    ) -> pd.DataFrame:
         """Apply feature transformations according to schema."""
         processed_data = data.copy()
 
         for feature in schema.features:
             if feature.source_column not in processed_data.columns:
-                self.logger.warning(f"Source column {feature.source_column} not found in data")
+                self.logger.warning(
+                    f"Source column {feature.source_column} not found in data"
+                )
                 continue
 
             # Handle missing values
             if feature.missing_value_strategy == "drop":
                 processed_data = processed_data.dropna(subset=[feature.source_column])
             elif feature.missing_value_strategy == "fill_mean":
-                processed_data[feature.source_column].fillna(processed_data[feature.source_column].mean(), inplace=True)
+                processed_data[feature.source_column].fillna(
+                    processed_data[feature.source_column].mean(), inplace=True
+                )
             elif feature.missing_value_strategy == "fill_median":
                 processed_data[feature.source_column].fillna(
                     processed_data[feature.source_column].median(), inplace=True
@@ -362,8 +386,13 @@ class DatasetManager:
                 processed_data[feature.source_column].fillna(
                     processed_data[feature.source_column].mode()[0], inplace=True
                 )
-            elif feature.missing_value_strategy == "custom" and feature.custom_fill_value is not None:
-                processed_data[feature.source_column].fillna(feature.custom_fill_value, inplace=True)
+            elif (
+                feature.missing_value_strategy == "custom"
+                and feature.custom_fill_value is not None
+            ):
+                processed_data[feature.source_column].fillna(
+                    feature.custom_fill_value, inplace=True
+                )
 
             # Apply transformations
             if feature.transformation:
@@ -371,11 +400,15 @@ class DatasetManager:
 
             # Rename column if needed
             if feature.name != feature.source_column:
-                processed_data.rename(columns={feature.source_column: feature.name}, inplace=True)
+                processed_data.rename(
+                    columns={feature.source_column: feature.name}, inplace=True
+                )
 
         return processed_data
 
-    def _apply_transformation(self, data: pd.DataFrame, feature: FeatureDefinition) -> pd.DataFrame:
+    def _apply_transformation(
+        self, data: pd.DataFrame, feature: FeatureDefinition
+    ) -> pd.DataFrame:
         """Apply specific transformation to a feature."""
         column = feature.source_column
 
@@ -398,19 +431,25 @@ class DatasetManager:
 
         return data
 
-    def _generate_quality_report(self, dataset_id: str, data: pd.DataFrame) -> DataQualityReport:
+    def _generate_quality_report(
+        self, dataset_id: str, data: pd.DataFrame
+    ) -> DataQualityReport:
         """Generate data quality assessment report."""
         report_id = str(uuid.uuid4())
 
         # Calculate quality scores
-        completeness = (1 - data.isnull().sum().sum() / (len(data) * len(data.columns))) * 100
+        completeness = (
+            1 - data.isnull().sum().sum() / (len(data) * len(data.columns))
+        ) * 100
         consistency = self._calculate_consistency_score(data)
         accuracy = self._calculate_accuracy_score(data)
         uniqueness = self._calculate_uniqueness_score(data)
         timeliness = 100.0  # Assume fresh data for now
 
         # Overall quality assessment
-        avg_score = (completeness + consistency + accuracy + uniqueness + timeliness) / 5
+        avg_score = (
+            completeness + consistency + accuracy + uniqueness + timeliness
+        ) / 5
         if avg_score >= 90:
             overall_quality = DataQuality.EXCELLENT
         elif avg_score >= 80:
@@ -473,7 +512,9 @@ class DatasetManager:
                 lower_bound = q1 - 1.5 * iqr
                 upper_bound = q3 + 1.5 * iqr
 
-                outliers = ((data[column] < lower_bound) | (data[column] > upper_bound)).sum()
+                outliers = (
+                    (data[column] < lower_bound) | (data[column] > upper_bound)
+                ).sum()
                 consistency = 1 - (outliers / len(data))
 
                 total_checks += 1
@@ -513,13 +554,17 @@ class DatasetManager:
         uniqueness = (1 - duplicate_rows / len(data)) * 100
         return uniqueness
 
-    def export_dataset(self, dataset_id: str, format_type: str = "csv", include_metadata: bool = True) -> str:
+    def export_dataset(
+        self, dataset_id: str, format_type: str = "csv", include_metadata: bool = True
+    ) -> str:
         """Export dataset in specified format."""
         if dataset_id not in self.datasets:
             raise ValueError(f"Dataset {dataset_id} not found")
 
         dataset = self.datasets[dataset_id]
-        processed_file = self.storage_path / "processed" / f"{dataset_id}_processed.parquet"
+        processed_file = (
+            self.storage_path / "processed" / f"{dataset_id}_processed.parquet"
+        )
 
         if not processed_file.exists():
             raise ValueError("Processed data not found. Run process_dataset() first.")
@@ -562,7 +607,11 @@ class DatasetManager:
                 "status": dataset.status.value,
                 "row_count": dataset.row_count,
                 "column_count": dataset.column_count,
-                "quality": (dataset.quality_report.overall_quality.value if dataset.quality_report else "unknown"),
+                "quality": (
+                    dataset.quality_report.overall_quality.value
+                    if dataset.quality_report
+                    else "unknown"
+                ),
                 "created_at": dataset.created_at.isoformat(),
                 "updated_at": dataset.updated_at.isoformat(),
                 "tags": dataset.tags,
@@ -613,7 +662,9 @@ class DatasetManager:
             "schema": asdict(dataset.schema),
             "data_sources": [asdict(source) for source in dataset.data_sources],
             "status": dataset.status.value,
-            "quality_report": (asdict(dataset.quality_report) if dataset.quality_report else None),
+            "quality_report": (
+                asdict(dataset.quality_report) if dataset.quality_report else None
+            ),
             "row_count": dataset.row_count,
             "column_count": dataset.column_count,
             "file_size_mb": dataset.file_size_mb,
@@ -644,7 +695,9 @@ class DatasetManager:
         data_sources = []
         for source_data in data["data_sources"]:
             if source_data.get("last_updated"):
-                source_data["last_updated"] = datetime.fromisoformat(source_data["last_updated"])
+                source_data["last_updated"] = datetime.fromisoformat(
+                    source_data["last_updated"]
+                )
             data_sources.append(DataSource(**source_data))
 
         # Convert quality report

@@ -261,10 +261,10 @@ class ModulePackager:
         """Package multiple modules in batch.
 
         Args:
-            project_paths: List of project paths to package
+            project_paths: list of project paths to package
 
         Returns:
-            List of packaging results
+            list of packaging results
         """
         results = []
 

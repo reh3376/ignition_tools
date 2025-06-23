@@ -26,7 +26,7 @@ def main():
     required_vars = {
         "NEO4J_URI": "bolt://localhost:7687",
         "NEO4J_USERNAME": "neo4j",
-        "NEO4J_PASSWORD": "ignition-graph"
+        "NEO4J_PASSWORD": "ignition-graph",
     }
 
     all_good = True
@@ -67,6 +67,7 @@ def main():
     else:
         print("\n❌ Neo4j environment configuration has issues!")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

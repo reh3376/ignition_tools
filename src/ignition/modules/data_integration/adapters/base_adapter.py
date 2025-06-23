@@ -58,14 +58,16 @@ class BaseDataAdapter(ABC):
         pass
 
     @abstractmethod
-    async def read_data(self, query: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    async def read_data(
+        self, query: dict[str, Any] | None = None
+    ) -> list[dict[str, Any]]:
         """Read data from the data source.
 
         Args:
             query: Optional query parameters specific to the data source
 
         Returns:
-            List of data records
+            list of data records
         """
         pass
 
@@ -74,7 +76,7 @@ class BaseDataAdapter(ABC):
         """Write data to the data source.
 
         Args:
-            data: List of data records to write
+            data: list of data records to write
 
         Returns:
             True if write successful, False otherwise
@@ -82,7 +84,9 @@ class BaseDataAdapter(ABC):
         pass
 
     @abstractmethod
-    async def stream_data(self, callback: callable, query: dict[str, Any] | None = None) -> None:
+    async def stream_data(
+        self, callback: callable, query: dict[str, Any] | None = None
+    ) -> None:
         """Stream data from the data source.
 
         Args:

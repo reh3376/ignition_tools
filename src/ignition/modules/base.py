@@ -182,7 +182,9 @@ class AbstractIgnitionModule(ABC):
 class ModuleError(Exception):
     """Base exception for module-related errors."""
 
-    def __init__(self, message: str, module_name: str = "", details: dict[str, Any] | None = None):
+    def __init__(
+        self, message: str, module_name: str = "", details: dict[str, Any] | None = None
+    ):
         super().__init__(message)
         self.module_name = module_name
         self.details = details or {}

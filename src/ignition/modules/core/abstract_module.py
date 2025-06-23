@@ -90,7 +90,9 @@ class AbstractIgnitionModule(ABC):
 
         # Initialize logging
         self._logger = self._diagnostics_manager.get_logger()
-        self._logger.info(f"Initializing module: {self._metadata.name} v{self._metadata.version}")
+        self._logger.info(
+            f"Initializing module: {self._metadata.name} v{self._metadata.version}"
+        )
 
     # Properties
 

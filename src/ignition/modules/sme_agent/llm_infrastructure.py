@@ -142,7 +142,7 @@ def validate_llm_infrastructure_environment() -> dict[str, Any]:
     Step 1: Environment validation first - comprehensive validation of all requirements.
 
     Returns:
-        Dict containing validation results and component availability.
+        dict containing validation results and component availability.
     """
     validation_result = {
         "validation_score": 0,

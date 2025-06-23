@@ -205,7 +205,7 @@ class AdvancedAnalyticsPlatformModule:
                 message=f"Required environment variable {var_name} is missing",
                 error=f"Missing required variable: {var_name}",
                 recommendations=[
-                    f"Set {var_name} in your .env file",
+                    f"set {var_name} in your .env file",
                     f"Description: {var_config.get('description', 'No description available')}",
                 ],
             )

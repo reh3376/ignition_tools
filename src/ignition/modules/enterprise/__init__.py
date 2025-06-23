@@ -21,7 +21,7 @@ import logging
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from dotenv import load_dotenv
 from rich.console import Console
@@ -515,7 +515,7 @@ class Phase10EnterpriseIntegration:
         # Display recommendations if validation failed
         if not validation_results.get("overall_valid"):
             console.print("\n📋 Recommendations:", style="bold yellow")
-            console.print("1. Set missing environment variables in your .env file")
+            console.print("1. set missing environment variables in your .env file")
             console.print("2. Correct invalid environment variable values")
             console.print("3. Run validation again to verify fixes")
             console.print(

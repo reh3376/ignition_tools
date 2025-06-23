@@ -129,7 +129,7 @@ class Phase97EnvironmentSetup:
                 required=False,
                 default_value="true",
                 validation_type="boolean",
-                setup_instructions="Set to 'true' to enable module signing, 'false' to disable",
+                setup_instructions="set to 'true' to enable module signing, 'false' to disable",
             ),
             EnvironmentRequirement(
                 name="Signing Certificate Path",
@@ -209,7 +209,7 @@ class Phase97EnvironmentSetup:
                     valid=False,
                     error=f"{req.env_var} is required but not set",
                     suggestions=[
-                        f"Set {req.env_var} environment variable",
+                        f"set {req.env_var} environment variable",
                         req.setup_instructions,
                     ],
                 )
@@ -225,7 +225,7 @@ class Phase97EnvironmentSetup:
                     valid=True,
                     warning="Optional variable not set",
                     suggestions=[
-                        f"Set {req.env_var} if needed: {req.setup_instructions}"
+                        f"set {req.env_var} if needed: {req.setup_instructions}"
                     ],
                 )
 
@@ -416,7 +416,7 @@ class Phase97EnvironmentSetup:
                     suggestions=[
                         "Install OpenJDK 11 or later",
                         "Add Java to system PATH",
-                        "Set JAVA_HOME environment variable",
+                        "set JAVA_HOME environment variable",
                     ],
                 )
 
@@ -455,7 +455,7 @@ class Phase97EnvironmentSetup:
                 suggestions=[
                     "Install OpenJDK 11+",
                     "Add Java bin directory to PATH",
-                    "Set JAVA_HOME environment variable",
+                    "set JAVA_HOME environment variable",
                 ],
             )
         except Exception as e:
@@ -479,7 +479,7 @@ class Phase97EnvironmentSetup:
                     suggestions=[
                         "Install Gradle 7.0+",
                         "Add Gradle to system PATH",
-                        "Set GRADLE_HOME environment variable",
+                        "set GRADLE_HOME environment variable",
                     ],
                 )
 
@@ -511,7 +511,7 @@ class Phase97EnvironmentSetup:
                 suggestions=[
                     "Install Gradle 7.0+",
                     "Add Gradle bin directory to PATH",
-                    "Set GRADLE_HOME environment variable",
+                    "set GRADLE_HOME environment variable",
                 ],
             )
         except Exception as e:
@@ -554,7 +554,7 @@ class Phase97EnvironmentSetup:
 
     def setup_development_environment(self, interactive: bool = True) -> dict[str, Any]:
         """Step 3: Progressive Environment Setup
-        Set up development environment with user guidance
+        set up development environment with user guidance
         """
         self.console.print(
             "\n🔧 Step 3: Development Environment Setup", style="bold blue"
@@ -721,8 +721,8 @@ class Phase97EnvironmentSetup:
                     valid=True,
                     value=f"Generated certificates in {cert_dir}",
                     suggestions=[
-                        f"Set SIGNING_CERT_PATH={cert_path}",
-                        f"Set SIGNING_KEY_PATH={key_path}",
+                        f"set SIGNING_CERT_PATH={cert_path}",
+                        f"set SIGNING_KEY_PATH={key_path}",
                     ],
                 )
             else:
@@ -811,7 +811,7 @@ class Phase97EnvironmentSetup:
                     value=f"Added {len(new_vars)} environment variables",
                     suggestions=[
                         "Review .env file for additional configuration",
-                        "Set JAVA_HOME and GRADLE_HOME manually",
+                        "set JAVA_HOME and GRADLE_HOME manually",
                         "Configure MODULE_REPOSITORY_URL if needed",
                     ],
                 )
@@ -925,7 +925,7 @@ class Phase97EnvironmentSetup:
 
         # Optional but recommended
         if not env_results.get("SIGNING_CERT_PATH", ValidationResult(False)).valid:
-            recommendations.append("🟡 Set up signing certificates for production")
+            recommendations.append("🟡 set up signing certificates for production")
 
         if not recommendations:
             recommendations.append("✅ Environment setup is complete!")
@@ -953,7 +953,7 @@ class Phase97EnvironmentSetup:
             if not env_results.get(var, ValidationResult(False)).valid
         ]
         if missing_critical:
-            steps.append(f"Set environment variables: {', '.join(missing_critical)}")
+            steps.append(f"set environment variables: {', '.join(missing_critical)}")
 
         # Testing steps
         if all(

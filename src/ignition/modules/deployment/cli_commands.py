@@ -476,7 +476,7 @@ def list_modules(
         if repository_url:
             config.repository_url = repository_url
 
-        # List modules
+        # list modules
         repository = RepositoryManager(config)
         result = repository.list_modules(search)
 
@@ -515,7 +515,7 @@ def list_modules(
                 console.print(f"  Error: {error}")
 
     except Exception as e:
-        console.print(f"❌ List error: {e!s}")
+        console.print(f"❌ list error: {e!s}")
 
 
 @deployment_cli.command()
@@ -809,7 +809,7 @@ def check_environment(detailed: bool, suggestions: bool):
                 "\n🔧 To fix issues automatically, run: [bold]ign deploy setup-environment[/bold]"
             )
 
-        # Set exit code based on results
+        # set exit code based on results
         if overall_score < 50:
             console.print("\n❌ Environment needs significant setup.", style="red")
             raise click.Exit(1)
@@ -910,7 +910,7 @@ def install_requirements(java: bool, gradle: bool, all: bool, dry_run: bool):
             )
             if result.returncode == 0:
                 console.print("  ✅ Java installed successfully", style="green")
-                console.print("    Set JAVA_HOME=$(brew --prefix)/opt/openjdk@11")
+                console.print("    set JAVA_HOME=$(brew --prefix)/opt/openjdk@11")
             else:
                 console.print("  ❌ Java installation verification failed", style="red")
         except FileNotFoundError:
@@ -932,6 +932,6 @@ def install_requirements(java: bool, gradle: bool, all: bool, dry_run: bool):
             console.print("  ❌ Gradle not found after installation", style="red")
 
     console.print("\n🎯 Next steps:")
-    console.print("  • Set environment variables (JAVA_HOME, GRADLE_HOME)")
+    console.print("  • set environment variables (JAVA_HOME, GRADLE_HOME)")
     console.print("  • Run: ign deploy setup-environment")
     console.print("  • Verify: ign deploy check-environment")

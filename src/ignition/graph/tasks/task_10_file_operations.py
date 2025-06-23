@@ -16,7 +16,7 @@ def get_file_operations_functions() -> list[dict[str, Any]]:
     - Archive extraction and validation
 
     Returns:
-        list[dict[str, Any]]: List of 8 file operation function definitions
+        list[dict[str, Any]]: list of 8 file operation function definitions
     """
     functions = []
 

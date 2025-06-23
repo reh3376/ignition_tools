@@ -66,7 +66,9 @@ class ModuleDiagnosticsManager:
             # Console handler
             console_handler = logging.StreamHandler(sys.stdout)
             console_handler.setLevel(logging.INFO)
-            console_formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+            console_formatter = logging.Formatter(
+                "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+            )
             console_handler.setFormatter(console_formatter)
             self._logger.addHandler(console_handler)
 
@@ -185,14 +187,18 @@ class ModuleDiagnosticsManager:
             "error_count": self._error_count,
             "warning_count": self._warning_count,
             "last_error": self._last_error,
-            "last_error_time": (self._last_error_time.isoformat() if self._last_error_time else None),
+            "last_error_time": (
+                self._last_error_time.isoformat() if self._last_error_time else None
+            ),
         }
 
     def get_health_status(self) -> dict[str, Any]:
         """Get current health status."""
         return {
             "status": self._health_status,
-            "last_check": (self._last_health_check.isoformat() if self._last_health_check else None),
+            "last_check": (
+                self._last_health_check.isoformat() if self._last_health_check else None
+            ),
             "error_count": self._error_count,
             "warning_count": self._warning_count,
             "last_error": self._last_error,
@@ -207,7 +213,9 @@ class ModuleDiagnosticsManager:
             "log_level": logging.getLevelName(self._log_level),
             "main_log_file": str(self._main_log_file),
             "error_log_file": str(self._error_log_file),
-            "last_health_check": (self._last_health_check.isoformat() if self._last_health_check else None),
+            "last_health_check": (
+                self._last_health_check.isoformat() if self._last_health_check else None
+            ),
         }
 
     def __str__(self) -> str:

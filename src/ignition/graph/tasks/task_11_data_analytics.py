@@ -25,7 +25,7 @@ def get_data_analytics_functions() -> list[dict[str, Any]]:
     """Get data analytics functions for Task 11.
 
     Returns:
-        list[dict[str, Any]]: List of data analytics function definitions
+        list[dict[str, Any]]: list of data analytics function definitions
     """
     functions = []
 

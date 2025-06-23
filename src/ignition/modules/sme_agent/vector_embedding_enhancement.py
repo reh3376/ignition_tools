@@ -179,7 +179,7 @@ def validate_vector_embedding_environment() -> dict[str, Any]:
     Step 1: Environment validation first - comprehensive validation of all requirements.
 
     Returns:
-        Dict containing validation results and component availability.
+        dict containing validation results and component availability.
     """
     validation_result = {
         "validation_score": 0,
@@ -877,7 +877,7 @@ async def create_enhanced_vector_search(
     """Create enhanced vector search with simplified interface.
 
     Args:
-        documents: List of documents to index
+        documents: list of documents to index
         embedding_model: Embedding model to use
         search_mode: Search mode (vector_only, graph_only, hybrid, adaptive)
         **kwargs: Additional configuration options

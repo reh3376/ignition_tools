@@ -95,7 +95,9 @@ class TemplateStorage:
         # Create default metadata if none exists
         return self._create_default_metadata(template_path)
 
-    def save_template_metadata(self, template_path: str, metadata: TemplateMetadata) -> None:
+    def save_template_metadata(
+        self, template_path: str, metadata: TemplateMetadata
+    ) -> None:
         """Save template metadata to file.
 
         Args:
@@ -144,7 +146,9 @@ class TemplateStorage:
 
         return None
 
-    def save_template_content(self, template_path: str, content: str, create_dirs: bool = True) -> bool:
+    def save_template_content(
+        self, template_path: str, content: str, create_dirs: bool = True
+    ) -> bool:
         """Save template content to file.
 
         Args:
@@ -214,7 +218,7 @@ class TemplateStorage:
         """List all template paths.
 
         Returns:
-            List of relative template paths
+            list of relative template paths
         """
         templates = []
         for template_file in self.templates_dir.rglob("*.jinja2"):
@@ -260,7 +264,7 @@ class TemplateStorage:
             template_path: Template path
 
         Returns:
-            List of extracted tags
+            list of extracted tags
         """
         tags = []
         parts = Path(template_path).parts

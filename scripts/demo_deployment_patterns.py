@@ -115,7 +115,9 @@ def create_sample_deployment_executions(learner: DeploymentPatternLearner) -> li
                     ]
                 )
                 rollback_triggered = random.choice([True, False])
-                rollback_successful = random.choice([True, False]) if rollback_triggered else None
+                rollback_successful = (
+                    random.choice([True, False]) if rollback_triggered else None
+                )
 
             execution_name = f"{scenario['name']} - Run {i + 1}"
 
@@ -134,7 +136,9 @@ def create_sample_deployment_executions(learner: DeploymentPatternLearner) -> li
                     failure_reasons=failure_reasons,
                     rollback_triggered=rollback_triggered,
                     rollback_successful=rollback_successful,
-                    user_id=random.choice(["engineer1", "operator1", "admin", "devops1"]),
+                    user_id=random.choice(
+                        ["engineer1", "operator1", "admin", "devops1"]
+                    ),
                     automation_triggered=random.choice([True, False]),
                     performance_data=(
                         {
@@ -209,7 +213,7 @@ def create_sample_environment_adaptations(
             ],
         },
         {
-            "name": "Tag Provider Security collections.abc.Mapping",
+            "name": "Tag Provider Security collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.Mapping",
             "source": "staging",
             "target": "production",
             "type": "security_adjustment",
@@ -283,7 +287,9 @@ def create_sample_environment_adaptations(
                     "All required fields are present",
                     "Security requirements are met",
                 ],
-                automation_level=random.choice(["manual", "semi_automated", "fully_automated"]),
+                automation_level=random.choice(
+                    ["manual", "semi_automated", "fully_automated"]
+                ),
             )
             adaptation_ids.append(adaptation_id)
 
@@ -471,7 +477,9 @@ def create_sample_deployment_metrics(learner: DeploymentPatternLearner) -> list[
             for strategy in strategies:
                 for metric_def in metric_types:
                     # Add some realistic variance
-                    value = metric_def["base_value"] + random.uniform(-metric_def["variance"], metric_def["variance"])
+                    value = metric_def["base_value"] + random.uniform(
+                        -metric_def["variance"], metric_def["variance"]
+                    )
 
                     # Ensure reasonable bounds
                     if metric_def["unit"] == "percentage":
@@ -500,7 +508,9 @@ def create_sample_deployment_metrics(learner: DeploymentPatternLearner) -> list[
                         metric_ids.append(metric_id)
 
                     except Exception as e:
-                        print(f"   ❌ Failed to create metric {metric_def['name']}: {e}")
+                        print(
+                            f"   ❌ Failed to create metric {metric_def['name']}: {e}"
+                        )
 
     print(f"✅ Created {len(metric_ids)} deployment metrics")
     return metric_ids
@@ -538,7 +548,9 @@ def demonstrate_deployment_pattern_learning():
         )
         print(f"   Found {len(recommendations)} recommendations")
         for rec in recommendations:
-            print(f"   • {rec['pattern_name']} (confidence: {rec['confidence_score']:.1%})")
+            print(
+                f"   • {rec['pattern_name']} (confidence: {rec['confidence_score']:.1%})"
+            )
 
         # Test environment adaptations
         print("\n2. Testing Environment Adaptations:")
@@ -547,7 +559,9 @@ def demonstrate_deployment_pattern_learning():
         )
         print(f"   Found {len(adaptations)} adaptations")
         for adaptation in adaptations:
-            print(f"   • {adaptation['adaptation_name']} (success rate: {adaptation['success_rate']:.1%})")
+            print(
+                f"   • {adaptation['adaptation_name']} (success rate: {adaptation['success_rate']:.1%})"
+            )
 
         # Test rollback scenarios
         print("\n3. Testing Rollback Scenarios:")
@@ -556,7 +570,9 @@ def demonstrate_deployment_pattern_learning():
         )
         print(f"   Found {len(scenarios)} rollback scenarios")
         for scenario in scenarios:
-            print(f"   • {scenario['scenario_name']} (success rate: {scenario['success_rate']:.1%})")
+            print(
+                f"   • {scenario['scenario_name']} (success rate: {scenario['success_rate']:.1%})"
+            )
 
         # Test deployment analytics
         print("\n4. Testing Deployment Analytics:")

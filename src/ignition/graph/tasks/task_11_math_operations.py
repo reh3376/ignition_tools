@@ -25,7 +25,7 @@ def get_math_operations_functions() -> list[dict[str, Any]]:
     """Get mathematical operations functions for Task 11.
 
     Returns:
-        list[dict[str, Any]]: List of mathematical operation function definitions
+        list[dict[str, Any]]: list of mathematical operation function definitions
     """
     functions = []
 

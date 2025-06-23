@@ -63,12 +63,16 @@ class TemplateManager:
         # Initialize version manager if enabled
         self.version_manager = None
         if enable_versioning:
-            self.version_manager = TemplateVersionManager(self.storage, Path(metadata_dir) / "versions")
+            self.version_manager = TemplateVersionManager(
+                self.storage, Path(metadata_dir) / "versions"
+            )
 
         # Initialize sharing manager if enabled
         self.sharing_manager = None
         if enable_sharing:
-            self.sharing_manager = TemplateSharingManager(self.storage, Path(metadata_dir) / "shared")
+            self.sharing_manager = TemplateSharingManager(
+                self.storage, Path(metadata_dir) / "shared"
+            )
 
     # Storage delegation methods
     def get_template_content(self, template_path: str) -> str | None:
@@ -154,7 +158,9 @@ class TemplateManager:
             return False
 
         # Update content if provided
-        if content is not None and not self.storage.save_template_content(template_path, content):
+        if content is not None and not self.storage.save_template_content(
+            template_path, content
+        ):
             return False
 
         # Update metadata if provided
@@ -180,7 +186,11 @@ class TemplateManager:
             self.version_manager.create_version(
                 template_path,
                 metadata.version,
-                (metadata_updates.get("author", "Unknown") if metadata_updates else "Unknown"),
+                (
+                    metadata_updates.get("author", "Unknown")
+                    if metadata_updates
+                    else "Unknown"
+                ),
                 changelog,
             )
 
@@ -228,7 +238,7 @@ class TemplateManager:
             tags: Filter by tags (any match)
 
         Returns:
-            List of matching templates
+            list of matching templates
         """
         return self.search_engine.browse_templates(category, status, tags)
 
@@ -246,7 +256,7 @@ class TemplateManager:
             limit: Maximum results to return
 
         Returns:
-            List of search results sorted by relevance
+            list of search results sorted by relevance
         """
         return self.search_engine.search_templates(query, category, limit)
 
@@ -258,7 +268,7 @@ class TemplateManager:
             template_path: Relative path to template
 
         Returns:
-            List of template versions
+            list of template versions
         """
         if self.version_manager:
             return self.version_manager.get_versions(template_path)
@@ -281,7 +291,9 @@ class TemplateManager:
             True if successful, False otherwise
         """
         if self.version_manager:
-            return self.version_manager.restore_version(template_path, version, create_backup)
+            return self.version_manager.restore_version(
+                template_path, version, create_backup
+            )
         return False
 
     # Sharing delegation methods
@@ -302,7 +314,9 @@ class TemplateManager:
             True if successful, False otherwise
         """
         if self.sharing_manager:
-            return self.sharing_manager.export_template(template_path, output_path, include_metadata)
+            return self.sharing_manager.export_template(
+                template_path, output_path, include_metadata
+            )
         return False
 
     def import_shared_template(
@@ -322,7 +336,9 @@ class TemplateManager:
             Path of imported template or None if failed
         """
         if self.sharing_manager:
-            return self.sharing_manager.import_template(bundle_path, target_path, overwrite)
+            return self.sharing_manager.import_template(
+                bundle_path, target_path, overwrite
+            )
         return None
 
     # Statistics and reporting
@@ -356,7 +372,9 @@ class TemplateManager:
             author_counts[author] = author_counts.get(author, 0) + 1
 
         # Recent activity
-        recent_templates = sorted(template_index.items(), key=lambda x: x[1].modified_at, reverse=True)[:10]
+        recent_templates = sorted(
+            template_index.items(), key=lambda x: x[1].modified_at, reverse=True
+        )[:10]
 
         return {
             "total_templates": total_templates,
@@ -375,7 +393,9 @@ class TemplateManager:
             "sharing_enabled": self.sharing_manager is not None,
         }
 
-    def _update_graph_template(self, template_path: str, metadata: TemplateMetadata) -> None:
+    def _update_graph_template(
+        self, template_path: str, metadata: TemplateMetadata
+    ) -> None:
         """Update template information in Neo4j graph.
 
         Args:
@@ -423,7 +443,7 @@ class TemplateManager:
         """List all template paths.
 
         Returns:
-            List of relative template paths
+            list of relative template paths
         """
         return self.storage.list_all_templates()
 

@@ -9,8 +9,6 @@ import argparse
 import sys
 import time
 from pathlib import Path
-import os
-from typing import Dict, List, Optional, Tuple
 
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
@@ -40,6 +38,7 @@ except ImportError:
 # Neo4j integration
 try:
     from neo4j import GraphDatabase
+
     NEO4J_AVAILABLE = True
 except ImportError:
     NEO4J_AVAILABLE = False
@@ -50,21 +49,28 @@ console = Console() if RICH_AVAILABLE else None
 
 class Neo4jMetricsCollector:
     """Collects actual metrics from Neo4j database."""
-    
-    def __init__(self, uri: str = "bolt://localhost:7687", user: str = "neo4j", password: str = "ignition-graph"):
+
+    def __init__(
+        self,
+        uri: str = "bolt://localhost:7687",
+        user: str = "neo4j",
+        password: str = "ignition-graph",
+    ):
         self.uri = uri
         self.user = user
         self.password = password
         self.driver = None
         self.connected = False
-        
+
     def connect(self) -> bool:
         """Connect to Neo4j database."""
         if not NEO4J_AVAILABLE:
             return False
-            
+
         try:
-            self.driver = GraphDatabase.driver(self.uri, auth=(self.user, self.password))
+            self.driver = GraphDatabase.driver(
+                self.uri, auth=(self.user, self.password)
+            )
             # Test connection
             with self.driver.session() as session:
                 session.run("RETURN 1")
@@ -73,27 +79,29 @@ class Neo4jMetricsCollector:
         except Exception as e:
             print(f"Failed to connect to Neo4j: {e}")
             return False
-    
-    def get_current_counts(self) -> Tuple[int, int]:
+
+    def get_current_counts(self) -> tuple[int, int]:
         """Get current node and relationship counts from Neo4j."""
         if not self.connected:
             return 0, 0
-            
+
         try:
             with self.driver.session() as session:
                 # Get node count
                 node_result = session.run("MATCH (n) RETURN count(n) as node_count")
                 node_count = node_result.single()["node_count"]
-                
+
                 # Get relationship count
-                rel_result = session.run("MATCH ()-[r]->() RETURN count(r) as rel_count")
+                rel_result = session.run(
+                    "MATCH ()-[r]->() RETURN count(r) as rel_count"
+                )
                 rel_count = rel_result.single()["rel_count"]
-                
+
                 return node_count, rel_count
         except Exception as e:
             print(f"Error getting Neo4j counts: {e}")
             return 0, 0
-    
+
     def close(self):
         """Close Neo4j connection."""
         if self.driver:
@@ -110,17 +118,19 @@ class ContextProcessor:
         self.successful_files = 0
         self.failed_files = 0
         self.start_time = time.time()
-        
+
         # Initialize Neo4j metrics collector
         self.neo4j_collector = Neo4jMetricsCollector(password=neo4j_password)
         self.neo4j_available = self.neo4j_collector.connect()
-        
+
         # Track initial counts
         if self.neo4j_available:
-            self.initial_nodes, self.initial_relationships = self.neo4j_collector.get_current_counts()
+            self.initial_nodes, self.initial_relationships = (
+                self.neo4j_collector.get_current_counts()
+            )
         else:
             self.initial_nodes, self.initial_relationships = 0, 0
-            
+
         self.embeddings_created = 0
 
     def get_relevant_files(self, force_refresh: bool = False) -> list[Path]:
@@ -158,7 +168,7 @@ class ContextProcessor:
         max_files = 50 if force_refresh else 25
         return filtered_files[:max_files]
 
-    def process_file(self, file_path: Path) -> Dict[str, any]:
+    def process_file(self, file_path: Path) -> dict[str, any]:
         """Process a single file and return actual metrics."""
         try:
             # Get initial counts if Neo4j is available
@@ -169,6 +179,7 @@ class ContextProcessor:
 
             # Use the existing CLI command
             import subprocess
+
             result = subprocess.run(
                 [
                     sys.executable,
@@ -186,26 +197,32 @@ class ContextProcessor:
             if result.returncode == 0:
                 # Get post-processing counts if Neo4j is available
                 if self.neo4j_available:
-                    post_nodes, post_relationships = self.neo4j_collector.get_current_counts()
+                    post_nodes, post_relationships = (
+                        self.neo4j_collector.get_current_counts()
+                    )
                     nodes_added = max(0, post_nodes - pre_nodes)
                     relationships_added = max(0, post_relationships - pre_relationships)
                 else:
                     # Fallback: estimate based on file size and complexity
                     file_size = file_path.stat().st_size
                     lines_estimate = max(1, file_size // 50)  # Rough estimate
-                    nodes_added = min(10, max(1, lines_estimate // 20))  # 1-10 nodes per file
-                    relationships_added = min(25, max(2, lines_estimate // 10))  # 2-25 relationships per file
-                
+                    nodes_added = min(
+                        10, max(1, lines_estimate // 20)
+                    )  # 1-10 nodes per file
+                    relationships_added = min(
+                        25, max(2, lines_estimate // 10)
+                    )  # 2-25 relationships per file
+
                 # Simulate embeddings (would be actual in real implementation)
                 embeddings_added = 1
-                
+
                 return {
                     "success": True,
                     "nodes_added": nodes_added,
                     "relationships_added": relationships_added,
                     "embeddings_added": embeddings_added,
                     "file_size": file_path.stat().st_size,
-                    "processing_time": 0.1  # Placeholder
+                    "processing_time": 0.1,  # Placeholder
                 }
             else:
                 return {
@@ -213,7 +230,7 @@ class ContextProcessor:
                     "nodes_added": 0,
                     "relationships_added": 0,
                     "embeddings_added": 0,
-                    "error": result.stderr[:200] if result.stderr else "Unknown error"
+                    "error": result.stderr[:200] if result.stderr else "Unknown error",
                 }
 
         except Exception as e:
@@ -222,10 +239,12 @@ class ContextProcessor:
                 "nodes_added": 0,
                 "relationships_added": 0,
                 "embeddings_added": 0,
-                "error": str(e)[:200]
+                "error": str(e)[:200],
             }
 
-    def process_batch(self, files: list[Path], progress_task=None, progress=None) -> dict:
+    def process_batch(
+        self, files: list[Path], progress_task=None, progress=None
+    ) -> dict:
         """Process a batch of files."""
         batch_results = {"processed": 0, "successful": 0, "failed": 0, "files": []}
         batch_nodes = 0
@@ -247,11 +266,13 @@ class ContextProcessor:
                 self.failed_files += 1
 
             self.processed_files += 1
-            batch_results["files"].append({
-                "path": str(file_path), 
-                "success": file_result["success"],
-                "metrics": file_result
-            })
+            batch_results["files"].append(
+                {
+                    "path": str(file_path),
+                    "success": file_result["success"],
+                    "metrics": file_result,
+                }
+            )
 
             # Update progress
             if progress and progress_task:
@@ -268,21 +289,23 @@ class ContextProcessor:
 
         return batch_results
 
-    def get_final_metrics(self) -> Dict[str, int]:
+    def get_final_metrics(self) -> dict[str, int]:
         """Get final metrics including actual Neo4j counts."""
         if self.neo4j_available and self.neo4j_collector.connected:
             final_nodes, final_relationships = self.neo4j_collector.get_current_counts()
             nodes_created = max(0, final_nodes - self.initial_nodes)
-            relationships_created = max(0, final_relationships - self.initial_relationships)
+            relationships_created = max(
+                0, final_relationships - self.initial_relationships
+            )
         else:
             # Use accumulated estimates
-            nodes_created = getattr(self, 'total_nodes_estimate', 0)
-            relationships_created = getattr(self, 'total_relationships_estimate', 0)
-        
+            nodes_created = getattr(self, "total_nodes_estimate", 0)
+            relationships_created = getattr(self, "total_relationships_estimate", 0)
+
         return {
             "nodes_created": nodes_created,
             "relationships_created": relationships_created,
-            "embeddings_created": self.embeddings_created
+            "embeddings_created": self.embeddings_created,
         }
 
     def run(self, force_refresh: bool = False) -> dict:
@@ -301,17 +324,23 @@ class ContextProcessor:
 
         # Create beautiful header
         header_text = Text("🚀 Automated Context Processing", style="bold cyan")
-        header_panel = Panel(Align.center(header_text), border_style="cyan", padding=(1, 2))
+        header_panel = Panel(
+            Align.center(header_text), border_style="cyan", padding=(1, 2)
+        )
         console.print(header_panel)
 
         # Display configuration
         config_table = Table(show_header=False, box=None, padding=(0, 2))
-        config_table.add_row("Mode:", "Full Refresh" if force_refresh else "Incremental Update")
+        config_table.add_row(
+            "Mode:", "Full Refresh" if force_refresh else "Incremental Update"
+        )
         config_table.add_row("Batch Size:", str(self.batch_size))
         config_table.add_row("Total Files:", str(total_files))
         config_table.add_row("Neo4j Password:", "✓ Configured")
 
-        console.print(Panel(config_table, title="📋 Configuration", border_style="blue"))
+        console.print(
+            Panel(config_table, title="📋 Configuration", border_style="blue")
+        )
 
         # Process files with progress bar
         with Progress(
@@ -330,7 +359,7 @@ class ContextProcessor:
             batch_count = 0
             total_nodes_estimate = 0
             total_relationships_estimate = 0
-            
+
             for i in range(0, total_files, self.batch_size):
                 batch_files = files[i : i + self.batch_size]
                 batch_count += 1
@@ -338,19 +367,23 @@ class ContextProcessor:
                 progress.update(task, description=f"Processing batch {batch_count}...")
 
                 batch_result = self.process_batch(batch_files, task, progress)
-                
+
                 # Accumulate estimates for fallback
                 if not self.neo4j_available:
                     total_nodes_estimate += batch_result.get("nodes_added", 0)
-                    total_relationships_estimate += batch_result.get("relationships_added", 0)
-            
+                    total_relationships_estimate += batch_result.get(
+                        "relationships_added", 0
+                    )
+
             # Store estimates for fallback
             self.total_nodes_estimate = total_nodes_estimate
             self.total_relationships_estimate = total_relationships_estimate
 
         # Calculate final metrics
         processing_time = time.time() - self.start_time
-        success_rate = (self.successful_files / total_files * 100) if total_files > 0 else 0
+        success_rate = (
+            (self.successful_files / total_files * 100) if total_files > 0 else 0
+        )
 
         # Display beautiful summary
         self._display_summary(total_files, processing_time, success_rate)
@@ -371,21 +404,35 @@ class ContextProcessor:
             "embeddings_created": self.get_final_metrics()["embeddings_created"],
         }
 
-    def _display_summary(self, total_files: int, processing_time: float, success_rate: float):
+    def _display_summary(
+        self, total_files: int, processing_time: float, success_rate: float
+    ):
         """Display beautiful completion summary."""
 
         # Create metrics table
         metrics_table = Table(show_header=False, box=None, padding=(0, 2))
-        metrics_table.add_row("📊 Files Processed:", f"{self.successful_files}/{total_files}")
+        metrics_table.add_row(
+            "📊 Files Processed:", f"{self.successful_files}/{total_files}"
+        )
         metrics_table.add_row("✅ Success Rate:", f"{success_rate:.1f}%")
-        metrics_table.add_row("🔗 Nodes Created:", str(self.get_final_metrics()["nodes_created"]))
-        metrics_table.add_row("🔀 Relationships:", str(self.get_final_metrics()["relationships_created"]))
-        metrics_table.add_row("🧠 Embeddings:", str(self.get_final_metrics()["embeddings_created"]))
+        metrics_table.add_row(
+            "🔗 Nodes Created:", str(self.get_final_metrics()["nodes_created"])
+        )
+        metrics_table.add_row(
+            "🔀 Relationships:", str(self.get_final_metrics()["relationships_created"])
+        )
+        metrics_table.add_row(
+            "🧠 Embeddings:", str(self.get_final_metrics()["embeddings_created"])
+        )
         metrics_table.add_row("⏱️  Processing Time:", f"{processing_time:.2f}s")
 
         # Success or warning style based on success rate
-        border_style = "green" if success_rate >= 90 else "yellow" if success_rate >= 70 else "red"
-        title_emoji = "✅" if success_rate >= 90 else "⚠️" if success_rate >= 70 else "❌"
+        border_style = (
+            "green" if success_rate >= 90 else "yellow" if success_rate >= 70 else "red"
+        )
+        title_emoji = (
+            "✅" if success_rate >= 90 else "⚠️" if success_rate >= 70 else "❌"
+        )
 
         console.print()
         console.print(
@@ -398,11 +445,17 @@ class ContextProcessor:
 
         # Final message
         if success_rate >= 90:
-            console.print("🎉 Your codebase context is now up to date!", style="bold green")
+            console.print(
+                "🎉 Your codebase context is now up to date!", style="bold green"
+            )
         elif success_rate >= 70:
-            console.print("⚠️  Context processing completed with some issues", style="bold yellow")
+            console.print(
+                "⚠️  Context processing completed with some issues", style="bold yellow"
+            )
         else:
-            console.print("❌ Context processing encountered significant issues", style="bold red")
+            console.print(
+                "❌ Context processing encountered significant issues", style="bold red"
+            )
 
         console.print(
             '💡 Query your code with: [bold cyan]python -m src.core.enhanced_cli code search-code "your query"[/bold cyan]'
@@ -438,11 +491,15 @@ class ContextProcessor:
         self.total_relationships_estimate = total_relationships_estimate
 
         processing_time = time.time() - self.start_time
-        success_rate = (self.successful_files / total_files * 100) if total_files > 0 else 0
-        
+        success_rate = (
+            (self.successful_files / total_files * 100) if total_files > 0 else 0
+        )
+
         final_metrics = self.get_final_metrics()
 
-        print(f"✅ Complete! {self.successful_files}/{total_files} files processed successfully")
+        print(
+            f"✅ Complete! {self.successful_files}/{total_files} files processed successfully"
+        )
         print(f"   Success Rate: {success_rate:.1f}%")
         print(f"   Nodes Created: {final_metrics['nodes_created']}")
         print(f"   Relationships Created: {final_metrics['relationships_created']}")
@@ -468,13 +525,21 @@ class ContextProcessor:
 def main():
     """Main entry point."""
     parser = argparse.ArgumentParser(description="Automated Context Processing")
-    parser.add_argument("--batch-size", type=int, default=25, help="Batch size for processing")
-    parser.add_argument("--force-refresh", action="store_true", help="Force full refresh")
-    parser.add_argument("--neo4j-password", default="ignition-graph", help="Neo4j password")
+    parser.add_argument(
+        "--batch-size", type=int, default=25, help="Batch size for processing"
+    )
+    parser.add_argument(
+        "--force-refresh", action="store_true", help="Force full refresh"
+    )
+    parser.add_argument(
+        "--neo4j-password", default="ignition-graph", help="Neo4j password"
+    )
 
     args = parser.parse_args()
 
-    processor = ContextProcessor(batch_size=args.batch_size, neo4j_password=args.neo4j_password)
+    processor = ContextProcessor(
+        batch_size=args.batch_size, neo4j_password=args.neo4j_password
+    )
 
     try:
         result = processor.run(force_refresh=args.force_refresh)

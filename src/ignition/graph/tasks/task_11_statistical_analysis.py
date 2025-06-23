@@ -25,7 +25,7 @@ def get_statistical_analysis_functions() -> list[dict[str, Any]]:
     """Get statistical analysis functions for Task 11.
 
     Returns:
-        list[dict[str, Any]]: List of statistical analysis function definitions
+        list[dict[str, Any]]: list of statistical analysis function definitions
     """
     functions = []
 

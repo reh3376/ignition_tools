@@ -74,7 +74,7 @@ class PerformanceThreshold:
             value: Value to evaluate
 
         Returns:
-            Tuple of (status, message)
+            tuple of (status, message)
         """
         if value > self.max_value:
             return (
@@ -235,7 +235,9 @@ def format_performance_error(error: Exception) -> str:
     elif "connection" in error_str:
         return "Connection error during performance test. Check target system availability."
     elif "permission" in error_str:
-        return "Permission denied during performance monitoring. Check system permissions."
+        return (
+            "Permission denied during performance monitoring. Check system permissions."
+        )
     elif "resource" in error_str:
         return "System resource exhausted during test. Reduce test load or free up resources."
     else:
@@ -289,16 +291,24 @@ class SystemMonitor:
         disk_read_mb = 0.0
         disk_write_mb = 0.0
         if self._initial_disk_io and disk_io:
-            disk_read_mb = (disk_io.read_bytes - self._initial_disk_io.read_bytes) / (1024 * 1024)
-            disk_write_mb = (disk_io.write_bytes - self._initial_disk_io.write_bytes) / (1024 * 1024)
+            disk_read_mb = (disk_io.read_bytes - self._initial_disk_io.read_bytes) / (
+                1024 * 1024
+            )
+            disk_write_mb = (
+                disk_io.write_bytes - self._initial_disk_io.write_bytes
+            ) / (1024 * 1024)
 
         # Network I/O
         network_io = psutil.net_io_counters()
         network_sent_mb = 0.0
         network_recv_mb = 0.0
         if self._initial_network_io and network_io:
-            network_sent_mb = (network_io.bytes_sent - self._initial_network_io.bytes_sent) / (1024 * 1024)
-            network_recv_mb = (network_io.bytes_recv - self._initial_network_io.bytes_recv) / (1024 * 1024)
+            network_sent_mb = (
+                network_io.bytes_sent - self._initial_network_io.bytes_sent
+            ) / (1024 * 1024)
+            network_recv_mb = (
+                network_io.bytes_recv - self._initial_network_io.bytes_recv
+            ) / (1024 * 1024)
 
         return PerformanceMetrics(
             timestamp=timestamp,
@@ -358,10 +368,14 @@ class ModulePerformanceTester:
         self.max_users = int(os.getenv("PERF_MAX_USERS", "100"))
         self.default_duration = int(os.getenv("PERF_TEST_DURATION", "300"))
         self.monitoring_interval = float(os.getenv("PERF_MONITORING_INTERVAL", "1.0"))
-        self.results_path = Path(os.getenv("PERF_RESULTS_PATH", "./performance_results"))
+        self.results_path = Path(
+            os.getenv("PERF_RESULTS_PATH", "./performance_results")
+        )
 
     @asynccontextmanager
-    async def performance_context(self, module_path: str) -> AsyncIterator["ModulePerformanceTester"]:
+    async def performance_context(
+        self, module_path: str
+    ) -> AsyncIterator["ModulePerformanceTester"]:
         """Create performance testing context with resource management.
 
         Args:
@@ -521,7 +535,10 @@ class ModulePerformanceTester:
                 await self.run_single_test(test)
 
                 # Store baseline metrics for comparison
-                if test.test_type == PerformanceTestType.BASELINE and test.summary_metrics:
+                if (
+                    test.test_type == PerformanceTestType.BASELINE
+                    and test.summary_metrics
+                ):
                     baseline_metrics = test.summary_metrics
 
             except Exception as e:
@@ -602,14 +619,18 @@ class ModulePerformanceTester:
                 if phase_name == "ramp_up":
                     # Gradually increase users
                     current_users = int(
-                        profile.initial_users + (profile.target_users - profile.initial_users) * (step / steps)
+                        profile.initial_users
+                        + (profile.target_users - profile.initial_users)
+                        * (step / steps)
                     )
                 elif phase_name == "hold":
                     # Maintain target users
                     current_users = profile.target_users
                 else:  # ramp_down
                     # Gradually decrease users
-                    current_users = int(profile.target_users - profile.target_users * (step / steps))
+                    current_users = int(
+                        profile.target_users - profile.target_users * (step / steps)
+                    )
 
                 # Simulate load generation delay
                 await asyncio.sleep(interval)
@@ -649,7 +670,9 @@ class ModulePerformanceTester:
             elif status == "warning":
                 test.warnings.append(message)
 
-    def _generate_report(self, total_duration: float, baseline_metrics: PerformanceMetrics | None) -> PerformanceReport:
+    def _generate_report(
+        self, total_duration: float, baseline_metrics: PerformanceMetrics | None
+    ) -> PerformanceReport:
         """Generate performance report.
 
         Args:
@@ -715,7 +738,9 @@ class ModulePerformanceTester:
 
         return trends
 
-    def _generate_recommendations(self, baseline_metrics: PerformanceMetrics | None) -> list[str]:
+    def _generate_recommendations(
+        self, baseline_metrics: PerformanceMetrics | None
+    ) -> list[str]:
         """Generate recommendations based on performance results."""
         recommendations = []
 
@@ -723,20 +748,34 @@ class ModulePerformanceTester:
         tests_with_issues = [t for t in self.tests if t.issues]
 
         if failed_tests:
-            recommendations.append(f"Fix {len(failed_tests)} failed performance tests before deployment")
+            recommendations.append(
+                f"Fix {len(failed_tests)} failed performance tests before deployment"
+            )
 
         if tests_with_issues:
             recommendations.append("Address performance threshold violations")
 
         # CPU-specific recommendations
-        high_cpu_tests = [t for t in self.tests if t.summary_metrics and t.summary_metrics.cpu_usage > 80.0]
+        high_cpu_tests = [
+            t
+            for t in self.tests
+            if t.summary_metrics and t.summary_metrics.cpu_usage > 80.0
+        ]
         if high_cpu_tests:
-            recommendations.append("High CPU usage detected - optimize computational efficiency")
+            recommendations.append(
+                "High CPU usage detected - optimize computational efficiency"
+            )
 
         # Memory-specific recommendations
-        high_memory_tests = [t for t in self.tests if t.summary_metrics and t.summary_metrics.memory_usage > 80.0]
+        high_memory_tests = [
+            t
+            for t in self.tests
+            if t.summary_metrics and t.summary_metrics.memory_usage > 80.0
+        ]
         if high_memory_tests:
-            recommendations.append("High memory usage detected - review memory leaks and optimization")
+            recommendations.append(
+                "High memory usage detected - review memory leaks and optimization"
+            )
 
         # Baseline comparison recommendations
         if baseline_metrics:
@@ -745,12 +784,18 @@ class ModulePerformanceTester:
                 None,
             )
             if stress_test and stress_test.summary_metrics:
-                cpu_increase = stress_test.summary_metrics.cpu_usage - baseline_metrics.cpu_usage
+                cpu_increase = (
+                    stress_test.summary_metrics.cpu_usage - baseline_metrics.cpu_usage
+                )
                 if cpu_increase > 50.0:
-                    recommendations.append("Significant CPU increase under load - review scalability")
+                    recommendations.append(
+                        "Significant CPU increase under load - review scalability"
+                    )
 
         if not recommendations:
-            recommendations.append("Performance tests passed - module meets performance requirements")
+            recommendations.append(
+                "Performance tests passed - module meets performance requirements"
+            )
 
         return recommendations
 
@@ -789,7 +834,9 @@ class ModulePerformanceTester:
                     "name": test.name,
                     "test_type": test.test_type.value,
                     "status": test.status.value,
-                    "duration": (test.end_time - test.start_time if test.end_time > 0 else 0),
+                    "duration": (
+                        test.end_time - test.start_time if test.end_time > 0 else 0
+                    ),
                     "load_profile": {
                         "name": test.load_profile.name,
                         "target_users": test.load_profile.target_users,
@@ -799,9 +846,21 @@ class ModulePerformanceTester:
                     },
                     "summary_metrics": (
                         {
-                            "cpu_usage": (test.summary_metrics.cpu_usage if test.summary_metrics else 0),
-                            "memory_usage": (test.summary_metrics.memory_usage if test.summary_metrics else 0),
-                            "response_time": (test.summary_metrics.response_time_ms if test.summary_metrics else 0),
+                            "cpu_usage": (
+                                test.summary_metrics.cpu_usage
+                                if test.summary_metrics
+                                else 0
+                            ),
+                            "memory_usage": (
+                                test.summary_metrics.memory_usage
+                                if test.summary_metrics
+                                else 0
+                            ),
+                            "response_time": (
+                                test.summary_metrics.response_time_ms
+                                if test.summary_metrics
+                                else 0
+                            ),
                         }
                         if test.summary_metrics
                         else {}

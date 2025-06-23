@@ -157,7 +157,7 @@ def validate_knowledge_graph_environment() -> dict[str, Any]:
     Step 1: Environment validation first - comprehensive validation of all requirements.
 
     Returns:
-        Dict containing validation results and component availability.
+        dict containing validation results and component availability.
     """
     validation_result = {
         "validation_score": 0,
@@ -773,7 +773,7 @@ async def create_knowledge_dataset(
     """Create knowledge dataset with simplified interface.
 
     Args:
-        extraction_types: List of extraction types (functions, components, patterns, etc.)
+        extraction_types: list of extraction types (functions, components, patterns, etc.)
         output_format: Output format (jsonl, csv, parquet)
         max_records: Maximum number of records to extract
         **kwargs: Additional configuration options

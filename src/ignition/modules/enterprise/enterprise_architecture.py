@@ -200,7 +200,7 @@ class EnterpriseArchitectureModule:
                 message=f"Required environment variable {var_name} is missing",
                 error=f"Missing required variable: {var_name}",
                 recommendations=[
-                    f"Set {var_name} in your .env file",
+                    f"set {var_name} in your .env file",
                     f"Description: {var_config.get('description', 'No description available')}",
                 ],
             )
@@ -231,7 +231,7 @@ class EnterpriseArchitectureModule:
                     message=f"Invalid value for {var_name}: {value}",
                     error=f"Value '{value}' not in valid options: {var_config['valid_values']}",
                     recommendations=[
-                        f"Set {var_name} to one of: {', '.join(var_config['valid_values'])}",
+                        f"set {var_name} to one of: {', '.join(var_config['valid_values'])}",
                         f"Current value: {value}",
                     ],
                 )
@@ -277,7 +277,7 @@ class EnterpriseArchitectureModule:
                         valid=False,
                         component=var_name,
                         message=f"Empty comma-separated list for {var_name}",
-                        error="List cannot be empty",
+                        error="list cannot be empty",
                         recommendations=[f"Provide at least one value for {var_name}"],
                     )
 

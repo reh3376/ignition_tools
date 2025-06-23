@@ -368,10 +368,10 @@ class ModuleSigner:
         """Sign multiple modules in batch.
 
         Args:
-            module_files: List of module files to sign
+            module_files: list of module files to sign
 
         Returns:
-            List of signing results
+            list of signing results
         """
         results = []
 

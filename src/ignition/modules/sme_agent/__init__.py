@@ -15,7 +15,7 @@ Following crawl_mcp.py methodology:
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from dotenv import load_dotenv
 
@@ -37,7 +37,7 @@ def validate_sme_agent_environment() -> dict[str, Any]:
     Validate all required environment variables and dependencies for SME Agent.
 
     Returns:
-        Dict containing validation results and configuration
+        dict containing validation results and configuration
     """
     validation_result = {
         "valid": True,
@@ -79,7 +79,7 @@ def validate_sme_agent_environment() -> dict[str, Any]:
         else:
             validation_result["config"][env_var] = value
 
-    # Step 1.2: Set optional environment variables with defaults
+    # Step 1.2: set optional environment variables with defaults
     for env_var, default_value in optional_env_vars.items():
         value = os.getenv(env_var, default_value)
         validation_result["config"][env_var] = value

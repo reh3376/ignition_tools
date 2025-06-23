@@ -61,7 +61,9 @@ class Neo4jBackupManager:
                 "datetime": datetime.now().isoformat(),
                 "reason": reason,
                 "node_count": backup_data.get("statistics", {}).get("node_count", 0),
-                "relationship_count": backup_data.get("statistics", {}).get("relationship_count", 0),
+                "relationship_count": backup_data.get("statistics", {}).get(
+                    "relationship_count", 0
+                ),
                 "version": "1.0.0",
                 "backup_type": "full",
                 "source": "IGN Scripts Learning System",
@@ -117,7 +119,9 @@ class Neo4jBackupManager:
             data = backup_content.get("data", {})
 
             print(f"Backup info: {metadata.get('datetime')} - {metadata.get('reason')}")
-            print(f"Data: {metadata.get('node_count', 0)} nodes, {metadata.get('relationship_count', 0)} relationships")
+            print(
+                f"Data: {metadata.get('node_count', 0)} nodes, {metadata.get('relationship_count', 0)} relationships"
+            )
 
             # Connect to database
             if not self.client.is_connected and not self.client.connect():
@@ -155,7 +159,9 @@ class Neo4jBackupManager:
 
             # Determine if backup is needed
             if self._should_create_backup(current_stats, last_backup_stats):
-                success, _ = self.create_full_backup("Automatic backup - significant changes detected")
+                success, _ = self.create_full_backup(
+                    "Automatic backup - significant changes detected"
+                )
                 return success
 
             return False
@@ -270,7 +276,9 @@ class Neo4jBackupManager:
             # Get statistics
             data["statistics"] = self._get_database_statistics()
 
-            print(f"Extracted {len(data['nodes'])} nodes and {len(data['relationships'])} relationships")
+            print(
+                f"Extracted {len(data['nodes'])} nodes and {len(data['relationships'])} relationships"
+            )
 
         except Exception as e:
             print(f"❌ Failed to extract database data: {e}")
@@ -292,7 +300,9 @@ class Neo4jBackupManager:
 
                 # Create node with labels
                 labels_str = ":".join(labels) if labels else "Node"
-                create_query = f"CREATE (n:{labels_str} $props) RETURN elementId(n) as new_id"
+                create_query = (
+                    f"CREATE (n:{labels_str} $props) RETURN elementId(n) as new_id"
+                )
 
                 result = self.client.execute_query(create_query, {"props": node_data})
                 if result:
@@ -353,11 +363,15 @@ class Neo4jBackupManager:
             stats = {}
 
             # Node count
-            node_result = self.client.execute_query("MATCH (n) RETURN count(n) as count")
+            node_result = self.client.execute_query(
+                "MATCH (n) RETURN count(n) as count"
+            )
             stats["node_count"] = node_result[0]["count"] if node_result else 0
 
             # Relationship count
-            rel_result = self.client.execute_query("MATCH ()-[r]->() RETURN count(r) as count")
+            rel_result = self.client.execute_query(
+                "MATCH ()-[r]->() RETURN count(r) as count"
+            )
             stats["relationship_count"] = rel_result[0]["count"] if rel_result else 0
 
             # Label counts
@@ -371,7 +385,9 @@ class Neo4jBackupManager:
             )
 
             if label_result:
-                stats["label_counts"] = {record["label"]: record["count"] for record in label_result}
+                stats["label_counts"] = {
+                    record["label"]: record["count"] for record in label_result
+                }
 
             return stats
 
@@ -395,7 +411,9 @@ class Neo4jBackupManager:
         except Exception:
             return {}
 
-    def _should_create_backup(self, current_stats: dict[str, Any], last_backup_stats: dict[str, Any]) -> bool:
+    def _should_create_backup(
+        self, current_stats: dict[str, Any], last_backup_stats: dict[str, Any]
+    ) -> bool:
         """Determine if a backup should be created based on changes."""
         if not last_backup_stats:
             return True  # No previous backup
@@ -457,9 +475,9 @@ class Neo4jBackupManager:
         all_metadata["backups"].append(backup_info)
 
         # Keep only the most recent backup metadata
-        all_metadata["backups"] = sorted(all_metadata["backups"], key=lambda x: x.get("timestamp", ""), reverse=True)[
-            : self.max_backups
-        ]
+        all_metadata["backups"] = sorted(
+            all_metadata["backups"], key=lambda x: x.get("timestamp", ""), reverse=True
+        )[: self.max_backups]
 
         # Save updated metadata
         with open(metadata_file, "w", encoding="utf-8") as f:
@@ -518,7 +536,9 @@ class Neo4jBackupManager:
             data = backup_content.get("data", {})
 
             print(f"Backup info: {metadata.get('datetime')} - {metadata.get('reason')}")
-            print(f"Data: {metadata.get('node_count', 0)} nodes, {metadata.get('relationship_count', 0)} relationships")
+            print(
+                f"Data: {metadata.get('node_count', 0)} nodes, {metadata.get('relationship_count', 0)} relationships"
+            )
 
             # Connect to database
             if not self.client.is_connected and not self.client.connect():
@@ -549,7 +569,9 @@ class Neo4jBackupManager:
             print(f"❌ {error_msg}")
             return False, error_msg
 
-    def _selective_restore_database_data(self, data: dict[str, Any], preserve_labels: list[str]) -> bool:
+    def _selective_restore_database_data(
+        self, data: dict[str, Any], preserve_labels: list[str]
+    ) -> bool:
         """Restore data to the Neo4j database while preserving specified node types."""
         try:
             nodes = data.get("nodes", [])
@@ -569,7 +591,9 @@ class Neo4jBackupManager:
                 else:
                     preserved_node_count += 1
 
-            print(f"Restoring {len(nodes_to_restore)} nodes (preserving {preserved_node_count} existing nodes)...")
+            print(
+                f"Restoring {len(nodes_to_restore)} nodes (preserving {preserved_node_count} existing nodes)..."
+            )
 
             # Create nodes with MERGE to avoid duplicates
             node_id_mapping = {}
@@ -592,13 +616,19 @@ class Neo4jBackupManager:
                     RETURN elementId(n) as new_id
                     """
 
-                    result = self.client.execute_query(merge_query, {"name": name, "props": node_data})
+                    result = self.client.execute_query(
+                        merge_query, {"name": name, "props": node_data}
+                    )
                 else:
                     # Create node without name constraint
                     labels_str = ":".join(labels)
-                    create_query = f"CREATE (n:{labels_str} $props) RETURN elementId(n) as new_id"
+                    create_query = (
+                        f"CREATE (n:{labels_str} $props) RETURN elementId(n) as new_id"
+                    )
 
-                    result = self.client.execute_query(create_query, {"props": node_data})
+                    result = self.client.execute_query(
+                        create_query, {"props": node_data}
+                    )
 
                 if result:
                     new_id = result[0]["new_id"]
@@ -652,11 +682,15 @@ def create_initial_backup() -> None:
     print("🚀 Creating initial backup for application distribution...")
 
     manager = Neo4jBackupManager()
-    success, result = manager.create_full_backup("Initial backup for application distribution")
+    success, result = manager.create_full_backup(
+        "Initial backup for application distribution"
+    )
 
     if success:
         print(f"✅ Initial backup created: {result}")
-        print("This backup will be included with the application for new installations.")
+        print(
+            "This backup will be included with the application for new installations."
+        )
     else:
         print(f"❌ Failed to create initial backup: {result}")
 
@@ -672,7 +706,9 @@ if __name__ == "__main__":
         help="Action to perform",
     )
     parser.add_argument("--file", "-f", help="Backup file name (for restore/info)")
-    parser.add_argument("--reason", "-r", default="Manual backup", help="Reason for backup")
+    parser.add_argument(
+        "--reason", "-r", default="Manual backup", help="Reason for backup"
+    )
 
     args = parser.parse_args()
 
@@ -680,11 +716,19 @@ if __name__ == "__main__":
 
     if args.action == "backup":
         success, result = manager.create_full_backup(args.reason)
-        print("✅ Backup completed successfully" if success else f"❌ Backup failed: {result}")
+        print(
+            "✅ Backup completed successfully"
+            if success
+            else f"❌ Backup failed: {result}"
+        )
 
     elif args.action == "restore":
         success, result = manager.restore_from_backup(args.file)
-        print("✅ Restore completed successfully" if success else f"❌ Restore failed: {result}")
+        print(
+            "✅ Restore completed successfully"
+            if success
+            else f"❌ Restore failed: {result}"
+        )
 
     elif args.action == "list":
         backups = manager.list_backups()

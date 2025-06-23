@@ -167,7 +167,9 @@ class IgnitionWrapperBase(ABC):
 
         if not logger.handlers:
             handler = logging.StreamHandler()
-            formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+            formatter = logging.Formatter(
+                "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+            )
             handler.setFormatter(formatter)
             logger.addHandler(handler)
 
@@ -217,7 +219,9 @@ class IgnitionWrapperBase(ABC):
 
         successful_calls = sum(1 for m in self.metrics if m.success)
         failed_calls = len(self.metrics) - successful_calls
-        avg_execution_time = sum(m.execution_time_ms for m in self.metrics) / len(self.metrics)
+        avg_execution_time = sum(m.execution_time_ms for m in self.metrics) / len(
+            self.metrics
+        )
 
         return {
             "total_calls": len(self.metrics),
@@ -252,7 +256,9 @@ def wrapper_function(func):
         retry_count = 0
 
         # Log operation start
-        self._log_operation(f"Starting {function_name}", f"args={args}, kwargs={kwargs}")
+        self._log_operation(
+            f"Starting {function_name}", f"args={args}, kwargs={kwargs}"
+        )
 
         for attempt in range(self.config.retry_attempts):
             try:

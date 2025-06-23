@@ -62,7 +62,9 @@ class IgnitionSDKManager:
 
         # Check Java/JDK
         try:
-            result = subprocess.run(["java", "-version"], capture_output=True, text=True, timeout=10)
+            result = subprocess.run(
+                ["java", "-version"], capture_output=True, text=True, timeout=10
+            )
             prerequisites["java"] = result.returncode == 0
             if prerequisites["java"]:
                 # Extract version info
@@ -74,7 +76,9 @@ class IgnitionSDKManager:
 
         # Check Git
         try:
-            result = subprocess.run(["git", "--version"], capture_output=True, text=True, timeout=10)
+            result = subprocess.run(
+                ["git", "--version"], capture_output=True, text=True, timeout=10
+            )
             prerequisites["git"] = result.returncode == 0
             if prerequisites["git"]:
                 prerequisites["git_version"] = result.stdout.strip()
@@ -84,7 +88,9 @@ class IgnitionSDKManager:
 
         # Check Gradle (optional - can use wrapper)
         try:
-            result = subprocess.run(["gradle", "--version"], capture_output=True, text=True, timeout=10)
+            result = subprocess.run(
+                ["gradle", "--version"], capture_output=True, text=True, timeout=10
+            )
             prerequisites["gradle"] = result.returncode == 0
             if prerequisites["gradle"]:
                 version_lines = result.stdout.split("\n")
@@ -164,7 +170,9 @@ class IgnitionSDKManager:
         """
         generator_path = self.tools_path / "generator"
         if not generator_path.exists():
-            console.print("❌ collections.abc.Generator directory not found in module tools")
+            console.print(
+                "❌ collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.Generator directory not found in module tools"
+            )
             return False
 
         try:
@@ -225,7 +233,9 @@ class IgnitionSDKManager:
                 TextColumn("[progress.description]{task.description}"),
                 console=console,
             ) as progress:
-                progress.add_task(f"Creating module project: {config.name}...", total=None)
+                progress.add_task(
+                    f"Creating module project: {config.name}...", total=None
+                )
 
                 # Use gradlew wrapper
                 gradlew_cmd = "./gradlew" if os.name != "nt" else "gradlew.bat"
@@ -237,7 +247,9 @@ class IgnitionSDKManager:
 {config.language}
 """
 
-                with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as f:
+                with tempfile.NamedTemporaryFile(
+                    mode="w", suffix=".txt", delete=False
+                ) as f:
                     f.write(input_data)
                     input_file = f.name
 
@@ -263,7 +275,9 @@ class IgnitionSDKManager:
                             console.print(f"✅ Created module project: {project_path}")
                             return True
                         else:
-                            console.print(f"❌ Generated project not found at: {generated_path}")
+                            console.print(
+                                f"❌ Generated project not found at: {generated_path}"
+                            )
                             return False
                     else:
                         console.print(f"❌ Failed to create project: {result.stderr}")
@@ -294,7 +308,9 @@ class IgnitionSDKManager:
         for item in self.workspace_path.iterdir():
             if item.is_dir() and item.name != "ignition-module-tools":
                 # Check if it looks like a module project
-                if (item / "build.gradle.kts").exists() or (item / "build.gradle").exists():
+                if (item / "build.gradle.kts").exists() or (
+                    item / "build.gradle"
+                ).exists():
                     projects.append(item)
 
         return projects
@@ -351,7 +367,9 @@ class IgnitionSDKManager:
                 TextColumn("[progress.description]{task.description}"),
                 console=console,
             ) as progress:
-                progress.add_task(f"Building project: {project_path.name}...", total=None)
+                progress.add_task(
+                    f"Building project: {project_path.name}...", total=None
+                )
 
                 # Use gradlew wrapper
                 gradlew_cmd = "./gradlew" if os.name != "nt" else "gradlew.bat"

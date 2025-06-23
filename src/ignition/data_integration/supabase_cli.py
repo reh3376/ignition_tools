@@ -43,7 +43,9 @@ def supabase() -> None:
 
 @supabase.command()
 @click.option("--force", is_flag=True, help="Force setup even if already configured")
-@click.option("--project-name", default="IGN Scripts Development", help="Supabase project name")
+@click.option(
+    "--project-name", default="IGN Scripts Development", help="Supabase project name"
+)
 @click.option("--org-name", default="IGN Scripts", help="Organization name")
 def setup(force: bool, project_name: str, org_name: str) -> None:
     """Initialize Supabase database and create configuration files."""
@@ -119,7 +121,9 @@ def status(format: str) -> None:
 
             if status_info.get("status") == "healthy":
                 click.echo(f"🟢 Status: {status_info['status'].upper()}")
-                click.echo(f"💾 Database Size: {status_info.get('database_size', 'Unknown')}")
+                click.echo(
+                    f"💾 Database Size: {status_info.get('database_size', 'Unknown')}"
+                )
                 click.echo(f"🔗 Connections: {status_info.get('connection_count', 0)}")
 
                 tables = status_info.get("tables", [])
@@ -138,7 +142,9 @@ def status(format: str) -> None:
                 if "message" in status_info:
                     click.echo(f"❌ Error: {status_info['message']}")
 
-            click.echo(f"\n🕒 Last checked: {status_info.get('last_checked', 'Unknown')}")
+            click.echo(
+                f"\n🕒 Last checked: {status_info.get('last_checked', 'Unknown')}"
+            )
 
     except Exception as e:
         click.echo(f"❌ Failed to get status: {e!s}")
@@ -226,7 +232,9 @@ def backups() -> None:
 
 
 @supabase.command()
-@click.option("--services", default="all", help="Services to start (all, db, api, studio)")
+@click.option(
+    "--services", default="all", help="Services to start (all, db, api, studio)"
+)
 def start(services: str) -> None:
     """Start Supabase Docker services."""
     click.echo("🚀 Starting Supabase services...")
@@ -251,7 +259,9 @@ def start(services: str) -> None:
     try:
         for service in service_list:
             click.echo(f"🔄 Starting {service}...")
-            result = subprocess.run(["docker-compose", "up", "-d", service], capture_output=True, text=True)
+            result = subprocess.run(
+                ["docker-compose", "up", "-d", service], capture_output=True, text=True
+            )
 
             if result.returncode == 0:
                 click.echo(f"   ✅ {service} started")
@@ -271,7 +281,9 @@ def start(services: str) -> None:
 
 
 @supabase.command()
-@click.option("--services", default="all", help="Services to stop (all, db, api, studio)")
+@click.option(
+    "--services", default="all", help="Services to stop (all, db, api, studio)"
+)
 def stop(services: str) -> None:
     """Stop Supabase Docker services."""
     click.echo("🛑 Stopping Supabase services...")
@@ -296,7 +308,9 @@ def stop(services: str) -> None:
     try:
         for service in service_list:
             click.echo(f"🔄 Stopping {service}...")
-            result = subprocess.run(["docker-compose", "stop", service], capture_output=True, text=True)
+            result = subprocess.run(
+                ["docker-compose", "stop", service], capture_output=True, text=True
+            )
 
             if result.returncode == 0:
                 click.echo(f"   ✅ {service} stopped")
@@ -356,7 +370,9 @@ def config(format: str) -> None:
             services = config_summary["docker_services"]
             click.echo(f"\n🐳 Docker Services ({len(services)}):")
             for service in services:
-                click.echo(f"   • {service['name']} (:{service['port']}) - {service['description']}")
+                click.echo(
+                    f"   • {service['name']} (:{service['port']}) - {service['description']}"
+                )
 
             # File structure
             files = config_summary["file_structure"]
@@ -374,7 +390,9 @@ def config(format: str) -> None:
 @supabase.command()
 def init() -> None:
     """Alias for setup command."""
-    setup.callback(force=False, project_name="IGN Scripts Development", org_name="IGN Scripts")
+    setup.callback(
+        force=False, project_name="IGN Scripts Development", org_name="IGN Scripts"
+    )
 
 
 @supabase.command()

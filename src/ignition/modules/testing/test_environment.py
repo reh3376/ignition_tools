@@ -12,7 +12,7 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
 import docker
 import docker.errors
@@ -122,7 +122,9 @@ def format_docker_error(error: Exception) -> str:
     elif "no such image" in error_str:
         return "Docker image not found. Check image name and availability."
     elif "port" in error_str and "already" in error_str:
-        return "Port already in use. Stop other containers or change port configuration."
+        return (
+            "Port already in use. Stop other containers or change port configuration."
+        )
     elif "memory" in error_str or "resources" in error_str:
         return "Insufficient system resources. Free up memory and try again."
     else:
@@ -247,9 +249,13 @@ class DockerTestEnvironment(TestEnvironment):
             # Create network if specified
             if self.config.network_name:
                 try:
-                    self.network = self.docker_client.networks.get(self.config.network_name)
+                    self.network = self.docker_client.networks.get(
+                        self.config.network_name
+                    )
                 except docker.errors.NotFound:
-                    self.network = self.docker_client.networks.create(self.config.network_name)
+                    self.network = self.docker_client.networks.create(
+                        self.config.network_name
+                    )
 
         except Exception as e:
             self.status = TestEnvironmentStatus.ERROR
@@ -382,7 +388,7 @@ class DockerTestEnvironment(TestEnvironment):
             command: Command to execute
 
         Returns:
-            Tuple of (exit_code, output)
+            tuple of (exit_code, output)
         """
         if not self.container:
             return 1, "No container available"
@@ -411,7 +417,9 @@ class TestEnvironmentManager:
         return TestEnvironmentConfig(
             ignition_version=os.getenv("IGNITION_TEST_VERSION", "8.1.0"),
             gateway_url=os.getenv("TEST_GATEWAY_URL", "http://localhost:8088"),
-            docker_image=os.getenv("DOCKER_TEST_IMAGE", "inductiveautomation/ignition:latest"),
+            docker_image=os.getenv(
+                "DOCKER_TEST_IMAGE", "inductiveautomation/ignition:latest"
+            ),
             gateway_port=int(os.getenv("TEST_GATEWAY_PORT", "8088")),
             designer_port=int(os.getenv("TEST_DESIGNER_PORT", "8043")),
             mqtt_port=int(os.getenv("TEST_MQTT_PORT", "1883")),
@@ -444,7 +452,11 @@ class TestEnvironmentManager:
                 if hasattr(config, key):
                     setattr(config, key, value)
 
-        environment = DockerTestEnvironment(config) if environment_type == "docker" else TestEnvironment(config)
+        environment = (
+            DockerTestEnvironment(config)
+            if environment_type == "docker"
+            else TestEnvironment(config)
+        )
 
         self.environments[name] = environment
         return environment

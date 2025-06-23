@@ -49,7 +49,9 @@ class DependencyAnalyzer:
             module_to_file_mapping = self._create_module_mapping()
 
             # Analyze dependencies and create relationships
-            dependencies = self._analyze_dependencies(file_imports, module_to_file_mapping)
+            dependencies = self._analyze_dependencies(
+                file_imports, module_to_file_mapping
+            )
 
             # Create the relationships in the graph
             relationships_created = self._create_dependency_relationships(dependencies)
@@ -76,7 +78,9 @@ class DependencyAnalyzer:
             RETURN count(*) as total_dependencies
             """
             result = self.client.execute_query(dep_count_query)
-            metrics["total_dependencies"] = result[0]["total_dependencies"] if result else 0
+            metrics["total_dependencies"] = (
+                result[0]["total_dependencies"] if result else 0
+            )
 
             # Get files with highest in-degree (most depended upon)
             high_in_degree_query = """
@@ -136,7 +140,9 @@ class DependencyAnalyzer:
             if file_path not in file_imports:
                 file_imports[file_path] = []
 
-            file_imports[file_path].append({"module": row["module"], "name": row["name"]})
+            file_imports[file_path].append(
+                {"module": row["module"], "name": row["name"]}
+            )
 
         return file_imports
 
@@ -193,7 +199,7 @@ class DependencyAnalyzer:
 
         Args:
             file_imports: Dictionary of file imports
-            module_mapping: collections.abc.Mapping of module names to file paths
+            module_mapping: collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.Mapping of module names to file paths
 
         Returns:
             list of dependency relationships
@@ -255,14 +261,23 @@ class DependencyAnalyzer:
 
                     # Check if we already have this relationship
                     existing = next(
-                        (d for d in dependencies if d.source_file == source_file and d.target_file == target_file),
+                        (
+                            d
+                            for d in dependencies
+                            if d.source_file == source_file
+                            and d.target_file == target_file
+                        ),
                         None,
                     )
 
                     if existing:
                         # Add to existing relationship
-                        existing.import_details.append(f"{module}.{name}" if name else module)
-                        existing.strength = min(existing.strength + 0.1, 1.0)  # Increase strength
+                        existing.import_details.append(
+                            f"{module}.{name}" if name else module
+                        )
+                        existing.strength = min(
+                            existing.strength + 0.1, 1.0
+                        )  # Increase strength
                     else:
                         # Create new relationship
                         dependency = DependencyRelationship(
@@ -276,7 +291,9 @@ class DependencyAnalyzer:
 
         return dependencies
 
-    def _create_dependency_relationships(self, dependencies: list[DependencyRelationship]) -> int:
+    def _create_dependency_relationships(
+        self, dependencies: list[DependencyRelationship]
+    ) -> int:
         """Create DEPENDS_ON relationships in the graph.
 
         Args:
@@ -324,7 +341,9 @@ class DependencyAnalyzer:
                 created_count += 1
 
             except Exception as e:
-                logger.warning(f"Failed to create dependency {dependency.source_file} -> {dependency.target_file}: {e}")
+                logger.warning(
+                    f"Failed to create dependency {dependency.source_file} -> {dependency.target_file}: {e}"
+                )
 
         return created_count
 
@@ -374,7 +393,9 @@ class DependencyAnalyzer:
             # Analyze and create dependencies
             relationships_created = self.analyze_and_create_dependencies()
 
-            logger.info(f"Dependency refresh complete. Created {relationships_created} relationships.")
+            logger.info(
+                f"Dependency refresh complete. Created {relationships_created} relationships."
+            )
             return True
 
         except Exception as e:

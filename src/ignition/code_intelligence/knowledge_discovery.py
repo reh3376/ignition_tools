@@ -453,7 +453,7 @@ class KnowledgeDiscoverySystem:
             "ign module sme ask - Ask SME Agent questions",
             "ign module sme analyze - Analyze files with SME Agent",
             "ign module sme test-all - Test all SME Agent complexity levels",
-            "ign module sme list-batches - List evaluation batches",
+            "ign module sme list-batches - list evaluation batches",
             "ign module sme export-batch - Export batch for human review",
             "ign module sme import-evaluation - Import human evaluations",
             "ign module sme rl-summary - Show reinforcement learning insights",

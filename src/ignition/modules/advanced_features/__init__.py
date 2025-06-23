@@ -22,7 +22,7 @@ import os
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 # Add src to path for imports
 sys.path.append(str(Path(__file__).parent.parent.parent))

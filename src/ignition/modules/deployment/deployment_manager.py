@@ -368,10 +368,10 @@ class DeploymentManager:
         """Deploy multiple modules in batch.
 
         Args:
-            project_paths: List of project paths to deploy
+            project_paths: list of project paths to deploy
 
         Returns:
-            List of deployment results
+            list of deployment results
         """
         results = []
 

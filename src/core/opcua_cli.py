@@ -66,7 +66,9 @@ def opcua(ctx, verbose, log_level):
 @click.option("--password", help="Password for authentication")
 @click.option("--security-policy", help="Security policy (None, Basic256Sha256, etc.)")
 @click.option("--security-mode", help="Security mode (None, Sign, SignAndEncrypt)")
-@click.option("--timeout", type=float, default=20.0, help="Connection timeout in seconds")
+@click.option(
+    "--timeout", type=float, default=20.0, help="Connection timeout in seconds"
+)
 @click.option("--config", help="Use saved configuration")
 @click.option("--save-config", help="Save connection config to file")
 @click.option("--cert-path", help="Client certificate path")
@@ -365,8 +367,12 @@ async def _info_async():
         # Connection info
         if current_config:
             console.print(f"🔗 Connected to: {current_config.server_url}")
-            console.print(f"👤 Authentication: {current_config.username or 'Anonymous'}")
-            console.print(f"🔒 Security: {current_config.security_policy}/{current_config.security_mode}")
+            console.print(
+                f"👤 Authentication: {current_config.username or 'Anonymous'}"
+            )
+            console.print(
+                f"🔒 Security: {current_config.security_policy}/{current_config.security_mode}"
+            )
 
         # Namespaces
         namespaces = await current_connection.get_namespaces()
@@ -565,7 +571,11 @@ def cert_generate(app_uri, app_name, org, dns_names, ip_addresses, output_dir):
     # Import certificate generation (would need to implement)
     # For now, show what would be generated
 
-    cert_dir = Path(output_dir) if output_dir else Path.home() / ".ignition" / "opcua" / "certificates"
+    cert_dir = (
+        Path(output_dir)
+        if output_dir
+        else Path.home() / ".ignition" / "opcua" / "certificates"
+    )
     cert_dir.mkdir(parents=True, exist_ok=True)
 
     console.print(f"📁 Certificate directory: {cert_dir}")
@@ -617,7 +627,9 @@ def cert_validate(cert_path):
 
 # Enhanced browse command with configuration awareness
 @opcua.command()
-@click.option("--node-id", default="i=85", help="Root node ID to browse (default: Objects folder)")
+@click.option(
+    "--node-id", default="i=85", help="Root node ID to browse (default: Objects folder)"
+)
 @click.option("--depth", default=2, help="Maximum browsing depth")
 @click.option("--filter", help="Filter nodes by name (case-insensitive)")
 @click.option("--show-attributes", is_flag=True, help="Show node attributes")
@@ -670,7 +682,9 @@ async def _browse_async(node_id, depth, filter_text, show_attributes, output):
                 if filter_text.lower() in result.get("name", "").lower():
                     filtered_results.append(result)
             results = filtered_results
-            console.print(f"🔍 Filtered to {len(results)} nodes containing '{filter_text}'")
+            console.print(
+                f"🔍 Filtered to {len(results)} nodes containing '{filter_text}'"
+            )
 
         if output == "json":
             print(json.dumps(results, indent=2))
@@ -702,7 +716,9 @@ def _display_browse_table(results, show_attributes):
         ]
 
         if show_attributes:
-            row.extend([str(result.get("value", "N/A")), result.get("data_type", "Unknown")])
+            row.extend(
+                [str(result.get("value", "N/A")), result.get("data_type", "Unknown")]
+            )
 
         table.add_row(*row)
 

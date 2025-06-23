@@ -439,13 +439,13 @@ class RepositoryManager:
 
             else:
                 result.errors.append(
-                    f"List request failed with status {response.status_code}: {response.text}"
+                    f"list request failed with status {response.status_code}: {response.text}"
                 )
 
         except requests.exceptions.RequestException as e:
-            result.errors.append(f"List request error: {e!s}")
+            result.errors.append(f"list request error: {e!s}")
         except Exception as e:
-            result.errors.append(f"List retrieval error: {e!s}")
+            result.errors.append(f"list retrieval error: {e!s}")
 
         return result
 

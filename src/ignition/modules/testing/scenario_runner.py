@@ -140,7 +140,9 @@ def format_scenario_error(error: Exception) -> str:
     if "timeout" in error_str:
         return "Test scenario timed out. Consider increasing timeout or reducing test scope."
     elif "memory" in error_str:
-        return "Memory error during test scenario. Reduce test complexity or system load."
+        return (
+            "Memory error during test scenario. Reduce test complexity or system load."
+        )
     elif "environment" in error_str:
         return "Test environment error. Check environment setup and configuration."
     elif "validation" in error_str:
@@ -207,7 +209,7 @@ class TestScenarioRunner:
         if env_type:
             self.config.environment_type = env_type
 
-        # Set default enabled phases based on suite type
+        # set default enabled phases based on suite type
         if not self.config.enabled_phases:
             self.config.enabled_phases = self._get_default_phases()
 
@@ -228,7 +230,9 @@ class TestScenarioRunner:
             return list(TestPhase)  # All phases, user can disable specific ones
 
     @asynccontextmanager
-    async def scenario_context(self, module_path: str) -> AsyncIterator["TestScenarioRunner"]:
+    async def scenario_context(
+        self, module_path: str
+    ) -> AsyncIterator["TestScenarioRunner"]:
         """Create test scenario context with resource management.
 
         Args:
@@ -343,7 +347,9 @@ class TestScenarioRunner:
                     self.phase_results.append(error_result)
 
         # Check if we should continue (fail_fast check)
-        if self.config.fail_fast and any(r.status == TestResult.FAILED for r in self.phase_results):
+        if self.config.fail_fast and any(
+            r.status == TestResult.FAILED for r in self.phase_results
+        ):
             return
 
         # Run dependent phases sequentially (they may depend on validation results)
@@ -399,7 +405,11 @@ class TestScenarioRunner:
             elif phase == TestPhase.QUALITY_ASSURANCE:
                 async with self.qa_pipeline.qa_context(module_path) as qa:
                     report = await qa.run_checks()
-                    status = TestResult.PASSED if report.overall_status == "passed" else TestResult.FAILED
+                    status = (
+                        TestResult.PASSED
+                        if report.overall_status == "passed"
+                        else TestResult.FAILED
+                    )
 
                     return PhaseResult(
                         phase=phase,
@@ -411,9 +421,15 @@ class TestScenarioRunner:
                     )
 
             elif phase == TestPhase.COMPATIBILITY:
-                async with self.compatibility_tester.compatibility_context(module_path) as tester:
+                async with self.compatibility_tester.compatibility_context(
+                    module_path
+                ) as tester:
                     report = await tester.run_all_tests()
-                    status = TestResult.PASSED if report.overall_status == "compatible" else TestResult.FAILED
+                    status = (
+                        TestResult.PASSED
+                        if report.overall_status == "compatible"
+                        else TestResult.FAILED
+                    )
 
                     return PhaseResult(
                         phase=phase,
@@ -425,9 +441,15 @@ class TestScenarioRunner:
                     )
 
             elif phase == TestPhase.PERFORMANCE:
-                async with self.performance_tester.performance_context(module_path) as tester:
+                async with self.performance_tester.performance_context(
+                    module_path
+                ) as tester:
                     report = await tester.run_all_tests()
-                    status = TestResult.PASSED if report.overall_status == "completed" else TestResult.FAILED
+                    status = (
+                        TestResult.PASSED
+                        if report.overall_status == "completed"
+                        else TestResult.FAILED
+                    )
 
                     return PhaseResult(
                         phase=phase,
@@ -441,7 +463,11 @@ class TestScenarioRunner:
             elif phase == TestPhase.USER_ACCEPTANCE:
                 async with self.uat_manager.uat_context(module_path) as uat:
                     report = await uat.run_all_scenarios()
-                    status = TestResult.PASSED if report.overall_status == "passed" else TestResult.FAILED
+                    status = (
+                        TestResult.PASSED
+                        if report.overall_status == "passed"
+                        else TestResult.FAILED
+                    )
 
                     return PhaseResult(
                         phase=phase,
@@ -464,7 +490,9 @@ class TestScenarioRunner:
                 issues=[format_scenario_error(e)],
             )
 
-    def _generate_scenario_report(self, module_path: str, total_duration: float) -> TestScenarioReport:
+    def _generate_scenario_report(
+        self, module_path: str, total_duration: float
+    ) -> TestScenarioReport:
         """Generate comprehensive test scenario report.
 
         Args:
@@ -544,8 +572,14 @@ class TestScenarioRunner:
             "phase_status_counts": phase_status_counts,
             "total_issues": total_issues,
             "total_warnings": total_warnings,
-            "success_rate": (phase_status_counts.get("passed", 0) / max(1, len(self.phase_results)) * 100),
-            "phase_durations": {result.phase.value: result.duration for result in self.phase_results},
+            "success_rate": (
+                phase_status_counts.get("passed", 0)
+                / max(1, len(self.phase_results))
+                * 100
+            ),
+            "phase_durations": {
+                result.phase.value: result.duration for result in self.phase_results
+            },
         }
 
     def _generate_recommendations(self) -> list[str]:
@@ -566,24 +600,44 @@ class TestScenarioRunner:
             recommendations.append(f"Fix issues in: {', '.join(failed_phase_names)}")
 
         # Phase-specific recommendations
-        validation_result = next((r for r in self.phase_results if r.phase == TestPhase.VALIDATION), None)
+        validation_result = next(
+            (r for r in self.phase_results if r.phase == TestPhase.VALIDATION), None
+        )
         if validation_result and validation_result.status == TestResult.FAILED:
-            recommendations.append("Fix module validation issues - these are critical for deployment")
+            recommendations.append(
+                "Fix module validation issues - these are critical for deployment"
+            )
 
-        performance_result = next((r for r in self.phase_results if r.phase == TestPhase.PERFORMANCE), None)
+        performance_result = next(
+            (r for r in self.phase_results if r.phase == TestPhase.PERFORMANCE), None
+        )
         if performance_result and performance_result.status == TestResult.FAILED:
-            recommendations.append("Address performance issues to ensure module scalability")
+            recommendations.append(
+                "Address performance issues to ensure module scalability"
+            )
 
-        compatibility_result = next((r for r in self.phase_results if r.phase == TestPhase.COMPATIBILITY), None)
+        compatibility_result = next(
+            (r for r in self.phase_results if r.phase == TestPhase.COMPATIBILITY), None
+        )
         if compatibility_result and compatibility_result.status == TestResult.FAILED:
-            recommendations.append("Fix compatibility issues for broader deployment support")
+            recommendations.append(
+                "Fix compatibility issues for broader deployment support"
+            )
 
         # Suite-specific recommendations
-        if self.config.suite_type == TestSuite.QUICK and not failed_phases and not error_phases:
-            recommendations.append("Consider running standard test suite for more comprehensive validation")
+        if (
+            self.config.suite_type == TestSuite.QUICK
+            and not failed_phases
+            and not error_phases
+        ):
+            recommendations.append(
+                "Consider running standard test suite for more comprehensive validation"
+            )
 
         if not recommendations:
-            recommendations.append("All test phases passed - module ready for deployment")
+            recommendations.append(
+                "All test phases passed - module ready for deployment"
+            )
 
         return recommendations
 
@@ -610,7 +664,9 @@ class TestScenarioRunner:
             "timestamp": self.report.generated_at,
             "scenario_config": {
                 "suite_type": self.report.scenario_config.suite_type.value,
-                "enabled_phases": [p.value for p in self.report.scenario_config.enabled_phases],
+                "enabled_phases": [
+                    p.value for p in self.report.scenario_config.enabled_phases
+                ],
                 "parallel_execution": self.report.scenario_config.parallel_execution,
                 "fail_fast": self.report.scenario_config.fail_fast,
                 "timeout": self.report.scenario_config.timeout,

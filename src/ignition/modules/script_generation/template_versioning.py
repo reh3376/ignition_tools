@@ -120,7 +120,7 @@ class TemplateVersionManager:
             template_path: Relative path to template
 
         Returns:
-            List of template versions sorted by creation date
+            list of template versions sorted by creation date
         """
         versions = []
         template_version_dir = self.versions_dir / template_path
@@ -149,7 +149,9 @@ class TemplateVersionManager:
                         versions.append(version_info)
 
                     except Exception as e:
-                        self.logger.warning(f"Failed to load version {version_dir.name}: {e}")
+                        self.logger.warning(
+                            f"Failed to load version {version_dir.name}: {e}"
+                        )
 
         # Sort by creation date (newest first)
         versions.sort(key=lambda v: v.created_at, reverse=True)
@@ -234,7 +236,9 @@ class TemplateVersionManager:
             self.logger.error(f"Failed to restore version: {e}")
             return False
 
-    def compare_versions(self, template_path: str, version1: str, version2: str) -> dict[str, Any] | None:
+    def compare_versions(
+        self, template_path: str, version1: str, version2: str
+    ) -> dict[str, Any] | None:
         """Compare two versions of a template.
 
         Args:
@@ -290,7 +294,9 @@ class TemplateVersionManager:
                     shutil.rmtree(version_dir)
                     deleted += 1
                 except Exception as e:
-                    self.logger.error(f"Failed to delete version {version.version}: {e}")
+                    self.logger.error(
+                        f"Failed to delete version {version.version}: {e}"
+                    )
 
         return deleted
 
