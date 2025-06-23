@@ -169,7 +169,9 @@ class DeploymentManager:
         # Initialize components
         self.packager = ModulePackager(self.config.packaging_config)
         self.signer = ModuleSigner(self.config.signing_config or SigningConfig())
-        self.repository_manager = RepositoryManager(self.config.repository_config or RepositoryConfig())
+        self.repository_manager = RepositoryManager(
+            self.config.repository_config or RepositoryConfig()
+        )
 
     def validate_environment(self) -> dict[str, bool]:
         """Validate deployment environment following crawl_mcp.py patterns."""

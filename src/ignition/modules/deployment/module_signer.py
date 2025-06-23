@@ -7,6 +7,7 @@ Following the crawl_mcp.py methodology for structured development:
 - Security-focused implementation
 """
 
+import logging
 import os
 import tempfile
 from dataclasses import dataclass, field
@@ -19,7 +20,6 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from dotenv import load_dotenv
 from rich.console import Console
-import logging
 
 # Load environment variables
 load_dotenv()

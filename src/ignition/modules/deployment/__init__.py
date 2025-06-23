@@ -1,5 +1,4 @@
-"""
-Module Deployment & Distribution System
+"""Module Deployment & Distribution System
 
 This module provides comprehensive tools for packaging, signing, and distributing
 Ignition modules across different environments and repositories.
@@ -21,6 +20,7 @@ Features:
 """
 
 import os
+
 from dotenv import load_dotenv
 
 # Load environment variables first

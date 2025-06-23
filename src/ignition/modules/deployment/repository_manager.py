@@ -167,7 +167,9 @@ class RepositoryManager:
 
         return validation_results
 
-    def upload_module(self, package_path: Path, metadata: dict[str, Any] | None = None) -> RepositoryResult:
+    def upload_module(
+        self, package_path: Path, metadata: dict[str, Any] | None = None
+    ) -> RepositoryResult:
         """Upload a module package to the repository."""
         result = RepositoryResult(success=False)
 
@@ -183,23 +185,32 @@ class RepositoryManager:
         ]
 
         if missing_requirements:
-            result.warnings.extend([f"Environment issue: {req}" for req in missing_requirements])
+            result.warnings.extend(
+                [f"Environment issue: {req}" for req in missing_requirements]
+            )
 
             # Check for critical missing requirements
-            critical_missing = [req for req in missing_requirements if req in ["repository_url_valid", "authentication_configured"]]
+            critical_missing = [
+                req
+                for req in missing_requirements
+                if req in ["repository_url_valid", "authentication_configured"]
+            ]
             if critical_missing:
-                result.errors.extend([f"Critical requirement missing: {req}" for req in critical_missing])
+                result.errors.extend(
+                    [f"Critical requirement missing: {req}" for req in critical_missing]
+                )
                 return result
 
         try:
             with console.status(
                 f"[bold green]Uploading {package_path.name}...", spinner="dots"
             ) as status:
-
                 # Prepare upload data
                 upload_data = {
                     "name": package_path.stem,
-                    "version": metadata.get("version", "1.0.0") if metadata else "1.0.0",
+                    "version": (
+                        metadata.get("version", "1.0.0") if metadata else "1.0.0"
+                    ),
                     "description": metadata.get("description", "") if metadata else "",
                     "author": metadata.get("author", "") if metadata else "",
                     "tags": metadata.get("tags", []) if metadata else [],
