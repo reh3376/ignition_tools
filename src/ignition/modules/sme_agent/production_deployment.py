@@ -84,7 +84,7 @@ class DockerConfig(BaseModel):
 
     @field_validator("image_name")
     @classmethod
-    def validate_image_name(cls, v):
+    def validate_image_name(cls, v: str) -> str:
         if not v or len(v.strip()) == 0:
             raise ValueError("Image name cannot be empty")
         if (
@@ -100,7 +100,7 @@ class DockerConfig(BaseModel):
 
     @field_validator("ports")
     @classmethod
-    def validate_ports(cls, v):
+    def validate_ports(cls, v: dict[int, int]) -> dict[int, int]:
         for host_port, container_port in v.items():
             if not (1 <= host_port <= 65535) or not (1 <= container_port <= 65535):
                 raise ValueError(f"Invalid port mapping: {host_port}:{container_port}")
@@ -125,14 +125,14 @@ class PLCConfig(BaseModel):
 
     @field_validator("server_url")
     @classmethod
-    def validate_server_url(cls, v):
+    def validate_server_url(cls, v: str) -> str:
         if not v.startswith(("opc.tcp://", "http://", "https://")):
             raise ValueError("Invalid OPC-UA server URL format")
         return v
 
     @field_validator("name")
     @classmethod
-    def validate_name(cls, v):
+    def validate_name(cls, v: str) -> str:
         if not v or len(v.strip()) == 0:
             raise ValueError("PLC name cannot be empty")
         return v.strip()
@@ -158,7 +158,7 @@ class ProductionConfig(BaseModel):
 
     @field_validator("log_level")
     @classmethod
-    def validate_log_level(cls, v):
+    def validate_log_level(cls, v: str) -> str:
         valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
         if v.upper() not in valid_levels:
             raise ValueError(f"Invalid log level. Must be one of: {valid_levels}")
@@ -263,8 +263,6 @@ def validate_docker_environment() -> dict[str, Any]:
             "cpus": info.get("NCPU", 0),
         }
 
-    except docker.errors.DockerException as e:
-        return {"valid": False, "errors": [f"Docker error: {e!s}"]}
     except Exception as e:
         return {"valid": False, "errors": [f"Docker validation error: {e!s}"]}
 
@@ -810,12 +808,26 @@ class ProductionDeploymentManager:
             # Create and start container
             logger.info(f"Creating container: {docker_config.container_name}")
 
+            # Convert port mappings to Docker API format
+            port_bindings = {
+                f"{container_port}/tcp": host_port
+                for host_port, container_port in docker_config.ports.items()
+            }
+
+            # Convert volumes to Docker API format (if any)
+            volume_bindings = None
+            if docker_config.volumes:
+                volume_bindings = [
+                    f"{host_path}:{container_path}"
+                    for host_path, container_path in docker_config.volumes.items()
+                ]
+
             container = self._docker_client.containers.run(
                 image=f"{docker_config.image_name}:{docker_config.tag}",
                 name=docker_config.container_name,
-                ports=docker_config.ports,
+                ports=port_bindings,
                 environment=docker_config.environment,
-                volumes=docker_config.volumes,
+                volumes=volume_bindings,
                 network_mode=docker_config.network_mode,
                 restart_policy={"Name": docker_config.restart_policy},
                 mem_limit=docker_config.memory_limit,
@@ -1109,7 +1121,7 @@ async def create_production_deployment_manager(
 # Main execution for testing
 if __name__ == "__main__":
 
-    async def main():
+    async def main() -> None:
         console.print(
             "[bold blue]🏭 Phase 11.7: Production Deployment & PLC Integration[/bold blue]"
         )
