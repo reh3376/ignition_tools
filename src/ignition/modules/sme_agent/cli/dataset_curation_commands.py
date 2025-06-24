@@ -29,8 +29,8 @@ from ..ai_model_preparation import (
     AIModelPreparation,
     FeatureEngineeringConfig,
     ModelPreparationConfig,
-    validate_environment as validate_ai_env,
 )
+from ..ai_model_preparation import validate_environment as validate_ai_env
 from ..data_ingestion_framework import DataIngestionFramework
 from ..industrial_dataset_curation import (
     DataSourceType,
@@ -543,7 +543,9 @@ def list_variable_types():
         }
 
         for var_type in VariableType:
-            description = descriptions.get(var_type.value, "Industrial process variable")
+            description = descriptions.get(
+                var_type.value, "Industrial process variable"
+            )
             table.add_row(var_type.name, var_type.value, description)
 
         console.print(table)
@@ -607,7 +609,7 @@ def validate_ai_env_cmd(complexity_level: str):
         for component, status in validation_results.items():
             status_icon = "✅" if status else "❌"
             status_text = "Available" if status else "Missing"
-            
+
             if component == "numpy":
                 details = "NumPy for numerical computations"
             elif component == "pandas":
@@ -651,10 +653,14 @@ def validate_ai_env_cmd(complexity_level: str):
             console.print(
                 f"\n⚠️ [bold yellow]{failed}/{total} components need attention[/bold yellow]"
             )
-            console.print("💡 Install missing packages: pip install numpy pandas scikit-learn")
+            console.print(
+                "💡 Install missing packages: pip install numpy pandas scikit-learn"
+            )
 
     except Exception as e:
-        console.print(f"\n❌ [bold red]AI environment validation failed: {e}[/bold red]")
+        console.print(
+            f"\n❌ [bold red]AI environment validation failed: {e}[/bold red]"
+        )
         raise click.ClickException(str(e))
 
 
@@ -715,18 +721,40 @@ def ai_model_prep_info(complexity_level: str):
         )
 
     except Exception as e:
-        console.print(f"\n❌ [bold red]Error getting AI model prep info: {e}[/bold red]")
+        console.print(
+            f"\n❌ [bold red]Error getting AI model prep info: {e}[/bold red]"
+        )
         raise click.ClickException(str(e))
 
 
 @ai_model_prep.command("engineer-features")
 @click.argument("dataset_name")
-@click.option("--enable-derivatives/--no-derivatives", default=True, help="Enable derivative features")
-@click.option("--enable-integrals/--no-integrals", default=True, help="Enable integral features")
-@click.option("--enable-moving-averages/--no-moving-averages", default=True, help="Enable moving average features")
-@click.option("--enable-correlations/--no-correlations", default=True, help="Enable cross-correlation features")
-@click.option("--enable-frequency/--no-frequency", default=False, help="Enable frequency domain features")
-@click.option("--window-sizes", default="5,10,30,60", help="Comma-separated window sizes")
+@click.option(
+    "--enable-derivatives/--no-derivatives",
+    default=True,
+    help="Enable derivative features",
+)
+@click.option(
+    "--enable-integrals/--no-integrals", default=True, help="Enable integral features"
+)
+@click.option(
+    "--enable-moving-averages/--no-moving-averages",
+    default=True,
+    help="Enable moving average features",
+)
+@click.option(
+    "--enable-correlations/--no-correlations",
+    default=True,
+    help="Enable cross-correlation features",
+)
+@click.option(
+    "--enable-frequency/--no-frequency",
+    default=False,
+    help="Enable frequency domain features",
+)
+@click.option(
+    "--window-sizes", default="5,10,30,60", help="Comma-separated window sizes"
+)
 @click.option(
     "--complexity-level",
     default="standard",
@@ -745,7 +773,9 @@ def engineer_features(
 ):
     """Engineer features from raw dataset."""
     try:
-        console.print(f"\n🔧 [bold blue]Engineering Features for Dataset: {dataset_name}[/bold blue]")
+        console.print(
+            f"\n🔧 [bold blue]Engineering Features for Dataset: {dataset_name}[/bold blue]"
+        )
 
         # Parse window sizes
         window_list = [int(w.strip()) for w in window_sizes.split(",")]
@@ -785,34 +815,61 @@ def engineer_features(
         results_table.add_column("Metric", style="cyan")
         results_table.add_column("Value", style="green")
 
-        results_table.add_row("Original Features", str(len([col for col in engineered_data.columns if not col.startswith('engineered_')])))
-        results_table.add_row("Engineered Features", str(len([col for col in engineered_data.columns if col.startswith('engineered_')])))
+        results_table.add_row(
+            "Original Features",
+            str(
+                len(
+                    [
+                        col
+                        for col in engineered_data.columns
+                        if not col.startswith("engineered_")
+                    ]
+                )
+            ),
+        )
+        results_table.add_row(
+            "Engineered Features",
+            str(
+                len(
+                    [
+                        col
+                        for col in engineered_data.columns
+                        if col.startswith("engineered_")
+                    ]
+                )
+            ),
+        )
         results_table.add_row("Total Features", str(len(engineered_data.columns)))
         results_table.add_row("Dataset Rows", str(len(engineered_data)))
-        results_table.add_row("Memory Usage", f"{engineered_data.memory_usage(deep=True).sum() / 1024**2:.2f} MB")
+        results_table.add_row(
+            "Memory Usage",
+            f"{engineered_data.memory_usage(deep=True).sum() / 1024**2:.2f} MB",
+        )
 
         console.print(results_table)
 
         # Show feature categories
         feature_categories = {}
         for col in engineered_data.columns:
-            if col.startswith('engineered_derivative_'):
-                feature_categories.setdefault('Derivatives', []).append(col)
-            elif col.startswith('engineered_integral_'):
-                feature_categories.setdefault('Integrals', []).append(col)
-            elif col.startswith('engineered_ma_'):
-                feature_categories.setdefault('Moving Averages', []).append(col)
-            elif col.startswith('engineered_corr_'):
-                feature_categories.setdefault('Cross-Correlations', []).append(col)
-            elif col.startswith('engineered_freq_'):
-                feature_categories.setdefault('Frequency Features', []).append(col)
+            if col.startswith("engineered_derivative_"):
+                feature_categories.setdefault("Derivatives", []).append(col)
+            elif col.startswith("engineered_integral_"):
+                feature_categories.setdefault("Integrals", []).append(col)
+            elif col.startswith("engineered_ma_"):
+                feature_categories.setdefault("Moving Averages", []).append(col)
+            elif col.startswith("engineered_corr_"):
+                feature_categories.setdefault("Cross-Correlations", []).append(col)
+            elif col.startswith("engineered_freq_"):
+                feature_categories.setdefault("Frequency Features", []).append(col)
 
         if feature_categories:
             console.print("\n📊 [bold yellow]Feature Categories:[/bold yellow]")
             for category, features in feature_categories.items():
                 console.print(f"  • {category}: {len(features)} features")
 
-        console.print(f"\n✅ [bold green]Feature engineering completed for dataset: {dataset_name}[/bold green]")
+        console.print(
+            f"\n✅ [bold green]Feature engineering completed for dataset: {dataset_name}[/bold green]"
+        )
 
     except Exception as e:
         console.print(f"\n❌ [bold red]Feature engineering failed: {e}[/bold red]")
@@ -821,13 +878,26 @@ def engineer_features(
 
 @ai_model_prep.command("prepare-training-data")
 @click.argument("dataset_name")
-@click.option("--train-split", default=0.7, type=float, help="Training data split ratio")
-@click.option("--validation-split", default=0.15, type=float, help="Validation data split ratio")
+@click.option(
+    "--train-split", default=0.7, type=float, help="Training data split ratio"
+)
+@click.option(
+    "--validation-split", default=0.15, type=float, help="Validation data split ratio"
+)
 @click.option("--test-split", default=0.15, type=float, help="Test data split ratio")
 @click.option("--target-variables", help="Comma-separated list of target variables")
-@click.option("--normalize/--no-normalize", default=True, help="Apply feature normalization")
-@click.option("--handle-missing/--no-handle-missing", default=True, help="Handle missing data")
-@click.option("--feature-selection", default="correlation", type=click.Choice(["correlation", "variance", "mutual_info"]), help="Feature selection method")
+@click.option(
+    "--normalize/--no-normalize", default=True, help="Apply feature normalization"
+)
+@click.option(
+    "--handle-missing/--no-handle-missing", default=True, help="Handle missing data"
+)
+@click.option(
+    "--feature-selection",
+    default="correlation",
+    type=click.Choice(["correlation", "variance", "mutual_info"]),
+    help="Feature selection method",
+)
 @click.option(
     "--complexity-level",
     default="standard",
@@ -847,11 +917,15 @@ def prepare_training_data(
 ):
     """Prepare training data with train/validation/test splits."""
     try:
-        console.print(f"\n🎯 [bold blue]Preparing Training Data for Dataset: {dataset_name}[/bold blue]")
+        console.print(
+            f"\n🎯 [bold blue]Preparing Training Data for Dataset: {dataset_name}[/bold blue]"
+        )
 
         # Validate splits
         if abs(train_split + validation_split + test_split - 1.0) > 0.01:
-            raise click.ClickException("Train, validation, and test splits must sum to 1.0")
+            raise click.ClickException(
+                "Train, validation, and test splits must sum to 1.0"
+            )
 
         # Parse target variables
         target_list = []
@@ -863,7 +937,9 @@ def prepare_training_data(
             TextColumn("[progress.description]{task.description}"),
             console=console,
         ) as progress:
-            task = progress.add_task("Initializing training data preparation...", total=None)
+            task = progress.add_task(
+                "Initializing training data preparation...", total=None
+            )
 
             # Initialize curator and AI model preparation
             curator = IndustrialDatasetCurator(complexity_level)
@@ -897,35 +973,55 @@ def prepare_training_data(
         results_table.add_row("Features", str(len(prepared_dataset.features)))
         results_table.add_row("Target Variables", str(len(prepared_dataset.targets)))
         results_table.add_row("Training Samples", str(prepared_dataset.train_samples))
-        results_table.add_row("Validation Samples", str(prepared_dataset.validation_samples))
+        results_table.add_row(
+            "Validation Samples", str(prepared_dataset.validation_samples)
+        )
         results_table.add_row("Test Samples", str(prepared_dataset.test_samples))
         results_table.add_row("Quality Score", f"{prepared_dataset.quality_score:.3f}")
-        results_table.add_row("Completeness Score", f"{prepared_dataset.completeness_score:.3f}")
+        results_table.add_row(
+            "Completeness Score", f"{prepared_dataset.completeness_score:.3f}"
+        )
 
         console.print(results_table)
 
         # Show feature and target information
-        console.print(f"\n📊 [bold yellow]Features ({len(prepared_dataset.features)}):[/bold yellow]")
+        console.print(
+            f"\n📊 [bold yellow]Features ({len(prepared_dataset.features)}):[/bold yellow]"
+        )
         for i, feature in enumerate(prepared_dataset.features[:10]):  # Show first 10
             console.print(f"  • {feature}")
         if len(prepared_dataset.features) > 10:
-            console.print(f"  ... and {len(prepared_dataset.features) - 10} more features")
+            console.print(
+                f"  ... and {len(prepared_dataset.features) - 10} more features"
+            )
 
         if prepared_dataset.targets:
-            console.print(f"\n🎯 [bold yellow]Target Variables ({len(prepared_dataset.targets)}):[/bold yellow]")
+            console.print(
+                f"\n🎯 [bold yellow]Target Variables ({len(prepared_dataset.targets)}):[/bold yellow]"
+            )
             for target in prepared_dataset.targets:
                 console.print(f"  • {target}")
 
-        console.print(f"\n✅ [bold green]Training data prepared successfully for: {dataset_name}[/bold green]")
+        console.print(
+            f"\n✅ [bold green]Training data prepared successfully for: {dataset_name}[/bold green]"
+        )
 
     except Exception as e:
-        console.print(f"\n❌ [bold red]Training data preparation failed: {e}[/bold red]")
+        console.print(
+            f"\n❌ [bold red]Training data preparation failed: {e}[/bold red]"
+        )
         raise click.ClickException(str(e))
 
 
 @ai_model_prep.command("export-dataset")
 @click.argument("dataset_name")
-@click.option("--format", "export_format", default="pandas", type=click.Choice(["pandas", "numpy", "tensorflow", "pytorch", "huggingface"]), help="Export format")
+@click.option(
+    "--format",
+    "export_format",
+    default="pandas",
+    type=click.Choice(["pandas", "numpy", "tensorflow", "pytorch", "huggingface"]),
+    help="Export format",
+)
 @click.option("--output-path", help="Output file path (optional)")
 @click.option(
     "--complexity-level",
@@ -958,22 +1054,28 @@ def export_dataset(
             progress.update(task, description=f"Exporting to {export_format} format...")
 
             # Export dataset
-            exported_data = ai_prep.export_dataset(dataset_name, export_format, output_path)
+            exported_data = ai_prep.export_dataset(
+                dataset_name, export_format, output_path
+            )
 
             progress.update(task, description="Export complete!")
 
         # Display results based on format
         if export_format == "pandas":
-            console.print(f"✅ [bold green]Exported as Pandas DataFrame[/bold green]")
+            console.print("✅ [bold green]Exported as Pandas DataFrame[/bold green]")
             console.print(f"Shape: {exported_data.shape}")
-            console.print(f"Memory usage: {exported_data.memory_usage(deep=True).sum() / 1024**2:.2f} MB")
+            console.print(
+                f"Memory usage: {exported_data.memory_usage(deep=True).sum() / 1024**2:.2f} MB"
+            )
         elif export_format == "numpy":
-            console.print(f"✅ [bold green]Exported as NumPy arrays[/bold green]")
+            console.print("✅ [bold green]Exported as NumPy arrays[/bold green]")
             console.print(f"Features shape: {exported_data['X'].shape}")
-            if 'y' in exported_data:
+            if "y" in exported_data:
                 console.print(f"Targets shape: {exported_data['y'].shape}")
         elif export_format in ["tensorflow", "pytorch", "huggingface"]:
-            console.print(f"✅ [bold green]Exported as {export_format} dataset[/bold green]")
+            console.print(
+                f"✅ [bold green]Exported as {export_format} dataset[/bold green]"
+            )
             console.print(f"Dataset type: {type(exported_data)}")
 
         if output_path:
@@ -1012,16 +1114,34 @@ def ai_model_prep_status(complexity_level: str):
         # Environment status
         env_validation = validate_ai_env()
         env_status = "✅ Ready" if all(env_validation.values()) else "⚠️ Issues"
-        status_table.add_row("Environment", env_status, f"{sum(env_validation.values())}/{len(env_validation)} components ready")
+        status_table.add_row(
+            "Environment",
+            env_status,
+            f"{sum(env_validation.values())}/{len(env_validation)} components ready",
+        )
 
         # System status
-        status_table.add_row("Complexity Level", complexity_level.title(), f"Deployment mode: {complexity_level}")
-        status_table.add_row("Prepared Datasets", str(status["prepared_datasets"]), "Datasets ready for training")
-        status_table.add_row("Feature Cache", str(status["feature_cache_size"]), "Cached feature sets")
+        status_table.add_row(
+            "Complexity Level",
+            complexity_level.title(),
+            f"Deployment mode: {complexity_level}",
+        )
+        status_table.add_row(
+            "Prepared Datasets",
+            str(status["prepared_datasets"]),
+            "Datasets ready for training",
+        )
+        status_table.add_row(
+            "Feature Cache", str(status["feature_cache_size"]), "Cached feature sets"
+        )
 
         # Capabilities status
         capabilities = [
-            ("Feature Engineering", "✅ Available", "Derivatives, integrals, moving averages"),
+            (
+                "Feature Engineering",
+                "✅ Available",
+                "Derivatives, integrals, moving averages",
+            ),
             ("Cross-Correlations", "✅ Available", "Variable relationship analysis"),
             ("Frequency Features", "✅ Available", "Oscillation detection features"),
             ("Data Splitting", "✅ Available", "Train/validation/test splits"),
@@ -1040,10 +1160,14 @@ def ai_model_prep_status(complexity_level: str):
             for activity in status["recent_activity"][-5:]:  # Last 5 activities
                 console.print(f"  • {activity}")
 
-        console.print(f"\n🎯 [bold green]AI Model Preparation System: Ready for {complexity_level} deployment[/bold green]")
+        console.print(
+            f"\n🎯 [bold green]AI Model Preparation System: Ready for {complexity_level} deployment[/bold green]"
+        )
 
     except Exception as e:
-        console.print(f"\n❌ [bold red]Error getting AI model prep status: {e}[/bold red]")
+        console.print(
+            f"\n❌ [bold red]Error getting AI model prep status: {e}[/bold red]"
+        )
         raise click.ClickException(str(e))
 
 

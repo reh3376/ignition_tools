@@ -32,12 +32,12 @@ Following the established crawl_mcp.py methodology:
 ```python
 class IndustrialDatasetCurator:
     """Main class following crawl_mcp.py patterns"""
-    
+
     def __init__(self):
         self.validate_environment()  # Environment validation first
         self.setup_logging()
         self.initialize_components()
-    
+
     async def ingest_data(self, source: DataSource) -> DataIngestionResult:
         """Data ingestion with comprehensive validation"""
         # Input validation using Pydantic models
@@ -66,7 +66,7 @@ class IndustrialDatasetCurator:
 ```python
 class AIModelPreparation:
     """AI model preparation with industrial focus"""
-    
+
     def prepare_features(self, config: FeatureEngineeringConfig) -> FeatureSet:
         """Industrial-specific feature engineering"""
         # Process control derivatives (rate of change)
@@ -74,7 +74,7 @@ class AIModelPreparation:
         # Moving averages for trend analysis
         # Cross-correlations for interaction detection
         # Frequency domain features for oscillation detection
-    
+
     def prepare_model_data(self, config: ModelPreparationConfig) -> ModelDataset:
         """Model-ready dataset preparation"""
         # Stratified splitting for industrial processes
@@ -194,11 +194,11 @@ graph TD
     E --> F[Feature Engineering Pipeline]
     F --> G[Model Preparation Engine]
     G --> H[AI-Ready Datasets]
-    
+
     I[CLI Interface] --> B
     J[Python API] --> B
     K[Web Interface] --> B
-    
+
     L[Configuration Management] --> B
     M[Error Handling System] --> B
     N[Logging & Monitoring] --> B
@@ -211,17 +211,17 @@ graph LR
     A[Dataset Curation Core] --> B[Data Ingestion]
     A --> C[Variable Classification]
     A --> D[Quality Assessment]
-    
+
     E[AI Model Preparation] --> F[Feature Engineering]
     E --> G[Data Preprocessing]
     E --> H[Model Configuration]
-    
+
     I[CLI Commands] --> A
     I --> E
-    
+
     J[Configuration] --> A
     J --> E
-    
+
     K[Error Handling] --> A
     K --> E
 ```
@@ -267,19 +267,19 @@ graph LR
 ```python
 class Phase11_5TestSuite:
     """Comprehensive test suite following crawl_mcp.py methodology"""
-    
+
     def test_environment_validation(self):
         """Test environment setup and dependencies"""
-    
+
     def test_data_ingestion(self):
         """Test multi-format data ingestion"""
-    
+
     def test_variable_classification(self):
         """Test industrial variable type detection"""
-    
+
     def test_feature_engineering(self):
         """Test AI feature preparation"""
-    
+
     def test_cli_integration(self):
         """Test command-line interface"""
 ```
@@ -373,4 +373,4 @@ The system is now ready for production deployment and provides a solid foundatio
 - **Documentation**: Complete API and usage guides
 - **Integration**: CLI and web interface support
 
-**Phase 11.5 Status: ✅ COMPLETED** 
+**Phase 11.5 Status: ✅ COMPLETED**

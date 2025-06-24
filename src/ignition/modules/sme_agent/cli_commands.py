@@ -19,11 +19,15 @@ import click
 from rich.console import Console
 
 from .cli import (
+    control_group,
     core_commands,
     dataset_curation,
+    deployment_group,
     evaluation_commands,
     infrastructure_commands,
     knowledge_commands,
+    mpc_group,
+    pid_group,
 )
 
 console = Console()
@@ -50,6 +54,16 @@ def sme_agent_cli(ctx):
         console.print("[bold blue]🤖 SME Agent CLI - Modular Architecture[/bold blue]")
         console.print("\nAvailable command groups:")
         console.print("  • [cyan]core[/cyan] - Basic operations and validation")
+        console.print(
+            "  • [cyan]control[/cyan] - AI Control Supervisor and optimization"
+        )
+        console.print("  • [cyan]pid[/cyan] - PID controller tuning and optimization")
+        console.print(
+            "  • [cyan]mpc[/cyan] - Model Predictive Control and hybrid systems"
+        )
+        console.print(
+            "  • [cyan]deployment[/cyan] - Production deployment and PLC integration"
+        )
         console.print("  • [cyan]evaluation[/cyan] - Testing and batch management")
         console.print(
             "  • [cyan]infrastructure[/cyan] - Deployment and system management"
@@ -67,6 +81,10 @@ def sme_agent_cli(ctx):
 
 # Add all sub-command groups to the main CLI
 sme_agent_cli.add_command(core_commands)
+sme_agent_cli.add_command(control_group)
+sme_agent_cli.add_command(pid_group)
+sme_agent_cli.add_command(mpc_group)
+sme_agent_cli.add_command(deployment_group)
 sme_agent_cli.add_command(evaluation_commands)
 sme_agent_cli.add_command(infrastructure_commands)
 sme_agent_cli.add_command(knowledge_commands)
