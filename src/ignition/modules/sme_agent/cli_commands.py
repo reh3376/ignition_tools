@@ -20,6 +20,7 @@ from rich.console import Console
 
 from .cli import (
     core_commands,
+    dataset_curation,
     evaluation_commands,
     infrastructure_commands,
     knowledge_commands,
@@ -57,6 +58,9 @@ def sme_agent_cli(ctx):
             "  • [cyan]knowledge[/cyan] - Knowledge extraction and vector enhancement"
         )
         console.print(
+            "  • [cyan]dataset-curation[/cyan] - Industrial dataset curation and AI model preparation"
+        )
+        console.print(
             "\nUse 'ign module sme <group> --help' for group-specific commands"
         )
 
@@ -66,6 +70,7 @@ sme_agent_cli.add_command(core_commands)
 sme_agent_cli.add_command(evaluation_commands)
 sme_agent_cli.add_command(infrastructure_commands)
 sme_agent_cli.add_command(knowledge_commands)
+sme_agent_cli.add_command(dataset_curation)
 
 
 # Backward compatibility aliases for commonly used commands
