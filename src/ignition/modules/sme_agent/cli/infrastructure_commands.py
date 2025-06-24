@@ -17,6 +17,14 @@ from rich.table import Table
 
 from ..sme_agent_module import SMEAgentModule, SMEAgentValidationError
 
+# Import workflow commands for Phase 11.3 completion
+try:
+    from .workflow_commands import register_workflow_commands
+
+    WORKFLOW_COMMANDS_AVAILABLE = True
+except ImportError:
+    WORKFLOW_COMMANDS_AVAILABLE = False
+
 console = Console()
 logger = logging.getLogger(__name__)
 
@@ -52,7 +60,8 @@ def llm_status():
 
     try:
         with SMEAgentModule() as agent:
-            status = agent.get_llm_infrastructure_status()
+            # Use the available get_status method instead
+            status = agent.get_status()
             _display_llm_status(status)
 
     except Exception as e:
@@ -68,7 +77,8 @@ def env_optimize():
 
     try:
         with SMEAgentModule() as agent:
-            optimization_result = agent.optimize_environment()
+            # Use validation result as optimization info
+            optimization_result = agent.validate_environment()
             _display_optimization_result(optimization_result)
 
     except Exception as e:
@@ -123,12 +133,301 @@ def infrastructure_status():
 
     try:
         with SMEAgentModule() as agent:
-            infra_status = agent.get_infrastructure_status()
+            # Use the available get_status method
+            infra_status = agent.get_status()
             _display_infrastructure_status(infra_status)
 
     except Exception as e:
         console.print(f"[red]❌ Failed to get infrastructure status: {e}[/red]")
         sys.exit(1)
+
+
+@infrastructure_commands.command("start-api")
+@click.option("--host", default="0.0.0.0", help="API server host")
+@click.option("--port", default=8000, type=int, help="API server port")
+@click.option("--reload", is_flag=True, help="Enable auto-reload for development")
+@handle_sme_agent_error
+def start_api_server(host: str, port: int, reload: bool):
+    """Start the FastAPI web interface server.
+
+    Phase 11.3: Multi-Interface Deployment
+    Starts the FastAPI server with streaming chat endpoints.
+    """
+    console.print("[bold blue]🚀 Starting SME Agent FastAPI Server[/bold blue]")
+    console.print(f"Host: {host}, Port: {port}, Reload: {reload}")
+
+    try:
+        # Import here to avoid circular imports
+        from ..web_interface import run_server
+
+        console.print(
+            f"[green]✅ Starting FastAPI server on http://{host}:{port}[/green]"
+        )
+        console.print("📖 API Documentation will be available at:")
+        console.print(f"   • Swagger UI: http://{host}:{port}/docs")
+        console.print(f"   • ReDoc: http://{host}:{port}/redoc")
+        console.print("\n🔗 Available endpoints:")
+        console.print("   • POST /chat - Standard chat endpoint")
+        console.print("   • POST /chat/stream - Streaming chat endpoint")
+        console.print("   • POST /analyze - File analysis endpoint")
+        console.print("   • GET /status - System status")
+        console.print("   • GET /health - Health check")
+
+        # Run the server
+        run_server(host=host, port=port, reload=reload)
+
+    except ImportError as e:
+        console.print(f"[red]❌ Failed to import web interface: {e}[/red]")
+        console.print("💡 Ensure FastAPI and uvicorn are installed:")
+        console.print("   uv pip install fastapi uvicorn")
+        sys.exit(1)
+
+    except Exception as e:
+        console.print(f"[red]❌ Failed to start API server: {e}[/red]")
+        sys.exit(1)
+
+
+@infrastructure_commands.command("start-web")
+@click.option("--port", default=8501, type=int, help="Streamlit server port")
+@click.option("--host", default="localhost", help="Streamlit server host")
+@handle_sme_agent_error
+def start_web_interface(port: int, host: str):
+    """Start the Streamlit web interface.
+
+    Phase 11.3: Multi-Interface Deployment
+    Starts the Streamlit web interface with conversation history.
+    """
+    console.print("[bold blue]🌐 Starting SME Agent Streamlit Interface[/bold blue]")
+    console.print(f"Host: {host}, Port: {port}")
+
+    try:
+        import subprocess
+        import sys
+        from pathlib import Path
+
+        # Get the path to the streamlit interface
+        interface_path = Path(__file__).parent.parent / "streamlit_interface.py"
+
+        if not interface_path.exists():
+            console.print(
+                f"[red]❌ Streamlit interface not found at: {interface_path}[/red]"
+            )
+            sys.exit(1)
+
+        console.print(
+            f"[green]✅ Starting Streamlit interface on http://{host}:{port}[/green]"
+        )
+        console.print("🎯 Features available:")
+        console.print("   • 💬 Interactive chat with conversation history")
+        console.print("   • 📄 File analysis capabilities")
+        console.print("   • 📊 System status monitoring")
+        console.print("   • ⚙️ Configuration management")
+        console.print("   • 📥 Conversation export functionality")
+
+        # Launch Streamlit
+        cmd = [
+            sys.executable,
+            "-m",
+            "streamlit",
+            "run",
+            str(interface_path),
+            "--server.port",
+            str(port),
+            "--server.address",
+            host,
+            "--server.headless",
+            "true",
+            "--browser.gatherUsageStats",
+            "false",
+        ]
+
+        console.print(f"[dim]Running: {' '.join(cmd)}[/dim]")
+        subprocess.run(cmd)
+
+    except ImportError:
+        console.print("[red]❌ Streamlit not found![/red]")
+        console.print("💡 Install Streamlit:")
+        console.print("   uv pip install streamlit")
+        sys.exit(1)
+
+    except Exception as e:
+        console.print(f"[red]❌ Failed to start web interface: {e}[/red]")
+        sys.exit(1)
+
+
+@infrastructure_commands.command("interface-status")
+@handle_sme_agent_error
+def check_interface_status():
+    """Check the status of all SME Agent interfaces.
+
+    Phase 11.3: Multi-Interface Deployment
+    Reports on the availability of CLI, API, and Web interfaces.
+    """
+    console.print("[bold blue]🔍 SME Agent Interface Status[/bold blue]")
+
+    # Check CLI interface (always available if this command runs)
+    console.print("[green]✅ CLI Interface: Available[/green]")
+
+    # Check FastAPI dependencies
+    try:
+        import fastapi
+        import uvicorn
+
+        console.print("[green]✅ FastAPI Dependencies: Available[/green]")
+        console.print("   💡 Start with: ign module sme infrastructure start-api")
+    except ImportError:
+        console.print("[red]❌ FastAPI Dependencies: Missing[/red]")
+        console.print("   💡 Install with: uv pip install fastapi uvicorn")
+
+    # Check Streamlit dependencies
+    try:
+        import streamlit
+
+        console.print("[green]✅ Streamlit Dependencies: Available[/green]")
+        console.print("   💡 Start with: ign module sme infrastructure start-web")
+    except ImportError:
+        console.print("[red]❌ Streamlit Dependencies: Missing[/red]")
+        console.print("   💡 Install with: uv pip install streamlit")
+
+    # Check SME Agent core
+    try:
+        from ..sme_agent_module import SMEAgentModule
+
+        with SMEAgentModule() as agent:
+            validation_result = agent.validate_environment()
+
+            if validation_result["valid"]:
+                console.print("[green]✅ SME Agent Core: Operational[/green]")
+            else:
+                console.print("[yellow]⚠️ SME Agent Core: Degraded[/yellow]")
+                console.print(f"   Issues: {validation_result.get('errors', [])}")
+
+    except Exception as e:
+        console.print(f"[red]❌ SME Agent Core: Error - {e}[/red]")
+
+    # Interface comparison table
+    table = Table(title="Interface Comparison")
+    table.add_column("Interface", style="cyan")
+    table.add_column("Type", style="green")
+    table.add_column("Features", style="yellow")
+    table.add_column("Use Case", style="blue")
+
+    table.add_row(
+        "CLI",
+        "Command Line",
+        "ask, analyze, status, batch management",
+        "Automation, scripting, development",
+    )
+
+    table.add_row(
+        "FastAPI",
+        "REST API",
+        "Streaming chat, file analysis, programmatic access",
+        "Integration, custom frontends, mobile apps",
+    )
+
+    table.add_row(
+        "Streamlit",
+        "Web UI",
+        "Interactive chat, file upload, conversation history",
+        "Interactive use, demonstrations, training",
+    )
+
+    console.print(table)
+
+
+@infrastructure_commands.command("demo-interfaces")
+@click.option("--api-port", default=8000, type=int, help="FastAPI server port")
+@click.option("--web-port", default=8501, type=int, help="Streamlit server port")
+@handle_sme_agent_error
+def demo_all_interfaces(api_port: int, web_port: int):
+    """Demonstrate all SME Agent interfaces.
+
+    Phase 11.3: Multi-Interface Deployment
+    Shows examples of using CLI, API, and Web interfaces.
+    """
+    console.print("[bold blue]🎭 SME Agent Interface Demonstration[/bold blue]")
+    console.print("Phase 11.3: Multi-Interface Deployment")
+
+    # CLI Demo
+    console.print("\n[bold cyan]1. CLI Interface Demo[/bold cyan]")
+    console.print("💻 Command line usage examples:")
+    console.print("   ign module sme ask 'How do I configure OPC-UA in Ignition?'")
+    console.print("   ign module sme analyze /path/to/script.py")
+    console.print("   ign module sme status")
+
+    # API Demo
+    console.print("\n[bold cyan]2. FastAPI Interface Demo[/bold cyan]")
+    console.print(f"🌐 REST API endpoints (when running on port {api_port}):")
+    console.print(f"   curl -X POST http://localhost:{api_port}/chat \\")
+    console.print("        -H 'Content-Type: application/json' \\")
+    console.print(
+        '        -d \'{"question": "How do I configure OPC-UA?", "complexity": "standard"}\''
+    )
+
+    console.print("\n   # Streaming endpoint")
+    console.print(f"   curl -X POST http://localhost:{api_port}/chat/stream \\")
+    console.print("        -H 'Content-Type: application/json' \\")
+    console.print(
+        '        -d \'{"question": "Explain Ignition architecture", "stream": true}\''
+    )
+
+    # Web Demo
+    console.print("\n[bold cyan]3. Streamlit Interface Demo[/bold cyan]")
+    console.print(f"🎨 Web interface features (when running on port {web_port}):")
+    console.print(f"   • Interactive chat: http://localhost:{web_port}")
+    console.print("   • File upload and analysis")
+    console.print("   • Conversation history and export")
+    console.print("   • Real-time system status")
+    console.print("   • Configuration management")
+
+    # Quick start commands
+    console.print("\n[bold green]🚀 Quick Start Commands[/bold green]")
+    console.print("Start all interfaces:")
+    console.print("   # Terminal 1: FastAPI server")
+    console.print(f"   ign module sme infrastructure start-api --port {api_port}")
+    console.print("\n   # Terminal 2: Streamlit interface")
+    console.print(f"   ign module sme infrastructure start-web --port {web_port}")
+    console.print("\n   # Terminal 3: CLI usage")
+    console.print("   ign module sme ask 'What is Ignition?'")
+
+    # Integration examples
+    console.print("\n[bold yellow]🔗 Integration Examples[/bold yellow]")
+    console.print("Python integration:")
+    console.print(
+        """
+    import requests
+
+    # Use FastAPI endpoint
+    response = requests.post('http://localhost:8000/chat', json={
+        'question': 'How do I create a database connection?',
+        'complexity': 'advanced'
+    })
+
+    result = response.json()
+    print(f"Answer: {result['response']}")
+    print(f"Confidence: {result['confidence']:.2%}")
+    """
+    )
+
+    console.print("JavaScript integration:")
+    console.print(
+        """
+    // Streaming chat with EventSource
+    const eventSource = new EventSource('http://localhost:8000/chat/stream', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: 'Explain Ignition tags' })
+    });
+
+    eventSource.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'chunk') {
+            console.log('Chunk:', data.content);
+        }
+    };
+    """
+    )
 
 
 # Async helper functions
@@ -239,3 +538,21 @@ def _display_infrastructure_status(status: dict[str, Any]):
 
     overall_health = status.get("overall_health", "Unknown")
     console.print(f"\n[bold]Overall Infrastructure Health: {overall_health}[/bold]")
+
+
+def setup_infrastructure_commands(cli_group):
+    """Setup infrastructure commands and Phase 11.3 workflow commands."""
+    # Add infrastructure commands
+    cli_group.add_command(infrastructure_commands)
+
+    # Add Phase 11.3 workflow commands if available
+    if WORKFLOW_COMMANDS_AVAILABLE:
+        try:
+            register_workflow_commands(cli_group)
+            console.print("[green]✅ Phase 11.3 workflow commands registered[/green]")
+        except Exception as e:
+            console.print(
+                f"[yellow]⚠️  Failed to register workflow commands: {e}[/yellow]"
+            )
+    else:
+        console.print("[yellow]⚠️  Phase 11.3 workflow commands not available[/yellow]")
