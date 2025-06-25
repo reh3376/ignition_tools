@@ -5,6 +5,22 @@
 
 **🎯 Core Principle**: The production UI will be modeled after the functionality provided by our existing CLI functionality, providing a visual interface for all CLI operations while maintaining the same underlying business logic.
 
+## 📚 Key Documentation
+
+### Frontend Development Framework
+- **[Frontend Development Methodology](../frontend/docs/frontend_development_methodology.js)** - Core methodology for frontend development (similar to crawl_mcp.py)
+- **[Code Intelligence Framework](../frontend/docs/CODE_INTELLIGENCE_FRAMEWORK.md)** - Comprehensive guide for code analysis, optimization, and refactoring
+- **[Neo4j Frontend Integration](../frontend/docs/NEO4J_FRONTEND_INTEGRATION.md)** - Guide for integrating Neo4j knowledge graph with frontend
+
+### Architecture & Planning
+- **[Frontend/Backend Decoupling Plan](FRONTEND_BACKEND_DECOUPLING_PLAN.md)** - Comprehensive plan for separating frontend and backend repositories
+- **[Frontend Development Standards](frontend.mdc)** - Project structure and development standards
+
+### Phase Summaries
+- **[Frontend Methodology Summary](phase_summary/FRONTEND_METHODOLOGY_AND_NEO4J_INTEGRATION_SUMMARY.md)** - Summary of frontend methodology implementation
+- **[Code Intelligence Framework Summary](phase_summary/FRONTEND_CODE_INTELLIGENCE_FRAMEWORK_SUMMARY.md)** - Summary of code intelligence framework implementation
+- **[Decoupling Plan Summary](phase_summary/FRONTEND_BACKEND_DECOUPLING_PLAN_SUMMARY.md)** - Summary of frontend/backend separation plan
+
 ## Phase 12.1: App Shell & Framework Setup
 
 ### Section 12.1.1: Project Initialization & Configuration
@@ -217,6 +233,45 @@
   - Code relationship mapping
   - Impact analysis visualization
   - Documentation generation tools
+
+### Section 12.3.4: Frontend Code Intelligence Framework 🆕
+**Implements frontend-specific code analysis and optimization**
+📖 **[Framework Documentation](../frontend/docs/CODE_INTELLIGENCE_FRAMEWORK.md)** | 📊 **[Implementation Summary](phase_summary/FRONTEND_CODE_INTELLIGENCE_FRAMEWORK_SUMMARY.md)**
+
+- [ ] **Frontend Code Intelligence Service:** Comprehensive code analysis for TypeScript/JavaScript
+  - Real-time code analysis with AST parsing ([analyzer.ts](../frontend/src/lib/codeIntelligence/analyzer.ts))
+  - React component optimization detection
+  - Bundle size impact analysis
+  - Performance optimization suggestions
+  - Integration with Neo4j knowledge graph ([client.ts](../frontend/src/lib/neo4j/client.ts))
+
+- [ ] **Code Optimization Dashboard:** Visual interface for optimization
+  - Memoization opportunity detection ([optimizer.ts](../frontend/src/lib/codeIntelligence/optimizer.ts))
+  - Code splitting recommendations
+  - Tree shaking analysis
+  - Lazy loading suggestions
+  - Bundle optimization metrics
+
+- [ ] **Automated Refactoring Tools:** Safe code transformations
+  - Extract component refactoring ([refactorer.ts](../frontend/src/lib/codeIntelligence/refactorer.ts))
+  - Convert to arrow function
+  - Extract function/variable
+  - Organize imports
+  - Remove dead code detection
+
+- [ ] **Neo4j Integration for Frontend:** Knowledge graph for frontend development
+  - Package validation against known libraries ([useNeo4j.ts](../frontend/src/hooks/useNeo4j.ts))
+  - React pattern validation
+  - Best practices enforcement
+  - Cross-repository code intelligence
+  - Shared knowledge between frontend and backend
+
+- [ ] **React Hooks for Code Intelligence:** Developer-friendly integration
+  - `useCodeIntelligence` hook for real-time analysis ([useCodeIntelligence.ts](../frontend/src/lib/codeIntelligence/hooks/useCodeIntelligence.ts))
+  - React Query integration for caching
+  - Debounced analysis for performance
+  - Error boundary integration
+  - Progressive enhancement support ([index.ts](../frontend/src/lib/codeIntelligence/index.ts))
 
 ## Phase 12.4: Integration & API Layer
 
