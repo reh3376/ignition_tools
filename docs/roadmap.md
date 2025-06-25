@@ -1686,6 +1686,8 @@ CHUNK_SIZE=1000                          # Optimized for local model context win
 ### **Overview**
 Finalize the IGN Scripts platform for production deployment with a comprehensive React/TypeScript frontend, complete end-to-end testing, production packaging, and finalized documentation. This phase transforms the platform into a fully deployable, enterprise-ready solution.
 
+**📋 Frontend Development Roadmap**: [UIroadmap.md](UIroadmap.md) - Detailed frontend UI/UX development roadmap with React/TypeScript implementation guidelines, component specifications, and testing strategies.
+
 ### **Phase 12.1: Dynamic Frontend UI Development** 🎨 **Week 1-8**
 
 #### **React/TypeScript Frontend Architecture**
