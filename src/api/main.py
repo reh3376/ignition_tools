@@ -23,7 +23,7 @@ import uvicorn
 from fastapi import BackgroundTasks, Body, FastAPI, HTTPException, Path
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -109,7 +109,8 @@ class ScriptGenerationRequest(BaseModel):
     parameters: dict[str, Any] = Field(..., description="Template parameters")
     output_format: str = Field(default="python", description="Output format")
 
-    @validator("template_type")
+    @field_validator("template_type")
+    @classmethod
     def validate_template_type(cls, v):
         allowed_types = ["opcua_client", "tag_historian", "alarm_handler", "custom"]
         if v not in allowed_types:
@@ -132,7 +133,8 @@ class ModuleCreateRequest(BaseModel):
     description: str = Field(..., description="Module description")
     template: str = Field(default="basic", description="Module template")
 
-    @validator("name")
+    @field_validator("name")
+    @classmethod
     def validate_name(cls, v):
         if not v.replace("_", "").replace("-", "").isalnum():
             raise ValueError(
@@ -859,6 +861,511 @@ async def get_system_info():
         "api_endpoints": 25,
         "environment_status": validate_environment(),
         "last_update": datetime.now().isoformat(),
+    }
+
+
+# === PHASE 12.3: NEO4J CONTEXT SHARING ENDPOINTS ===
+
+
+class KnowledgeGraphQueryRequest(BaseModel):
+    """Request model for knowledge graph queries"""
+
+    query: str = Field(..., description="Cypher query to execute")
+    parameters: dict[str, Any] = Field(
+        default_factory=dict, description="Query parameters"
+    )
+    limit: int = Field(default=20, ge=1, le=100, description="Result limit (1-100)")
+
+    @field_validator("query")
+    @classmethod
+    def validate_query(cls, v):
+        if not v or not v.strip():
+            raise ValueError("Query cannot be empty")
+        # Basic safety check - prevent destructive operations
+        dangerous_keywords = ["DELETE", "REMOVE", "DROP", "CREATE", "MERGE", "SET"]
+        query_upper = v.upper()
+        for keyword in dangerous_keywords:
+            if keyword in query_upper:
+                raise ValueError(
+                    f"Destructive operation '{keyword}' not allowed in read-only API"
+                )
+        return v.strip()
+
+
+class KnowledgeGraphResponse(BaseModel):
+    """Response model for knowledge graph operations"""
+
+    success: bool
+    data: list[dict[str, Any]] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    query: str | None = None
+    execution_time: float | None = None
+    timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
+
+
+class ContextSharingRequest(BaseModel):
+    """Request model for context sharing operations"""
+
+    repository: str = Field(..., description="Repository name")
+    context_type: str = Field(..., description="Type of context to share")
+    filters: dict[str, Any] = Field(default_factory=dict, description="Context filters")
+
+    @field_validator("context_type")
+    @classmethod
+    def validate_context_type(cls, v):
+        allowed_types = [
+            "classes",
+            "methods",
+            "functions",
+            "imports",
+            "dependencies",
+            "structure",
+        ]
+        if v not in allowed_types:
+            raise ValueError(f"Context type must be one of: {allowed_types}")
+        return v
+
+
+async def validate_neo4j_connection() -> dict[str, Any]:
+    """Validate Neo4j connection with comprehensive error handling"""
+    try:
+        from neo4j import GraphDatabase
+
+        neo4j_uri = os.getenv("NEO4J_URI")
+        neo4j_user = os.getenv("NEO4J_USER")
+        neo4j_password = os.getenv("NEO4J_PASSWORD")
+
+        if not all([neo4j_uri, neo4j_user, neo4j_password]):
+            return {
+                "connected": False,
+                "error": "Neo4j credentials not configured",
+                "missing": [
+                    var
+                    for var, val in [
+                        ("NEO4J_URI", neo4j_uri),
+                        ("NEO4J_USER", neo4j_user),
+                        ("NEO4J_PASSWORD", neo4j_password),
+                    ]
+                    if not val
+                ],
+            }
+
+        # Type assertion since we've validated all values exist
+        assert neo4j_uri is not None
+        assert neo4j_user is not None
+        assert neo4j_password is not None
+
+        driver = GraphDatabase.driver(neo4j_uri, auth=(neo4j_user, neo4j_password))
+
+        with driver.session() as session:
+            result = session.run(
+                "RETURN 'Connection successful' as status, datetime() as timestamp"
+            )
+            record = result.single()
+
+            # Get basic statistics
+            stats_result = session.run(
+                """
+                MATCH (n)
+                RETURN count(n) as total_nodes,
+                       count(distinct labels(n)) as node_types
+            """
+            )
+            stats = stats_result.single()
+
+        driver.close()
+
+        return {
+            "connected": True,
+            "status": record["status"],
+            "timestamp": str(record["timestamp"]),
+            "statistics": {
+                "total_nodes": stats["total_nodes"],
+                "node_types": stats["node_types"],
+            },
+        }
+
+    except Exception as e:
+        error_msg = str(e).lower()
+        if "authentication" in error_msg:
+            user_error = (
+                "Neo4j authentication failed. Check NEO4J_USER and NEO4J_PASSWORD."
+            )
+        elif "connection" in error_msg or "refused" in error_msg:
+            user_error = (
+                "Cannot connect to Neo4j. Check NEO4J_URI and ensure Neo4j is running."
+            )
+        else:
+            user_error = f"Neo4j connection error: {e!s}"
+
+        return {"connected": False, "error": user_error, "technical_details": str(e)}
+
+
+async def execute_knowledge_query(
+    query: str, parameters: dict[str, Any] | None = None, limit: int = 20
+) -> dict[str, Any]:
+    """Execute a knowledge graph query with comprehensive error handling"""
+    import time
+
+    start_time = time.time()
+
+    try:
+        from neo4j import GraphDatabase
+
+        neo4j_uri = os.getenv("NEO4J_URI")
+        neo4j_user = os.getenv("NEO4J_USER")
+        neo4j_password = os.getenv("NEO4J_PASSWORD")
+
+        if not all([neo4j_uri, neo4j_user, neo4j_password]):
+            raise ValueError("Neo4j credentials not configured")
+
+        # Type assertion since we've validated all values exist
+        assert neo4j_uri is not None
+        assert neo4j_user is not None
+        assert neo4j_password is not None
+
+        driver = GraphDatabase.driver(neo4j_uri, auth=(neo4j_user, neo4j_password))
+
+        # Add LIMIT to query if not present
+        query_with_limit = query
+        if "LIMIT" not in query.upper():
+            query_with_limit = f"{query} LIMIT {limit}"
+
+        with driver.session() as session:
+            # Type ignore for Neo4j driver typing compatibility
+            result = session.run(query_with_limit, parameters if parameters is not None else {})  # type: ignore
+            records = [dict(record) for record in result]
+
+        driver.close()
+
+        execution_time = time.time() - start_time
+
+        return {
+            "success": True,
+            "data": records,
+            "metadata": {
+                "record_count": len(records),
+                "execution_time": execution_time,
+                "limited": len(records) >= limit,
+            },
+        }
+
+    except Exception as e:
+        execution_time = time.time() - start_time
+        error_msg = str(e).lower()
+
+        if "syntax" in error_msg or "invalid" in error_msg:
+            user_error = f"Invalid Cypher query syntax: {e!s}"
+        elif "authentication" in error_msg:
+            user_error = "Neo4j authentication failed"
+        elif "connection" in error_msg:
+            user_error = "Cannot connect to Neo4j database"
+        else:
+            user_error = f"Query execution failed: {e!s}"
+
+        return {
+            "success": False,
+            "error": user_error,
+            "metadata": {"execution_time": execution_time, "technical_details": str(e)},
+        }
+
+
+@app.get("/api/v1/knowledge/status", response_model=KnowledgeGraphResponse)
+async def get_knowledge_graph_status():
+    """Get Neo4j knowledge graph connection status and statistics"""
+    connection_info = await validate_neo4j_connection()
+
+    return KnowledgeGraphResponse(
+        success=connection_info["connected"],
+        data=[connection_info],
+        metadata={
+            "component": "Neo4j Knowledge Graph",
+            "phase": "12.3",
+            "purpose": "Context sharing for AI agents",
+        },
+    )
+
+
+@app.post("/api/v1/knowledge/query", response_model=KnowledgeGraphResponse)
+async def execute_cypher_query(request: KnowledgeGraphQueryRequest):
+    """Execute a read-only Cypher query on the knowledge graph"""
+    result = await execute_knowledge_query(
+        query=request.query, parameters=request.parameters, limit=request.limit
+    )
+
+    return KnowledgeGraphResponse(
+        success=result["success"],
+        data=result.get("data", []),
+        metadata=result.get("metadata", {}),
+        query=request.query,
+        execution_time=result.get("metadata", {}).get("execution_time"),
+    )
+
+
+@app.get("/api/v1/knowledge/repositories")
+async def list_repositories():
+    """List all repositories in the knowledge graph"""
+    query = "MATCH (r:Repository) RETURN r.name as name ORDER BY r.name"
+    result = await execute_knowledge_query(query)
+
+    if result["success"]:
+        repos = [record["name"] for record in result["data"]]
+        return {
+            "success": True,
+            "repositories": repos,
+            "total_count": len(repos),
+            "timestamp": datetime.now().isoformat(),
+        }
+    else:
+        raise HTTPException(status_code=500, detail=result["error"])
+
+
+@app.get("/api/v1/knowledge/repositories/{repo_name}/overview")
+async def get_repository_overview(repo_name: str):
+    """Get comprehensive overview of a repository from the knowledge graph"""
+    query = """
+    MATCH (r:Repository {name: $repo_name})
+    OPTIONAL MATCH (r)-[:CONTAINS]->(f:File)
+    OPTIONAL MATCH (f)-[:DEFINES]->(c:Class)
+    OPTIONAL MATCH (c)-[:HAS_METHOD]->(m:Method)
+    OPTIONAL MATCH (f)-[:DEFINES]->(func:Function)
+    OPTIONAL MATCH (c)-[:HAS_ATTRIBUTE]->(a:Attribute)
+
+    RETURN r.name as repository,
+           count(DISTINCT f) as files_count,
+           count(DISTINCT c) as classes_count,
+           count(DISTINCT m) as methods_count,
+           count(DISTINCT func) as functions_count,
+           count(DISTINCT a) as attributes_count
+    """
+
+    result = await execute_knowledge_query(query, {"repo_name": repo_name})
+
+    if result["success"] and result["data"]:
+        overview = result["data"][0]
+        return {
+            "success": True,
+            "repository": repo_name,
+            "statistics": {
+                "files": overview["files_count"],
+                "classes": overview["classes_count"],
+                "methods": overview["methods_count"],
+                "functions": overview["functions_count"],
+                "attributes": overview["attributes_count"],
+            },
+            "timestamp": datetime.now().isoformat(),
+        }
+    else:
+        raise HTTPException(
+            status_code=404, detail=f"Repository '{repo_name}' not found"
+        )
+
+
+@app.post("/api/v1/knowledge/context")
+async def get_repository_context(request: ContextSharingRequest):
+    """Get specific context information for AI agent development"""
+    # Build query based on context type
+    if request.context_type == "classes":
+        query = """
+        MATCH (r:Repository {name: $repo_name})-[:CONTAINS]->(f:File)-[:DEFINES]->(c:Class)
+        RETURN c.name as name, c.full_name as full_name, f.path as file_path
+        ORDER BY c.name
+        """
+    elif request.context_type == "methods":
+        query = """
+        MATCH (r:Repository {name: $repo_name})-[:CONTAINS]->(f:File)-[:DEFINES]->(c:Class)-[:HAS_METHOD]->(m:Method)
+        RETURN c.name as class_name, m.name as method_name,
+               m.params_list as parameters, m.return_type as return_type
+        ORDER BY c.name, m.name
+        """
+    elif request.context_type == "functions":
+        query = """
+        MATCH (r:Repository {name: $repo_name})-[:CONTAINS]->(f:File)-[:DEFINES]->(func:Function)
+        RETURN func.name as name, func.params_list as parameters,
+               func.return_type as return_type, f.path as file_path
+        ORDER BY func.name
+        """
+    elif request.context_type == "structure":
+        query = """
+        MATCH (r:Repository {name: $repo_name})-[:CONTAINS]->(f:File)
+        RETURN f.path as file_path, f.module_name as module_name
+        ORDER BY f.path
+        """
+    else:
+        raise HTTPException(
+            status_code=400, detail=f"Unsupported context type: {request.context_type}"
+        )
+
+    result = await execute_knowledge_query(
+        query, {"repo_name": request.repository}, limit=100
+    )
+
+    if result["success"]:
+        return {
+            "success": True,
+            "repository": request.repository,
+            "context_type": request.context_type,
+            "data": result["data"],
+            "metadata": {
+                "record_count": len(result["data"]),
+                "filters_applied": request.filters,
+                "execution_time": result["metadata"].get("execution_time"),
+            },
+            "timestamp": datetime.now().isoformat(),
+        }
+    else:
+        raise HTTPException(status_code=500, detail=result["error"])
+
+
+@app.get("/api/v1/knowledge/cli-mapping")
+async def get_cli_api_mapping():
+    """Get mapping between CLI commands and API endpoints for AI agent context"""
+    # This provides AI agents with understanding of how CLI maps to API
+    mapping = {
+        "sme_agent": {
+            "cli": ["ign", "module", "sme", "*"],
+            "api": "/api/v1/sme/*",
+            "endpoints": [
+                {
+                    "method": "POST",
+                    "path": "/api/v1/sme/validate-env",
+                    "description": "Validate SME environment",
+                },
+                {
+                    "method": "GET",
+                    "path": "/api/v1/sme/status",
+                    "description": "Get SME status",
+                },
+                {
+                    "method": "POST",
+                    "path": "/api/v1/sme/ask",
+                    "description": "Ask SME question",
+                },
+            ],
+        },
+        "scripts": {
+            "cli": ["ign", "script", "*"],
+            "api": "/api/v1/scripts/*",
+            "endpoints": [
+                {
+                    "method": "POST",
+                    "path": "/api/v1/scripts/generate",
+                    "description": "Generate script",
+                },
+                {
+                    "method": "POST",
+                    "path": "/api/v1/scripts/validate",
+                    "description": "Validate script",
+                },
+            ],
+        },
+        "refactoring": {
+            "cli": ["ign", "refactor", "*"],
+            "api": "/api/v1/refactor/*",
+            "endpoints": [
+                {
+                    "method": "GET",
+                    "path": "/api/v1/refactor/detect",
+                    "description": "Detect refactoring opportunities",
+                },
+                {
+                    "method": "GET",
+                    "path": "/api/v1/refactor/statistics",
+                    "description": "Get refactoring statistics",
+                },
+                {
+                    "method": "POST",
+                    "path": "/api/v1/refactor/analyze/{file_path:path}",
+                    "description": "Analyze file",
+                },
+                {
+                    "method": "POST",
+                    "path": "/api/v1/refactor/split/{file_path:path}",
+                    "description": "Split large file",
+                },
+            ],
+        },
+        "knowledge_graph": {
+            "cli": ["ign", "code", "intelligence", "*"],
+            "api": "/api/v1/knowledge/*",
+            "endpoints": [
+                {
+                    "method": "GET",
+                    "path": "/api/v1/knowledge/status",
+                    "description": "Knowledge graph status",
+                },
+                {
+                    "method": "POST",
+                    "path": "/api/v1/knowledge/query",
+                    "description": "Execute Cypher query",
+                },
+                {
+                    "method": "GET",
+                    "path": "/api/v1/knowledge/repositories",
+                    "description": "List repositories",
+                },
+                {
+                    "method": "POST",
+                    "path": "/api/v1/knowledge/context",
+                    "description": "Get repository context",
+                },
+            ],
+        },
+    }
+
+    return {
+        "success": True,
+        "mapping": mapping,
+        "total_categories": len(mapping),
+        "total_endpoints": sum(len(cat["endpoints"]) for cat in mapping.values()),
+        "purpose": "AI agent CLI-to-API context sharing",
+        "phase": "12.3",
+        "timestamp": datetime.now().isoformat(),
+    }
+
+
+@app.get("/api/v1/knowledge/agent-context")
+async def get_agent_context():
+    """Get comprehensive context for AI agent development across repositories"""
+    # Get environment status
+    env_status = validate_environment()
+
+    # Get Neo4j status
+    neo4j_status = await validate_neo4j_connection()
+
+    # Get repository list if Neo4j is available
+    repositories = []
+    if neo4j_status["connected"]:
+        repo_result = await execute_knowledge_query(
+            "MATCH (r:Repository) RETURN r.name as name ORDER BY r.name"
+        )
+        if repo_result["success"]:
+            repositories = [record["name"] for record in repo_result["data"]]
+
+    return {
+        "success": True,
+        "context": {
+            "project_name": "IGN Scripts - Code Intelligence System",
+            "current_phase": "12.3 - Neo4j Context Sharing",
+            "environment": env_status,
+            "knowledge_graph": neo4j_status,
+            "available_repositories": repositories,
+            "api_version": "12.3.0",
+            "capabilities": [
+                "CLI-to-API mapping",
+                "Knowledge graph queries",
+                "Repository context sharing",
+                "AI agent development support",
+                "Cross-repository intelligence",
+            ],
+        },
+        "recommendations": [
+            "Use /api/v1/knowledge/repositories to explore available repositories",
+            "Use /api/v1/knowledge/context to get specific repository context",
+            "Use /api/v1/knowledge/cli-mapping for CLI-to-API understanding",
+            "Ensure Neo4j connection for full knowledge graph access",
+        ],
+        "timestamp": datetime.now().isoformat(),
     }
 
 
