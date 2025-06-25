@@ -26,7 +26,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any
+from typing import Self, Any
 
 # Add src to path for imports
 sys.path.append(str(Path(__file__).parent.parent.parent))
@@ -70,7 +70,7 @@ class SecurityConfig:
     # Progressive complexity settings
     security_level: str = "standard"  # basic, standard, high, critical
 
-    def __post_init__(self):
+    def __post_init__(self: Self):
         """Validate configuration following crawl_mcp.py methodology."""
         if not self.security_temp_dir:
             self.security_temp_dir = os.getenv(
@@ -110,7 +110,7 @@ class SecurityEvent:
     details: dict[str, Any] = field(default_factory=dict)
     severity: str = "info"  # info, warning, error, critical
 
-    def __post_init__(self):
+    def __post_init__(self: Self):
         """Validate security event structure."""
         if not isinstance(self.timestamp, datetime):
             raise ValueError("timestamp must be datetime object")
@@ -144,7 +144,7 @@ class SecurityComplianceModule:
     - Step 6: Resource Management
     """
 
-    def __init__(self, config: SecurityConfig | None = None):
+    def __init__(self: Self, config: SecurityConfig | None = None):
         """Initialize security module with comprehensive validation."""
         self.console = console
         self.logger = logger
@@ -168,7 +168,7 @@ class SecurityComplianceModule:
         # Initialize based on progressive complexity
         self._initialize_security_components()
 
-    def validate_environment(self) -> dict[str, ValidationResult]:
+    def validate_environment(self: Self) -> dict[str, ValidationResult]:
         """Step 1: Environment Variable Validation First
         Following crawl_mcp.py methodology
         """
@@ -275,7 +275,7 @@ class SecurityComplianceModule:
                 security_level="error",
             )
 
-    def _validate_security_dependencies(self) -> ValidationResult:
+    def _validate_security_dependencies(self: Self) -> ValidationResult:
         """Validate security dependencies with detailed feedback."""
         missing_packages = []
 
@@ -302,7 +302,7 @@ class SecurityComplianceModule:
 
         return ValidationResult(valid=True, security_level="secure")
 
-    def _validate_encryption_dependencies(self) -> ValidationResult:
+    def _validate_encryption_dependencies(self: Self) -> ValidationResult:
         """Validate encryption dependencies."""
         missing_packages = []
 
@@ -328,7 +328,7 @@ class SecurityComplianceModule:
 
         return ValidationResult(valid=True, security_level="secure")
 
-    def _validate_compliance_dependencies(self) -> ValidationResult:
+    def _validate_compliance_dependencies(self: Self) -> ValidationResult:
         """Validate compliance checking dependencies."""
         if not self.config.enable_compliance_checks:
             return ValidationResult(
@@ -340,7 +340,7 @@ class SecurityComplianceModule:
         # For now, compliance checking uses built-in modules
         return ValidationResult(valid=True, security_level="secure")
 
-    def _validate_security_configuration(self) -> ValidationResult:
+    def _validate_security_configuration(self: Self) -> ValidationResult:
         """Validate security configuration parameters."""
         issues = []
 
@@ -363,7 +363,7 @@ class SecurityComplianceModule:
 
         return ValidationResult(valid=True, security_level="secure")
 
-    def _display_validation_results(self, results: dict[str, ValidationResult]) -> None:
+    def _display_validation_results(self: Self, results: dict[str, ValidationResult]) -> None:
         """Display validation results with security-focused formatting."""
         table = Table(title="Security Environment Validation")
         table.add_column("Component", style="cyan")
@@ -400,7 +400,7 @@ class SecurityComplianceModule:
 
         self.console.print(table)
 
-    def _initialize_security_components(self) -> None:
+    def _initialize_security_components(self: Self) -> None:
         """Step 5: Progressive Complexity
         Initialize security components based on security level and validation results
         """
@@ -429,7 +429,7 @@ class SecurityComplianceModule:
         elif self.config.security_level == "critical":
             self._initialize_critical_security()
 
-    def _initialize_basic_security(self) -> None:
+    def _initialize_basic_security(self: Self) -> None:
         """Initialize basic security components."""
         self.console.print("🔒 Initializing Basic Security Components", style="green")
 
@@ -441,7 +441,7 @@ class SecurityComplianceModule:
 
         self.console.print("✅ Basic security components initialized", style="green")
 
-    def _initialize_standard_security(self) -> None:
+    def _initialize_standard_security(self: Self) -> None:
         """Initialize standard security components."""
         self.console.print(
             "🔒 Initializing Standard Security Components", style="green"
@@ -461,7 +461,7 @@ class SecurityComplianceModule:
 
         self.console.print("✅ Standard security components initialized", style="green")
 
-    def _initialize_high_security(self) -> None:
+    def _initialize_high_security(self: Self) -> None:
         """Initialize high security components."""
         self.console.print("🔒 Initializing High Security Components", style="green")
 
@@ -477,7 +477,7 @@ class SecurityComplianceModule:
 
         self.console.print("✅ High security components initialized", style="green")
 
-    def _initialize_critical_security(self) -> None:
+    def _initialize_critical_security(self: Self) -> None:
         """Initialize critical security components."""
         self.console.print(
             "🔒 Initializing Critical Security Components", style="green"
@@ -586,7 +586,7 @@ class SecurityComplianceModule:
 
         return {"valid": True, "event": security_event}
 
-    def run_compliance_check(self, standard: str = "general") -> dict[str, Any]:
+    def run_compliance_check(self: Self, standard: str = "general") -> dict[str, Any]:
         """Run compliance checks for specified standard."""
         try:
             if not self.compliance_checker:
@@ -620,7 +620,7 @@ class SecurityComplianceModule:
                 "suggestions": ["Check compliance checker configuration"],
             }
 
-    def generate_security_report(self) -> dict[str, Any]:
+    def generate_security_report(self: Self) -> dict[str, Any]:
         """Generate comprehensive security report."""
         try:
             report = {
@@ -661,7 +661,7 @@ class SecurityComplianceModule:
                 "error": f"Failed to generate security report: {e!s}",
             }
 
-    def cleanup_resources(self) -> None:
+    def cleanup_resources(self: Self) -> None:
         """Step 6: Resource Management
         Clean up security resources and sensitive data
         """
@@ -703,11 +703,11 @@ class SecurityComplianceModule:
 class BasicAuditLogger:
     """Basic audit logging component."""
 
-    def __init__(self, config: SecurityConfig):
+    def __init__(self: Self, config: SecurityConfig):
         self.config = config
         self.log_file = Path(config.audit_log_dir) / "audit.log"
 
-    def log_event(self, event: SecurityEvent) -> dict[str, Any]:
+    def log_event(self: Self, event: SecurityEvent) -> dict[str, Any]:
         """Log security event to file."""
         try:
             log_entry = {
@@ -731,10 +731,10 @@ class BasicAuditLogger:
 class BasicAuthManager:
     """Basic authentication manager."""
 
-    def __init__(self, config: SecurityConfig):
+    def __init__(self: Self, config: SecurityConfig):
         self.config = config
 
-    def authenticate(self, username: str, password: str) -> dict[str, Any]:
+    def authenticate(self: Self, username: str, password: str) -> dict[str, Any]:
         """Basic authentication."""
         # In production, this would validate against secure user store
         return {
@@ -747,10 +747,10 @@ class BasicAuthManager:
 class StandardComplianceChecker:
     """Standard compliance checker."""
 
-    def __init__(self, config: SecurityConfig):
+    def __init__(self: Self, config: SecurityConfig):
         self.config = config
 
-    def run_checks(self, standard: str) -> list[ComplianceCheck]:
+    def run_checks(self: Self, standard: str) -> list[ComplianceCheck]:
         """Run standard compliance checks."""
         checks = []
 
@@ -781,10 +781,10 @@ class StandardComplianceChecker:
 class BasicIncidentDetector:
     """Basic security incident detector."""
 
-    def __init__(self, config: SecurityConfig):
+    def __init__(self: Self, config: SecurityConfig):
         self.config = config
 
-    def detect_incidents(self, events: list[SecurityEvent]) -> list[dict[str, Any]]:
+    def detect_incidents(self: Self, events: list[SecurityEvent]) -> list[dict[str, Any]]:
         """Detect basic security incidents."""
         incidents = []
 
@@ -805,10 +805,10 @@ class BasicIncidentDetector:
 class AdvancedAuthManager:
     """Advanced authentication manager with encryption."""
 
-    def __init__(self, config: SecurityConfig):
+    def __init__(self: Self, config: SecurityConfig):
         self.config = config
 
-    def authenticate(self, username: str, password: str) -> dict[str, Any]:
+    def authenticate(self: Self, username: str, password: str) -> dict[str, Any]:
         """Advanced authentication with token generation."""
         # Would implement JWT tokens, MFA, etc.
         return {
@@ -824,10 +824,10 @@ class AdvancedAuthManager:
 class AdvancedIncidentDetector:
     """Advanced security incident detector with ML capabilities."""
 
-    def __init__(self, config: SecurityConfig):
+    def __init__(self: Self, config: SecurityConfig):
         self.config = config
 
-    def detect_incidents(self, events: list[SecurityEvent]) -> list[dict[str, Any]]:
+    def detect_incidents(self: Self, events: list[SecurityEvent]) -> list[dict[str, Any]]:
         """Detect advanced security incidents using pattern analysis."""
         incidents = []
 
@@ -840,10 +840,10 @@ class AdvancedIncidentDetector:
 class EnterpriseComplianceChecker:
     """Enterprise-grade compliance checker."""
 
-    def __init__(self, config: SecurityConfig):
+    def __init__(self: Self, config: SecurityConfig):
         self.config = config
 
-    def run_checks(self, standard: str) -> list[ComplianceCheck]:
+    def run_checks(self: Self, standard: str) -> list[ComplianceCheck]:
         """Run enterprise compliance checks for multiple standards."""
         checks = []
 
@@ -856,10 +856,10 @@ class EnterpriseComplianceChecker:
 class EnterpriseAuditLogger:
     """Enterprise audit logger with encryption and integrity checking."""
 
-    def __init__(self, config: SecurityConfig):
+    def __init__(self: Self, config: SecurityConfig):
         self.config = config
 
-    def log_event(self, event: SecurityEvent) -> dict[str, Any]:
+    def log_event(self: Self, event: SecurityEvent) -> dict[str, Any]:
         """Log event with encryption and digital signature."""
         # Would implement encrypted logging, digital signatures,
         # tamper detection, etc.

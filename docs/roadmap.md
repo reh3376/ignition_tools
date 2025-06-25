@@ -1485,7 +1485,7 @@ Integrate advanced web crawling, knowledge graph validation, and AI-powered code
 
 ##### **Open Source Model Selection & Infrastructure** 🤖
 - [ ] **Local Model Deployment Infrastructure**
-  - [ ] Set up **Ollama** container for local LLM hosting (supports Llama 3.1, Mistral, CodeLlama)
+  - [ ] Set up **Ollama** container for local LLM hosting (supports Llama 3.1, 3.2, 3.3, Mistral, CodeLlama)
   - [ ] Configure **sentence-transformers** with open models for embeddings
   - [ ] Implement **Hugging Face Transformers** integration for specialized tasks
   - [ ] Create model switching framework for different use cases

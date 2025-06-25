@@ -20,7 +20,7 @@ import logging
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Self, Any
 
 import numpy as np
 import pandas as pd
@@ -369,7 +369,7 @@ class AIModelPreparation:
             self.logger.error(f"Failed to add cross-correlation features: {e}")
             return data
 
-    def _add_frequency_features(self, data: pd.DataFrame) -> pd.DataFrame:
+    def _add_frequency_features(self: Self, data: pd.DataFrame) -> pd.DataFrame:
         """Add frequency domain features (FFT-based)."""
         try:
             numeric_columns = data.select_dtypes(include=[np.number]).columns
@@ -475,7 +475,7 @@ class AIModelPreparation:
             )
             raise
 
-    def _handle_missing_data(self, data: pd.DataFrame) -> pd.DataFrame:
+    def _handle_missing_data(self: Self, data: pd.DataFrame) -> pd.DataFrame:
         """Handle missing data with appropriate strategies."""
         try:
             # Forward fill for time series data
@@ -525,7 +525,7 @@ class AIModelPreparation:
             self.logger.error(f"Feature selection failed: {e}")
             return list(data.columns), []
 
-    def _auto_select_targets(self, data: pd.DataFrame) -> list[str]:
+    def _auto_select_targets(self: Self, data: pd.DataFrame) -> list[str]:
         """Auto-select target variables based on variable types."""
         try:
             # Look for PV (Process Variables) as common targets
@@ -622,7 +622,7 @@ class AIModelPreparation:
             self.logger.error(f"Feature normalization failed: {e}")
             return train_data, val_data, test_data
 
-    def _calculate_quality_score(self, data: pd.DataFrame) -> float:
+    def _calculate_quality_score(self: Self, data: pd.DataFrame) -> float:
         """Calculate overall data quality score."""
         try:
             # Factors: completeness, consistency, validity
@@ -657,7 +657,7 @@ class AIModelPreparation:
             self.logger.error(f"Quality score calculation failed: {e}")
             return 0.5  # Default moderate quality
 
-    def _calculate_completeness_score(self, data: pd.DataFrame) -> float:
+    def _calculate_completeness_score(self: Self, data: pd.DataFrame) -> float:
         """Calculate data completeness score."""
         try:
             total_cells = len(data) * len(data.columns)
@@ -743,7 +743,7 @@ class AIModelPreparation:
             self.logger.error(f"Dataset export failed: {e}")
             raise
 
-    def get_preparation_status(self) -> dict[str, Any]:
+    def get_preparation_status(self: Self) -> dict[str, Any]:
         """Get status of model preparation system."""
         try:
             return {

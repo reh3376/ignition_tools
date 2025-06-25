@@ -17,7 +17,7 @@ from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any
+from typing import Any, Self
 
 import docker
 from pydantic import BaseModel, Field, field_validator
@@ -435,7 +435,7 @@ class ProductionDeploymentManager:
     _monitoring_task: asyncio.Task | None = field(default=None, init=False)
     _is_initialized: bool = field(default=False, init=False)
 
-    async def initialize(self) -> dict[str, Any]:
+    async def initialize(self: Any) -> dict[str, Any]:
         """Initialize the production deployment manager."""
         logger.info("🚀 Initializing Production Deployment Manager...")
 
@@ -486,7 +486,7 @@ class ProductionDeploymentManager:
             logger.error(f"❌ Initialization failed: {error_msg}")
             return {"success": False, "error": error_msg}
 
-    async def _initialize_docker(self) -> dict[str, Any]:
+    async def _initialize_docker(self: Any) -> dict[str, Any]:
         """Initialize Docker client."""
         try:
             self._docker_client = docker.from_env()
@@ -499,7 +499,7 @@ class ProductionDeploymentManager:
             error_msg = format_deployment_error(e, "Docker initialization")
             return {"success": False, "error": error_msg}
 
-    async def _initialize_plc_connections(self) -> dict[str, Any]:
+    async def _initialize_plc_connections(self: Any) -> dict[str, Any]:
         """Initialize PLC connections."""
         if not self.config.plc_configs:
             return {"success": True, "message": "No PLC configurations provided"}
@@ -548,7 +548,7 @@ class ProductionDeploymentManager:
             error_msg = format_deployment_error(e, "PLC initialization")
             return {"success": False, "error": error_msg}
 
-    async def _test_plc_connection(self, plc_config: PLCConfig) -> dict[str, Any]:
+    async def _test_plc_connection(self: Self, plc_config: PLCConfig) -> dict[str, Any]:
         """Test PLC connection."""
         try:
             from asyncua import Client
@@ -579,7 +579,7 @@ class ProductionDeploymentManager:
                 "error": f"PLC {plc_config.name} connection failed: {e!s}",
             }
 
-    async def _start_monitoring(self) -> dict[str, Any]:
+    async def _start_monitoring(self: Any) -> dict[str, Any]:
         """Start monitoring tasks."""
         try:
             self._monitoring_task = asyncio.create_task(self._monitoring_loop())
@@ -590,7 +590,7 @@ class ProductionDeploymentManager:
             error_msg = format_deployment_error(e, "monitoring startup")
             return {"success": False, "error": error_msg}
 
-    async def _monitoring_loop(self) -> None:
+    async def _monitoring_loop(self: Any) -> None:
         """Main monitoring loop."""
         while self._is_initialized:
             try:
@@ -613,7 +613,7 @@ class ProductionDeploymentManager:
                 logger.error(f"Monitoring error: {e}")
                 await asyncio.sleep(self.config.health_check_interval)
 
-    async def _update_deployment_status(self) -> None:
+    async def _update_deployment_status(self: Any) -> None:
         """Update deployment status information."""
         if not self._docker_client or not self._deployment_info:
             return
@@ -667,7 +667,7 @@ class ProductionDeploymentManager:
         except Exception as e:
             logger.error(f"Error updating deployment status: {e}")
 
-    async def _monitor_plc_connections(self) -> None:
+    async def _monitor_plc_connections(self: Any) -> None:
         """Monitor PLC connection health."""
         for name, connection_info in self._plc_connections.items():
             try:
@@ -699,7 +699,7 @@ class ProductionDeploymentManager:
                 connection_info.status = PLCConnectionStatus.ERROR
                 connection_info.error_message = str(e)
 
-    async def _perform_health_checks(self) -> None:
+    async def _perform_health_checks(self: Any) -> None:
         """Perform system health checks."""
         try:
             # Check system resources
@@ -725,7 +725,9 @@ class ProductionDeploymentManager:
     # Resource Management (Step 6: crawl_mcp.py methodology)
 
     @asynccontextmanager
-    async def managed_deployment(self) -> AsyncIterator["ProductionDeploymentManager"]:
+    async def managed_deployment(
+        self: Any,
+    ) -> AsyncIterator["ProductionDeploymentManager"]:
         """Manage production deployment with proper cleanup."""
         try:
             initialization_result = await self.initialize()
@@ -739,7 +741,7 @@ class ProductionDeploymentManager:
         finally:
             await self.cleanup()
 
-    async def cleanup(self) -> None:
+    async def cleanup(self: Any) -> None:
         """Clean up all resources properly."""
         logger.info("🧹 Cleaning up Production Deployment Manager resources...")
 
@@ -765,7 +767,7 @@ class ProductionDeploymentManager:
 
     # Deployment Operations
 
-    async def deploy_container(self) -> dict[str, Any]:
+    async def deploy_container(self: Any) -> dict[str, Any]:
         """Deploy production container."""
         if not self._is_initialized:
             return {"success": False, "error": "Manager not initialized"}
@@ -861,7 +863,7 @@ class ProductionDeploymentManager:
             logger.error(f"❌ Container deployment failed: {error_msg}")
             return {"success": False, "error": error_msg}
 
-    async def stop_container(self) -> dict[str, Any]:
+    async def stop_container(self: Any) -> dict[str, Any]:
         """Stop production container."""
         if not self._docker_client or not self._deployment_info:
             return {"success": False, "error": "No active deployment"}
@@ -885,7 +887,7 @@ class ProductionDeploymentManager:
             error_msg = format_deployment_error(e, "container stop")
             return {"success": False, "error": error_msg}
 
-    async def restart_container(self) -> dict[str, Any]:
+    async def restart_container(self: Any) -> dict[str, Any]:
         """Restart production container."""
         if not self._docker_client or not self._deployment_info:
             return {"success": False, "error": "No active deployment"}
@@ -911,7 +913,7 @@ class ProductionDeploymentManager:
             error_msg = format_deployment_error(e, "container restart")
             return {"success": False, "error": error_msg}
 
-    def get_deployment_status(self) -> dict[str, Any]:
+    def get_deployment_status(self: Any) -> dict[str, Any]:
         """Get current deployment status."""
         if not self._deployment_info:
             return {"deployed": False, "message": "No active deployment"}
@@ -946,7 +948,7 @@ class ProductionDeploymentManager:
             "deployment_mode": self.config.deployment_mode.value,
         }
 
-    def display_status(self) -> None:
+    def display_status(self: Any) -> None:
         """Display deployment status in a formatted table."""
         status = self.get_deployment_status()
 

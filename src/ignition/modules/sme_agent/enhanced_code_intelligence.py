@@ -23,7 +23,7 @@ import os
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Self, Any
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +80,7 @@ class CodePattern:
 class EnhancedCodeIntelligence:
     """Enhanced Code Intelligence for SME Agent."""
 
-    def __init__(self, config: dict[str, Any] | None = None):
+    def __init__(self: Self, config: dict[str, Any] | None = None):
         """Initialize enhanced code intelligence."""
         self.config = config or {}
         self.logger = logging.getLogger(__name__)
@@ -103,7 +103,7 @@ class EnhancedCodeIntelligence:
             "last_analysis": None,
         }
 
-    async def initialize(self) -> dict[str, Any]:
+    async def initialize(self: Self) -> dict[str, Any]:
         """Initialize enhanced code intelligence following crawl_mcp.py methodology."""
         try:
             # Step 1: Environment validation first
@@ -371,7 +371,7 @@ class EnhancedCodeIntelligence:
                 "result": None,
             }
 
-    async def get_intelligence_statistics(self) -> dict[str, Any]:
+    async def get_intelligence_statistics(self: Self) -> dict[str, Any]:
         """Get enhanced code intelligence statistics."""
         return {
             "statistics": self.intelligence_stats.copy(),
@@ -400,7 +400,7 @@ class EnhancedCodeIntelligence:
 
     # Private methods following crawl_mcp.py methodology
 
-    async def _validate_environment(self) -> dict[str, Any]:
+    async def _validate_environment(self: Self) -> dict[str, Any]:
         """Validate environment for enhanced code intelligence."""
         errors = []
         warnings = []
@@ -443,7 +443,7 @@ class EnhancedCodeIntelligence:
             "neo4j_available": self.neo4j_available,
         }
 
-    async def _load_code_patterns(self) -> None:
+    async def _load_code_patterns(self: Self) -> None:
         """Load code patterns for analysis."""
         patterns = [
             CodePattern(
@@ -530,7 +530,7 @@ class EnhancedCodeIntelligence:
                     "                # Deep nesting...",
                     "",
                     "# Good: Reduced complexity",
-                    "def simple_function(params):",
+                    "def simple_function(params: Any):",
                     "    if not _validate_params(params):",
                     "        return None",
                     "    return _process_params(params)",
@@ -541,7 +541,7 @@ class EnhancedCodeIntelligence:
         self.code_patterns.extend(patterns)
         self.intelligence_stats["code_patterns_loaded"] = len(self.code_patterns)
 
-    async def _initialize_tool_integrations(self) -> None:
+    async def _initialize_tool_integrations(self: Self) -> None:
         """Initialize integrations with existing tools."""
         try:
             if self.refactor_tools_available:
@@ -712,7 +712,7 @@ class EnhancedCodeIntelligence:
                 issues=[{"type": "analysis_error", "message": str(e)}],
             )
 
-    def _calculate_code_metrics(self, tree: ast.AST, content: str) -> dict[str, Any]:
+    def _calculate_code_metrics(self: Self, tree: ast.AST, content: str) -> dict[str, Any]:
         """Calculate code metrics from AST."""
         metrics = {
             "lines_of_code": len(content.splitlines()),
@@ -831,7 +831,7 @@ class EnhancedCodeIntelligence:
 
         return opportunities
 
-    def _extract_dependencies(self, tree: ast.AST) -> list[str]:
+    def _extract_dependencies(self: Self, tree: ast.AST) -> list[str]:
         """Extract dependencies from the code."""
         dependencies = []
 
@@ -875,7 +875,7 @@ class EnhancedCodeIntelligence:
 
         return issues
 
-    def _calculate_complexity_score(self, metrics: dict[str, Any]) -> float:
+    def _calculate_complexity_score(self: Self, metrics: dict[str, Any]) -> float:
         """Calculate complexity score (0-100, lower is better)."""
         complexity = metrics.get("cyclomatic_complexity", 0)
         lines = metrics.get("lines_of_code", 1)
@@ -940,7 +940,7 @@ class EnhancedCodeIntelligence:
 
         return max(base_score, 0.0)
 
-    def _calculate_cache_size(self) -> float:
+    def _calculate_cache_size(self: Self) -> float:
         """Calculate cache size in MB."""
         # Simplified calculation
         return len(self.analysis_cache) * 0.1  # Rough estimate
@@ -1018,7 +1018,7 @@ class EnhancedCodeIntelligence:
 
         return detected_patterns
 
-    def _check_pattern_rule(self, content: str, rule: str) -> bool:
+    def _check_pattern_rule(self: Self, content: str, rule: str) -> bool:
         """Check if a pattern rule matches the content."""
         # Simplified pattern matching
         if "in loop" in rule:
@@ -1109,22 +1109,22 @@ class EnhancedCodeIntelligence:
 class CyclomaticComplexityVisitor(ast.NodeVisitor):
     """AST visitor to calculate cyclomatic complexity."""
 
-    def __init__(self):
+    def __init__(self: Self):
         self.complexity = 1  # Base complexity
 
-    def visit_If(self, node):
+    def visit_If(self: Self, node: Any):
         self.complexity += 1
         self.generic_visit(node)
 
-    def visit_While(self, node):
+    def visit_While(self: Self, node: Any):
         self.complexity += 1
         self.generic_visit(node)
 
-    def visit_For(self, node):
+    def visit_For(self: Self, node: Any):
         self.complexity += 1
         self.generic_visit(node)
 
-    def visit_ExceptHandler(self, node):
+    def visit_ExceptHandler(self: Self, node: Any):
         self.complexity += 1
         self.generic_visit(node)
 
@@ -1132,10 +1132,10 @@ class CyclomaticComplexityVisitor(ast.NodeVisitor):
 class CodeIssueVisitor(ast.NodeVisitor):
     """AST visitor to detect code issues."""
 
-    def __init__(self):
+    def __init__(self: Self):
         self.issues = []
 
-    def visit_FunctionDef(self, node):
+    def visit_FunctionDef(self: Self, node: Any):
         # Check for long parameter lists
         if len(node.args.args) > 5:
             self.issues.append(

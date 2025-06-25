@@ -24,6 +24,7 @@ from .opcua_connection_config import (
     load_config,
 )
 from .opcua_integration import OPCUAClient
+from typing import Any, Self
 
 console = Console()
 
@@ -40,7 +41,7 @@ current_config: OPCUAConnectionConfig | None = None
     help="set logging level (DEBUG, INFO, WARNING, ERROR)",
 )
 @click.pass_context
-def opcua(ctx, verbose, log_level):
+def opcua(ctx, verbose, log_level) -> None:
     """OPC-UA Client Commands with Advanced Configuration.
 
     🔒 SAFETY: All operations are READ-ONLY to protect live systems.
@@ -86,7 +87,7 @@ def connect(
     cert_path,
     key_path,
     server_cert,
-):
+) -> None:
     r"""Connect to an OPC-UA server with comprehensive configuration.
 
     🔒 READ-ONLY: Connection is configured for safe read operations only.
@@ -134,7 +135,7 @@ async def _connect_async(
     cert_path,
     key_path,
     server_cert,
-):
+) -> None:
     """Async connection logic."""
     global current_connection, current_config
 
@@ -251,7 +252,7 @@ async def _connect_async(
         current_config = None
 
 
-def _display_connection_info(config: OPCUAConnectionConfig):
+def _display_connection_info(config: OPCUAConnectionConfig) -> None:
     """Display connection information."""
     table = Table(title="🔗 Connection Configuration")
     table.add_column("Setting", style="cyan")
@@ -272,7 +273,7 @@ def _display_connection_info(config: OPCUAConnectionConfig):
     console.print(table)
 
 
-async def _display_server_info():
+async def _display_server_info() -> None:
     """Display server information after connection."""
     if not current_connection:
         return
@@ -292,7 +293,7 @@ async def _display_server_info():
         console.print(f"⚠️ Could not retrieve server info: {e}")
 
 
-async def _save_current_config(config_name: str):
+async def _save_current_config(config_name: str) -> None:
     """Save current configuration."""
     if not current_config:
         return
@@ -320,7 +321,7 @@ async def _save_current_config(config_name: str):
 
 @opcua.command()
 @click.option("--force", is_flag=True, help="Force disconnect without confirmation")
-def disconnect(force):
+def disconnect(force: Any) -> None:
     """Disconnect from the current OPC-UA server."""
     global current_connection, current_config
 
@@ -338,14 +339,14 @@ def disconnect(force):
     console.print("✅ Disconnected from OPC-UA server")
 
 
-async def _disconnect_async():
+async def _disconnect_async() -> None:
     """Async disconnect logic."""
     if current_connection:
         await current_connection.disconnect()
 
 
 @opcua.command()
-def info():
+def info() -> None:
     """Get comprehensive information about the connected OPC-UA server."""
     if not current_connection:
         console.print("❌ Not connected to OPC-UA server. Use 'connect' command first.")
@@ -354,7 +355,7 @@ def info():
     asyncio.run(_info_async())
 
 
-async def _info_async():
+async def _info_async() -> None:
     """Async server info logic."""
     try:
         console.print(
@@ -425,7 +426,7 @@ async def _info_async():
 
 # Configuration management commands
 @opcua.group(name="config")
-def config_group():
+def config_group() -> None:
     """OPC-UA connection configuration management.
 
     Manage saved connection configurations for easy reuse.
@@ -434,7 +435,7 @@ def config_group():
 
 
 @config_group.command("wizard")
-def config_wizard():
+def config_wizard() -> None:
     """Run the interactive configuration wizard.
 
     Comprehensive setup wizard that collects all necessary information
@@ -458,14 +459,14 @@ def config_wizard():
 
 
 @config_group.command("list")
-def config_list():
+def config_list() -> None:
     """List all saved OPC-UA configurations."""
     list_configs()
 
 
 @config_group.command("load")
 @click.argument("name")
-def config_load(name):
+def config_load(name: Any) -> None:
     """Load and display a saved configuration.
 
     NAME: Configuration name to load
@@ -498,7 +499,7 @@ def config_load(name):
 @config_group.command("delete")
 @click.argument("name")
 @click.option("--force", is_flag=True, help="Delete without confirmation")
-def config_delete(name, force):
+def config_delete(name, force) -> None:
     """Delete a saved configuration.
 
     NAME: Configuration name to delete
@@ -514,7 +515,7 @@ def config_delete(name, force):
 
 @config_group.command("test")
 @click.argument("name")
-def config_test(name):
+def config_test(name: Any) -> None:
     """Test a saved configuration.
 
     NAME: Configuration name to test
@@ -529,7 +530,7 @@ def config_test(name):
     asyncio.run(_test_config_async(config))
 
 
-async def _test_config_async(config: OPCUAConnectionConfig):
+async def _test_config_async(config: OPCUAConnectionConfig) -> None:
     """Test a configuration asynchronously."""
     try:
         wizard = OPCUAConnectionWizard()
@@ -546,7 +547,7 @@ async def _test_config_async(config: OPCUAConnectionConfig):
 
 # Certificate management commands
 @opcua.group(name="cert")
-def cert_group():
+def cert_group() -> None:
     """Certificate management for OPC-UA connections.
 
     Generate, manage, and validate certificates for secure OPC-UA connections.
@@ -561,7 +562,7 @@ def cert_group():
 @click.option("--dns-names", help="DNS names (comma-separated)")
 @click.option("--ip-addresses", help="IP addresses (comma-separated)")
 @click.option("--output-dir", help="Output directory for certificates")
-def cert_generate(app_uri, app_name, org, dns_names, ip_addresses, output_dir):
+def cert_generate(app_uri, app_name, org, dns_names, ip_addresses, output_dir) -> None:
     """Generate client certificates for OPC-UA connections.
 
     Creates both certificate and private key files suitable for Ignition OPC-UA servers.
@@ -594,7 +595,7 @@ def cert_generate(app_uri, app_name, org, dns_names, ip_addresses, output_dir):
 
 @cert_group.command("validate")
 @click.argument("cert_path")
-def cert_validate(cert_path):
+def cert_validate(cert_path: Any) -> None:
     """Validate a certificate file.
 
     CERT_PATH: Path to certificate file to validate
@@ -639,7 +640,7 @@ def cert_validate(cert_path):
     default="tree",
     help="Output format",
 )
-def browse(node_id, depth, filter, show_attributes, output):
+def browse(node_id, depth, filter, show_attributes, output) -> None:
     """Browse the OPC-UA server address space with advanced options.
 
     🔒 READ-ONLY: Safe browsing without any modifications.
@@ -664,7 +665,7 @@ def browse(node_id, depth, filter, show_attributes, output):
     asyncio.run(_browse_async(node_id, depth, filter, show_attributes, output))
 
 
-async def _browse_async(node_id, depth, filter_text, show_attributes, output):
+async def _browse_async(node_id, depth, filter_text, show_attributes, output) -> None:
     """Enhanced async browse logic."""
     try:
         console.print(f"🔍 Browsing from node: {node_id}")
@@ -697,7 +698,7 @@ async def _browse_async(node_id, depth, filter_text, show_attributes, output):
         console.print(f"❌ Browse error: {e}")
 
 
-def _display_browse_table(results, show_attributes):
+def _display_browse_table(results, show_attributes) -> None:
     """Display browse results as table."""
     table = Table(title="🌳 OPC-UA Address Space")
     table.add_column("Node ID", style="cyan")
@@ -725,7 +726,7 @@ def _display_browse_table(results, show_attributes):
     console.print(table)
 
 
-def _display_browse_tree(results, show_attributes):
+def _display_browse_tree(results, show_attributes) -> None:
     """Display browse results as tree."""
     console.print("🌳 Address Space Tree:")
 

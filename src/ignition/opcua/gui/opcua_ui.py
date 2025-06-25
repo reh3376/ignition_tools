@@ -17,6 +17,7 @@ from src.ignition.core.opcua_connection_config import (
 )
 from src.ignition.opcua.client import OPCUAClientManager
 from src.ignition.opcua.security import OPCUASecurityManager
+from typing import Any, Self
 
 # Load environment variables
 load_dotenv()
@@ -25,7 +26,7 @@ load_dotenv()
 class OPCUAWebUI:
     """Web-based OPC-UA interface using Streamlit."""
 
-    def __init__(self):
+    def __init__(self: Self) -> None:
         """Initialize the OPC-UA Web UI."""
         self.client_manager = None
         self.config_manager = OPCUAConfigManager()
@@ -41,7 +42,7 @@ class OPCUAWebUI:
         if "monitoring_data" not in st.session_state:
             st.session_state.monitoring_data = {}
 
-    def run(self):
+    def run(self: Self) -> None:
         """Run the OPC-UA Web UI."""
         st.set_page_config(
             page_title="IGN Scripts - OPC-UA Interface",
@@ -99,7 +100,7 @@ class OPCUAWebUI:
         elif page == "Security":
             self._render_security_page()
 
-    def _render_sidebar(self):
+    def _render_sidebar(self: Self) -> None:
         """Render the sidebar navigation."""
         with st.sidebar:
             st.title("🔗 OPC-UA Control")
@@ -144,7 +145,7 @@ class OPCUAWebUI:
                 if selected_config != "None" and st.button("Load", use_container_width=True):
                     self._load_configuration(selected_config)
 
-    def _render_connection_page(self):
+    def _render_connection_page(self: Self) -> None:
         """Render the connection management page."""
         st.header("🔗 Connection Management")
 
@@ -227,7 +228,7 @@ class OPCUAWebUI:
         st.subheader("📝 Connection History")
         self._show_connection_history()
 
-    def _render_browse_page(self):
+    def _render_browse_page(self: Self) -> None:
         """Render the OPC-UA node browsing page."""
         st.header("🌐 Node Browser")
 
@@ -269,7 +270,7 @@ class OPCUAWebUI:
             else:
                 st.info("No nodes browsed yet. Click 'Browse' to start.")
 
-    def _render_monitor_page(self):
+    def _render_monitor_page(self: Self) -> None:
         """Render the OPC-UA monitoring page."""
         st.header("📊 Real-time Monitoring")
 
@@ -329,7 +330,7 @@ class OPCUAWebUI:
             time.sleep(1)
             st.rerun()
 
-    def _render_configuration_page(self):
+    def _render_configuration_page(self: Self) -> None:
         """Render the configuration management page."""
         st.header("⚙️ Configuration Management")
 
@@ -393,7 +394,7 @@ class OPCUAWebUI:
             if uploaded_file and st.button("📥 Import"):
                 self._import_configurations(uploaded_file)
 
-    def _render_security_page(self):
+    def _render_security_page(self: Self) -> None:
         """Render the security management page."""
         st.header("🔒 Security Management")
 
@@ -467,7 +468,7 @@ class OPCUAWebUI:
                 st.text(f"{key}: {value}")
 
     # Helper methods
-    def _quick_connect(self):
+    def _quick_connect(self: Self) -> None:
         """Quick connect using environment variables."""
         config = OPCUAConnectionConfig(
             name="Quick Connect",
@@ -479,11 +480,11 @@ class OPCUAWebUI:
         )
         self._connect(config)
 
-    def _quick_disconnect(self):
+    def _quick_disconnect(self: Self) -> None:
         """Quick disconnect."""
         self._disconnect()
 
-    def _connect(self, config: OPCUAConnectionConfig):
+    def _connect(self: Self, config: OPCUAConnectionConfig) -> None:
         """Connect to OPC-UA server."""
         try:
             self.client_manager = OPCUAClientManager(config)
@@ -496,7 +497,7 @@ class OPCUAWebUI:
         except Exception as e:
             st.error(f"❌ Connection failed: {e!s}")
 
-    def _disconnect(self):
+    def _disconnect(self: Self) -> None:
         """Disconnect from OPC-UA server."""
         try:
             if self.client_manager:
@@ -511,7 +512,7 @@ class OPCUAWebUI:
         except Exception as e:
             st.error(f"❌ Disconnect failed: {e!s}")
 
-    def _browse_nodes(self, root_node: str, max_depth: int, variables_only: bool):
+    def _browse_nodes(self: Self, root_node: str, max_depth: int, variables_only: bool) -> None:
         """Browse OPC-UA nodes."""
         # Simulated node browsing for demo
         sample_nodes = [
@@ -540,13 +541,13 @@ class OPCUAWebUI:
         st.session_state.browse_nodes = sample_nodes
         st.success(f"✅ Browsed {len(sample_nodes)} nodes from {root_node}")
 
-    def _filter_nodes(self, nodes: list[dict], filter_text: str) -> list[dict]:
+    def _filter_nodes(self: Self, nodes: list[dict], filter_text: str) -> list[dict]:
         """Filter nodes by name."""
         if not filter_text:
             return nodes
         return [node for node in nodes if filter_text.lower() in node["name"].lower()]
 
-    def _display_node_tree(self, nodes: list[dict]):
+    def _display_node_tree(self: Self, nodes: list[dict]) -> None:
         """Display node tree."""
         for node in nodes:
             with st.container():
@@ -569,7 +570,7 @@ class OPCUAWebUI:
                     if node["type"] == "Variable" and st.button("📊", key=f"monitor_{node['id']}"):
                         self._add_monitor(node["id"], 2)
 
-    def _add_monitor(self, node_id: str, interval: int):
+    def _add_monitor(self: Self, node_id: str, interval: int) -> None:
         """Add node to monitoring."""
         if node_id:
             st.session_state.monitoring_data[node_id] = {
@@ -579,20 +580,20 @@ class OPCUAWebUI:
             }
             st.success(f"✅ Added {node_id} to monitoring")
 
-    def _remove_monitor(self, node_id: str):
+    def _remove_monitor(self: Self, node_id: str) -> None:
         """Remove node from monitoring."""
         if node_id in st.session_state.monitoring_data:
             del st.session_state.monitoring_data[node_id]
             st.success(f"✅ Removed {node_id} from monitoring")
             st.rerun()
 
-    def _save_configuration(self, name: str):
+    def _save_configuration(self: Self, name: str) -> None:
         """Save current configuration."""
         if st.session_state.current_config:
             self.config_manager.save_configuration(name, st.session_state.current_config)
             st.success(f"✅ Configuration '{name}' saved successfully!")
 
-    def _load_configuration(self, name: str):
+    def _load_configuration(self: Self, name: str) -> None:
         """Load configuration."""
         config = self.config_manager.load_configuration(name)
         if config:
@@ -600,13 +601,13 @@ class OPCUAWebUI:
             st.success(f"✅ Configuration '{name}' loaded successfully!")
             st.rerun()
 
-    def _delete_configuration(self, name: str):
+    def _delete_configuration(self: Self, name: str) -> None:
         """Delete configuration."""
         self.config_manager.delete_configuration(name)
         st.success(f"✅ Configuration '{name}' deleted successfully!")
         st.rerun()
 
-    def _show_server_info(self):
+    def _show_server_info(self: Self) -> None:
         """Show server information."""
         info = {
             "Server Name": "Demo OPC-UA Server",
@@ -619,7 +620,7 @@ class OPCUAWebUI:
 
         st.json(info)
 
-    def _show_connection_history(self):
+    def _show_connection_history(self: Self) -> None:
         """Show connection history."""
         # Simulated connection history
         history = [
@@ -656,7 +657,7 @@ class OPCUAWebUI:
                 st.text(entry["duration"])
 
 
-def main():
+def main() -> None:
     """Main entry point for the OPC-UA Web UI."""
     ui = OPCUAWebUI()
     ui.run()

@@ -24,7 +24,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Self, Any
 
 # Add src to path for imports
 sys.path.append(str(Path(__file__).parent.parent.parent))
@@ -63,7 +63,7 @@ class AnalyticsConfig:
     # Progressive complexity settings
     complexity_level: str = "basic"  # basic, intermediate, advanced
 
-    def __post_init__(self):
+    def __post_init__(self: Self):
         """Validate configuration following crawl_mcp.py methodology."""
         if not self.analytics_temp_dir:
             self.analytics_temp_dir = os.getenv(
@@ -94,7 +94,7 @@ class AnalyticsData:
     values: dict[str, int | float]
     metadata: dict[str, Any] = field(default_factory=dict)
 
-    def __post_init__(self):
+    def __post_init__(self: Self):
         """Validate data structure."""
         if not isinstance(self.timestamp, datetime):
             raise ValueError("timestamp must be datetime object")
@@ -114,7 +114,7 @@ class RealTimeAnalyticsModule:
     - Step 6: Resource Management
     """
 
-    def __init__(self, config: AnalyticsConfig | None = None):
+    def __init__(self: Self, config: AnalyticsConfig | None = None):
         """Initialize analytics module with comprehensive validation."""
         self.console = console
         self.logger = logger
@@ -137,7 +137,7 @@ class RealTimeAnalyticsModule:
         # Initialize based on progressive complexity
         self._initialize_components()
 
-    def validate_environment(self) -> dict[str, ValidationResult]:
+    def validate_environment(self: Self) -> dict[str, ValidationResult]:
         """Step 1: Environment Variable Validation First
         Following crawl_mcp.py methodology
         """
@@ -213,7 +213,7 @@ class RealTimeAnalyticsModule:
                 valid=False, error=f"Error validating {description}: {e!s}"
             )
 
-    def _validate_analytics_dependencies(self) -> ValidationResult:
+    def _validate_analytics_dependencies(self: Self) -> ValidationResult:
         """Validate analytics dependencies with detailed feedback."""
         missing_packages = []
 
@@ -239,7 +239,7 @@ class RealTimeAnalyticsModule:
 
         return ValidationResult(valid=True)
 
-    def _validate_ml_dependencies(self) -> ValidationResult:
+    def _validate_ml_dependencies(self: Self) -> ValidationResult:
         """Validate machine learning dependencies."""
         if not self.config.enable_ml_models:
             return ValidationResult(valid=True, warning="ML models disabled")
@@ -267,7 +267,7 @@ class RealTimeAnalyticsModule:
 
         return ValidationResult(valid=True)
 
-    def _validate_visualization_dependencies(self) -> ValidationResult:
+    def _validate_visualization_dependencies(self: Self) -> ValidationResult:
         """Validate visualization dependencies."""
         if not self.config.enable_dashboards:
             return ValidationResult(valid=True, warning="Dashboards disabled")
@@ -291,7 +291,7 @@ class RealTimeAnalyticsModule:
 
         return ValidationResult(valid=True)
 
-    def _display_validation_results(self, results: dict[str, ValidationResult]) -> None:
+    def _display_validation_results(self: Self, results: dict[str, ValidationResult]) -> None:
         """Display validation results with user-friendly formatting."""
         table = Table(title="Analytics Environment Validation")
         table.add_column("Component", style="cyan")
@@ -312,7 +312,7 @@ class RealTimeAnalyticsModule:
 
         self.console.print(table)
 
-    def _initialize_components(self) -> None:
+    def _initialize_components(self: Self) -> None:
         """Step 5: Progressive Complexity
         Initialize components based on complexity level and validation results
         """
@@ -338,7 +338,7 @@ class RealTimeAnalyticsModule:
         elif self.config.complexity_level == "advanced":
             self._initialize_advanced_components()
 
-    def _initialize_basic_components(self) -> None:
+    def _initialize_basic_components(self: Self) -> None:
         """Initialize basic analytics components."""
         self.console.print("📊 Initializing Basic Analytics Components", style="green")
 
@@ -350,7 +350,7 @@ class RealTimeAnalyticsModule:
 
         self.console.print("✅ Basic components initialized", style="green")
 
-    def _initialize_intermediate_components(self) -> None:
+    def _initialize_intermediate_components(self: Self) -> None:
         """Initialize intermediate analytics components."""
         self.console.print(
             "📊 Initializing Intermediate Analytics Components", style="green"
@@ -372,7 +372,7 @@ class RealTimeAnalyticsModule:
 
         self.console.print("✅ Intermediate components initialized", style="green")
 
-    def _initialize_advanced_components(self) -> None:
+    def _initialize_advanced_components(self: Self) -> None:
         """Initialize advanced analytics components."""
         self.console.print(
             "📊 Initializing Advanced Analytics Components", style="green"
@@ -497,7 +497,7 @@ class RealTimeAnalyticsModule:
 
         return {"valid": True, "data": validated_items}
 
-    def generate_analytics_report(self) -> dict[str, Any]:
+    def generate_analytics_report(self: Self) -> dict[str, Any]:
         """Generate comprehensive analytics report."""
         try:
             report = {
@@ -530,7 +530,7 @@ class RealTimeAnalyticsModule:
         except Exception as e:
             return {"success": False, "error": f"Failed to generate report: {e!s}"}
 
-    def cleanup_resources(self) -> None:
+    def cleanup_resources(self: Self) -> None:
         """Step 6: Resource Management
         Clean up resources and temporary files
         """
@@ -563,10 +563,10 @@ class RealTimeAnalyticsModule:
 class BasicDataProcessor:
     """Basic data processing component."""
 
-    def __init__(self, config: AnalyticsConfig):
+    def __init__(self: Self, config: AnalyticsConfig):
         self.config = config
 
-    def process(self, data: list[AnalyticsData]) -> dict[str, Any]:
+    def process(self: Self, data: list[AnalyticsData]) -> dict[str, Any]:
         """Process data with basic statistics."""
         if not data:
             return {"error": "No data to process"}
@@ -591,7 +591,7 @@ class BasicDataProcessor:
 class BasicStatsCalculator:
     """Basic statistics calculator."""
 
-    def calculate_stats(self, values: list[int | float]) -> dict[str, float]:
+    def calculate_stats(self: Self, values: list[int | float]) -> dict[str, float]:
         """Calculate basic statistics for a list of values."""
         if not values:
             return {}
@@ -608,7 +608,7 @@ class BasicStatsCalculator:
 class IntermediateMLEngine:
     """Intermediate machine learning engine."""
 
-    def __init__(self, config: AnalyticsConfig):
+    def __init__(self: Self, config: AnalyticsConfig):
         self.config = config
         self.models = {}
 
@@ -626,10 +626,10 @@ class IntermediateMLEngine:
 class BasicDashboardGenerator:
     """Basic dashboard generator."""
 
-    def __init__(self, config: AnalyticsConfig):
+    def __init__(self: Self, config: AnalyticsConfig):
         self.config = config
 
-    def generate_dashboard(self, data: list[AnalyticsData]) -> dict[str, Any]:
+    def generate_dashboard(self: Self, data: list[AnalyticsData]) -> dict[str, Any]:
         """Generate basic dashboard."""
         return {
             "dashboard_type": "basic",
@@ -641,10 +641,10 @@ class BasicDashboardGenerator:
 class AdvancedPredictionEngine:
     """Advanced prediction engine."""
 
-    def __init__(self, config: AnalyticsConfig):
+    def __init__(self: Self, config: AnalyticsConfig):
         self.config = config
 
-    def predict(self, data: list[AnalyticsData]) -> dict[str, Any]:
+    def predict(self: Self, data: list[AnalyticsData]) -> dict[str, Any]:
         """Generate predictions."""
         return {
             "predictions": [],
@@ -656,10 +656,10 @@ class AdvancedPredictionEngine:
 class AdvancedDashboardGenerator:
     """Advanced dashboard generator with real-time updates."""
 
-    def __init__(self, config: AnalyticsConfig):
+    def __init__(self: Self, config: AnalyticsConfig):
         self.config = config
 
-    def generate_realtime_dashboard(self, data: list[AnalyticsData]) -> dict[str, Any]:
+    def generate_realtime_dashboard(self: Self, data: list[AnalyticsData]) -> dict[str, Any]:
         """Generate advanced real-time dashboard."""
         return {
             "dashboard_type": "advanced_realtime",

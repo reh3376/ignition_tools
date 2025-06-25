@@ -6,7 +6,7 @@ and analytics visualization.
 """
 
 from contextlib import contextmanager
-from typing import Any
+from typing import Self, Any
 
 import streamlit as st
 
@@ -26,7 +26,7 @@ except ImportError:
 class LearningSystemUI:
     """Learning system integration for Streamlit UI."""
 
-    def __init__(self):
+    def __init__(self: Self) -> None:
         """Initialize the learning system UI components."""
         self.client = None
         self.tracker = None
@@ -34,7 +34,7 @@ class LearningSystemUI:
         self.manager = None
         self._initialize_components()
 
-    def _initialize_components(self):
+    def _initialize_components(self: Self) -> None:
         """Initialize learning system components."""
         if not IgnitionGraphClient:
             return
@@ -48,12 +48,12 @@ class LearningSystemUI:
         except Exception as e:
             st.warning(f"Learning system not available: {e}")
 
-    def is_available(self) -> bool:
+    def is_available(self: Self) -> bool:
         """Check if learning system is available."""
         return all([self.client, self.tracker, self.analyzer, self.manager])
 
     @contextmanager
-    def track_session(self, user_id: str = "streamlit_user", session_type: str = "ui_session"):
+    def track_session(self: Self, user_id: str = "streamlit_user", session_type: str = "ui_session") -> None:
         """Context manager for tracking UI sessions."""
         session_id = None
 
@@ -72,7 +72,7 @@ class LearningSystemUI:
         action_type: str,
         details: dict[str, Any] | None = None,
         success: bool = True,
-    ):
+    ) -> None:
         """Track user actions in the UI."""
         if not self.tracker:
             return
@@ -93,7 +93,7 @@ class LearningSystemUI:
             # Silently fail for usage tracking
             pass
 
-    def get_recommendations(self, current_action: str, limit: int = 5) -> list[dict[str, Any]]:
+    def get_recommendations(self: Self, current_action: str, limit: int = 5) -> list[dict[str, Any]]:
         """Get UI recommendations based on usage patterns."""
         if not self.analyzer:
             return []
@@ -119,7 +119,7 @@ class LearningSystemUI:
         except Exception:
             return []
 
-    def display_learning_status(self):
+    def display_learning_status(self: Self) -> None:
         """Display learning system status in the UI."""
         if self.is_available():
             st.success("🧠 Learning System: Connected")
@@ -128,7 +128,7 @@ class LearningSystemUI:
             st.warning("⚠️ Learning System: Not Available")
             return False
 
-    def display_recommendations(self, current_action: str, container=None):
+    def display_recommendations(self: Self, current_action: str, container=None) -> None:
         """Display recommendations for the current action."""
         recommendations = self.get_recommendations(current_action)
 
@@ -141,7 +141,7 @@ class LearningSystemUI:
         else:
             self._render_recommendations(recommendations, current_action)
 
-    def _render_recommendations(self, recommendations: list[dict[str, Any]], current_action: str):
+    def _render_recommendations(self: Self, recommendations: list[dict[str, Any]], current_action: str) -> None:
         """Render recommendations in the UI."""
         st.markdown("### 🎯 Smart Recommendations")
         st.markdown(f"*Based on your {current_action} usage patterns*")
@@ -167,7 +167,7 @@ class LearningSystemUI:
                     st.session_state.page = "validation"
                     st.rerun()
 
-    def display_usage_insights(self):
+    def display_usage_insights(self: Self) -> None:
         """Display usage insights and analytics."""
         if not self.manager:
             st.info("Learning system not available for insights")
@@ -204,7 +204,7 @@ class LearningSystemUI:
         except Exception as e:
             st.error(f"Error loading insights: {e}")
 
-    def _display_pattern_chart(self, pattern_counts: dict[str, int]):
+    def _display_pattern_chart(self: Self, pattern_counts: dict[str, int]) -> None:
         """Display pattern distribution chart."""
         import pandas as pd
         import plotly.express as px
@@ -227,7 +227,7 @@ class LearningSystemUI:
 
             st.plotly_chart(fig, use_container_width=True)
 
-    def _display_top_patterns(self):
+    def _display_top_patterns(self: Self) -> None:
         """Display top patterns summary."""
         try:
             top_patterns = self.manager.get_top_patterns_summary(limit=5)
@@ -257,7 +257,7 @@ class LearningSystemUI:
         except Exception as e:
             st.warning(f"Could not load top patterns: {e}")
 
-    def display_learning_dashboard(self):
+    def display_learning_dashboard(self: Self) -> None:
         """Display comprehensive learning system dashboard."""
         if not self.is_available():
             st.warning("Learning system not available")
@@ -315,7 +315,7 @@ class LearningSystemUI:
         with tab4:
             self._display_parameter_patterns()
 
-    def _display_cooccurrence_patterns(self):
+    def _display_cooccurrence_patterns(self: Self) -> None:
         """Display function co-occurrence patterns."""
         st.markdown("### 🔗 Function Co-occurrence Patterns")
 
@@ -344,7 +344,7 @@ class LearningSystemUI:
         except Exception as e:
             st.error(f"Error loading co-occurrence patterns: {e}")
 
-    def _display_template_patterns(self):
+    def _display_template_patterns(self: Self) -> None:
         """Display template usage patterns."""
         st.markdown("### 📋 Template Usage Patterns")
 
@@ -400,7 +400,7 @@ class LearningSystemUI:
         except Exception as e:
             st.error(f"Error loading template patterns: {e}")
 
-    def _display_parameter_patterns(self):
+    def _display_parameter_patterns(self: Self) -> None:
         """Display parameter combination patterns."""
         st.markdown("### ⚙️ Parameter Combination Patterns")
 
@@ -446,13 +446,13 @@ def get_learning_system() -> LearningSystemUI:
     return LearningSystemUI()
 
 
-def track_page_visit(page_name: str):
+def track_page_visit(page_name: str) -> None:
     """Track page visits in the UI."""
     learning_system = get_learning_system()
     learning_system.track_action("page_visit", {"page": page_name})
 
 
-def track_script_generation(template: str, config: dict[str, Any], success: bool):
+def track_script_generation(template: str, config: dict[str, Any], success: bool) -> None:
     """Track script generation actions."""
     learning_system = get_learning_system()
     learning_system.track_action(
@@ -466,43 +466,43 @@ def track_script_generation(template: str, config: dict[str, Any], success: bool
     )
 
 
-def track_template_usage(template: str, action: str):
+def track_template_usage(template: str, action: str) -> None:
     """Track template-related actions."""
     learning_system = get_learning_system()
     learning_system.track_action("template_usage", {"template": template, "action": action})
 
 
-def show_smart_recommendations(current_action: str, container=None):
+def show_smart_recommendations(current_action: str, container=None) -> None:
     """Show smart recommendations based on current action."""
     learning_system = get_learning_system()
     if learning_system.is_available():
         learning_system.display_recommendations(current_action, container)
 
 
-def show_learning_status():
+def show_learning_status() -> None:
     """Show learning system status."""
     learning_system = get_learning_system()
     return learning_system.display_learning_status()
 
 
-def show_usage_insights():
+def show_usage_insights() -> None:
     """Show usage insights dashboard."""
     learning_system = get_learning_system()
     learning_system.display_usage_insights()
 
 
-def show_learning_dashboard():
+def show_learning_dashboard() -> None:
     """Show comprehensive learning dashboard."""
     learning_system = get_learning_system()
     learning_system.display_learning_dashboard()
 
 
 # Decorators for automatic tracking
-def track_ui_action(action_name: str):
+def track_ui_action(action_name: str) -> None:
     """Decorator to automatically track UI actions."""
 
-    def decorator(func):
-        def wrapper(*args, **kwargs):
+    def decorator(func: Any) -> None:
+        def wrapper(*args, **kwargs) -> None:
             learning_system = get_learning_system()
 
             try:

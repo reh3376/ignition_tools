@@ -24,7 +24,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any
+from typing import Self, Any
 from urllib.parse import urlparse
 
 # Add src to path for imports
@@ -71,7 +71,7 @@ class IntegrationConfig:
     # Progressive complexity settings
     integration_level: str = "basic"  # basic, standard, advanced, enterprise
 
-    def __post_init__(self):
+    def __post_init__(self: Self):
         """Validate configuration following crawl_mcp.py methodology."""
         if not self.integration_temp_dir:
             self.integration_temp_dir = os.getenv(
@@ -112,7 +112,7 @@ class APIEndpoint:
     auth_credentials: dict[str, str] = field(default_factory=dict)
     timeout: int = 30
 
-    def __post_init__(self):
+    def __post_init__(self: Self):
         """Validate API endpoint configuration."""
         if not self.name:
             raise ValueError("API endpoint name is required")
@@ -147,7 +147,7 @@ class IntegrationEvent:
     status: str = "pending"  # pending, success, failed, retry
     error_message: str = ""
 
-    def __post_init__(self):
+    def __post_init__(self: Self):
         """Validate integration event structure."""
         if not isinstance(self.timestamp, datetime):
             raise ValueError("timestamp must be datetime object")
@@ -169,7 +169,7 @@ class IntegrationHubModule:
     - Step 6: Resource Management
     """
 
-    def __init__(self, config: IntegrationConfig | None = None):
+    def __init__(self: Self, config: IntegrationConfig | None = None):
         """Initialize integration hub with comprehensive validation."""
         self.console = console
         self.logger = logger
@@ -197,7 +197,7 @@ class IntegrationHubModule:
         # Initialize based on progressive complexity
         self._initialize_integration_components()
 
-    def validate_environment(self) -> dict[str, ValidationResult]:
+    def validate_environment(self: Self) -> dict[str, ValidationResult]:
         """Step 1: Environment Variable Validation First
         Following crawl_mcp.py methodology
         """
@@ -289,7 +289,7 @@ class IntegrationHubModule:
                 integration_status="error",
             )
 
-    def _validate_http_dependencies(self) -> ValidationResult:
+    def _validate_http_dependencies(self: Self) -> ValidationResult:
         """Validate HTTP client dependencies."""
         missing_packages = []
 
@@ -315,7 +315,7 @@ class IntegrationHubModule:
 
         return ValidationResult(valid=True, integration_status="ready")
 
-    def _validate_async_dependencies(self) -> ValidationResult:
+    def _validate_async_dependencies(self: Self) -> ValidationResult:
         """Validate async dependencies."""
         try:
             import asyncio
@@ -331,7 +331,7 @@ class IntegrationHubModule:
                 integration_status="dependencies_missing",
             )
 
-    def _validate_cloud_dependencies(self) -> ValidationResult:
+    def _validate_cloud_dependencies(self: Self) -> ValidationResult:
         """Validate cloud service dependencies."""
         if not self.config.enable_cloud_connectors:
             return ValidationResult(
@@ -367,7 +367,7 @@ class IntegrationHubModule:
 
         return ValidationResult(valid=True, integration_status="ready")
 
-    def _validate_message_queue_dependencies(self) -> ValidationResult:
+    def _validate_message_queue_dependencies(self: Self) -> ValidationResult:
         """Validate message queue dependencies."""
         if not self.config.enable_message_queues:
             return ValidationResult(
@@ -386,7 +386,7 @@ class IntegrationHubModule:
             integration_status="partial",
         )
 
-    def _validate_network_connectivity(self) -> ValidationResult:
+    def _validate_network_connectivity(self: Self) -> ValidationResult:
         """Validate basic network connectivity."""
         try:
             import socket
@@ -402,7 +402,7 @@ class IntegrationHubModule:
                 integration_status="offline",
             )
 
-    def _display_validation_results(self, results: dict[str, ValidationResult]) -> None:
+    def _display_validation_results(self: Self, results: dict[str, ValidationResult]) -> None:
         """Display validation results with integration-focused formatting."""
         table = Table(title="Integration Hub Environment Validation")
         table.add_column("Component", style="cyan")
@@ -440,7 +440,7 @@ class IntegrationHubModule:
 
         self.console.print(table)
 
-    def _initialize_integration_components(self) -> None:
+    def _initialize_integration_components(self: Self) -> None:
         """Step 5: Progressive Complexity
         Initialize integration components based on level and validation results
         """
@@ -469,7 +469,7 @@ class IntegrationHubModule:
         elif self.config.integration_level == "enterprise":
             self._initialize_enterprise_integration()
 
-    def _initialize_basic_integration(self) -> None:
+    def _initialize_basic_integration(self: Self) -> None:
         """Initialize basic integration components."""
         self.console.print(
             "🔌 Initializing Basic Integration Components", style="green"
@@ -487,7 +487,7 @@ class IntegrationHubModule:
 
         self.console.print("✅ Basic integration components initialized", style="green")
 
-    def _initialize_standard_integration(self) -> None:
+    def _initialize_standard_integration(self: Self) -> None:
         """Initialize standard integration components."""
         self.console.print(
             "🔌 Initializing Standard Integration Components", style="green"
@@ -509,7 +509,7 @@ class IntegrationHubModule:
             "✅ Standard integration components initialized", style="green"
         )
 
-    def _initialize_advanced_integration(self) -> None:
+    def _initialize_advanced_integration(self: Self) -> None:
         """Initialize advanced integration components."""
         self.console.print(
             "🔌 Initializing Advanced Integration Components", style="green"
@@ -529,7 +529,7 @@ class IntegrationHubModule:
             "✅ Advanced integration components initialized", style="green"
         )
 
-    def _initialize_enterprise_integration(self) -> None:
+    def _initialize_enterprise_integration(self: Self) -> None:
         """Initialize enterprise integration components."""
         self.console.print(
             "🔌 Initializing Enterprise Integration Components", style="green"
@@ -546,7 +546,7 @@ class IntegrationHubModule:
             "✅ Enterprise integration components initialized", style="green"
         )
 
-    def _initialize_cloud_connectors(self) -> dict[str, Any]:
+    def _initialize_cloud_connectors(self: Self) -> dict[str, Any]:
         """Initialize cloud service connectors."""
         connectors = {}
 
@@ -657,7 +657,7 @@ class IntegrationHubModule:
 
         return {"valid": True, "endpoint": api_endpoint}
 
-    async def call_api_endpoint(self, endpoint_name: str, **kwargs) -> dict[str, Any]:
+    async def call_api_endpoint(self: Self, endpoint_name: str, **kwargs) -> dict[str, Any]:
         """Call registered API endpoint with rate limiting and error handling."""
         try:
             if endpoint_name not in self.api_endpoints:
@@ -714,7 +714,7 @@ class IntegrationHubModule:
                 ],
             }
 
-    def _check_rate_limit(self) -> bool:
+    def _check_rate_limit(self: Self) -> bool:
         """Check if API call is within rate limits."""
         now = datetime.now()
 
@@ -731,7 +731,7 @@ class IntegrationHubModule:
         self.api_call_timestamps.append(now)
         return True
 
-    def process_webhook(self, webhook_data: dict[str, Any]) -> dict[str, Any]:
+    def process_webhook(self: Self, webhook_data: dict[str, Any]) -> dict[str, Any]:
         """Process incoming webhook data."""
         try:
             if not self.webhook_handler:
@@ -763,7 +763,7 @@ class IntegrationHubModule:
                 "suggestions": ["Check webhook data format"],
             }
 
-    def generate_integration_report(self) -> dict[str, Any]:
+    def generate_integration_report(self: Self) -> dict[str, Any]:
         """Generate comprehensive integration report."""
         try:
             report = {
@@ -805,7 +805,7 @@ class IntegrationHubModule:
                 "error": f"Failed to generate integration report: {e!s}",
             }
 
-    def cleanup_resources(self) -> None:
+    def cleanup_resources(self: Self) -> None:
         """Step 6: Resource Management
         Clean up integration resources and connections
         """
@@ -854,10 +854,10 @@ class IntegrationHubModule:
 class BasicRESTClient:
     """Basic REST client using requests library."""
 
-    def __init__(self, config: IntegrationConfig):
+    def __init__(self: Self, config: IntegrationConfig):
         self.config = config
 
-    async def call_endpoint(self, endpoint: APIEndpoint, **kwargs) -> dict[str, Any]:
+    async def call_endpoint(self: Self, endpoint: APIEndpoint, **kwargs) -> dict[str, Any]:
         """Make basic REST API call."""
         try:
             import requests
@@ -911,10 +911,10 @@ class BasicRESTClient:
 class AsyncRESTClient:
     """Async REST client using aiohttp."""
 
-    def __init__(self, config: IntegrationConfig):
+    def __init__(self: Self, config: IntegrationConfig):
         self.config = config
 
-    async def call_endpoint(self, endpoint: APIEndpoint, **kwargs) -> dict[str, Any]:
+    async def call_endpoint(self: Self, endpoint: APIEndpoint, **kwargs) -> dict[str, Any]:
         """Make async REST API call."""
         try:
             import aiohttp
@@ -960,10 +960,10 @@ class AsyncRESTClient:
 class EnterpriseRESTClient:
     """Enterprise REST client with advanced features."""
 
-    def __init__(self, config: IntegrationConfig):
+    def __init__(self: Self, config: IntegrationConfig):
         self.config = config
 
-    async def call_endpoint(self, endpoint: APIEndpoint, **kwargs) -> dict[str, Any]:
+    async def call_endpoint(self: Self, endpoint: APIEndpoint, **kwargs) -> dict[str, Any]:
         """Make enterprise-grade REST API call with retry and circuit breaker."""
         # Would implement advanced features like:
         # - Circuit breaker pattern
@@ -983,10 +983,10 @@ class EnterpriseRESTClient:
 class BasicWebhookHandler:
     """Basic webhook handler."""
 
-    def __init__(self, config: IntegrationConfig):
+    def __init__(self: Self, config: IntegrationConfig):
         self.config = config
 
-    def process_webhook(self, webhook_data: dict[str, Any]) -> dict[str, Any]:
+    def process_webhook(self: Self, webhook_data: dict[str, Any]) -> dict[str, Any]:
         """Process webhook data."""
         return {
             "success": True,
@@ -998,10 +998,10 @@ class BasicWebhookHandler:
 class AdvancedWebhookHandler:
     """Advanced webhook handler with validation and retry."""
 
-    def __init__(self, config: IntegrationConfig):
+    def __init__(self: Self, config: IntegrationConfig):
         self.config = config
 
-    def process_webhook(self, webhook_data: dict[str, Any]) -> dict[str, Any]:
+    def process_webhook(self: Self, webhook_data: dict[str, Any]) -> dict[str, Any]:
         """Process webhook with advanced features."""
         return {
             "success": True,
@@ -1014,7 +1014,7 @@ class AdvancedWebhookHandler:
 class AWSConnector:
     """AWS cloud service connector."""
 
-    def __init__(self, config: IntegrationConfig):
+    def __init__(self: Self, config: IntegrationConfig):
         self.config = config
         self.services = ["s3", "lambda", "sqs", "sns"]
 
@@ -1022,7 +1022,7 @@ class AWSConnector:
 class AzureConnector:
     """Azure cloud service connector."""
 
-    def __init__(self, config: IntegrationConfig):
+    def __init__(self: Self, config: IntegrationConfig):
         self.config = config
         self.services = ["blob_storage", "functions", "service_bus"]
 
@@ -1030,7 +1030,7 @@ class AzureConnector:
 class GCPConnector:
     """Google Cloud Platform connector."""
 
-    def __init__(self, config: IntegrationConfig):
+    def __init__(self: Self, config: IntegrationConfig):
         self.config = config
         self.services = ["cloud_storage", "cloud_functions", "pub_sub"]
 
@@ -1038,7 +1038,7 @@ class GCPConnector:
 class AdvancedMessageQueueManager:
     """Advanced message queue manager."""
 
-    def __init__(self, config: IntegrationConfig):
+    def __init__(self: Self, config: IntegrationConfig):
         self.config = config
         self.supported_queues = ["rabbitmq", "redis", "kafka"]
 
@@ -1046,7 +1046,7 @@ class AdvancedMessageQueueManager:
 class EnterpriseMessageQueueManager:
     """Enterprise message queue manager with high availability."""
 
-    def __init__(self, config: IntegrationConfig):
+    def __init__(self: Self, config: IntegrationConfig):
         self.config = config
         self.supported_queues = [
             "rabbitmq",

@@ -1,7 +1,7 @@
 """Basic example module demonstrating the Ignition module framework."""
 
 from pathlib import Path
-from typing import Any
+from typing import Self, Any
 
 from ignition.modules.core import AbstractIgnitionModule
 from ignition.modules.core.abstract_module import (
@@ -19,7 +19,7 @@ class BasicExampleModule(AbstractIgnitionModule):
     demonstrates basic configuration, logging, and lifecycle management.
     """
 
-    def __init__(self, context: ModuleContext):
+    def __init__(self: Self, context: ModuleContext):
         """Initialize the basic example module.
 
         Args:
@@ -57,7 +57,7 @@ class BasicExampleModule(AbstractIgnitionModule):
 
     # Required abstract method implementations
 
-    def get_module_info(self) -> dict[str, Any]:
+    def get_module_info(self: Self) -> dict[str, Any]:
         """Get detailed module information."""
         return {
             "name": self.metadata.name,
@@ -73,7 +73,7 @@ class BasicExampleModule(AbstractIgnitionModule):
             "health_status": self.diagnostics_manager.health_status,
         }
 
-    def validate_configuration(self) -> bool:
+    def validate_configuration(self: Self) -> bool:
         """Validate module configuration."""
         try:
             config = self.config_manager.config
@@ -100,7 +100,7 @@ class BasicExampleModule(AbstractIgnitionModule):
             self.logger.error(f"Configuration validation failed: {e}")
             return False
 
-    def initialize_module(self) -> bool:
+    def initialize_module(self: Self) -> bool:
         """Initialize the module."""
         try:
             self.logger.info("Initializing Basic Example Module")
@@ -123,7 +123,7 @@ class BasicExampleModule(AbstractIgnitionModule):
             self.diagnostics_manager.log_error(e, "Module initialization")
             return False
 
-    def startup_module(self) -> bool:
+    def startup_module(self: Self) -> bool:
         """Start the module."""
         try:
             if not self._is_initialized:
@@ -144,7 +144,7 @@ class BasicExampleModule(AbstractIgnitionModule):
             self.diagnostics_manager.log_error(e, "Module startup")
             return False
 
-    def shutdown_module(self) -> bool:
+    def shutdown_module(self: Self) -> bool:
         """Shutdown the module."""
         try:
             self.logger.info("Shutting down Basic Example Module")
@@ -163,7 +163,7 @@ class BasicExampleModule(AbstractIgnitionModule):
             self.diagnostics_manager.log_error(e, "Module shutdown")
             return False
 
-    def configure_module(self, config: dict[str, Any]) -> bool:
+    def configure_module(self: Self, config: dict[str, Any]) -> bool:
         """Configure the module with new settings."""
         try:
             self.logger.info("Configuring Basic Example Module")
@@ -196,43 +196,43 @@ class BasicExampleModule(AbstractIgnitionModule):
 
     # Optional hook implementations
 
-    def create_gateway_hook(self):
+    def create_gateway_hook(self: Self):
         """Create Gateway-specific functionality."""
         self.logger.info("Creating Gateway hook for Basic Example Module")
 
         # In a real implementation, this would return a Gateway hook class
         # that implements Gateway-specific functionality
         class BasicGatewayHook:
-            def __init__(self, module):
+            def __init__(self: Self, module: Any):
                 self.module = module
                 self.logger = module.logger
 
-            def startup(self):
+            def startup(self: Self):
                 self.logger.info("Gateway hook started")
                 # Initialize Gateway-specific resources
 
-            def shutdown(self):
+            def shutdown(self: Self):
                 self.logger.info("Gateway hook shutdown")
                 # Clean up Gateway-specific resources
 
         return BasicGatewayHook(self)
 
-    def create_designer_hook(self):
+    def create_designer_hook(self: Self):
         """Create Designer-specific functionality."""
         self.logger.info("Creating Designer hook for Basic Example Module")
 
         # In a real implementation, this would return a Designer hook class
         # that implements Designer-specific functionality
         class BasicDesignerHook:
-            def __init__(self, module):
+            def __init__(self: Self, module: Any):
                 self.module = module
                 self.logger = module.logger
 
-            def startup(self):
+            def startup(self: Self):
                 self.logger.info("Designer hook started")
                 # Initialize Designer-specific resources
 
-            def shutdown(self):
+            def shutdown(self: Self):
                 self.logger.info("Designer hook shutdown")
                 # Clean up Designer-specific resources
 
@@ -240,7 +240,7 @@ class BasicExampleModule(AbstractIgnitionModule):
 
     # Module-specific methods
 
-    def _setup_data_processing(self):
+    def _setup_data_processing(self: Self):
         """Set up data processing components."""
         self.logger.debug("Setting up data processing")
 
@@ -252,7 +252,7 @@ class BasicExampleModule(AbstractIgnitionModule):
             f"Data processing setup complete - batch_size: {batch_size}, timeout: {timeout}"
         )
 
-    def _start_processing(self):
+    def _start_processing(self: Self):
         """Start data processing."""
         if self._custom_config.get("processing_enabled", False):
             self.logger.info("Starting data processing")
@@ -260,19 +260,19 @@ class BasicExampleModule(AbstractIgnitionModule):
         else:
             self.logger.info("Data processing disabled in configuration")
 
-    def _stop_processing(self):
+    def _stop_processing(self: Self):
         """Stop data processing."""
         self.logger.info("Stopping data processing")
         # In a real implementation, this would stop background processing
 
-    def _cleanup_resources(self):
+    def _cleanup_resources(self: Self):
         """Clean up module resources."""
         self.logger.debug("Cleaning up module resources")
         # Clean up any resources allocated during initialization
 
     # Public API methods
 
-    def process_data(self, data: Any) -> bool:
+    def process_data(self: Self, data: Any) -> bool:
         """Process data using module functionality.
 
         Args:
@@ -297,7 +297,7 @@ class BasicExampleModule(AbstractIgnitionModule):
             self.diagnostics_manager.log_error(e, "Data processing")
             return False
 
-    def get_processing_stats(self) -> dict[str, Any]:
+    def get_processing_stats(self: Self) -> dict[str, Any]:
         """Get processing statistics.
 
         Returns:
@@ -310,7 +310,7 @@ class BasicExampleModule(AbstractIgnitionModule):
             "timeout_seconds": self._custom_config.get("timeout_seconds", 30),
         }
 
-    def reset_processing_stats(self):
+    def reset_processing_stats(self: Self):
         """Reset processing statistics."""
         self._data_processed = 0
         self.logger.info("Processing statistics reset")

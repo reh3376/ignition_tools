@@ -4,12 +4,13 @@ from pathlib import Path
 
 import click
 from rich.console import Console
+from typing import Any, Self
 
 console = Console()
 
 
 @click.group()
-def version():
+def version() -> None:
     """🔄 Version Control Intelligence commands."""
     pass
 
@@ -17,7 +18,7 @@ def version():
 @version.command()
 @click.option("--repository", "-r", help="Repository path (default: current directory)")
 @click.option("--detailed", "-d", is_flag=True, help="Show detailed status information")
-def status(repository: str | None, detailed: bool):
+def status(repository: str | None, detailed: bool) -> None:
     """📊 Show version control intelligence status."""
     try:
         from src.ignition.version_control.manager import (
@@ -91,7 +92,7 @@ def status(repository: str | None, detailed: bool):
 @click.option("--files", "-f", help="Comma-separated list of files to analyze")
 @click.option("--detailed", "-d", is_flag=True, help="Show detailed impact analysis")
 @click.option("--repository", "-r", help="Repository path (default: current directory)")
-def analyze_commit(commit_hash: str | None, files: str | None, detailed: bool, repository: str | None):
+def analyze_commit(commit_hash: str | None, files: str | None, detailed: bool, repository: str | None) -> None:
     """🔍 Analyze the impact of a commit or changes."""
     try:
         from src.ignition.version_control.manager import (
@@ -150,7 +151,7 @@ def analyze_commit(commit_hash: str | None, files: str | None, detailed: bool, r
 @click.option("--target-branch", "-t", default="main", help="Target branch to merge to")
 @click.option("--detailed", "-d", is_flag=True, help="Show detailed conflict predictions")
 @click.option("--repository", "-r", help="Repository path (default: current directory)")
-def predict_conflicts(source_branch: str, target_branch: str, detailed: bool, repository: str | None):
+def predict_conflicts(source_branch: str, target_branch: str, detailed: bool, repository: str | None) -> None:
     """🔮 Predict merge conflicts between branches."""
     try:
         from src.ignition.version_control.manager import (
@@ -219,7 +220,7 @@ def plan_release(
     include: str | None,
     exclude: str | None,
     repository: str | None,
-):
+) -> None:
     """📋 Plan a release with intelligent recommendations."""
     try:
         from src.ignition.version_control.manager import (
@@ -292,7 +293,7 @@ def plan_release(
 )
 @click.option("--output", "-o", help="Output file path")
 @click.option("--repository", "-r", help="Repository path (default: current directory)")
-def report(type: str, format: str, output: str | None, repository: str | None):
+def report(type: str, format: str, output: str | None, repository: str | None) -> None:
     """📄 Generate version control intelligence report."""
     try:
         from src.ignition.version_control.manager import (
@@ -358,7 +359,7 @@ def report(type: str, format: str, output: str | None, repository: str | None):
 
 # Analysis command group
 @click.group()
-def analyze():
+def analyze() -> None:
     """🔍 Analysis commands for version control intelligence."""
     pass
 
@@ -373,7 +374,7 @@ def analyze():
     help="Scope of impact analysis",
 )
 @click.option("--repository", "-r", help="Repository path (default: current directory)")
-def impact(file: str, scope: str, repository: str | None):
+def impact(file: str, scope: str, repository: str | None) -> None:
     """📊 Analyze change impact for a specific file."""
     console.print(f"[bold blue]📊 Analyzing impact for: {file}[/bold blue]")
     console.print(f"Scope: {scope}")
@@ -384,7 +385,7 @@ def impact(file: str, scope: str, repository: str | None):
 @click.option("--resource", "-r", required=True, help="Resource identifier to analyze")
 @click.option("--depth", "-d", default=3, help="Dependency analysis depth")
 @click.option("--repository", "-p", help="Repository path (default: current directory)")
-def dependencies(resource: str, depth: int, repository: str | None):
+def dependencies(resource: str, depth: int, repository: str | None) -> None:
     """🔗 Analyze dependencies for a resource."""
     console.print(f"[bold blue]🔗 Analyzing dependencies for: {resource}[/bold blue]")
     console.print(f"Depth: {depth}")
@@ -401,7 +402,7 @@ def dependencies(resource: str, depth: int, repository: str | None):
     help="Risk threshold",
 )
 @click.option("--repository", "-r", help="Repository path (default: current directory)")
-def risks(branch: str, threshold: str, repository: str | None):
+def risks(branch: str, threshold: str, repository: str | None) -> None:
     """⚠️ Analyze risks for a branch."""
     console.print(f"[bold blue]⚠️ Analyzing risks for branch: {branch}[/bold blue]")
     console.print(f"Threshold: {threshold}")
@@ -410,7 +411,7 @@ def risks(branch: str, threshold: str, repository: str | None):
 
 # Prediction command group
 @click.group()
-def predict():
+def predict() -> None:
     """🔮 Prediction commands for version control intelligence."""
     pass
 
@@ -419,7 +420,7 @@ def predict():
 @click.option("--merge-from", "-f", required=True, help="Source branch for merge")
 @click.option("--merge-to", "-t", default="main", help="Target branch for merge")
 @click.option("--repository", "-r", help="Repository path (default: current directory)")
-def conflicts(merge_from: str, merge_to: str, repository: str | None):
+def conflicts(merge_from: str, merge_to: str, repository: str | None) -> None:
     """🔮 Predict merge conflicts."""
     console.print(f"[bold blue]🔮 Predicting conflicts: {merge_from} → {merge_to}[/bold blue]")
     console.print("[yellow]💡[/yellow] Conflict prediction implementation in progress")
@@ -429,7 +430,7 @@ def conflicts(merge_from: str, merge_to: str, repository: str | None):
 @click.option("--release", "-r", required=True, help="Release version to analyze")
 @click.option("--environment", "-e", default="production", help="Target environment")
 @click.option("--repository", "-p", help="Repository path (default: current directory)")
-def deployment(release: str, environment: str, repository: str | None):
+def deployment(release: str, environment: str, repository: str | None) -> None:
     """🚀 Predict deployment issues."""
     console.print(f"[bold blue]🚀 Predicting deployment issues for: {release}[/bold blue]")
     console.print(f"Environment: {environment}")
@@ -439,7 +440,7 @@ def deployment(release: str, environment: str, repository: str | None):
 @predict.command()
 @click.option("--changes", "-c", required=True, help="Comma-separated list of changes")
 @click.option("--repository", "-r", help="Repository path (default: current directory)")
-def rollback(changes: str, repository: str | None):
+def rollback(changes: str, repository: str | None) -> None:
     """🔄 Predict rollback complexity."""
     change_list = [c.strip() for c in changes.split(",")]
     console.print("[bold blue]🔄 Predicting rollback complexity[/bold blue]")
@@ -452,7 +453,7 @@ def rollback(changes: str, repository: str | None):
 
 
 # Add the command groups to the main CLI
-def register_version_control_commands(cli_group):
+def register_version_control_commands(cli_group: Any) -> None:
     """Register version control commands with the main CLI."""
     cli_group.add_command(version)
     cli_group.add_command(analyze)

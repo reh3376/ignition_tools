@@ -7,7 +7,7 @@ Following crawl_mcp.py methodology:
 
 import logging
 import sys
-from typing import Any
+from typing import Self, Any
 
 import click
 from rich.console import Console
@@ -20,10 +20,10 @@ console = Console()
 logger = logging.getLogger(__name__)
 
 
-def handle_sme_agent_error(func):
+def handle_sme_agent_error(func: Any) -> None:
     """Decorator for handling SME Agent errors with user-friendly messages."""
 
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> None:
         try:
             return func(*args, **kwargs)
         except SMEAgentValidationError as e:
@@ -38,14 +38,14 @@ def handle_sme_agent_error(func):
 
 
 @click.group(name="evaluation")
-def evaluation_commands():
+def evaluation_commands() -> None:
     """SME Agent Evaluation Commands - Testing and Batch Management"""
     pass
 
 
 @evaluation_commands.command("test-all")
 @handle_sme_agent_error
-def test_all_components():
+def test_all_components() -> None:
     """Step 4: Modular Component Testing
 
     Run comprehensive tests on all SME Agent components.
@@ -67,7 +67,7 @@ def test_all_components():
 
 @evaluation_commands.command("list-batches")
 @handle_sme_agent_error
-def list_evaluation_batches():
+def list_evaluation_batches() -> None:
     """List all evaluation batches."""
     console.print("[bold blue]📋 SME Agent Evaluation Batches[/bold blue]")
 
@@ -91,7 +91,7 @@ def list_evaluation_batches():
     help="Export format",
 )
 @handle_sme_agent_error
-def export_evaluation_batch(batch_id: str, export_format: str):
+def export_evaluation_batch(batch_id: str, export_format: str) -> None:
     """Export evaluation batch for human review."""
     console.print(f"[bold blue]📤 Exporting Evaluation Batch: {batch_id}[/bold blue]")
 
@@ -112,7 +112,7 @@ def export_evaluation_batch(batch_id: str, export_format: str):
     "--sme-id", required=True, help="ID of the human SME who performed the evaluation"
 )
 @handle_sme_agent_error
-def import_human_evaluation(batch_id: str, evaluation_file: str, sme_id: str):
+def import_human_evaluation(batch_id: str, evaluation_file: str, sme_id: str) -> None:
     """Import human evaluation results."""
     console.print(f"[bold blue]📥 Importing Human Evaluation: {batch_id}[/bold blue]")
 
@@ -130,7 +130,7 @@ def import_human_evaluation(batch_id: str, evaluation_file: str, sme_id: str):
 
 @evaluation_commands.command("rl-summary")
 @handle_sme_agent_error
-def reinforcement_learning_summary():
+def reinforcement_learning_summary() -> None:
     """Display reinforcement learning insights and progress."""
     console.print("[bold blue]🧠 Reinforcement Learning Summary[/bold blue]")
 
@@ -147,7 +147,7 @@ def reinforcement_learning_summary():
 @evaluation_commands.command("create-test-batch")
 @click.option("--size", default=5, help="Number of test decisions to create")
 @handle_sme_agent_error
-def create_test_evaluation_batch(size: int):
+def create_test_evaluation_batch(size: int) -> None:
     """Create a test evaluation batch for human review."""
     console.print(
         f"[bold blue]🎯 Creating Test Evaluation Batch (Size: {size})[/bold blue]"
@@ -164,7 +164,7 @@ def create_test_evaluation_batch(size: int):
 
 
 # Display helper functions
-def _display_test_results(test_results: dict[str, Any]):
+def _display_test_results(test_results: dict[str, Any]) -> None:
     """Display comprehensive test results."""
     table = Table(title="SME Agent Test Results")
     table.add_column("Component", style="cyan")
@@ -184,7 +184,7 @@ def _display_test_results(test_results: dict[str, Any]):
     console.print(f"\n[bold]Overall Test Score: {overall_score:.1%}[/bold]")
 
 
-def _display_evaluation_batches(batches: list[dict[str, Any]]):
+def _display_evaluation_batches(batches: list[dict[str, Any]]) -> None:
     """Display evaluation batches."""
     table = Table(title="Evaluation Batches")
     table.add_column("Batch ID", style="cyan")
@@ -203,7 +203,7 @@ def _display_evaluation_batches(batches: list[dict[str, Any]]):
     console.print(table)
 
 
-def _display_export_result(export_result: dict[str, Any]):
+def _display_export_result(export_result: dict[str, Any]) -> None:
     """Display export result."""
     if export_result.get("success", False):
         console.print("[green]✅ Export successful![/green]")
@@ -214,7 +214,7 @@ def _display_export_result(export_result: dict[str, Any]):
         console.print(f"Error: {export_result.get('error', 'Unknown error')}")
 
 
-def _display_import_result(import_result: dict[str, Any]):
+def _display_import_result(import_result: dict[str, Any]) -> None:
     """Display import result."""
     if import_result.get("success", False):
         console.print("[green]✅ Import successful![/green]")
@@ -225,7 +225,7 @@ def _display_import_result(import_result: dict[str, Any]):
         console.print(f"Error: {import_result.get('error', 'Unknown error')}")
 
 
-def _display_reinforcement_learning_insights(insights: dict[str, Any]):
+def _display_reinforcement_learning_insights(insights: dict[str, Any]) -> None:
     """Display reinforcement learning insights."""
     console.print(
         Panel(
@@ -242,7 +242,7 @@ def _display_reinforcement_learning_insights(insights: dict[str, Any]):
     )
 
 
-def _display_batch_creation_result(batch_result: dict[str, Any]):
+def _display_batch_creation_result(batch_result: dict[str, Any]) -> None:
     """Display batch creation result."""
     if batch_result.get("success", False):
         console.print("[green]✅ Test batch created successfully![/green]")

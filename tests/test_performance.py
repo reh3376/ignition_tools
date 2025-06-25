@@ -6,13 +6,14 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import pytest
 
 from src.ignition.generators.script_generator import IgnitionScriptGenerator
+from typing import Any, Self
 
 
 class TestPerformance:
     """Performance test cases for IGN Scripts."""
 
     @pytest.mark.performance
-    def test_script_generator_initialization_speed(self, benchmark):
+    def test_script_generator_initialization_speed(self: Self, benchmark: Any):
         """Benchmark script generator initialization."""
 
         def create_generator():
@@ -22,7 +23,7 @@ class TestPerformance:
         assert result is not None
 
     @pytest.mark.performance
-    def test_template_listing_speed(self, script_generator, benchmark):
+    def test_template_listing_speed(self: Self, script_generator, benchmark):
         """Benchmark template listing performance."""
 
         def list_templates():
@@ -32,7 +33,7 @@ class TestPerformance:
         assert isinstance(templates, list)
 
     @pytest.mark.performance
-    def test_single_script_generation_speed(self, script_generator, sample_button_config, benchmark):
+    def test_single_script_generation_speed(self: Self, script_generator, sample_button_config, benchmark):
         """Benchmark single script generation."""
 
         def generate_script():
@@ -43,7 +44,7 @@ class TestPerformance:
         assert len(result) > 0
 
     @pytest.mark.performance
-    def test_batch_script_generation(self, script_generator, performance_monitor):
+    def test_batch_script_generation(self: Self, script_generator, performance_monitor):
         """Test batch script generation performance."""
         configs = []
         for i in range(50):
@@ -77,7 +78,7 @@ class TestPerformance:
         print(f"Memory usage: {memory_usage / 1024 / 1024:.2f} MB")
 
     @pytest.mark.performance
-    def test_concurrent_script_generation(self, script_generator, performance_monitor):
+    def test_concurrent_script_generation(self: Self, script_generator, performance_monitor):
         """Test concurrent script generation performance."""
         configs = []
         for i in range(20):
@@ -90,7 +91,7 @@ class TestPerformance:
             }
             configs.append(config)
 
-        def generate_single_script(config):
+        def generate_single_script(config: Any):
             return script_generator.generate_script(config["template"], config)
 
         performance_monitor.start()
@@ -112,7 +113,7 @@ class TestPerformance:
         print(f"Memory usage: {memory_usage / 1024 / 1024:.2f} MB")
 
     @pytest.mark.performance
-    def test_template_parsing_performance(self, script_generator, benchmark):
+    def test_template_parsing_performance(self: Self, script_generator, benchmark):
         """Benchmark template parsing performance."""
         template_name = "vision/button_click_handler.jinja2"
         context = {
@@ -128,7 +129,7 @@ class TestPerformance:
         assert "PerformanceTest" in result
 
     @pytest.mark.performance
-    def test_large_context_handling(self, script_generator, performance_monitor):
+    def test_large_context_handling(self: Self, script_generator, performance_monitor):
         """Test performance with large context objects."""
         # Create a large context with many variables
         large_context = {
@@ -161,7 +162,7 @@ class TestPerformance:
         print(f"Memory usage: {memory_usage / 1024 / 1024:.2f} MB")
 
     @pytest.mark.performance
-    def test_memory_usage_stability(self, script_generator, performance_monitor):
+    def test_memory_usage_stability(self: Self, script_generator, performance_monitor):
         """Test memory usage stability over multiple generations."""
         initial_memory = performance_monitor.process.memory_info().rss
 
@@ -200,7 +201,7 @@ class TestPerformance:
         print(f"Memory growth after 100 generations: {memory_growth / 1024 / 1024:.2f} MB")
 
     @pytest.mark.performance
-    def test_jinja2_filter_performance(self, script_generator, benchmark):
+    def test_jinja2_filter_performance(self: Self, script_generator, benchmark):
         """Benchmark custom Jinja2 filter performance."""
         test_data = {
             "complex_object": {
@@ -221,7 +222,7 @@ class TestPerformance:
         assert "True" in result  # Python True -> Jython True
 
     @pytest.mark.performance
-    def test_template_caching_effectiveness(self, script_generator, performance_monitor):
+    def test_template_caching_effectiveness(self: Self, script_generator, performance_monitor):
         """Test effectiveness of template caching."""
         template_name = "vision/button_click_handler.jinja2"
         base_config = {
@@ -257,7 +258,7 @@ class TestPerformance:
         print(f"Cache effectiveness: {((cold_duration - avg_warm_duration) / cold_duration * 100):.1f}%")
 
     @pytest.mark.performance
-    def test_cli_performance(self, performance_monitor, temp_dir):
+    def test_cli_performance(self: Self, performance_monitor, temp_dir):
         """Test CLI performance for script generation."""
         from click.testing import CliRunner
 
@@ -294,7 +295,7 @@ class TestPerformance:
 
     @pytest.mark.slow
     @pytest.mark.performance
-    def test_stress_test_script_generation(self, script_generator):
+    def test_stress_test_script_generation(self: Self, script_generator: Any):
         """Stress test with many script generations."""
         import gc
 

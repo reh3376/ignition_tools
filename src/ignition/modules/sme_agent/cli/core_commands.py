@@ -12,7 +12,7 @@ Following crawl_mcp.py methodology:
 import logging
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Self, Any
 
 import click
 from rich.console import Console
@@ -25,7 +25,7 @@ console = Console()
 logger = logging.getLogger(__name__)
 
 
-def handle_sme_agent_error(func):
+def handle_sme_agent_error(func: Any):
     """Decorator for handling SME Agent errors with user-friendly messages."""
 
     def wrapper(*args, **kwargs):
@@ -241,7 +241,7 @@ def _display_initialization_results(result: dict[str, Any]):
         console.print(f"Error: {result.get('error', 'Unknown error')}")
 
 
-def _display_response(response):
+def _display_response(response: Any):
     """Display SME Agent response."""
     if isinstance(response, dict):
         if "answer" in response:

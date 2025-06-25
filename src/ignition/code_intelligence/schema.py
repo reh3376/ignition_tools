@@ -3,7 +3,7 @@
 import logging
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any
+from typing import Any, Self
 
 logger = logging.getLogger(__name__)
 
@@ -70,11 +70,11 @@ class ImportNode:
 class CodeSchema:
     """Manages Neo4j schema for code intelligence."""
 
-    def __init__(self, graph_client) -> None:
+    def __init__(self: Self, graph_client: Any) -> None:
         """Initialize with graph client."""
         self.client = graph_client
 
-    def create_schema(self) -> bool:
+    def create_schema(self: Self) -> bool:
         """Create the complete schema for code intelligence."""
         try:
             # Create constraints
@@ -93,7 +93,7 @@ class CodeSchema:
             logger.error(f"Failed to create schema: {e}")
             return False
 
-    def _create_constraints(self) -> None:
+    def _create_constraints(self: Self) -> None:
         """Create uniqueness constraints."""
         constraints = [
             "CREATE CONSTRAINT code_file_path IF NOT EXISTS FOR (f:CodeFile) REQUIRE f.path IS UNIQUE",
@@ -109,7 +109,7 @@ class CodeSchema:
             except Exception as e:
                 logger.debug(f"Constraint may already exist: {e}")
 
-    def _create_indexes(self) -> None:
+    def _create_indexes(self: Self) -> None:
         """Create performance indexes."""
         indexes = [
             "CREATE INDEX code_file_modified IF NOT EXISTS FOR (f:CodeFile) ON (f.last_modified)",
@@ -126,7 +126,7 @@ class CodeSchema:
             except Exception as e:
                 logger.debug(f"Index may already exist: {e}")
 
-    def _create_vector_indexes(self) -> None:
+    def _create_vector_indexes(self: Self) -> None:
         """Create vector indexes for embeddings."""
         vector_indexes = [
             {
@@ -148,9 +148,11 @@ class CodeSchema:
                 self.client.execute_query(index_info["query"])
                 logger.info(f"Created vector index: {index_info['name']}")
             except Exception as e:
-                logger.debug(f"Vector index {index_info['name']} may already exist: {e}")
+                logger.debug(
+                    f"Vector index {index_info['name']} may already exist: {e}"
+                )
 
-    def get_schema_info(self) -> dict[str, Any]:
+    def get_schema_info(self: Self) -> dict[str, Any]:
         """Get information about the current schema."""
         try:
             # Get constraints
@@ -164,7 +166,9 @@ class CodeSchema:
             # Get node counts
             node_counts = {}
             for node_type in ["CodeFile", "Class", "Method", "Import"]:
-                count_result = self.client.execute_query(f"MATCH (n:{node_type}) RETURN count(n) as count")
+                count_result = self.client.execute_query(
+                    f"MATCH (n:{node_type}) RETURN count(n) as count"
+                )
                 node_counts[node_type] = count_result[0]["count"] if count_result else 0
 
             return {
@@ -178,7 +182,7 @@ class CodeSchema:
             logger.error(f"Failed to get schema info: {e}")
             return {}
 
-    def drop_schema(self) -> bool:
+    def drop_schema(self: Self) -> bool:
         """Drop the code intelligence schema (for testing/reset)."""
         try:
             # Drop all code intelligence nodes

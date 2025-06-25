@@ -4,7 +4,7 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Self, TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from .abstract_module import AbstractIgnitionModule
@@ -19,13 +19,13 @@ class ConfigurationError(Exception):
 class ConfigurationValidator:
     """Validates module configuration data."""
 
-    def __init__(self):
+    def __init__(self: Self):
         """Initialize the configuration validator."""
         self._validators: dict[str, callable] = {}
         self._required_keys: list[str] = []
         self._optional_keys: list[str] = []
 
-    def add_validator(self, key: str, validator: callable):
+    def add_validator(self: Self, key: str, validator: callable):
         """Add a validator function for a configuration key.
 
         Args:
@@ -34,7 +34,7 @@ class ConfigurationValidator:
         """
         self._validators[key] = validator
 
-    def add_required_key(self, key: str):
+    def add_required_key(self: Self, key: str):
         """Add a required configuration key.
 
         Args:
@@ -43,7 +43,7 @@ class ConfigurationValidator:
         if key not in self._required_keys:
             self._required_keys.append(key)
 
-    def add_optional_key(self, key: str):
+    def add_optional_key(self: Self, key: str):
         """Add an optional configuration key.
 
         Args:
@@ -52,7 +52,7 @@ class ConfigurationValidator:
         if key not in self._optional_keys:
             self._optional_keys.append(key)
 
-    def validate(self, config: dict[str, Any]) -> tuple[bool, list[str]]:
+    def validate(self: Self, config: dict[str, Any]) -> tuple[bool, list[str]]:
         """Validate configuration data.
 
         Args:
@@ -91,7 +91,7 @@ class ModuleConfigurationManager:
     - Backup and recovery
     """
 
-    def __init__(self, module: "AbstractIgnitionModule"):
+    def __init__(self: Self, module: "AbstractIgnitionModule"):
         """Initialize the configuration manager.
 
         Args:
@@ -122,12 +122,12 @@ class ModuleConfigurationManager:
         # Ensure directories exist
         self._ensure_directories()
 
-    def _ensure_directories(self):
+    def _ensure_directories(self: Self):
         """Ensure configuration directories exist."""
         self._config_path.mkdir(parents=True, exist_ok=True)
         self._backup_dir.mkdir(parents=True, exist_ok=True)
 
-    def _setup_default_validation(self):
+    def _setup_default_validation(self: Self):
         """Set up default configuration validation rules."""
         # Add common validation rules
         self._validator.add_required_key("module_id")
@@ -153,28 +153,28 @@ class ModuleConfigurationManager:
     # Properties
 
     @property
-    def config(self) -> dict[str, Any]:
+    def config(self: Self) -> dict[str, Any]:
         """Get current configuration."""
         return self._config.copy()
 
     @property
-    def config_file(self) -> Path:
+    def config_file(self: Self) -> Path:
         """Get configuration file path."""
         return self._config_file
 
     @property
-    def is_configuration_loaded(self) -> bool:
+    def is_configuration_loaded(self: Self) -> bool:
         """Check if configuration is loaded."""
         return self._config_loaded
 
     @property
-    def validator(self) -> ConfigurationValidator:
+    def validator(self: Self) -> ConfigurationValidator:
         """Get configuration validator."""
         return self._validator
 
     # Default configuration management
 
-    def set_default_configuration(self, config: dict[str, Any]):
+    def set_default_configuration(self: Self, config: dict[str, Any]):
         """Set default configuration values.
 
         Args:
@@ -183,7 +183,7 @@ class ModuleConfigurationManager:
         self._default_config = config.copy()
         self._module.logger.info("Default configuration set")
 
-    def get_default_configuration(self) -> dict[str, Any]:
+    def get_default_configuration(self: Self) -> dict[str, Any]:
         """Get default configuration.
 
         Returns:
@@ -204,7 +204,7 @@ class ModuleConfigurationManager:
 
     # Configuration loading and saving
 
-    def load_configuration(self) -> bool:
+    def load_configuration(self: Self) -> bool:
         """Load configuration from file.
 
         Returns:
@@ -256,7 +256,7 @@ class ModuleConfigurationManager:
             self._module.logger.exception(f"Failed to load configuration: {e}")
             return False
 
-    def save_configuration(self, config: dict[str, Any] | None = None) -> bool:
+    def save_configuration(self: Self, config: dict[str, Any] | None = None) -> bool:
         """Save configuration to file.
 
         Args:
@@ -308,7 +308,7 @@ class ModuleConfigurationManager:
             self._module.logger.exception(f"Failed to save configuration: {e}")
             return False
 
-    def reload_configuration(self) -> bool:
+    def reload_configuration(self: Self) -> bool:
         """Reload configuration from file.
 
         Returns:
@@ -320,7 +320,7 @@ class ModuleConfigurationManager:
 
     # Environment variable integration
 
-    def _apply_environment_variables(self):
+    def _apply_environment_variables(self: Self):
         """Apply environment variable overrides to configuration."""
         env_overrides = {}
 
@@ -342,7 +342,7 @@ class ModuleConfigurationManager:
             )
             self._config.update(env_overrides)
 
-    def get_environment_prefix(self) -> str:
+    def get_environment_prefix(self: Self) -> str:
         """Get environment variable prefix for this module.
 
         Returns:
@@ -352,7 +352,7 @@ class ModuleConfigurationManager:
 
     # Configuration access methods
 
-    def get(self, key: str, default: Any = None) -> Any:
+    def get(self: Self, key: str, default: Any = None) -> Any:
         """Get configuration value.
 
         Args:
@@ -364,7 +364,7 @@ class ModuleConfigurationManager:
         """
         return self._config.get(key, default)
 
-    def set(self, key: str, value: Any, save: bool = True) -> bool:
+    def set(self: Self, key: str, value: Any, save: bool = True) -> bool:
         """Set configuration value.
 
         Args:
@@ -387,7 +387,7 @@ class ModuleConfigurationManager:
             self._module.logger.exception(f"Failed to set configuration {key}: {e}")
             return False
 
-    def update(self, updates: dict[str, Any], save: bool = True) -> bool:
+    def update(self: Self, updates: dict[str, Any], save: bool = True) -> bool:
         """Update multiple configuration values.
 
         Args:
@@ -409,7 +409,7 @@ class ModuleConfigurationManager:
             self._module.logger.exception(f"Failed to update configuration: {e}")
             return False
 
-    def remove(self, key: str, save: bool = True) -> bool:
+    def remove(self: Self, key: str, save: bool = True) -> bool:
         """Remove configuration value.
 
         Args:
@@ -434,7 +434,7 @@ class ModuleConfigurationManager:
 
     # Backup and recovery
 
-    def _create_backup(self):
+    def _create_backup(self: Self):
         """Create backup of current configuration."""
         try:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -451,7 +451,7 @@ class ModuleConfigurationManager:
         except Exception as e:
             self._module.logger.warning(f"Failed to create configuration backup: {e}")
 
-    def list_backups(self) -> list[Path]:
+    def list_backups(self: Self) -> list[Path]:
         """List available configuration backups.
 
         Returns:
@@ -460,7 +460,7 @@ class ModuleConfigurationManager:
         pattern = f"{self._module.metadata.id}_*.json"
         return sorted(self._backup_dir.glob(pattern), reverse=True)
 
-    def restore_backup(self, backup_file: Path) -> bool:
+    def restore_backup(self: Self, backup_file: Path) -> bool:
         """Restore configuration from backup.
 
         Args:
@@ -494,7 +494,7 @@ class ModuleConfigurationManager:
             self._module.logger.exception(f"Failed to restore backup: {e}")
             return False
 
-    def cleanup_backups(self, keep_count: int = 5):
+    def cleanup_backups(self: Self, keep_count: int = 5):
         """Clean up old backup files.
 
         Args:
@@ -513,7 +513,7 @@ class ModuleConfigurationManager:
 
     # Configuration history
 
-    def _add_to_history(self, config: dict[str, Any]):
+    def _add_to_history(self: Self, config: dict[str, Any]):
         """Add configuration to history.
 
         Args:
@@ -530,7 +530,7 @@ class ModuleConfigurationManager:
         if len(self._config_history) > self._max_history:
             self._config_history = self._config_history[-self._max_history :]
 
-    def get_configuration_history(self) -> list[dict[str, Any]]:
+    def get_configuration_history(self: Self) -> list[dict[str, Any]]:
         """Get configuration history.
 
         Returns:
@@ -538,7 +538,7 @@ class ModuleConfigurationManager:
         """
         return self._config_history.copy()
 
-    def rollback_configuration(self, steps: int = 1) -> bool:
+    def rollback_configuration(self: Self, steps: int = 1) -> bool:
         """Rollback configuration to previous version.
 
         Args:
@@ -570,7 +570,7 @@ class ModuleConfigurationManager:
 
     # Utility methods
 
-    def export_configuration(self, export_path: Path) -> bool:
+    def export_configuration(self: Self, export_path: Path) -> bool:
         """Export configuration to file.
 
         Args:
@@ -601,7 +601,7 @@ class ModuleConfigurationManager:
             self._module.logger.exception(f"Failed to export configuration: {e}")
             return False
 
-    def import_configuration(self, import_path: Path) -> bool:
+    def import_configuration(self: Self, import_path: Path) -> bool:
         """Import configuration from file.
 
         Args:
@@ -637,7 +637,7 @@ class ModuleConfigurationManager:
             self._module.logger.exception(f"Failed to import configuration: {e}")
             return False
 
-    def get_status(self) -> dict[str, Any]:
+    def get_status(self: Self) -> dict[str, Any]:
         """Get configuration manager status.
 
         Returns:
@@ -654,13 +654,13 @@ class ModuleConfigurationManager:
             "last_modified": self._config.get("last_modified"),
         }
 
-    def __str__(self) -> str:
+    def __str__(self: Self) -> str:
         """String representation of the configuration manager."""
         return (
             f"ConfigManager({self._module.metadata.name}, loaded={self._config_loaded})"
         )
 
-    def __repr__(self) -> str:
+    def __repr__(self: Self) -> str:
         """Detailed string representation of the configuration manager."""
         return (
             f"ModuleConfigurationManager(module='{self._module.metadata.name}', "

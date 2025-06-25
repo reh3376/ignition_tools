@@ -39,6 +39,7 @@ from ignition.modules.advanced_features.integration_hub import (
     IntegrationHubModule,
 )
 from ignition.modules.advanced_features.security_module import (
+from typing import Any, Self
     SecurityComplianceModule,
     SecurityConfig,
 )
@@ -50,7 +51,7 @@ console = Console()
 # Create CLI group for advanced features
 @click.group(name="advanced")
 @click.pass_context
-def advanced_features_cli(ctx):
+def advanced_features_cli(ctx: Any) -> None:
     """Phase 9.8 Advanced Module Features
 
     Following crawl_mcp.py methodology for systematic command execution:
@@ -66,7 +67,7 @@ def advanced_features_cli(ctx):
 # Analytics Module Commands
 @advanced_features_cli.group(name="analytics")
 @click.pass_context
-def analytics_commands(ctx):
+def analytics_commands(ctx: Any) -> None:
     """Real-time Analytics Module commands."""
     console.print("📊 Analytics Module Commands", style="green")
 
@@ -79,7 +80,7 @@ def analytics_commands(ctx):
     help="Analytics complexity level",
 )
 @click.option("--show-details", is_flag=True, help="Show detailed validation results")
-def validate_analytics_environment(complexity: str, show_details: bool):
+def validate_analytics_environment(complexity: str, show_details: bool) -> None:
     """Validate analytics environment following crawl_mcp.py methodology.
 
     Step 1: Environment Variable Validation First
@@ -148,7 +149,7 @@ def validate_analytics_environment(complexity: str, show_details: bool):
 @click.option("--output-file", type=click.Path(), help="Output file for results")
 def process_analytics_data(
     data_file: str | None, complexity: str, output_file: str | None
-):
+) -> None:
     """Process analytics data following crawl_mcp.py methodology.
 
     Step 2: Comprehensive Input Validation
@@ -220,7 +221,7 @@ def process_analytics_data(
 # Security Module Commands
 @advanced_features_cli.group(name="security")
 @click.pass_context
-def security_commands(ctx):
+def security_commands(ctx: Any) -> None:
     """Security and Compliance Module commands."""
     console.print("🔒 Security Module Commands", style="red")
 
@@ -233,7 +234,7 @@ def security_commands(ctx):
     help="Security level",
 )
 @click.option("--show-details", is_flag=True, help="Show detailed validation results")
-def validate_security_environment(security_level: str, show_details: bool):
+def validate_security_environment(security_level: str, show_details: bool) -> None:
     """Validate security environment following crawl_mcp.py methodology.
 
     Step 1: Environment Variable Validation First
@@ -309,7 +310,7 @@ def validate_security_environment(security_level: str, show_details: bool):
 @click.option("--details", help="Additional event details (JSON string)")
 def log_security_event(
     event_type: str, user_id: str, source_ip: str, severity: str, details: str | None
-):
+) -> None:
     """Log security event following crawl_mcp.py methodology.
 
     Step 2: Comprehensive Input Validation
@@ -366,7 +367,7 @@ def log_security_event(
 @click.option(
     "--output-file", type=click.Path(), help="Output file for compliance report"
 )
-def run_compliance_check(standard: str, output_file: str | None):
+def run_compliance_check(standard: str, output_file: str | None) -> None:
     """Run compliance check following crawl_mcp.py methodology."""
     try:
         console.print(f"🔒 Running Compliance Check: {standard.upper()}", style="red")
@@ -434,7 +435,7 @@ def run_compliance_check(standard: str, output_file: str | None):
 # Integration Hub Commands
 @advanced_features_cli.group(name="integration")
 @click.pass_context
-def integration_commands(ctx):
+def integration_commands(ctx: Any) -> None:
     """Integration Hub Module commands."""
     console.print("🔌 Integration Hub Commands", style="cyan")
 
@@ -447,7 +448,7 @@ def integration_commands(ctx):
     help="Integration level",
 )
 @click.option("--show-details", is_flag=True, help="Show detailed validation results")
-def validate_integration_environment(integration_level: str, show_details: bool):
+def validate_integration_environment(integration_level: str, show_details: bool) -> None:
     """Validate integration environment following crawl_mcp.py methodology.
 
     Step 1: Environment Variable Validation First
@@ -529,7 +530,7 @@ def validate_integration_environment(integration_level: str, show_details: bool)
 )
 def register_api_endpoint(
     name: str, url: str, method: str, auth_type: str, config_file: str | None
-):
+) -> None:
     """Register API endpoint following crawl_mcp.py methodology.
 
     Step 2: Comprehensive Input Validation
@@ -582,7 +583,7 @@ def register_api_endpoint(
 )
 @click.option("--source", default="unknown", help="Webhook source system")
 @click.option("--event", help="Event type")
-def process_webhook_data(webhook_file: str | None, source: str, event: str | None):
+def process_webhook_data(webhook_file: str | None, source: str, event: str | None) -> None:
     """Process webhook data following crawl_mcp.py methodology."""
     try:
         console.print("🔌 Processing Webhook Data", style="cyan")
@@ -634,7 +635,7 @@ def process_webhook_data(webhook_file: str | None, source: str, event: str | Non
 @click.option("--complexity", default="basic", help="Test complexity level")
 @click.option("--output-file", type=click.Path(), help="Output file for test results")
 @click.option("--verbose", is_flag=True, help="Verbose test output")
-def test_all_modules(complexity: str, output_file: str | None, verbose: bool):
+def test_all_modules(complexity: str, output_file: str | None, verbose: bool) -> None:
     """Test all Phase 9.8 modules following crawl_mcp.py methodology.
 
     Step 4: Modular Component Testing
@@ -797,7 +798,7 @@ def test_all_modules(complexity: str, output_file: str | None, verbose: bool):
     type=click.Choice(["json", "markdown"]),
     help="Report format",
 )
-def generate_comprehensive_report(output_file: str | None, format: str):
+def generate_comprehensive_report(output_file: str | None, format: str) -> None:
     """Generate comprehensive Phase 9.8 report following crawl_mcp.py methodology."""
     try:
         console.print("📋 Generating Phase 9.8 Comprehensive Report", style="magenta")

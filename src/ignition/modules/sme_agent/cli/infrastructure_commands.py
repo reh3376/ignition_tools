@@ -8,7 +8,7 @@ Following crawl_mcp.py methodology:
 import asyncio
 import logging
 import sys
-from typing import Any
+from typing import Self, Any
 
 import click
 from rich.console import Console
@@ -29,10 +29,10 @@ console = Console()
 logger = logging.getLogger(__name__)
 
 
-def handle_sme_agent_error(func):
+def handle_sme_agent_error(func: Any) -> None:
     """Decorator for handling SME Agent errors with user-friendly messages."""
 
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> None:
         try:
             return func(*args, **kwargs)
         except SMEAgentValidationError as e:
@@ -47,14 +47,14 @@ def handle_sme_agent_error(func):
 
 
 @click.group(name="infrastructure")
-def infrastructure_commands():
+def infrastructure_commands() -> None:
     """SME Agent Infrastructure Commands - Deployment and System Management"""
     pass
 
 
 @infrastructure_commands.command("llm-status")
 @handle_sme_agent_error
-def llm_status():
+def llm_status() -> None:
     """Check Local LLM Infrastructure Status"""
     console.print("[bold blue]🔍 Local LLM Infrastructure Status[/bold blue]")
 
@@ -71,7 +71,7 @@ def llm_status():
 
 @infrastructure_commands.command("env-optimize")
 @handle_sme_agent_error
-def env_optimize():
+def env_optimize() -> None:
     """Optimize Environment for Local LLM Performance"""
     console.print("[bold blue]⚡ Environment Optimization for Local LLMs[/bold blue]")
 
@@ -102,7 +102,7 @@ def env_optimize():
 @click.option("--use-docker", is_flag=True, help="Deploy using Docker container")
 @click.option("--gpu", is_flag=True, help="Enable GPU acceleration")
 @handle_sme_agent_error
-def deploy_llm_infrastructure(model: str, complexity: str, use_docker: bool, gpu: bool):
+def deploy_llm_infrastructure(model: str, complexity: str, use_docker: bool, gpu: bool) -> None:
     """Deploy Local LLM Infrastructure"""
     console.print(f"[bold blue]🚀 Deploying LLM Infrastructure: {model}[/bold blue]")
     console.print(f"Complexity: {complexity}, Docker: {use_docker}, GPU: {gpu}")
@@ -127,7 +127,7 @@ def deploy_llm_infrastructure(model: str, complexity: str, use_docker: bool, gpu
 
 @infrastructure_commands.command("infrastructure-status")
 @handle_sme_agent_error
-def infrastructure_status():
+def infrastructure_status() -> None:
     """Check Overall Infrastructure Status"""
     console.print("[bold blue]🏗️ SME Agent Infrastructure Status[/bold blue]")
 
@@ -147,7 +147,7 @@ def infrastructure_status():
 @click.option("--port", default=8000, type=int, help="API server port")
 @click.option("--reload", is_flag=True, help="Enable auto-reload for development")
 @handle_sme_agent_error
-def start_api_server(host: str, port: int, reload: bool):
+def start_api_server(host: str, port: int, reload: bool) -> None:
     """Start the FastAPI web interface server.
 
     Phase 11.3: Multi-Interface Deployment
@@ -191,7 +191,7 @@ def start_api_server(host: str, port: int, reload: bool):
 @click.option("--port", default=8501, type=int, help="Streamlit server port")
 @click.option("--host", default="localhost", help="Streamlit server host")
 @handle_sme_agent_error
-def start_web_interface(port: int, host: str):
+def start_web_interface(port: int, host: str) -> None:
     """Start the Streamlit web interface.
 
     Phase 11.3: Multi-Interface Deployment
@@ -257,7 +257,7 @@ def start_web_interface(port: int, host: str):
 
 @infrastructure_commands.command("interface-status")
 @handle_sme_agent_error
-def check_interface_status():
+def check_interface_status() -> None:
     """Check the status of all SME Agent interfaces.
 
     Phase 11.3: Multi-Interface Deployment
@@ -340,7 +340,7 @@ def check_interface_status():
 @click.option("--api-port", default=8000, type=int, help="FastAPI server port")
 @click.option("--web-port", default=8501, type=int, help="Streamlit server port")
 @handle_sme_agent_error
-def demo_all_interfaces(api_port: int, web_port: int):
+def demo_all_interfaces(api_port: int, web_port: int) -> None:
     """Demonstrate all SME Agent interfaces.
 
     Phase 11.3: Multi-Interface Deployment
@@ -460,7 +460,7 @@ async def _deploy_llm_async(
 
 
 # Display helper functions
-def _display_llm_status(status: dict[str, Any]):
+def _display_llm_status(status: dict[str, Any]) -> None:
     """Display LLM infrastructure status."""
     console.print(
         Panel(
@@ -477,7 +477,7 @@ def _display_llm_status(status: dict[str, Any]):
     )
 
 
-def _display_optimization_result(result: dict[str, Any]):
+def _display_optimization_result(result: dict[str, Any]) -> None:
     """Display environment optimization result."""
     if result.get("success", False):
         console.print("[green]✅ Environment optimization completed![/green]")
@@ -502,7 +502,7 @@ def _display_optimization_result(result: dict[str, Any]):
         console.print(f"Error: {result.get('error', 'Unknown error')}")
 
 
-def _display_deployment_result(result: dict[str, Any]):
+def _display_deployment_result(result: dict[str, Any]) -> None:
     """Display LLM deployment result."""
     if result.get("success", False):
         console.print("[green]✅ LLM deployment successful![/green]")
@@ -515,7 +515,7 @@ def _display_deployment_result(result: dict[str, Any]):
         console.print(f"Error: {result.get('error', 'Unknown error')}")
 
 
-def _display_infrastructure_status(status: dict[str, Any]):
+def _display_infrastructure_status(status: dict[str, Any]) -> None:
     """Display overall infrastructure status."""
     table = Table(title="Infrastructure Status")
     table.add_column("Component", style="cyan")
@@ -540,7 +540,7 @@ def _display_infrastructure_status(status: dict[str, Any]):
     console.print(f"\n[bold]Overall Infrastructure Health: {overall_health}[/bold]")
 
 
-def setup_infrastructure_commands(cli_group):
+def setup_infrastructure_commands(cli_group: Any) -> None:
     """Setup infrastructure commands and Phase 11.3 workflow commands."""
     # Add infrastructure commands
     cli_group.add_command(infrastructure_commands)

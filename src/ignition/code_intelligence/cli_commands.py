@@ -8,6 +8,7 @@ import json
 import sys
 from dataclasses import asdict
 from pathlib import Path
+from typing import Any
 
 import click
 
@@ -17,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).parents[2]))
 from ignition.code_intelligence.code_splitter import BatchCodeSplitter, CodeSplitter
 from ignition.code_intelligence.refactor_analyzer import (
     LargeFileDetector,
+    RefactoringRecommendation,
     RefactoringRecommendationEngine,
 )
 from ignition.code_intelligence.refactoring_workflow import RefactoringWorkflow
@@ -356,7 +358,7 @@ def _display_files_detailed(files: list[Path], engine: RefactoringRecommendation
             click.echo(f"   Error: {e!s}")
 
 
-def _display_analysis_summary(recommendation) -> None:
+def _display_analysis_summary(recommendation: RefactoringRecommendation) -> None:
     """Display analysis in summary format."""
     click.echo("\n📊 ANALYSIS SUMMARY")
     click.echo(f"{'=' * 50}")
@@ -378,7 +380,7 @@ def _display_analysis_summary(recommendation) -> None:
     click.echo(f"Risk level: {risk}")
 
 
-def _display_analysis_detailed(recommendation) -> None:
+def _display_analysis_detailed(recommendation: RefactoringRecommendation) -> None:
     """Display analysis in detailed format."""
     _display_analysis_summary(recommendation)
 
@@ -405,7 +407,7 @@ def _display_analysis_detailed(recommendation) -> None:
         click.echo(f"  Risk level: {impact.get('risk_level', 'unknown')}")
 
 
-def _display_analysis_json(recommendation) -> None:
+def _display_analysis_json(recommendation: RefactoringRecommendation) -> None:
     """Display analysis in JSON format."""
     import json
     from dataclasses import asdict
@@ -661,7 +663,7 @@ def statistics() -> None:
         click.echo(f"❌ Error getting statistics: {e}", err=True)
 
 
-def _display_evolution_table(evolution) -> None:
+def _display_evolution_table(evolution: Any) -> None:
     """Display evolution data in table format."""
     from rich.console import Console
     from rich.table import Table
@@ -697,7 +699,7 @@ def _display_evolution_table(evolution) -> None:
         console.print(table)
 
 
-def _display_detailed_evolution(evolution) -> None:
+def _display_detailed_evolution(evolution: Any) -> None:
     """Display detailed evolution analysis."""
     from rich.console import Console
     from rich.panel import Panel
@@ -738,7 +740,7 @@ def _display_detailed_evolution(evolution) -> None:
             console.print(f"  • {rec}")
 
 
-def _display_branch_analysis_table(analysis) -> None:
+def _display_branch_analysis_table(analysis: Any) -> None:
     """Display branch analysis in table format."""
     from rich.console import Console
     from rich.table import Table
@@ -769,7 +771,7 @@ def _display_branch_analysis_table(analysis) -> None:
             console.print(f"  • {conflict_file}")
 
 
-def _display_tracking_report_table(report) -> None:
+def _display_tracking_report_table(report: Any) -> None:
     """Display tracking report in table format."""
     from rich.console import Console
 
@@ -799,7 +801,7 @@ def _display_tracking_report_table(report) -> None:
             console.print(f"Average Impact Score: {summary['average_impact_score']:.2f}")
 
 
-def _display_detailed_tracking_report(report) -> None:
+def _display_detailed_tracking_report(report: Any) -> None:
     """Display detailed tracking report."""
     from rich.console import Console
     from rich.json import JSON
@@ -812,7 +814,7 @@ def _display_detailed_tracking_report(report) -> None:
     console.print(JSON.from_data(report))
 
 
-def _display_complexity_trends_table(trends) -> None:
+def _display_complexity_trends_table(trends: Any) -> None:
     """Display complexity trends in table format."""
     from rich.console import Console
     from rich.table import Table

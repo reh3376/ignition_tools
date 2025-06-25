@@ -18,6 +18,7 @@ from rich.table import Table
 
 from ..ai_assistant import create_ai_assistant_module
 from ..ai_assistant.ai_assistant_module import CodeAnalysisRequest
+from typing import Any, Self
 
 console = Console()
 logger = logging.getLogger(__name__)
@@ -25,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 @click.group(name="ai")
 @click.pass_context
-def ai_assistant_commands(ctx):
+def ai_assistant_commands(ctx: Any) -> None:
     """AI Assistant commands for intelligent code analysis and validation."""
     ctx.ensure_object(dict)
 
@@ -58,10 +59,10 @@ def analyze(
     output: str | None,
     output_format: str,
     verbose: bool,
-):
+) -> None:
     """Analyze a Python file for potential issues and AI hallucinations."""
 
-    async def _analyze():
+    async def _analyze() -> None:
         # Create AI Assistant Module
         ai_module = create_ai_assistant_module()
 
@@ -118,13 +119,13 @@ def analyze(
     help="Enable/disable knowledge graph validation",
 )
 @click.option("--verbose", "-v", is_flag=True, help="Verbose output")
-def quick_check(code: str | None, file_path: str | None, validate: bool, verbose: bool):
+def quick_check(code: str | None, file_path: str | None, validate: bool, verbose: bool) -> None:
     """Quick code analysis for immediate feedback."""
     if not code and not file_path:
         console.print("[red]Error: Either --code or --file must be provided[/red]")
         return
 
-    async def _quick_check():
+    async def _quick_check() -> None:
         ai_module = create_ai_assistant_module()
 
         try:
@@ -164,10 +165,10 @@ def batch_analyze(
     output_dir: str | None,
     validate: bool,
     summary_only: bool,
-):
+) -> None:
     """Analyze multiple Python files in a directory."""
 
-    async def _batch_analyze():
+    async def _batch_analyze() -> None:
         ai_module = create_ai_assistant_module()
 
         try:
@@ -217,10 +218,10 @@ def batch_analyze(
 
 
 @ai_assistant_commands.command()
-def info():
+def info() -> None:
     """Display AI Assistant Module information and capabilities."""
 
-    async def _info():
+    async def _info() -> None:
         ai_module = create_ai_assistant_module()
 
         try:
@@ -292,10 +293,10 @@ def info():
 @click.option("--neo4j-uri", help="Neo4j URI")
 @click.option("--neo4j-user", help="Neo4j username")
 @click.option("--neo4j-password", help="Neo4j password")
-def test_connection(neo4j_uri: str | None, neo4j_user: str | None, neo4j_password: str | None):
+def test_connection(neo4j_uri: str | None, neo4j_user: str | None, neo4j_password: str | None) -> None:
     """Test Neo4j knowledge graph connection."""
 
-    async def _test_connection():
+    async def _test_connection() -> None:
         from dotenv import load_dotenv
 
         load_dotenv()
@@ -328,7 +329,7 @@ def test_connection(neo4j_uri: str | None, neo4j_user: str | None, neo4j_passwor
     asyncio.run(_test_connection())
 
 
-def _display_analysis_console(response, verbose: bool):
+def _display_analysis_console(response, verbose: bool) -> None:
     """Display analysis results in console format."""
     # Header
     console.print(
@@ -407,7 +408,7 @@ def _display_analysis_console(response, verbose: bool):
             console.print(f"  • {error}")
 
 
-def _display_quick_summary(response, verbose: bool):
+def _display_quick_summary(response, verbose: bool) -> None:
     """Display quick analysis summary."""
     status_color = (
         "green" if response.confidence_score > 0.7 else "yellow" if response.confidence_score > 0.4 else "red"
@@ -429,7 +430,7 @@ def _display_quick_summary(response, verbose: bool):
         _display_analysis_console(response, verbose)
 
 
-def _display_analysis_json(response, output_file: str | None):
+def _display_analysis_json(response, output_file: str | None) -> None:
     """Display analysis results in JSON format."""
     # Convert response to JSON-serializable format
     result = {
@@ -457,7 +458,7 @@ def _display_analysis_json(response, output_file: str | None):
         console.print(json_output)
 
 
-def _display_analysis_markdown(response, output_file: str | None):
+def _display_analysis_markdown(response, output_file: str | None) -> None:
     """Display analysis results in Markdown format."""
     from datetime import datetime
 
@@ -508,7 +509,7 @@ def _display_analysis_markdown(response, output_file: str | None):
         console.print(md_content)
 
 
-def _display_batch_summary(results, summary_only: bool):
+def _display_batch_summary(results, summary_only: bool) -> None:
     """Display batch analysis summary."""
     total_files = len(results)
     total_confidence = sum(r["response"].confidence_score for r in results)
@@ -560,7 +561,7 @@ def _display_batch_summary(results, summary_only: bool):
         console.print(results_table)
 
 
-def _save_individual_report(file_path: Path, response, output_dir: str):
+def _save_individual_report(file_path: Path, response, output_dir: str) -> None:
     """Save individual analysis report."""
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)

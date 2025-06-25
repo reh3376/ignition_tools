@@ -26,6 +26,7 @@ from ..proactive_development_assistance import (
     ProactiveDevelopmentAssistance,
     validate_proactive_development_environment,
 )
+from typing import Any, Self
 from ..specialized_domain_expertise import (
     SpecializedDomainExpertise,
     validate_specialized_domain_environment,
@@ -36,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 @click.group(name="advanced")
 @click.pass_context
-def advanced_commands(ctx):
+def advanced_commands(ctx: Any) -> None:
     """Advanced SME Agent features and capabilities."""
     if ctx.obj is None:
         ctx.obj = {}
@@ -47,7 +48,7 @@ def advanced_commands(ctx):
 
 @advanced_commands.group(name="domain")
 @click.pass_context
-def domain_commands(ctx):
+def domain_commands(ctx: Any) -> None:
     """Specialized domain expertise commands."""
     pass
 
@@ -55,7 +56,7 @@ def domain_commands(ctx):
 @domain_commands.command(name="validate-env")
 @click.option("--verbose", "-v", is_flag=True, help="Verbose output")
 @click.pass_context
-def validate_domain_environment(ctx, verbose):
+def validate_domain_environment(ctx, verbose) -> None:
     """Validate specialized domain expertise environment."""
     try:
         result = asyncio.run(validate_specialized_domain_environment())
@@ -89,7 +90,7 @@ def validate_domain_environment(ctx, verbose):
     help="Output format",
 )
 @click.pass_context
-def domain_info(ctx, format):
+def domain_info(ctx, format) -> None:
     """Get specialized domain expertise information."""
     try:
         from ..specialized_domain_expertise import get_specialized_domain_info
@@ -128,11 +129,11 @@ def domain_info(ctx, format):
 )
 @click.option("--context", type=str, help="Additional context for the query")
 @click.pass_context
-def domain_query(ctx, domain, question, complexity, context):
+def domain_query(ctx, domain, question, complexity, context) -> None:
     """Query specialized domain expertise."""
     try:
 
-        async def run_query():
+        async def run_query() -> None:
             expertise = SpecializedDomainExpertise()
             await expertise.initialize()
 
@@ -197,11 +198,11 @@ def domain_query(ctx, domain, question, complexity, context):
 )
 @click.option("--environment", type=str, help="Environment details (JSON)")
 @click.pass_context
-def domain_troubleshoot(ctx, system_type, symptoms, complexity, environment):
+def domain_troubleshoot(ctx, system_type, symptoms, complexity, environment) -> None:
     """Get troubleshooting guidance for system issues."""
     try:
 
-        async def run_troubleshoot():
+        async def run_troubleshoot() -> None:
             expertise = SpecializedDomainExpertise()
             await expertise.initialize()
 
@@ -269,7 +270,7 @@ def domain_troubleshoot(ctx, system_type, symptoms, complexity, environment):
 
 @advanced_commands.group(name="assist")
 @click.pass_context
-def assistance_commands(ctx):
+def assistance_commands(ctx: Any) -> None:
     """Proactive development assistance commands."""
     pass
 
@@ -277,7 +278,7 @@ def assistance_commands(ctx):
 @assistance_commands.command(name="validate-env")
 @click.option("--verbose", "-v", is_flag=True, help="Verbose output")
 @click.pass_context
-def validate_assistance_environment(ctx, verbose):
+def validate_assistance_environment(ctx, verbose) -> None:
     """Validate proactive development assistance environment."""
     try:
         result = asyncio.run(validate_proactive_development_environment())
@@ -312,7 +313,7 @@ def validate_assistance_environment(ctx, verbose):
     help="Output format",
 )
 @click.pass_context
-def assistance_info(ctx, format):
+def assistance_info(ctx, format) -> None:
     """Get proactive development assistance information."""
     try:
         from ..proactive_development_assistance import get_proactive_development_info
@@ -352,11 +353,11 @@ def assistance_info(ctx, format):
     help="Complexity level",
 )
 @click.pass_context
-def suggest_architecture(ctx, requirements, constraints, complexity):
+def suggest_architecture(ctx, requirements, constraints, complexity) -> None:
     """Suggest architecture patterns based on project requirements."""
     try:
 
-        async def run_suggestion():
+        async def run_suggestion() -> None:
             assistance = ProactiveDevelopmentAssistance()
             await assistance.initialize()
 
@@ -431,11 +432,11 @@ def suggest_architecture(ctx, requirements, constraints, complexity):
     help="Complexity level",
 )
 @click.pass_context
-def optimize_components(ctx, components, requirements, complexity):
+def optimize_components(ctx, components, requirements, complexity) -> None:
     """Optimize component selection and configuration."""
     try:
 
-        async def run_optimization():
+        async def run_optimization() -> None:
             assistance = ProactiveDevelopmentAssistance()
             await assistance.initialize()
 
@@ -501,7 +502,7 @@ def optimize_components(ctx, components, requirements, complexity):
 
 @advanced_commands.group(name="code")
 @click.pass_context
-def code_commands(ctx):
+def code_commands(ctx: Any) -> None:
     """Enhanced code intelligence commands."""
     pass
 
@@ -509,7 +510,7 @@ def code_commands(ctx):
 @code_commands.command(name="validate-env")
 @click.option("--verbose", "-v", is_flag=True, help="Verbose output")
 @click.pass_context
-def validate_code_environment(ctx, verbose):
+def validate_code_environment(ctx, verbose) -> None:
     """Validate enhanced code intelligence environment."""
     try:
         result = asyncio.run(validate_enhanced_code_intelligence_environment())
@@ -543,7 +544,7 @@ def validate_code_environment(ctx, verbose):
     help="Output format",
 )
 @click.pass_context
-def code_info(ctx, format):
+def code_info(ctx, format) -> None:
     """Get enhanced code intelligence information."""
     try:
         from ..enhanced_code_intelligence import get_enhanced_code_intelligence_info
@@ -596,11 +597,11 @@ def code_info(ctx, format):
     help="Output format",
 )
 @click.pass_context
-def analyze_code(ctx, file_path, analysis_type, complexity, format):
+def analyze_code(ctx, file_path, analysis_type, complexity, format) -> None:
     """Analyze a code file for quality, patterns, and refactoring opportunities."""
     try:
 
-        async def run_analysis():
+        async def run_analysis() -> None:
             intelligence = EnhancedCodeIntelligence()
             await intelligence.initialize()
 
@@ -719,11 +720,11 @@ def analyze_code(ctx, file_path, analysis_type, complexity, format):
     help="Complexity level",
 )
 @click.pass_context
-def suggest_refactoring(ctx, file_path, focus, complexity):
+def suggest_refactoring(ctx, file_path, focus, complexity) -> None:
     """Generate intelligent refactoring suggestions."""
     try:
 
-        async def run_suggestion():
+        async def run_suggestion() -> None:
             intelligence = EnhancedCodeIntelligence()
             await intelligence.initialize()
 
@@ -804,11 +805,11 @@ def suggest_refactoring(ctx, file_path, focus, complexity):
     help="Complexity level",
 )
 @click.pass_context
-def detect_patterns(ctx, file_path, pattern_types, complexity):
+def detect_patterns(ctx, file_path, pattern_types, complexity) -> None:
     """Detect code patterns and anti-patterns."""
     try:
 
-        async def run_detection():
+        async def run_detection() -> None:
             intelligence = EnhancedCodeIntelligence()
             await intelligence.initialize()
 
@@ -893,11 +894,11 @@ def detect_patterns(ctx, file_path, pattern_types, complexity):
     help="Output format",
 )
 @click.pass_context
-def advanced_status(ctx, format):
+def advanced_status(ctx, format) -> None:
     """Get status of all advanced SME Agent features."""
     try:
 
-        async def get_status():
+        async def get_status() -> None:
             status = {
                 "specialized_domain": {"available": False, "statistics": {}},
                 "proactive_assistance": {"available": False, "statistics": {}},
@@ -1018,6 +1019,6 @@ def advanced_status(ctx, format):
 
 
 # Export commands for CLI integration
-def get_advanced_commands():
+def get_advanced_commands() -> None:
     """Get advanced commands for CLI integration."""
     return advanced_commands

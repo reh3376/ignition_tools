@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any
+from typing import Self, Any
 
 from .config import ModuleConfigurationManager
 from .lifecycle import ModuleLifecycleManager, ModuleState
@@ -32,7 +32,7 @@ class ModuleMetadata:
     min_ignition_version: str = "8.1.0"
     dependencies: list[str] | None = None
 
-    def __post_init__(self):
+    def __post_init__(self: Self):
         """Initialize default values."""
         if self.dependencies is None:
             self.dependencies = []
@@ -64,7 +64,7 @@ class AbstractIgnitionModule(ABC):
     the required abstract methods for their specific functionality.
     """
 
-    def __init__(self, metadata: ModuleMetadata, context: ModuleContext):
+    def __init__(self: Self, metadata: ModuleMetadata, context: ModuleContext):
         """Initialize the abstract module.
 
         Args:
@@ -97,49 +97,49 @@ class AbstractIgnitionModule(ABC):
     # Properties
 
     @property
-    def metadata(self) -> ModuleMetadata:
+    def metadata(self: Self) -> ModuleMetadata:
         """Get module metadata."""
         return self._metadata
 
     @property
-    def context(self) -> ModuleContext:
+    def context(self: Self) -> ModuleContext:
         """Get module context."""
         return self._context
 
     @property
-    def state(self) -> ModuleState:
+    def state(self: Self) -> ModuleState:
         """Get current module state."""
         return self._state
 
     @property
-    def lifecycle_manager(self) -> ModuleLifecycleManager:
+    def lifecycle_manager(self: Self) -> ModuleLifecycleManager:
         """Get lifecycle manager."""
         return self._lifecycle_manager
 
     @property
-    def config_manager(self) -> ModuleConfigurationManager:
+    def config_manager(self: Self) -> ModuleConfigurationManager:
         """Get configuration manager."""
         return self._config_manager
 
     @property
-    def diagnostics_manager(self) -> ModuleDiagnosticsManager:
+    def diagnostics_manager(self: Self) -> ModuleDiagnosticsManager:
         """Get diagnostics manager."""
         return self._diagnostics_manager
 
     @property
-    def logger(self):
+    def logger(self: Self):
         """Get module logger."""
         return self._logger
 
     @property
-    def error_state(self) -> str | None:
+    def error_state(self: Self) -> str | None:
         """Get error state if any."""
         return self._error_state
 
     # Abstract methods - must be implemented by subclasses
 
     @abstractmethod
-    def get_module_info(self) -> dict[str, Any]:
+    def get_module_info(self: Self) -> dict[str, Any]:
         """Get detailed module information.
 
         Returns:
@@ -148,7 +148,7 @@ class AbstractIgnitionModule(ABC):
         pass
 
     @abstractmethod
-    def validate_configuration(self) -> bool:
+    def validate_configuration(self: Self) -> bool:
         """Validate module configuration.
 
         Returns:
@@ -157,7 +157,7 @@ class AbstractIgnitionModule(ABC):
         pass
 
     @abstractmethod
-    def initialize_module(self) -> bool:
+    def initialize_module(self: Self) -> bool:
         """Initialize the module.
 
         This method is called during module startup to perform any necessary
@@ -169,7 +169,7 @@ class AbstractIgnitionModule(ABC):
         pass
 
     @abstractmethod
-    def startup_module(self) -> bool:
+    def startup_module(self: Self) -> bool:
         """Start the module.
 
         This method is called to start the module after initialization.
@@ -180,7 +180,7 @@ class AbstractIgnitionModule(ABC):
         pass
 
     @abstractmethod
-    def shutdown_module(self) -> bool:
+    def shutdown_module(self: Self) -> bool:
         """Shutdown the module.
 
         This method is called to gracefully shutdown the module.
@@ -191,7 +191,7 @@ class AbstractIgnitionModule(ABC):
         pass
 
     @abstractmethod
-    def configure_module(self, config: dict[str, Any]) -> bool:
+    def configure_module(self: Self, config: dict[str, Any]) -> bool:
         """Configure the module with new settings.
 
         Args:
@@ -204,7 +204,7 @@ class AbstractIgnitionModule(ABC):
 
     # Optional hook methods - can be overridden by subclasses
 
-    def create_gateway_hook(self) -> Any | None:
+    def create_gateway_hook(self: Self) -> Any | None:
         """Create and return Gateway hook instance.
 
         Override this method to provide Gateway-specific functionality.
@@ -214,7 +214,7 @@ class AbstractIgnitionModule(ABC):
         """
         return None
 
-    def create_designer_hook(self) -> Any | None:
+    def create_designer_hook(self: Self) -> Any | None:
         """Create and return Designer hook instance.
 
         Override this method to provide Designer-specific functionality.
@@ -224,7 +224,7 @@ class AbstractIgnitionModule(ABC):
         """
         return None
 
-    def create_client_hook(self) -> Any | None:
+    def create_client_hook(self: Self) -> Any | None:
         """Create and return Client hook instance.
 
         Override this method to provide Client-specific functionality.
@@ -236,7 +236,7 @@ class AbstractIgnitionModule(ABC):
 
     # Lifecycle management methods
 
-    def _set_state(self, new_state: ModuleState, error_message: str | None = None):
+    def _set_state(self: Self, new_state: ModuleState, error_message: str | None = None):
         """Set module state.
 
         Args:
@@ -254,7 +254,7 @@ class AbstractIgnitionModule(ABC):
         # Notify lifecycle manager
         self._lifecycle_manager.on_state_changed(old_state, new_state)
 
-    def start(self) -> bool:
+    def start(self: Self) -> bool:
         """Start the module lifecycle.
 
         Returns:
@@ -282,7 +282,7 @@ class AbstractIgnitionModule(ABC):
             self._logger.exception("Exception during module startup")
             return False
 
-    def stop(self) -> bool:
+    def stop(self: Self) -> bool:
         """Stop the module lifecycle.
 
         Returns:
@@ -304,7 +304,7 @@ class AbstractIgnitionModule(ABC):
             self._logger.exception("Exception during module shutdown")
             return False
 
-    def restart(self) -> bool:
+    def restart(self: Self) -> bool:
         """Restart the module.
 
         Returns:
@@ -317,7 +317,7 @@ class AbstractIgnitionModule(ABC):
 
         return self.start()
 
-    def configure(self, config: dict[str, Any]) -> bool:
+    def configure(self: Self, config: dict[str, Any]) -> bool:
         """Configure the module.
 
         Args:
@@ -353,7 +353,7 @@ class AbstractIgnitionModule(ABC):
 
     # Internal lifecycle methods
 
-    def _initialize(self) -> bool:
+    def _initialize(self: Self) -> bool:
         """Internal initialization method."""
         self._set_state(ModuleState.INITIALIZING)
 
@@ -368,7 +368,7 @@ class AbstractIgnitionModule(ABC):
         # Call user initialization
         return self.initialize_module()
 
-    def _startup(self) -> bool:
+    def _startup(self: Self) -> bool:
         """Internal startup method."""
         self._set_state(ModuleState.STARTING)
 
@@ -378,7 +378,7 @@ class AbstractIgnitionModule(ABC):
         # Call user startup
         return self.startup_module()
 
-    def _shutdown(self) -> bool:
+    def _shutdown(self: Self) -> bool:
         """Internal shutdown method."""
         self._set_state(ModuleState.STOPPING)
 
@@ -388,7 +388,7 @@ class AbstractIgnitionModule(ABC):
         # Call user shutdown
         return self.shutdown_module()
 
-    def _initialize_hooks(self):
+    def _initialize_hooks(self: Self):
         """Initialize module hooks."""
         if ModuleScope.GATEWAY in self._metadata.scopes:
             self._gateway_hook = self.create_gateway_hook()
@@ -405,7 +405,7 @@ class AbstractIgnitionModule(ABC):
             if self._client_hook:
                 self._logger.info("Client hook created")
 
-    def _startup_hooks(self):
+    def _startup_hooks(self: Self):
         """Start module hooks."""
         if self._gateway_hook and hasattr(self._gateway_hook, "startup"):
             try:
@@ -428,7 +428,7 @@ class AbstractIgnitionModule(ABC):
             except Exception as e:
                 self._logger.exception(f"Client hook startup failed: {e}")
 
-    def _shutdown_hooks(self):
+    def _shutdown_hooks(self: Self):
         """Shutdown module hooks."""
         if self._gateway_hook and hasattr(self._gateway_hook, "shutdown"):
             try:
@@ -453,7 +453,7 @@ class AbstractIgnitionModule(ABC):
 
     # Utility methods
 
-    def get_status(self) -> dict[str, Any]:
+    def get_status(self: Self) -> dict[str, Any]:
         """Get comprehensive module status.
 
         Returns:
@@ -474,11 +474,11 @@ class AbstractIgnitionModule(ABC):
             "diagnostics": self._diagnostics_manager.get_health_status(),
         }
 
-    def __str__(self) -> str:
+    def __str__(self: Self) -> str:
         """String representation of the module."""
         return f"{self._metadata.name} v{self._metadata.version} ({self._state.value})"
 
-    def __repr__(self) -> str:
+    def __repr__(self: Self) -> str:
         """Detailed string representation of the module."""
         return (
             f"AbstractIgnitionModule(name='{self._metadata.name}', "

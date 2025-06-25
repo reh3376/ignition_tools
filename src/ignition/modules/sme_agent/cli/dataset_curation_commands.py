@@ -40,6 +40,7 @@ from ..industrial_dataset_curation import (
     validate_environment,
 )
 from ..variable_type_classifier import VariableTypeClassifier
+from typing import Any, Self
 
 # Load environment variables
 load_dotenv()
@@ -53,7 +54,7 @@ console = Console()
 
 
 @click.group()
-def dataset_curation():
+def dataset_curation() -> None:
     """Industrial Dataset Curation & AI Model Preparation commands."""
     pass
 
@@ -65,7 +66,7 @@ def dataset_curation():
     type=click.Choice(["basic", "standard", "advanced", "enterprise"]),
     help="Deployment complexity level",
 )
-def validate_env(complexity_level: str):
+def validate_env(complexity_level: str) -> None:
     """Validate environment for dataset curation system."""
     try:
         console.print(
@@ -133,7 +134,7 @@ def validate_env(complexity_level: str):
     type=click.Choice(["basic", "standard", "advanced", "enterprise"]),
     help="Deployment complexity level",
 )
-def info(complexity_level: str):
+def info(complexity_level: str) -> None:
     """Show dataset curation system information."""
     try:
         # Initialize curator to get status
@@ -200,7 +201,7 @@ def ingest_csv(
     timestamp_column: str,
     dataset_name: str | None,
     complexity_level: str,
-):
+) -> None:
     """Ingest CSV/XLS data with validation and quality assessment."""
     try:
         console.print(f"\n📊 [bold blue]Ingesting Data from {file_path}[/bold blue]")
@@ -287,7 +288,7 @@ def ingest_csv(
 )
 def classify_variables(
     dataset_name: str, confidence_threshold: float, complexity_level: str
-):
+) -> None:
     """Automatically classify variables in a dataset."""
     try:
         console.print(
@@ -362,7 +363,7 @@ def classify_variables(
     type=click.Choice(["basic", "standard", "advanced", "enterprise"]),
     help="Deployment complexity level",
 )
-def status(complexity_level: str):
+def status(complexity_level: str) -> None:
     """Show current status of dataset curation system."""
     try:
         console.print("\n📊 [bold blue]Dataset Curation System Status[/bold blue]")
@@ -466,7 +467,7 @@ def add_variable(
     low_limit: float | None,
     description: str | None,
     complexity_level: str,
-):
+) -> None:
     """Add a variable with metadata to the curation system."""
     try:
         console.print(f"\n➕ [bold blue]Adding Variable: {variable_name}[/bold blue]")
@@ -523,7 +524,7 @@ def add_variable(
 
 
 @dataset_curation.command()
-def list_variable_types():
+def list_variable_types() -> None:
     """List available variable types for classification."""
     try:
         console.print("\n📋 [bold blue]Available Variable Types[/bold blue]")
@@ -569,7 +570,7 @@ def list_variable_types():
 
 # AI Model Preparation Commands
 @dataset_curation.group("ai-model-prep")
-def ai_model_prep():
+def ai_model_prep() -> None:
     """AI Model Preparation commands for feature engineering and training data preparation."""
     pass
 
@@ -581,7 +582,7 @@ def ai_model_prep():
     type=click.Choice(["basic", "standard", "advanced", "enterprise"]),
     help="Deployment complexity level",
 )
-def validate_ai_env_cmd(complexity_level: str):
+def validate_ai_env_cmd(complexity_level: str) -> None:
     """Validate environment for AI model preparation."""
     try:
         console.print(
@@ -671,7 +672,7 @@ def validate_ai_env_cmd(complexity_level: str):
     type=click.Choice(["basic", "standard", "advanced", "enterprise"]),
     help="Deployment complexity level",
 )
-def ai_model_prep_info(complexity_level: str):
+def ai_model_prep_info(complexity_level: str) -> None:
     """Show AI model preparation system information."""
     try:
         # Create info panel
@@ -770,7 +771,7 @@ def engineer_features(
     enable_frequency: bool,
     window_sizes: str,
     complexity_level: str,
-):
+) -> None:
     """Engineer features from raw dataset."""
     try:
         console.print(
@@ -914,7 +915,7 @@ def prepare_training_data(
     handle_missing: bool,
     feature_selection: str,
     complexity_level: str,
-):
+) -> None:
     """Prepare training data with train/validation/test splits."""
     try:
         console.print(
@@ -1034,7 +1035,7 @@ def export_dataset(
     export_format: str,
     output_path: str | None,
     complexity_level: str,
-):
+) -> None:
     """Export prepared dataset in various ML framework formats."""
     try:
         console.print(f"\n📤 [bold blue]Exporting Dataset: {dataset_name}[/bold blue]")
@@ -1093,7 +1094,7 @@ def export_dataset(
     type=click.Choice(["basic", "standard", "advanced", "enterprise"]),
     help="Deployment complexity level",
 )
-def ai_model_prep_status(complexity_level: str):
+def ai_model_prep_status(complexity_level: str) -> None:
     """Show AI model preparation system status."""
     try:
         console.print("\n📊 [bold blue]AI Model Preparation System Status[/bold blue]")

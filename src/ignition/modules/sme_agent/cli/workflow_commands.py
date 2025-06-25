@@ -18,6 +18,7 @@ from ..development_workflow_integration import (
     get_development_workflow_info,
     validate_development_workflow_environment,
 )
+from typing import Any, Self
 from ..real_time_knowledge_updates import (
     RealTimeKnowledgeUpdater,
     get_knowledge_update_info,
@@ -26,13 +27,13 @@ from ..real_time_knowledge_updates import (
 
 
 @click.group(name="workflow")
-def workflow_group():
+def workflow_group() -> None:
     """Development workflow integration commands."""
     pass
 
 
 @click.group(name="knowledge")
-def knowledge_group():
+def knowledge_group() -> None:
     """Real-time knowledge update commands."""
     pass
 
@@ -41,11 +42,11 @@ def knowledge_group():
 
 
 @workflow_group.command("validate-env")
-def validate_workflow_environment():
+def validate_workflow_environment() -> None:
     """Validate development workflow integration environment."""
     click.echo("🔍 Validating development workflow environment...")
 
-    async def run_validation():
+    async def run_validation() -> None:
         result = await validate_development_workflow_environment()
         return result
 
@@ -69,7 +70,7 @@ def validate_workflow_environment():
 
 
 @workflow_group.command("info")
-def workflow_info():
+def workflow_info() -> None:
     """Show development workflow integration information."""
     info = get_development_workflow_info()
 
@@ -95,11 +96,11 @@ def workflow_info():
 
 @workflow_group.command("health")
 @click.option("--detailed", is_flag=True, help="Perform detailed health assessment")
-def assess_project_health(detailed):
+def assess_project_health(detailed: Any) -> None:
     """Assess project health with SME Agent insights."""
     click.echo("🏥 Assessing project health...")
 
-    async def run_assessment():
+    async def run_assessment() -> None:
         integrator = DevelopmentWorkflowIntegrator()
         await integrator.initialize()
 
@@ -148,11 +149,11 @@ def assess_project_health(detailed):
 
 
 @workflow_group.command("setup-git-hooks")
-def setup_git_hooks():
+def setup_git_hooks() -> None:
     """Set up git hooks for SME Agent integration."""
     click.echo("🔗 Setting up git hooks...")
 
-    async def run_setup():
+    async def run_setup() -> None:
         integrator = DevelopmentWorkflowIntegrator()
         await integrator.initialize()
         success = await integrator.setup_git_hooks()
@@ -173,13 +174,13 @@ def setup_git_hooks():
 @workflow_group.command("generate-docs")
 @click.option("--target", "-t", multiple=True, help="Target paths to document")
 @click.option("--force", is_flag=True, help="Force regeneration of existing docs")
-def generate_documentation(target, force):
+def generate_documentation(target, force) -> None:
     """Generate automated documentation with SME Agent enhancement."""
     click.echo("📚 Generating documentation...")
 
     target_paths = list(target) if target else None
 
-    async def run_generation():
+    async def run_generation() -> None:
         integrator = DevelopmentWorkflowIntegrator()
         await integrator.initialize()
 
@@ -218,11 +219,11 @@ def generate_documentation(target, force):
 
 
 @knowledge_group.command("validate-env")
-def validate_knowledge_environment():
+def validate_knowledge_environment() -> None:
     """Validate real-time knowledge updates environment."""
     click.echo("🔍 Validating knowledge update environment...")
 
-    async def run_validation():
+    async def run_validation() -> None:
         result = await validate_knowledge_update_environment()
         return result
 
@@ -246,7 +247,7 @@ def validate_knowledge_environment():
 
 
 @knowledge_group.command("info")
-def knowledge_info():
+def knowledge_info() -> None:
     """Show real-time knowledge updates information."""
     info = get_knowledge_update_info()
 
@@ -263,11 +264,11 @@ def knowledge_info():
 
 
 @knowledge_group.command("start-monitoring")
-def start_knowledge_monitoring():
+def start_knowledge_monitoring() -> None:
     """Start real-time knowledge monitoring."""
     click.echo("🚀 Starting knowledge monitoring...")
 
-    async def run_monitoring():
+    async def run_monitoring() -> None:
         updater = RealTimeKnowledgeUpdater()
         await updater.initialize()
         await updater.start_monitoring()
@@ -294,7 +295,7 @@ def start_knowledge_monitoring():
 
 
 @knowledge_group.command("status")
-def knowledge_status():
+def knowledge_status() -> None:
     """Show knowledge update status and statistics."""
     click.echo("📊 Knowledge Update Status")
     click.echo("=" * 30)
@@ -331,11 +332,11 @@ def knowledge_status():
     type=click.Choice(["all", "releases", "community", "patterns", "graph"]),
     help="Type of update to perform",
 )
-def force_knowledge_update(type):
+def force_knowledge_update(type: Any) -> None:
     """Force immediate knowledge update."""
     click.echo(f"🔄 Forcing {type} update...")
 
-    async def run_update():
+    async def run_update() -> None:
         updater = RealTimeKnowledgeUpdater()
         await updater.initialize()
 
@@ -359,7 +360,7 @@ def force_knowledge_update(type):
 
 
 # Register command groups
-def register_workflow_commands(cli_group):
+def register_workflow_commands(cli_group: Any) -> None:
     """Register workflow and knowledge commands with the main CLI."""
     cli_group.add_command(workflow_group)
     cli_group.add_command(knowledge_group)

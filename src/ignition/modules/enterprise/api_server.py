@@ -29,7 +29,7 @@ Usage:
 import asyncio
 import logging
 from datetime import datetime
-from typing import Any
+from typing import Self, Any
 
 import uvicorn
 from fastapi import BackgroundTasks, FastAPI, HTTPException
@@ -132,7 +132,7 @@ startup_time = datetime.now()
 
 
 @app.on_event("startup")
-async def startup_event():
+async def startup_event() -> None:
     """Initialize modules on startup following crawl_mcp.py methodology."""
     global architecture_module, cloud_module, analytics_module
 
@@ -155,7 +155,7 @@ async def startup_event():
 
 
 @app.on_event("shutdown")
-async def shutdown_event():
+async def shutdown_event() -> None:
     """Clean up resources on shutdown."""
     logger.info("🧹 Phase 10 Enterprise API: Shutting down...")
 
@@ -174,7 +174,7 @@ async def shutdown_event():
 
 
 @app.get("/", response_model=dict[str, Any])
-async def root():
+async def root() -> None:
     """Root endpoint with API information."""
     return {
         "message": "Phase 10: Enterprise Integration & Deployment API",
@@ -192,7 +192,7 @@ async def root():
 
 
 @app.get("/health", response_model=HealthCheckResponse)
-async def health_check():
+async def health_check() -> None:
     """Health check endpoint for monitoring.
 
     Following crawl_mcp.py methodology for comprehensive status reporting.
@@ -275,7 +275,7 @@ async def health_check():
 
 
 @app.get("/api/v1/validation/all", response_model=ValidationResponse)
-async def validate_all_environments():
+async def validate_all_environments() -> None:
     """Validate all enterprise module environments.
 
     Following crawl_mcp.py methodology: Step 1 - Environment Variable Validation First
@@ -338,7 +338,7 @@ async def validate_all_environments():
 
 
 @app.get("/api/v1/validation/architecture", response_model=dict[str, Any])
-async def validate_architecture_environment():
+async def validate_architecture_environment() -> None:
     """Validate enterprise architecture environment."""
     if not architecture_module:
         raise HTTPException(
@@ -355,7 +355,7 @@ async def validate_architecture_environment():
 
 
 @app.get("/api/v1/validation/cloud", response_model=dict[str, Any])
-async def validate_cloud_environment():
+async def validate_cloud_environment() -> None:
     """Validate cloud integration environment."""
     if not cloud_module:
         raise HTTPException(
@@ -370,7 +370,7 @@ async def validate_cloud_environment():
 
 
 @app.get("/api/v1/validation/analytics", response_model=dict[str, Any])
-async def validate_analytics_environment():
+async def validate_analytics_environment() -> None:
     """Validate analytics platform environment."""
     if not analytics_module:
         raise HTTPException(
@@ -392,7 +392,7 @@ async def validate_analytics_environment():
 @app.post("/api/v1/deployment/architecture", response_model=DeploymentResponse)
 async def deploy_architecture(
     request: DeploymentRequest, background_tasks: BackgroundTasks
-):
+) -> None:
     """Deploy enterprise architecture with progressive complexity.
 
     Following crawl_mcp.py methodology: Step 5 - Progressive Complexity Support
@@ -439,7 +439,7 @@ async def deploy_architecture(
 
 
 @app.post("/api/v1/deployment/cloud", response_model=DeploymentResponse)
-async def deploy_cloud(request: DeploymentRequest, background_tasks: BackgroundTasks):
+async def deploy_cloud(request: DeploymentRequest, background_tasks: BackgroundTasks) -> None:
     """Deploy cloud infrastructure with progressive complexity."""
     if not cloud_module:
         raise HTTPException(
@@ -482,7 +482,7 @@ async def deploy_cloud(request: DeploymentRequest, background_tasks: BackgroundT
 @app.post("/api/v1/deployment/analytics", response_model=DeploymentResponse)
 async def deploy_analytics(
     request: DeploymentRequest, background_tasks: BackgroundTasks
-):
+) -> None:
     """Deploy analytics platform with progressive complexity."""
     if not analytics_module:
         raise HTTPException(
@@ -528,7 +528,7 @@ async def deploy_analytics(
 
 
 @app.post("/api/v1/testing/comprehensive", response_model=dict[str, Any])
-async def run_comprehensive_tests(request: TestRequest):
+async def run_comprehensive_tests(request: TestRequest) -> None:
     """Run comprehensive tests on all enterprise modules.
 
     Following crawl_mcp.py methodology: Step 4 - Modular Component Testing
@@ -639,7 +639,7 @@ async def run_comprehensive_tests(request: TestRequest):
 
 
 @app.get("/api/v1/monitoring/status", response_model=dict[str, Any])
-async def get_module_status():
+async def get_module_status() -> None:
     """Get detailed status of all enterprise modules."""
     try:
         status = {}
@@ -666,7 +666,7 @@ async def get_module_status():
 
 
 # Background task for cleanup
-async def cleanup_after_delay(module_name: str, delay_seconds: int):
+async def cleanup_after_delay(module_name: str, delay_seconds: int) -> None:
     """Clean up module resources after a delay."""
     await asyncio.sleep(delay_seconds)
     logger.info(
@@ -682,7 +682,7 @@ async def cleanup_after_delay(module_name: str, delay_seconds: int):
 
 
 # CLI command to start the server
-def start_server(host: str = "0.0.0.0", port: int = 8000, reload: bool = True):
+def start_server(host: str = "0.0.0.0", port: int = 8000, reload: bool = True) -> None:
     """Start the Phase 10 Enterprise API server.
 
     Args:

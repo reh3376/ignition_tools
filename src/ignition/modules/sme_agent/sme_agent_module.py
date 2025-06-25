@@ -13,7 +13,7 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Self, Any
 
 from dotenv import load_dotenv
 
@@ -51,7 +51,7 @@ class SMEDecisionLog:
     rating: int | None = None  # 1-5 scale
     feedback_incorporated: bool = False
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self: Self) -> dict[str, Any]:
         """Convert decision log to dictionary for storage."""
         return {
             "decision_id": self.decision_id,
@@ -121,7 +121,7 @@ class HumanEvaluationBatch:
     evaluation_summary: str | None = None
     overall_rating: float | None = None
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self: Self) -> dict[str, Any]:
         """Convert evaluation batch to dictionary."""
         return {
             "batch_id": self.batch_id,
@@ -168,7 +168,7 @@ class SMEAgentConfig:
     data_dir: str = "data"
     evaluation_dir: str = "evaluation"
 
-    def __post_init__(self):
+    def __post_init__(self: Self):
         """Validate configuration after initialization."""
         # Convert string booleans
         if isinstance(self.gpu_enabled, str):
@@ -221,7 +221,7 @@ class SMEAgentResponse:
     knowledge_sources: list[str]
     decision_log: SMEDecisionLog | None = None
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self: Self) -> dict[str, Any]:
         """Convert response to dictionary."""
         result = {
             "response": self.response,
@@ -254,7 +254,7 @@ class SMEAgentModule:
     - Performance tracking and improvement
     """
 
-    def __init__(self, config: SMEAgentConfig | None = None):
+    def __init__(self: Self, config: SMEAgentConfig | None = None):
         """Initialize SME Agent Module.
 
         Args:
@@ -298,7 +298,7 @@ class SMEAgentModule:
 
         self.logger.info("SME Agent Module initialized successfully")
 
-    def _create_config_from_environment(self) -> SMEAgentConfig:
+    def _create_config_from_environment(self: Self) -> SMEAgentConfig:
         """Create configuration from environment variables."""
         env_config = self.validation_result["config"]
 
@@ -336,7 +336,7 @@ class SMEAgentModule:
             ),
         )
 
-    def validate_environment(self) -> dict[str, Any]:
+    def validate_environment(self: Self) -> dict[str, Any]:
         """Step 1: Environment Validation First
 
         Returns:
@@ -347,7 +347,7 @@ class SMEAgentModule:
 
         return self.validation_result
 
-    def initialize_components(self, complexity_level: str = "basic") -> dict[str, Any]:
+    def initialize_components(self: Self, complexity_level: str = "basic") -> dict[str, Any]:
         """Step 5: Progressive Complexity Support
 
         Initialize SME Agent components based on complexity level.
@@ -409,7 +409,7 @@ class SMEAgentModule:
         initialization_result["initialization_time"] = time.time() - start_time
         return initialization_result
 
-    def _initialize_logging(self):
+    def _initialize_logging(self: Self):
         """Initialize logging configuration."""
         log_level = getattr(logging, self.config.log_level.upper(), logging.INFO)
         logging.basicConfig(
@@ -418,7 +418,7 @@ class SMEAgentModule:
         )
         self.logger.info("Logging initialized")
 
-    def _initialize_directories(self):
+    def _initialize_directories(self: Self):
         """Initialize required directories."""
         dirs = [self.config.cache_dir, self.config.data_dir, "logs"]
         for dir_name in dirs:
@@ -426,7 +426,7 @@ class SMEAgentModule:
             dir_path.mkdir(exist_ok=True)
         self.logger.info("Directories initialized")
 
-    def _initialize_neo4j(self):
+    def _initialize_neo4j(self: Self):
         """Initialize Neo4j connection."""
         try:
             if self.validation_result["components_available"]["neo4j"]:
@@ -443,7 +443,7 @@ class SMEAgentModule:
             self.logger.error(f"Neo4j initialization failed: {e}")
             raise
 
-    def _initialize_llm_placeholder(self):
+    def _initialize_llm_placeholder(self: Self):
         """Initialize LLM model with real integration."""
         try:
             # Import LLM integration module
@@ -495,7 +495,7 @@ class SMEAgentModule:
             self.logger.warning(f"LLM integration failed, using placeholder: {e}")
             self.logger.info(f"LLM placeholder initialized: {self.config.model_name}")
 
-    def _initialize_vector_store_placeholder(self):
+    def _initialize_vector_store_placeholder(self: Self):
         """Initialize vector store (placeholder implementation)."""
         # Placeholder for vector store initialization
         self.vector_store = {
@@ -635,12 +635,12 @@ class SMEAgentModule:
             self.logger.error(f"Question processing failed: {e}")
             raise SMEAgentValidationError(f"Question processing failed: {e}")
 
-    def _check_evaluation_batch_creation(self):
+    def _check_evaluation_batch_creation(self: Self):
         """Check if it's time to create a new evaluation batch."""
         if len(self.decision_logs) >= self.config.evaluation_batch_size:
             self._create_evaluation_batch()
 
-    def _create_evaluation_batch(self):
+    def _create_evaluation_batch(self: Self):
         """Create a new evaluation batch from pending decision logs."""
         if not self.decision_logs:
             return
@@ -665,7 +665,7 @@ class SMEAgentModule:
             f"Created evaluation batch {batch.batch_id} with {len(batch.decision_logs)} decisions"
         )
 
-    def _save_evaluation_batch(self, batch: HumanEvaluationBatch):
+    def _save_evaluation_batch(self: Self, batch: HumanEvaluationBatch):
         """Save evaluation batch to file for human review."""
         if not hasattr(self, "evaluation_dir") or self.evaluation_dir is None:
             self.evaluation_dir = Path(self.config.evaluation_dir)
@@ -682,7 +682,7 @@ class SMEAgentModule:
         except Exception as e:
             self.logger.error(f"Failed to save evaluation batch: {e}")
 
-    def get_pending_evaluation_batches(self) -> dict[str, Any]:
+    def get_pending_evaluation_batches(self: Self) -> dict[str, Any]:
         """Get all pending evaluation batches for human review."""
         pending_batches = [
             batch.to_dict()
@@ -1027,7 +1027,7 @@ class SMEAgentModule:
 
         return insights
 
-    def get_reinforcement_learning_summary(self) -> dict[str, Any]:
+    def get_reinforcement_learning_summary(self: Self) -> dict[str, Any]:
         """Get comprehensive reinforcement learning summary across all evaluations."""
         all_evaluated_logs = []
 
@@ -1118,7 +1118,7 @@ class SMEAgentModule:
 
         return summary
 
-    def get_status(self) -> dict[str, Any]:
+    def get_status(self: Self) -> dict[str, Any]:
         """Get current status of SME Agent."""
         return {
             "initialized": self.initialized,
@@ -1135,7 +1135,7 @@ class SMEAgentModule:
             "validation": self.validation_result,
         }
 
-    def cleanup(self):
+    def cleanup(self: Self):
         """Step 6: Resource Management and Cleanup
 
         Clean up resources and connections.
@@ -1154,10 +1154,10 @@ class SMEAgentModule:
         except Exception as e:
             self.logger.error(f"Cleanup failed: {e}")
 
-    def __enter__(self):
+    def __enter__(self: Self):
         """Context manager entry."""
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self: Self, exc_type, exc_val, exc_tb):
         """Context manager exit with cleanup."""
         self.cleanup()

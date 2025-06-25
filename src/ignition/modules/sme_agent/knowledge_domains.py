@@ -16,7 +16,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Self, Any
 
 from dotenv import load_dotenv
 
@@ -40,7 +40,7 @@ class DomainKnowledgeItem:
     last_updated: datetime = field(default_factory=datetime.now)
     tags: list[str] = field(default_factory=list)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self: Self) -> dict[str, Any]:
         """Convert to dictionary for serialization."""
         return {
             "id": self.id,
@@ -67,7 +67,7 @@ class DomainQueryResult:
     suggestions: list[str] = field(default_factory=list)
     related_topics: list[str] = field(default_factory=list)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self: Self) -> dict[str, Any]:
         """Convert to dictionary for serialization."""
         return {
             "query": self.query,
@@ -86,7 +86,7 @@ class BaseDomainManager(ABC):
     Following crawl_mcp.py methodology for systematic implementation.
     """
 
-    def __init__(self, domain_name: str, data_dir: str | None = None):
+    def __init__(self: Self, domain_name: str, data_dir: str | None = None):
         """Initialize domain manager.
 
         Args:
@@ -117,7 +117,7 @@ class BaseDomainManager(ABC):
 
         self.logger.info(f"Initialized {domain_name} domain manager")
 
-    def validate_input(self, query: str, context: dict[str, Any] | None = None) -> bool:
+    def validate_input(self: Self, query: str, context: dict[str, Any] | None = None) -> bool:
         """Step 2: Comprehensive Input Validation.
 
         Args:
@@ -145,7 +145,7 @@ class BaseDomainManager(ABC):
 
         return True
 
-    def handle_error(self, error: Exception, context: str) -> dict[str, Any]:
+    def handle_error(self: Self, error: Exception, context: str) -> dict[str, Any]:
         """Step 3: Error Handling with User-Friendly Messages.
 
         Args:
@@ -168,7 +168,7 @@ class BaseDomainManager(ABC):
         }
 
     @abstractmethod
-    def load_knowledge_base(self) -> bool:
+    def load_knowledge_base(self: Self) -> bool:
         """Load domain-specific knowledge base.
 
         Returns:
@@ -191,11 +191,11 @@ class BaseDomainManager(ABC):
         """
         pass
 
-    def get_statistics(self) -> dict[str, Any]:
+    def get_statistics(self: Self) -> dict[str, Any]:
         """Get domain statistics."""
         return self.statistics.copy()
 
-    def update_statistics(self):
+    def update_statistics(self: Self):
         """Update domain statistics."""
         total_items = len(self.knowledge_items)
         avg_confidence = sum(
@@ -211,7 +211,7 @@ class BaseDomainManager(ABC):
             }
         )
 
-    def save_knowledge_base(self) -> bool:
+    def save_knowledge_base(self: Self) -> bool:
         """Save knowledge base to disk.
 
         Returns:
@@ -245,7 +245,7 @@ class BaseDomainManager(ABC):
             self.logger.error(f"Failed to save knowledge base: {e}")
             return False
 
-    def load_knowledge_base_from_file(self) -> bool:
+    def load_knowledge_base_from_file(self: Self) -> bool:
         """Load knowledge base from disk.
 
         Returns:
@@ -297,7 +297,7 @@ class GatewayScriptingDomainManager(BaseDomainManager):
     - Message handlers
     """
 
-    def __init__(self, data_dir: str | None = None):
+    def __init__(self: Self, data_dir: str | None = None):
         """Initialize Gateway Scripting domain manager."""
         super().__init__("gateway_scripting", data_dir)
 
@@ -344,7 +344,7 @@ class GatewayScriptingDomainManager(BaseDomainManager):
         # Load knowledge base
         self.load_knowledge_base()
 
-    def load_knowledge_base(self) -> bool:
+    def load_knowledge_base(self: Self) -> bool:
         """Load gateway scripting knowledge base."""
         try:
             # First try to load from file
@@ -361,7 +361,7 @@ class GatewayScriptingDomainManager(BaseDomainManager):
             self.logger.error(f"Failed to load gateway scripting knowledge: {e}")
             return False
 
-    def _create_initial_knowledge_base(self):
+    def _create_initial_knowledge_base(self: Self):
         """Create initial knowledge base for gateway scripting."""
         # Startup script examples
         startup_examples = [
@@ -624,7 +624,7 @@ def valueChanged(tag, tagPath, previousValue, currentValue, initialChange, misse
 
         return min(score, 1.0)  # Cap at 1.0
 
-    def _generate_suggestions(self, results: list[DomainKnowledgeItem]) -> list[str]:
+    def _generate_suggestions(self: Self, results: list[DomainKnowledgeItem]) -> list[str]:
         """Generate suggestions based on query and results."""
         suggestions = []
 
@@ -647,7 +647,7 @@ def valueChanged(tag, tagPath, previousValue, currentValue, initialChange, misse
 
         return suggestions[:3]  # Limit to 3 suggestions
 
-    def _get_related_topics(self, query: str) -> list[str]:
+    def _get_related_topics(self: Self, query: str) -> list[str]:
         """Get related topics based on query."""
         related = []
 
@@ -667,7 +667,7 @@ def valueChanged(tag, tagPath, previousValue, currentValue, initialChange, misse
 
         return related[:5]  # Limit to 5 related topics
 
-    def get_script_template(self, script_type: str) -> dict[str, Any] | None:
+    def get_script_template(self: Self, script_type: str) -> dict[str, Any] | None:
         """Get script template for specific type.
 
         Args:
@@ -700,7 +700,7 @@ def valueChanged(tag, tagPath, previousValue, currentValue, initialChange, misse
             "description": best_item.description,
         }
 
-    def analyze_script_quality(self, script_content: str) -> dict[str, Any]:
+    def analyze_script_quality(self: Self, script_content: str) -> dict[str, Any]:
         """Analyze script quality and provide recommendations.
 
         Args:
@@ -783,7 +783,7 @@ class SystemFunctionsDomainManager(BaseDomainManager):
     Provides expertise in Ignition system functions with Neo4j integration.
     """
 
-    def __init__(self, neo4j_client=None, data_dir: str | None = None):
+    def __init__(self: Self, neo4j_client=None, data_dir: str | None = None):
         """Initialize System Functions domain manager.
 
         Args:
@@ -797,7 +797,7 @@ class SystemFunctionsDomainManager(BaseDomainManager):
         # Load knowledge base
         self.load_knowledge_base()
 
-    def load_knowledge_base(self) -> bool:
+    def load_knowledge_base(self: Self) -> bool:
         """Load system functions knowledge base."""
         try:
             # Load from Neo4j if available
@@ -821,7 +821,7 @@ class SystemFunctionsDomainManager(BaseDomainManager):
             self.logger.error(f"Failed to load system functions knowledge: {e}")
             return False
 
-    def _load_from_neo4j(self):
+    def _load_from_neo4j(self: Self):
         """Load system functions from Neo4j knowledge graph."""
         try:
             # Query for all system functions
@@ -868,7 +868,7 @@ class SystemFunctionsDomainManager(BaseDomainManager):
             self.logger.error(f"Failed to load from Neo4j: {e}")
             self._create_initial_knowledge_base()
 
-    def _create_initial_knowledge_base(self):
+    def _create_initial_knowledge_base(self: Self):
         """Create initial knowledge base for system functions."""
         # Common Ignition system functions
         system_functions = [
@@ -945,7 +945,7 @@ class SystemFunctionsDomainManager(BaseDomainManager):
             f"Created initial system functions knowledge base with {len(self.knowledge_items)} items"
         )
 
-    def _categorize_function(self, function_name: str) -> str:
+    def _categorize_function(self: Self, function_name: str) -> str:
         """Categorize function based on name."""
         name_lower = function_name.lower()
 
@@ -964,7 +964,7 @@ class SystemFunctionsDomainManager(BaseDomainManager):
         else:
             return "utility"
 
-    def _generate_function_tags(self, function_name: str, module: str) -> list[str]:
+    def _generate_function_tags(self: Self, function_name: str, module: str) -> list[str]:
         """Generate tags for a function."""
         tags = []
 
@@ -1133,7 +1133,7 @@ class SystemFunctionsDomainManager(BaseDomainManager):
 
         return suggestions[:3]
 
-    def _get_function_related_topics(self, query: str) -> list[str]:
+    def _get_function_related_topics(self: Self, query: str) -> list[str]:
         """Get related topics for system function queries."""
         related = []
 
@@ -1155,7 +1155,7 @@ class SystemFunctionsDomainManager(BaseDomainManager):
 
         return related[:5]
 
-    def get_function_details(self, function_name: str) -> dict[str, Any] | None:
+    def get_function_details(self: Self, function_name: str) -> dict[str, Any] | None:
         """Get detailed information about a specific system function.
 
         Args:

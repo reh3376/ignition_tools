@@ -23,6 +23,7 @@ from .deployment_manager import DeploymentConfig, DeploymentManager
 from .module_packager import ModulePackager, PackagingConfig
 from .module_signer import ModuleSigner, SigningConfig
 from .repository_manager import RepositoryConfig, RepositoryManager
+from typing import Any, Self
 
 # Load environment variables
 load_dotenv()
@@ -31,7 +32,7 @@ console = Console()
 
 
 @click.group(name="deploy")
-def deployment_cli():
+def deployment_cli() -> None:
     """Module Deployment & Distribution commands."""
     pass
 
@@ -87,7 +88,7 @@ def module(
     notes: str | None,
     tags: str | None,
     dry_run: bool,
-):
+) -> None:
     """Deploy a single module through the complete workflow."""
     try:
         console.print(f"🚀 Starting module deployment: {project_path.name}")
@@ -193,7 +194,7 @@ def batch(
     skip_signing: bool,
     skip_upload: bool,
     continue_on_error: bool,
-):
+) -> None:
     """Deploy multiple modules in batch."""
     try:
         if not project_paths:
@@ -249,7 +250,7 @@ def package(
     project_path: Path,
     output_dir: Path | None,
     gradle_args: str | None,
-):
+) -> None:
     """Package a module for distribution."""
     try:
         console.print(f"📦 Packaging module: {project_path.name}")
@@ -301,7 +302,7 @@ def sign(
     cert_path: str | None,
     key_path: str | None,
     output_dir: Path | None,
-):
+) -> None:
     """Sign a module for secure distribution."""
     try:
         console.print(f"🔐 Signing module: {module_file.name}")
@@ -362,7 +363,7 @@ def upload(
     version: str | None,
     description: str | None,
     repository_url: str | None,
-):
+) -> None:
     """Upload a module package to the repository."""
     try:
         console.print(f"📤 Uploading module: {package_file.name}")
@@ -420,7 +421,7 @@ def download(
     version: str | None,
     output_dir: Path | None,
     repository_url: str | None,
-):
+) -> None:
     """Download a module from the repository."""
     try:
         console.print(f"📥 Downloading module: {module_name}")
@@ -466,7 +467,7 @@ def download(
 def list_modules(
     search: str | None,
     repository_url: str | None,
-):
+) -> None:
     """List available modules in the repository."""
     try:
         console.print("📋 Listing repository modules...")
@@ -538,7 +539,7 @@ def validate_env(
     packaging: bool,
     signing: bool,
     repository: bool,
-):
+) -> None:
     """Validate deployment environment and configuration."""
     try:
         console.print("🔍 Validating deployment environment...")
@@ -572,7 +573,7 @@ def validate_env(
 
 def _display_environment_validation(
     validation_results: dict, title: str = "Environment Validation"
-):
+) -> None:
     """Display environment validation results in a table."""
     table = Table(title=title)
     table.add_column("Check", style="cyan")
@@ -605,7 +606,7 @@ def _display_environment_validation(
 @click.option(
     "--report-only", is_flag=True, help="Generate report without making changes"
 )
-def setup_environment(interactive: bool, force: bool, report_only: bool):
+def setup_environment(interactive: bool, force: bool, report_only: bool) -> None:
     """Set up Phase 9.7 development environment following crawl_mcp.py methodology.
 
     This command follows the systematic approach from crawl_mcp.py:
@@ -712,7 +713,7 @@ def setup_environment(interactive: bool, force: bool, report_only: bool):
 @click.option(
     "--suggestions/--no-suggestions", default=True, help="Show fix suggestions"
 )
-def check_environment(detailed: bool, suggestions: bool):
+def check_environment(detailed: bool, suggestions: bool) -> None:
     """Check Phase 9.7 environment configuration following crawl_mcp.py validation patterns.
 
     This command performs comprehensive environment validation without making changes.
@@ -830,7 +831,7 @@ def check_environment(detailed: bool, suggestions: bool):
 @click.option("--gradle", is_flag=True, help="Install Gradle (macOS with Homebrew)")
 @click.option("--all", is_flag=True, help="Install all available tools")
 @click.option("--dry-run", is_flag=True, help="Show commands without executing")
-def install_requirements(java: bool, gradle: bool, all: bool, dry_run: bool):
+def install_requirements(java: bool, gradle: bool, all: bool, dry_run: bool) -> None:
     """Install system requirements for Phase 9.7 deployment (macOS with Homebrew).
 
     This command helps install Java and Gradle on macOS systems using Homebrew.

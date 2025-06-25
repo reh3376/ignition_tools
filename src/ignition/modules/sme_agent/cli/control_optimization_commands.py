@@ -12,7 +12,7 @@ import json
 import logging
 import os
 from datetime import datetime
-from typing import Any
+from typing import Self, Any
 
 import click
 from dotenv import load_dotenv
@@ -140,19 +140,19 @@ def display_test_results(
 
 
 @click.group(name="control")
-def control_group():
+def control_group() -> None:
     """AI Control Supervisor commands for PID optimization and MPC control."""
     pass
 
 
 @click.group(name="pid")
-def pid_group():
+def pid_group() -> None:
     """PID control optimization commands."""
     pass
 
 
 @click.group(name="mpc")
-def mpc_group():
+def mpc_group() -> None:
     """Model Predictive Control (MPC) commands."""
     pass
 
@@ -164,7 +164,7 @@ def mpc_group():
 @click.option(
     "--verbose", "-v", is_flag=True, help="Show detailed validation information"
 )
-def validate_control_environment(verbose: bool):
+def validate_control_environment(verbose: bool) -> None:
     """Validate AI Control Supervisor environment setup."""
     console.print(
         "[bold blue]🔍 Validating AI Control Supervisor Environment...[/bold blue]"
@@ -204,7 +204,7 @@ def validate_control_environment(verbose: bool):
     default="all",
     help="Component to test",
 )
-def test_control_system(component: str):
+def test_control_system(component: str) -> None:
     """Test AI Control Supervisor functionality."""
     console.print(
         f"[bold blue]🧪 Testing AI Control Supervisor - {component.title()}...[/bold blue]"
@@ -214,7 +214,7 @@ def test_control_system(component: str):
         console.print("[red]❌ Control modules not available. Check imports.[/red]")
         return
 
-    async def run_tests():
+    async def run_tests() -> None:
         test_results = []
 
         try:
@@ -263,7 +263,7 @@ def test_control_system(component: str):
 
 
 @control_group.command("status")
-def control_system_status():
+def control_system_status() -> None:
     """Show AI Control Supervisor system status."""
     console.print("[bold blue]📊 AI Control Supervisor Status[/bold blue]")
 
@@ -354,7 +354,7 @@ def control_system_status():
 )
 def tune_pid_controller(
     method: str, data_file: str | None, setpoint: float, output: str | None
-):
+) -> None:
     """Tune PID controller using specified method."""
     console.print(
         f"[bold blue]🎛️ Tuning PID Controller - {method.replace('_', ' ').title()}[/bold blue]"
@@ -437,7 +437,7 @@ def tune_pid_controller(
 @click.option(
     "--test-data", "-d", type=click.Path(exists=True), help="Test data file (CSV)"
 )
-def validate_pid_configuration(config_file: str, test_data: str | None):
+def validate_pid_configuration(config_file: str, test_data: str | None) -> None:
     """Validate PID controller configuration."""
     console.print("[bold blue]✅ Validating PID Configuration[/bold blue]")
 
@@ -501,7 +501,7 @@ def validate_pid_configuration(config_file: str, test_data: str | None):
 @click.option(
     "--output", "-o", type=click.Path(), help="Output file for identified model"
 )
-def identify_process_model(data_file: str, model_type: str, output: str | None):
+def identify_process_model(data_file: str, model_type: str, output: str | None) -> None:
     """Identify process model from historical data."""
     console.print(
         f"[bold blue]🔬 Identifying Process Model - {model_type.upper()}[/bold blue]"
@@ -511,7 +511,7 @@ def identify_process_model(data_file: str, model_type: str, output: str | None):
         console.print("[red]❌ Control modules not available[/red]")
         return
 
-    async def run_identification():
+    async def run_identification() -> None:
         try:
             console.print(f"[yellow]📊 Processing data from: {data_file}[/yellow]")
 
@@ -585,7 +585,7 @@ def identify_process_model(data_file: str, model_type: str, output: str | None):
 )
 def design_mpc_controller(
     model_file: str, prediction_horizon: int, control_horizon: int, output: str | None
-):
+) -> None:
     """Design MPC controller with specified parameters."""
     console.print("[bold blue]🎛️ Designing MPC Controller[/bold blue]")
 
@@ -667,7 +667,7 @@ def design_mpc_controller(
 )
 @click.option("--setpoint", "-s", type=float, default=50.0, help="Control setpoint")
 @click.option("--steps", "-n", type=int, default=20, help="Simulation steps")
-def simulate_mpc_control(config_file: str, setpoint: float, steps: int):
+def simulate_mpc_control(config_file: str, setpoint: float, steps: int) -> None:
     """Simulate MPC controller performance."""
     console.print(f"[bold blue]🎮 Simulating MPC Control - {steps} steps[/bold blue]")
 
@@ -675,7 +675,7 @@ def simulate_mpc_control(config_file: str, setpoint: float, steps: int):
         console.print("[red]❌ Control modules not available[/red]")
         return
 
-    async def run_simulation():
+    async def run_simulation() -> None:
         try:
             # Load configuration
             with open(config_file) as f:

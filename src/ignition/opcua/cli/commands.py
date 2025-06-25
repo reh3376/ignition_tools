@@ -10,7 +10,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Self, Any
 
 import click
 from rich.console import Console
@@ -40,7 +40,7 @@ _connection_config: dict[str, Any] = {}
     default="INFO",
     help="Set logging level (DEBUG, INFO, WARNING, ERROR)",
 )
-def opcua(verbose: bool, log_level: str):
+def opcua(verbose: bool, log_level: str) -> None:
     """OPC-UA Client Commands.
 
     🔒 SAFETY: All operations are READ-ONLY to protect live systems.
@@ -81,7 +81,7 @@ def connect(
     security_mode: str,
     timeout: float,
     save_config: str | None,
-):
+) -> None:
     r"""Connect to an OPC-UA server.
 
     🔒 READ-ONLY: Connection is configured for safe read operations only.
@@ -112,7 +112,7 @@ async def _connect_impl(
     security_mode: str,
     timeout: float,
     save_config: str | None,
-):
+) -> None:
     """Implementation of connect command."""
     global _current_client, _connection_config
 
@@ -204,12 +204,12 @@ async def _connect_impl(
 
 
 @opcua.command()
-def disconnect():
+def disconnect() -> None:
     """Disconnect from the current OPC-UA server."""
     asyncio.run(_disconnect_impl())
 
 
-async def _disconnect_impl():
+async def _disconnect_impl() -> None:
     """Implementation of disconnect command."""
     global _current_client, _connection_config
 
@@ -239,12 +239,12 @@ async def _disconnect_impl():
 
 
 @opcua.command()
-def info():
+def info() -> None:
     """Get information about the connected OPC-UA server."""
     asyncio.run(_info_impl())
 
 
-async def _info_impl():
+async def _info_impl() -> None:
     """Implementation of info command."""
     if not _current_client or not _current_client.connected:
         console.print("❌ Not connected to any OPC-UA server. Use 'connect' first.")
@@ -305,7 +305,7 @@ async def _info_impl():
 @click.option("--depth", "-d", default=2, help="Maximum browsing depth")
 @click.option("--filter", "-f", help="Filter nodes by browse name (case-insensitive)")
 @click.option("--variables-only", is_flag=True, help="Show only variable nodes")
-def browse(node: str, depth: int, filter: str | None, variables_only: bool):
+def browse(node: str, depth: int, filter: str | None, variables_only: bool) -> None:
     """Browse the OPC-UA server address space.
 
     🔒 READ-ONLY: Safely browse server structure without modifications.
@@ -318,7 +318,7 @@ def browse(node: str, depth: int, filter: str | None, variables_only: bool):
     asyncio.run(_browse_impl(node, depth, filter, variables_only))
 
 
-async def _browse_impl(node: str, depth: int, filter: str | None, variables_only: bool):
+async def _browse_impl(node: str, depth: int, filter: str | None, variables_only: bool) -> None:
     """Implementation of browse command."""
     if not _current_client or not _current_client.connected:
         console.print("❌ Not connected to any OPC-UA server. Use 'connect' first.")
@@ -352,7 +352,7 @@ async def _browse_impl(node: str, depth: int, filter: str | None, variables_only
         console.print(f"❌ [bold red]Browse error:[/bold red] {e!s}")
 
 
-def _build_tree_display(tree: Tree, node_data: dict[str, Any], filter: str | None, variables_only: bool):
+def _build_tree_display(tree: Tree, node_data: dict[str, Any], filter: str | None, variables_only: bool) -> None:
     """Build rich tree display from node data."""
     children = node_data.get("children", [])
 
@@ -404,7 +404,7 @@ def _count_nodes(node_data: dict[str, Any]) -> int:
     type=click.Choice(["auto", "json", "table", "raw"]),
     help="Output format",
 )
-def read(node_id: str, format: str):
+def read(node_id: str, format: str) -> None:
     """Read value from an OPC-UA node.
 
     🔒 READ-ONLY: Safely read node values without modifications.
@@ -416,7 +416,7 @@ def read(node_id: str, format: str):
     asyncio.run(_read_impl(node_id, format))
 
 
-async def _read_impl(node_id: str, format: str):
+async def _read_impl(node_id: str, format: str) -> None:
     """Implementation of read command."""
     if not _current_client or not _current_client.connected:
         console.print("❌ Not connected to any OPC-UA server. Use 'connect' first.")
@@ -476,7 +476,7 @@ async def _read_impl(node_id: str, format: str):
 
 
 @opcua.command()
-def status():
+def status() -> None:
     """Show current connection status and statistics."""
     global _current_client, _connection_config
 
@@ -487,7 +487,7 @@ def status():
     asyncio.run(_status_impl())
 
 
-async def _status_impl():
+async def _status_impl() -> None:
     """Implementation of status command."""
     try:
         health = await _current_client.health_check()
@@ -534,7 +534,7 @@ async def _status_impl():
     help="Output format for monitored data",
 )
 @click.option("--output", "-o", help="Output file path (default: console)")
-def monitor(node_ids: tuple, interval: int, duration: int, format: str, output: str | None):
+def monitor(node_ids: tuple, interval: int, duration: int, format: str, output: str | None) -> None:
     """Monitor OPC-UA nodes for real-time data changes.
 
     🔒 READ-ONLY: Safely monitor data changes without modifications.
@@ -547,7 +547,7 @@ def monitor(node_ids: tuple, interval: int, duration: int, format: str, output: 
     asyncio.run(_monitor_impl(list(node_ids), interval, duration, format, output))
 
 
-async def _monitor_impl(node_ids: list, interval: int, duration: int, format: str, output: str | None):
+async def _monitor_impl(node_ids: list, interval: int, duration: int, format: str, output: str | None) -> None:
     """Implementation of monitor command."""
     if not _current_client or not _current_client.connected:
         console.print("❌ Not connected to any OPC-UA server. Use 'connect' first.")
@@ -576,7 +576,7 @@ async def _monitor_impl(node_ids: list, interval: int, duration: int, format: st
                 writer.writeheader()
 
         # Create subscription callback
-        def data_change_callback(node_id, value, data):
+        def data_change_callback(node_id, value, data) -> None:
             timestamp = datetime.now()
             quality = getattr(data, "status_code", "Unknown")
             source_timestamp = getattr(data, "source_timestamp", timestamp)

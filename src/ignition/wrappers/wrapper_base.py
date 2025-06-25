@@ -10,7 +10,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
 from functools import wraps
-from typing import Any
+from typing import Self, Any
 
 # Mock system functions for development/testing environment
 try:
@@ -23,7 +23,7 @@ except ImportError:
     class MockSystem:
         """Mock system object for development and testing."""
 
-        def __init__(self) -> None:
+        def __init__(self: Self) -> None:
             self.tag = MockTag()
             self.db = MockDb()
             self.gui = MockGui()
@@ -32,67 +32,67 @@ except ImportError:
             self.util = MockUtil()
 
     class MockTag:
-        def readBlocking(self, tag_paths, timeout=45000):
+        def readBlocking(self: Self, tag_paths, timeout=45000) -> None:
             return [MockQualifiedValue(0, 192, time.time())]
 
-        def writeBlocking(self, tag_paths, values, timeout=45000):
+        def writeBlocking(self: Self, tag_paths, values, timeout=45000) -> None:
             return [MockQualityCode(192)]
 
-        def read(self, tag_paths):
+        def read(self: Self, tag_paths: Any) -> None:
             return [MockQualifiedValue(0, 192, time.time())]
 
-        def write(self, tag_paths, values):
+        def write(self: Self, tag_paths, values) -> None:
             return [MockQualityCode(192)]
 
     class MockDb:
-        def runQuery(self, query, database=""):
+        def runQuery(self: Self, query, database="") -> None:
             return []
 
-        def runUpdateQuery(self, query, database=""):
+        def runUpdateQuery(self: Self, query, database="") -> None:
             return 0
 
-        def runPrepQuery(self, query, args, database=""):
+        def runPrepQuery(self: Self, query, args, database="") -> None:
             return []
 
     class MockGui:
-        def messageBox(self, message: str, title: str = "") -> None:
+        def messageBox(self: Self, message: str, title: str = "") -> None:
             print(f"MessageBox - {title}: {message}")
 
-        def errorBox(self, message: str, title: str = "") -> None:
+        def errorBox(self: Self, message: str, title: str = "") -> None:
             print(f"ErrorBox - {title}: {message}")
 
-        def warningBox(self, message: str, title: str = "") -> None:
+        def warningBox(self: Self, message: str, title: str = "") -> None:
             print(f"WarningBox - {title}: {message}")
 
     class MockNav:
-        def openWindow(self, path: str, params: dict | None = None) -> None:
+        def openWindow(self: Self, path: str, params: dict | None = None) -> None:
             print(f"Opening window: {path}")
 
-        def closeWindow(self, path: str) -> None:
+        def closeWindow(self: Self, path: str) -> None:
             print(f"Closing window: {path}")
 
     class MockAlarm:
-        def acknowledge(self, alarmIds, notes=""):
+        def acknowledge(self: Self, alarmIds, notes="") -> None:
             return True
 
-        def queryStatus(self, priority=None, state=None):
+        def queryStatus(self: Self, priority=None, state=None) -> None:
             return []
 
     class MockUtil:
-        def getLogger(self, name):
+        def getLogger(self: Self, name: Any) -> None:
             return logging.getLogger(name)
 
-        def getSystemFlags(self):
+        def getSystemFlags(self: Self) -> None:
             return 0  # Return 0 for unknown context in mock
 
     class MockQualifiedValue:
-        def __init__(self, value, quality, timestamp) -> None:
+        def __init__(self: Self, value, quality, timestamp) -> None:
             self.value = value
             self.quality = quality
             self.timestamp = timestamp
 
     class MockQualityCode:
-        def __init__(self, code) -> None:
+        def __init__(self: Self, code: Any) -> None:
             self.code = code
 
     system = MockSystem()
@@ -102,7 +102,7 @@ except ImportError:
 class WrapperError(Exception):
     """Base exception for wrapper-related errors."""
 
-    def __init__(self, message: str, original_error: Exception | None = None) -> None:
+    def __init__(self: Self, message: str, original_error: Exception | None = None) -> None:
         super().__init__(message)
         self.original_error = original_error
 
@@ -146,7 +146,7 @@ class WrapperMetrics:
 class IgnitionWrapperBase(ABC):
     """Base class for all Ignition system function wrappers."""
 
-    def __init__(self, config: WrapperConfig | None = None) -> None:
+    def __init__(self: Self, config: WrapperConfig | None = None) -> None:
         """Initialize the wrapper with configuration.
 
         Args:
@@ -160,7 +160,7 @@ class IgnitionWrapperBase(ABC):
         if self.config.context == IgnitionContext.UNKNOWN:
             self.config.context = self._detect_context()
 
-    def _setup_logger(self) -> logging.Logger:
+    def _setup_logger(self: Self) -> logging.Logger:
         """Set up logger for the wrapper."""
         logger_name = f"ignition.wrapper.{self.__class__.__name__}"
         logger = logging.getLogger(logger_name)
@@ -176,7 +176,7 @@ class IgnitionWrapperBase(ABC):
         logger.setLevel(getattr(logging, self.config.log_level.upper()))
         return logger
 
-    def _detect_context(self) -> IgnitionContext:
+    def _detect_context(self: Self) -> IgnitionContext:
         """Detect the current Ignition execution context."""
         try:
             # Try to detect context based on available system functions
@@ -193,17 +193,17 @@ class IgnitionWrapperBase(ABC):
 
         return IgnitionContext.UNKNOWN
 
-    def _log_operation(self, operation: str, details: str = "") -> None:
+    def _log_operation(self: Self, operation: str, details: str = "") -> None:
         """Log wrapper operation if logging is enabled."""
         if self.config.enable_logging:
             self.logger.info(f"{operation}: {details}")
 
-    def _log_error(self, operation: str, error: Exception) -> None:
+    def _log_error(self: Self, operation: str, error: Exception) -> None:
         """Log wrapper error."""
         if self.config.enable_logging:
             self.logger.error(f"{operation} failed: {error}")
 
-    def _record_metrics(self, metrics: WrapperMetrics) -> None:
+    def _record_metrics(self: Self, metrics: WrapperMetrics) -> None:
         """Record performance metrics if enabled."""
         if self.config.enable_metrics:
             self.metrics.append(metrics)
@@ -212,7 +212,7 @@ class IgnitionWrapperBase(ABC):
             if len(self.metrics) > 1000:
                 self.metrics = self.metrics[-1000:]
 
-    def get_metrics_summary(self) -> dict[str, Any]:
+    def get_metrics_summary(self: Self) -> dict[str, Any]:
         """Get summary of collected metrics."""
         if not self.metrics:
             return {"total_calls": 0}
@@ -232,12 +232,12 @@ class IgnitionWrapperBase(ABC):
             "total_retries": sum(m.retry_count for m in self.metrics),
         }
 
-    def clear_metrics(self) -> None:
+    def clear_metrics(self: Self) -> None:
         """Clear collected metrics."""
         self.metrics.clear()
 
     @abstractmethod
-    def get_wrapped_functions(self) -> list[str]:
+    def get_wrapped_functions(self: Self) -> list[str]:
         """Get list of wrapped function names.
 
         Returns:
@@ -246,11 +246,11 @@ class IgnitionWrapperBase(ABC):
         pass
 
 
-def wrapper_function(func):
+def wrapper_function(func: Any) -> None:
     """Decorator for wrapper functions to add common functionality."""
 
     @wraps(func)
-    def wrapper_impl(self, *args, **kwargs):
+    def wrapper_impl(self: Self, *args, **kwargs) -> None:
         start_time = time.time()
         function_name = f"{self.__class__.__name__}.{func.__name__}"
         retry_count = 0

@@ -3,7 +3,7 @@
 import json
 import os
 from pathlib import Path
-from typing import Any
+from typing import Self, Any
 
 import click
 from rich.console import Console
@@ -13,7 +13,7 @@ from rich.table import Table
 console = Console()
 
 
-def _create_test_module():
+def _create_test_module() -> None:
     """Create a test data integration module instance."""
     try:
         # Import here to avoid circular imports
@@ -276,12 +276,12 @@ def test_command(verbose: bool, supabase: bool) -> None:
             return False
 
     # Test 1: Module Creation
-    def test_module_creation():
+    def test_module_creation() -> None:
         module = _create_test_module()
         return module is not None
 
     # Test 2: Module Lifecycle
-    def test_module_lifecycle():
+    def test_module_lifecycle() -> None:
         module = _create_test_module()
         # set up default configuration before testing lifecycle
         default_config = {
@@ -327,7 +327,7 @@ def test_command(verbose: bool, supabase: bool) -> None:
         )
 
     # Test 3: Data Source Configuration
-    def test_data_source_configuration():
+    def test_data_source_configuration() -> None:
         from ..data_integration import DataSourceConfig, DataSourceType
 
         module = _create_test_module()
@@ -381,7 +381,7 @@ def test_command(verbose: bool, supabase: bool) -> None:
         return module.add_data_source(config)
 
     # Test 4: Variable Metadata
-    def test_variable_metadata():
+    def test_variable_metadata() -> None:
         from ..data_integration import VariableMetadata, VariableType
 
         metadata = VariableMetadata(
@@ -396,7 +396,7 @@ def test_command(verbose: bool, supabase: bool) -> None:
         return metadata.variable_type == VariableType.PV
 
     # Test 5: JSON Serialization
-    def test_json_serialization():
+    def test_json_serialization() -> None:
         from ..data_integration import DataSourceConfig, DataSourceType
 
         module = _create_test_module()
@@ -424,7 +424,7 @@ def test_command(verbose: bool, supabase: bool) -> None:
     if supabase:
         console.print("\n🗄️ Testing Supabase Integration:")
 
-        def test_supabase_connection():
+        def test_supabase_connection() -> None:
             # Test Supabase connection if available
             try:
                 # This would test actual Supabase connection
@@ -917,6 +917,6 @@ def info_command() -> None:
 
 
 # Register the command group
-def register_commands(cli):
+def register_commands(cli: Any) -> None:
     """Register data integration commands with the CLI."""
     cli.add_command(data_integration_group)

@@ -10,7 +10,7 @@ import os
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Self
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +48,7 @@ class ProjectContext:
 class KnowledgeDiscoverySystem:
     """Discovers and connects to all available knowledge bases."""
 
-    def __init__(self, project_root: Path | None = None) -> None:
+    def __init__(self: Self, project_root: Path | None = None) -> None:
         self.project_root = project_root or Path.cwd()
         self.knowledge_bases = []
         self.project_context = None
@@ -58,7 +58,7 @@ class KnowledgeDiscoverySystem:
         self._discover_knowledge_bases()
         self._build_project_context()
 
-    def get_agent_initialization_info(self) -> dict[str, Any]:
+    def get_agent_initialization_info(self: Any) -> dict[str, Any]:
         """Get complete initialization information for new agents."""
         init_info = {
             "project_context": (
@@ -75,7 +75,7 @@ class KnowledgeDiscoverySystem:
 
         return init_info
 
-    def _discover_project_structure(self) -> None:
+    def _discover_project_structure(self: Any) -> None:
         """Discover the overall project structure."""
         # Check for key project files
         key_files = [
@@ -96,7 +96,7 @@ class KnowledgeDiscoverySystem:
                 "type": "directory" if full_path.is_dir() else "file",
             }
 
-    def _discover_knowledge_bases(self) -> None:
+    def _discover_knowledge_bases(self: Any) -> None:
         """Discover all available knowledge bases."""
         # 1. Neo4j Graph Database
         neo4j_info = self._discover_neo4j()
@@ -127,7 +127,7 @@ class KnowledgeDiscoverySystem:
         if sme_agent_info:
             self.knowledge_bases.append(sme_agent_info)
 
-    def _discover_neo4j(self) -> KnowledgeBaseInfo | None:
+    def _discover_neo4j(self: Any) -> KnowledgeBaseInfo | None:
         """Discover Neo4j graph database connection."""
         try:
             # Check for Neo4j configuration
@@ -203,7 +203,7 @@ class KnowledgeDiscoverySystem:
                 description="Neo4j driver not installed",
             )
 
-    def _discover_vector_db(self) -> KnowledgeBaseInfo | None:
+    def _discover_vector_db(self: Any) -> KnowledgeBaseInfo | None:
         """Discover vector database for embeddings."""
         # Check for vector database configuration
         vector_db_path = self.project_root / ".vector_cache"
@@ -230,7 +230,7 @@ class KnowledgeDiscoverySystem:
 
         return None
 
-    def _discover_file_caches(self) -> list[KnowledgeBaseInfo]:
+    def _discover_file_caches(self: Any) -> list[KnowledgeBaseInfo]:
         """Discover file-based knowledge caches."""
         caches = []
 
@@ -285,7 +285,7 @@ class KnowledgeDiscoverySystem:
 
         return caches
 
-    def _discover_git_integration(self) -> KnowledgeBaseInfo | None:
+    def _discover_git_integration(self: Any) -> KnowledgeBaseInfo | None:
         """Discover git integration capabilities."""
         git_dir = self.project_root / ".git"
         if not git_dir.exists():
@@ -331,7 +331,7 @@ class KnowledgeDiscoverySystem:
                 description=f"Git integration error: {e!s}",
             )
 
-    def _discover_refactoring_tracking(self) -> KnowledgeBaseInfo | None:
+    def _discover_refactoring_tracking(self: Any) -> KnowledgeBaseInfo | None:
         """Discover refactoring tracking system."""
         tracking_dir = self.project_root / ".refactoring_tracking"
         if not tracking_dir.exists():
@@ -360,7 +360,7 @@ class KnowledgeDiscoverySystem:
             ],
         )
 
-    def _discover_sme_agent(self) -> KnowledgeBaseInfo | None:
+    def _discover_sme_agent(self: Any) -> KnowledgeBaseInfo | None:
         """Discover SME Agent system."""
         sme_agent_path = (
             self.project_root / "src" / "ignition" / "modules" / "sme_agent"
@@ -391,7 +391,7 @@ class KnowledgeDiscoverySystem:
 
         return None
 
-    def _build_project_context(self) -> None:
+    def _build_project_context(self: Any) -> None:
         """Build complete project context."""
         # Read roadmap for current phase
         completed_phases = [
@@ -511,7 +511,7 @@ class KnowledgeDiscoverySystem:
             ],
         )
 
-    def _generate_connection_instructions(self) -> dict[str, str]:
+    def _generate_connection_instructions(self: Any) -> dict[str, str]:
         """Generate connection instructions for each knowledge base."""
         instructions = {}
 
@@ -568,7 +568,7 @@ response = await agent.ask_question('How do I optimize PID control?')
 
         return instructions
 
-    def _generate_quick_start_guide(self) -> str:
+    def _generate_quick_start_guide(self: Any) -> str:
         """Generate a quick start guide for new agents."""
         return f"""
 # IGN Scripts Code Intelligence System - Quick Start
@@ -625,7 +625,7 @@ Ensure these environment variables are set:
 - Other project-specific variables in .env file
 """
 
-    def _get_environment_setup(self) -> dict[str, Any]:
+    def _get_environment_setup(self: Any) -> dict[str, Any]:
         """Get environment setup information."""
         env_vars = {
             "required": [
@@ -650,7 +650,7 @@ Ensure these environment variables are set:
 
         return env_vars
 
-    def _get_key_files_for_context(self) -> list[str]:
+    def _get_key_files_for_context(self: Any) -> list[str]:
         """Get list of key files new agents should read for context."""
         return [
             "docs/roadmap.md",
@@ -662,7 +662,7 @@ Ensure these environment variables are set:
             ".env.sample",
         ]
 
-    def _get_recent_developments(self) -> list[dict[str, Any]]:
+    def _get_recent_developments(self: Any) -> list[dict[str, Any]]:
         """Get recent project developments."""
         return [
             {
@@ -685,7 +685,7 @@ Ensure these environment variables are set:
             },
         ]
 
-    def _get_available_tools(self) -> list[dict[str, str]]:
+    def _get_available_tools(self: Any) -> list[dict[str, str]]:
         """Get list of available tools and their purposes."""
         return [
             {
@@ -720,7 +720,7 @@ Ensure these environment variables are set:
             },
         ]
 
-    def save_agent_context(self, output_file: Path | None = None) -> Path:
+    def save_agent_context(self: Self, output_file: Path | None = None) -> Path:
         """Save complete agent context to file for easy loading."""
         if output_file is None:
             output_file = self.project_root / ".agent_context.json"

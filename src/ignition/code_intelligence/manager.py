@@ -2,7 +2,7 @@
 
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, Self
 
 logger = logging.getLogger(__name__)
 
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class CodeIntelligenceManager:
     """Main manager for code intelligence system."""
 
-    def __init__(self, graph_client, embedder=None) -> None:
+    def __init__(self: Self, graph_client, embedder=None) -> None:
         """Initialize the code intelligence manager.
 
         Args:
@@ -30,7 +30,7 @@ class CodeIntelligenceManager:
         # Initialize schema
         self._initialize_schema()
 
-    def _initialize_schema(self) -> None:
+    def _initialize_schema(self: Any) -> None:
         """Initialize the Neo4j schema for code intelligence."""
         try:
             self.schema.create_schema()
@@ -38,7 +38,7 @@ class CodeIntelligenceManager:
         except Exception as e:
             logger.error(f"Failed to initialize schema: {e}")
 
-    def analyze_and_store_file(self, file_path: Path) -> bool:
+    def analyze_and_store_file(self: Self, file_path: Path) -> bool:
         """Analyze a file and store results in Neo4j."""
         try:
             # Analyze the file
@@ -53,7 +53,9 @@ class CodeIntelligenceManager:
             logger.error(f"Failed to analyze and store file {file_path}: {e}")
             return False
 
-    def analyze_and_store_directory(self, directory_path: Path, recursive: bool = True) -> dict[str, Any]:
+    def analyze_and_store_directory(
+        self: Self, directory_path: Path, recursive: bool = True
+    ) -> dict[str, Any]:
         """Analyze all files in a directory and store results."""
         results = {
             "files_processed": 0,
@@ -90,7 +92,7 @@ class CodeIntelligenceManager:
 
         return results
 
-    def _store_analysis(self, analysis: dict[str, Any]) -> bool:
+    def _store_analysis(self: Self, analysis: dict[str, Any]) -> bool:
         """Store analysis results in Neo4j."""
         try:
             # Store file node
@@ -118,7 +120,7 @@ class CodeIntelligenceManager:
             logger.error(f"Failed to store analysis: {e}")
             return False
 
-    def _store_file_node(self, file_info) -> None:
+    def _store_file_node(self: Self, file_info: Any) -> None:
         """Store a file node in Neo4j."""
         cypher = """
         MERGE (f:CodeFile {path: $path})
@@ -145,7 +147,7 @@ class CodeIntelligenceManager:
 
         self.client.execute_query(cypher, params)
 
-    def _store_class_node(self, class_info) -> None:
+    def _store_class_node(self: Self, class_info: Any) -> None:
         """Store a class node in Neo4j."""
         cypher = """
         MERGE (c:Class {name: $name, file_path: $file_path})
@@ -171,7 +173,7 @@ class CodeIntelligenceManager:
 
         self.client.execute_query(cypher, params)
 
-    def _store_method_node(self, method_info) -> None:
+    def _store_method_node(self: Self, method_info: Any) -> None:
         """Store a method node in Neo4j."""
         cypher = """
         MERGE (m:Method {name: $name, file_path: $file_path, start_line: $start_line})
@@ -200,7 +202,7 @@ class CodeIntelligenceManager:
 
         self.client.execute_query(cypher, params)
 
-    def _store_import_node(self, import_info) -> None:
+    def _store_import_node(self: Self, import_info: Any) -> None:
         """Store an import node in Neo4j."""
         cypher = """
         MERGE (i:Import {module: $module, file_path: $file_path, line_number: $line_number})
@@ -221,7 +223,7 @@ class CodeIntelligenceManager:
 
         self.client.execute_query(cypher, params)
 
-    def _create_relationships(self, analysis: dict[str, Any]) -> None:
+    def _create_relationships(self: Self, analysis: dict[str, Any]) -> None:
         """Create relationships between nodes."""
         file_path = analysis["file"].path
 
@@ -232,7 +234,9 @@ class CodeIntelligenceManager:
             MATCH (c:Class {name: $class_name, file_path: $file_path})
             MERGE (f)-[:CONTAINS]->(c)
             """
-            self.client.execute_query(cypher, {"file_path": file_path, "class_name": class_info.name})
+            self.client.execute_query(
+                cypher, {"file_path": file_path, "class_name": class_info.name}
+            )
 
         # Class HAS_METHOD Method relationships
         for method_info in analysis["methods"]:
@@ -283,7 +287,7 @@ class CodeIntelligenceManager:
                 },
             )
 
-    def get_file_context(self, file_path: str) -> dict[str, Any]:
+    def get_file_context(self: Self, file_path: str) -> dict[str, Any]:
         """Get comprehensive context for a file."""
         cypher = """
         MATCH (f:CodeFile {path: $path})
@@ -315,7 +319,9 @@ class CodeIntelligenceManager:
             "dependents": [path for path in data["dependents"] if path],
         }
 
-    def find_similar_files(self, file_path: str, limit: int = 10) -> list[dict[str, Any]]:
+    def find_similar_files(
+        self: Self, file_path: str, limit: int = 10
+    ) -> list[dict[str, Any]]:
         """Find files similar to the given file based on structure."""
         # Get the target file's characteristics
         context = self.get_file_context(file_path)
@@ -358,7 +364,7 @@ class CodeIntelligenceManager:
 
         return self.client.execute_query(cypher, params)
 
-    def get_code_statistics(self) -> dict[str, Any]:
+    def get_code_statistics(self: Any) -> dict[str, Any]:
         """Get comprehensive statistics about the codebase."""
         stats = {}
 
@@ -411,7 +417,9 @@ class CodeIntelligenceManager:
 
         return stats
 
-    def search_code(self, query: str, search_type: str = "all") -> list[dict[str, Any]]:
+    def search_code(
+        self: Self, query: str, search_type: str = "all"
+    ) -> list[dict[str, Any]]:
         """Search for code elements by name or content."""
         results = []
 
@@ -448,7 +456,9 @@ class CodeIntelligenceManager:
 
         return results
 
-    def get_dependency_graph(self, file_path: str, depth: int = 2) -> dict[str, Any]:
+    def get_dependency_graph(
+        self: Self, file_path: str, depth: int = 2
+    ) -> dict[str, Any]:
         """Get dependency graph for a file."""
         cypher = """
         MATCH path = (f:CodeFile {path: $path})-[:IMPORTS*1..$depth]-(related:CodeFile)
@@ -458,6 +468,8 @@ class CodeIntelligenceManager:
                relationships(path) as relationships
         """
 
-        dependencies = self.client.execute_query(cypher, {"path": file_path, "depth": depth})
+        dependencies = self.client.execute_query(
+            cypher, {"path": file_path, "depth": depth}
+        )
 
         return {"center_file": file_path, "dependencies": dependencies, "depth": depth}

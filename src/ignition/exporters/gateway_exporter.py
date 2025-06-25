@@ -10,7 +10,7 @@ import logging
 import zipfile
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Self, Any
 from uuid import uuid4
 
 from src.ignition.gateway.client import IgnitionGatewayClient
@@ -44,7 +44,7 @@ class GatewayResourceExporter:
             "exporter_version": "1.0.0",
         }
 
-    def export_gateway_backup(self, output_path: Path, export_profile: dict[str, Any] | None = None) -> dict[str, Any]:
+    def export_gateway_backup(self: Self, output_path: Path, export_profile: dict[str, Any] | None = None) -> dict[str, Any]:
         """Create a full gateway backup (.gwbk equivalent).
 
         Args:
@@ -221,7 +221,7 @@ class GatewayResourceExporter:
             logger.error(f"Selective resource export failed: {e}")
             raise
 
-    def create_deployment_package(self, package_config: dict[str, Any], output_path: Path) -> dict[str, Any]:
+    def create_deployment_package(self: Self, package_config: dict[str, Any], output_path: Path) -> dict[str, Any]:
         """Create a deployment package with scripts and configurations.
 
         Args:
@@ -268,7 +268,7 @@ class GatewayResourceExporter:
             logger.error(f"Deployment package creation failed: {e}")
             raise
 
-    def _create_default_backup_profile(self) -> dict[str, Any]:
+    def _create_default_backup_profile(self: Self) -> dict[str, Any]:
         """Create default backup profile configuration."""
         return {
             "name": "full_backup",
@@ -284,7 +284,7 @@ class GatewayResourceExporter:
             "validate_dependencies": True,
         }
 
-    def _create_default_project_options(self) -> dict[str, Any]:
+    def _create_default_project_options(self: Self) -> dict[str, Any]:
         """Create default project export options."""
         return {
             "include_global_resources": False,
@@ -293,7 +293,7 @@ class GatewayResourceExporter:
             "compression": True,
         }
 
-    def _gather_gateway_resources(self, profile: dict[str, Any]) -> dict[str, Any]:
+    def _gather_gateway_resources(self: Self, profile: dict[str, Any]) -> dict[str, Any]:
         """Gather all gateway resources based on export profile."""
         resources = {}
 
@@ -321,7 +321,7 @@ class GatewayResourceExporter:
 
         return resources
 
-    def _analyze_dependencies(self, resources: dict[str, Any]) -> dict[str, Any]:
+    def _analyze_dependencies(self: Self, resources: dict[str, Any]) -> dict[str, Any]:
         """Analyze dependencies between resources."""
         dependencies = {
             "strong_dependencies": [],
@@ -340,19 +340,19 @@ class GatewayResourceExporter:
 
         return dependencies
 
-    def _save_gwbk_format(self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
+    def _save_gwbk_format(self: Self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
         """Save data in .gwbk compatible format."""
         # In a real implementation, this would create an actual .gwbk file
         # For now, we'll save as compressed JSON
         return self._save_compressed_json(data, output_path)
 
-    def _save_proj_format(self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
+    def _save_proj_format(self: Self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
         """Save data in .proj compatible format."""
         # In a real implementation, this would create an actual .proj file
         # For now, we'll save as compressed JSON
         return self._save_compressed_json(data, output_path)
 
-    def _save_json_format(self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
+    def _save_json_format(self: Self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
         """Save data in JSON format."""
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -370,7 +370,7 @@ class GatewayResourceExporter:
             "export_time": datetime.now().isoformat(),
         }
 
-    def _save_zip_format(self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
+    def _save_zip_format(self: Self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
         """Save data in ZIP format with structured files."""
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -400,7 +400,7 @@ class GatewayResourceExporter:
             "export_time": datetime.now().isoformat(),
         }
 
-    def _save_compressed_json(self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
+    def _save_compressed_json(self: Self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
         """Save data as compressed JSON."""
         import gzip
 
@@ -423,7 +423,7 @@ class GatewayResourceExporter:
             "export_time": datetime.now().isoformat(),
         }
 
-    def _track_export_in_graph(self, profile: dict[str, Any], result: dict[str, Any]) -> None:
+    def _track_export_in_graph(self: Self, profile: dict[str, Any], result: dict[str, Any]) -> None:
         """Track export operation in the graph database."""
         if not self.graph_client or not self.graph_client.is_connected:
             return
@@ -456,7 +456,7 @@ class GatewayResourceExporter:
     # Mock methods for gathering gateway resources
     # In a real implementation, these would use the gateway client APIs
 
-    def _get_projects(self) -> list[dict[str, Any]]:
+    def _get_projects(self: Self) -> list[dict[str, Any]]:
         """Get all projects from the gateway."""
         return [
             {
@@ -467,7 +467,7 @@ class GatewayResourceExporter:
             },
         ]
 
-    def _get_tag_providers(self) -> list[dict[str, Any]]:
+    def _get_tag_providers(self: Self) -> list[dict[str, Any]]:
         """Get all tag providers from the gateway."""
         return [
             {
@@ -478,7 +478,7 @@ class GatewayResourceExporter:
             },
         ]
 
-    def _get_database_connections(self) -> list[dict[str, Any]]:
+    def _get_database_connections(self: Self) -> list[dict[str, Any]]:
         """Get all database connections from the gateway."""
         return [
             {
@@ -489,7 +489,7 @@ class GatewayResourceExporter:
             },
         ]
 
-    def _get_device_connections(self) -> list[dict[str, Any]]:
+    def _get_device_connections(self: Self) -> list[dict[str, Any]]:
         """Get all device connections from the gateway."""
         return [
             {
@@ -500,7 +500,7 @@ class GatewayResourceExporter:
             },
         ]
 
-    def _get_security_configuration(self) -> list[dict[str, Any]]:
+    def _get_security_configuration(self: Self) -> list[dict[str, Any]]:
         """Get security configuration from the gateway."""
         return [
             {
@@ -511,13 +511,13 @@ class GatewayResourceExporter:
             },
         ]
 
-    def _get_alarm_configuration(self) -> list[dict[str, Any]]:
+    def _get_alarm_configuration(self: Self) -> list[dict[str, Any]]:
         """Get alarm configuration from the gateway."""
         return [
             {"name": "alarm_config", "type": "alarms", "pipelines": 3, "journals": 1},
         ]
 
-    def _get_gateway_scripts(self) -> list[dict[str, Any]]:
+    def _get_gateway_scripts(self: Self) -> list[dict[str, Any]]:
         """Get gateway scripts from the gateway."""
         return [
             {
@@ -528,12 +528,12 @@ class GatewayResourceExporter:
             },
         ]
 
-    def _analyze_resource_dependencies(self, resource_type: str, resource: dict[str, Any]) -> dict[str, list[str]]:
+    def _analyze_resource_dependencies(self: Self, resource_type: str, resource: dict[str, Any]) -> dict[str, list[str]]:
         """Analyze dependencies for a specific resource."""
         # Mock implementation
         return {"strong": [], "weak": []}
 
-    def _gather_project_resources(self, project_name: str, options: dict[str, Any]) -> dict[str, Any]:
+    def _gather_project_resources(self: Self, project_name: str, options: dict[str, Any]) -> dict[str, Any]:
         """Gather resources for a specific project."""
         # Mock implementation
         return {
@@ -544,37 +544,37 @@ class GatewayResourceExporter:
             "tags": [],
         }
 
-    def _analyze_project_dependencies(self, project_name: str, resources: dict[str, Any]) -> dict[str, Any]:
+    def _analyze_project_dependencies(self: Self, project_name: str, resources: dict[str, Any]) -> dict[str, Any]:
         """Analyze dependencies for a project."""
         # Mock implementation
         return {"dependencies": [], "conflicts": []}
 
-    def _gather_resources_by_type(self, resource_type: str, resource_names: list[str]) -> list[dict[str, Any]]:
+    def _gather_resources_by_type(self: Self, resource_type: str, resource_names: list[str]) -> list[dict[str, Any]]:
         """Gather specific resources by type and names."""
         # Mock implementation
         return [{"name": name, "type": resource_type} for name in resource_names]
 
-    def _calculate_resources_size(self, resources: list[dict[str, Any]]) -> int:
+    def _calculate_resources_size(self: Self, resources: list[dict[str, Any]]) -> int:
         """Calculate total size of resources."""
         # Mock implementation
         return len(resources) * 1000
 
-    def _analyze_selective_dependencies(self, resources: dict[str, Any]) -> dict[str, Any]:
+    def _analyze_selective_dependencies(self: Self, resources: dict[str, Any]) -> dict[str, Any]:
         """Analyze dependencies for selective export."""
         # Mock implementation
         return {"dependencies": [], "conflicts": []}
 
-    def _save_xml_format(self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
+    def _save_xml_format(self: Self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
         """Save data in XML format."""
         # Mock implementation - would use xml.etree.ElementTree or lxml
         return self._save_json_format(data, output_path.with_suffix(".json"))
 
-    def _gather_package_components(self, config: dict[str, Any]) -> dict[str, Any]:
+    def _gather_package_components(self: Self, config: dict[str, Any]) -> dict[str, Any]:
         """Gather components for deployment package."""
         # Mock implementation
         return {"components": []}
 
-    def _generate_deployment_scripts(self, config: dict[str, Any]) -> dict[str, Any]:
+    def _generate_deployment_scripts(self: Self, config: dict[str, Any]) -> dict[str, Any]:
         """Generate deployment scripts for package."""
         # Mock implementation
         return {
@@ -583,7 +583,7 @@ class GatewayResourceExporter:
             "validate.py": "# Validation script",
         }
 
-    def _save_deployment_package(self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
+    def _save_deployment_package(self: Self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
         """Save deployment package."""
         return self._save_zip_format(data, output_path)
 
@@ -594,12 +594,12 @@ class GatewayResourceExporter:
         # Similar to _track_export_in_graph but for projects
         pass
 
-    def _track_selective_export_in_graph(self, selection: dict[str, list[str]], result: dict[str, Any]) -> None:
+    def _track_selective_export_in_graph(self: Self, selection: dict[str, list[str]], result: dict[str, Any]) -> None:
         """Track selective export in graph database."""
         # Similar to _track_export_in_graph but for selective exports
         pass
 
-    def _track_package_creation_in_graph(self, config: dict[str, Any], result: dict[str, Any]) -> None:
+    def _track_package_creation_in_graph(self: Self, config: dict[str, Any], result: dict[str, Any]) -> None:
         """Track package creation in graph database."""
         # Similar to _track_export_in_graph but for packages
         pass

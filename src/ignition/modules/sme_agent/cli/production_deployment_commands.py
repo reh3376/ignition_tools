@@ -1,4 +1,4 @@
-"""Phase 11.7: Production Deployment CLI Commands
+"""Production Deployment CLI Commands for Phase 11.7.
 
 Following crawl_mcp.py methodology:
 - Step 1: Environment validation first
@@ -13,6 +13,8 @@ import asyncio
 import json
 import logging
 import sys
+from pathlib import Path
+from typing import Self, Any
 
 import click
 from rich.console import Console
@@ -35,10 +37,10 @@ console = Console()
 logger = logging.getLogger(__name__)
 
 
-def handle_deployment_error(func):
+def handle_deployment_error(func: Any) -> None:
     """Decorator for handling deployment errors with user-friendly messages."""
 
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> None:
         try:
             return func(*args, **kwargs)
         except Exception as e:
@@ -51,7 +53,7 @@ def handle_deployment_error(func):
 
 
 @click.group(name="deployment")
-def deployment_group():
+def deployment_group() -> None:
     """Production Deployment & PLC Integration commands for Phase 11.7.
 
     Manages Docker-based production deployments with comprehensive
@@ -62,7 +64,7 @@ def deployment_group():
 
 @deployment_group.command("validate-env")
 @handle_deployment_error
-def validate_deployment_environment():
+def validate_deployment_environment() -> None:
     """Validate production deployment environment.
 
     Checks Docker availability, required packages, environment variables,
@@ -142,7 +144,7 @@ def validate_deployment_environment():
 
 @deployment_group.command("test")
 @handle_deployment_error
-def test_deployment_functionality():
+def test_deployment_functionality() -> None:
     """Test production deployment functionality.
 
     Runs comprehensive tests including Docker operations,
@@ -150,7 +152,7 @@ def test_deployment_functionality():
     """
     console.print("[bold blue]🧪 Phase 11.7: Production Deployment Testing[/bold blue]")
 
-    async def run_test():
+    async def run_test() -> None:
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
@@ -186,7 +188,7 @@ def test_deployment_functionality():
     help="Deployment name to check",
 )
 @handle_deployment_error
-def check_deployment_status(deployment_name: str):
+def check_deployment_status(deployment_name: str) -> None:
     """Check production deployment status.
 
     Displays comprehensive status information including container health,
@@ -194,7 +196,7 @@ def check_deployment_status(deployment_name: str):
     """
     console.print(f"[bold blue]📊 Deployment Status: {deployment_name}[/bold blue]")
 
-    async def get_status():
+    async def get_status() -> None:
         try:
             # Create minimal config for status checking
             docker_config = DockerConfig(
@@ -277,7 +279,7 @@ def deploy_production(
     cpu: float,
     monitoring: bool,
     plc_config: str | None,
-):
+) -> None:
     """Deploy production container with PLC integration.
 
     Creates and starts a production deployment with specified configuration,
@@ -299,7 +301,7 @@ def deploy_production(
             console.print(f"[red]❌ Failed to load PLC config: {e}[/red]")
             sys.exit(1)
 
-    async def perform_deployment():
+    async def perform_deployment() -> None:
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
@@ -387,14 +389,14 @@ def deploy_production(
 )
 @click.option("--force", "-f", is_flag=True, help="Force stop container")
 @handle_deployment_error
-def stop_deployment(name: str, force: bool):
+def stop_deployment(name: str, force: bool) -> None:
     """Stop production deployment.
 
     Gracefully stops the specified production container and cleans up resources.
     """
     console.print(f"[bold blue]🛑 Stopping Deployment: {name}[/bold blue]")
 
-    async def perform_stop():
+    async def perform_stop() -> None:
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
@@ -476,14 +478,14 @@ def stop_deployment(name: str, force: bool):
     "--name", "-n", default="ign-scripts-production", help="Container name to restart"
 )
 @handle_deployment_error
-def restart_deployment(name: str):
+def restart_deployment(name: str) -> None:
     """Restart production deployment.
 
     Restarts the specified production container with health checks.
     """
     console.print(f"[bold blue]🔄 Restarting Deployment: {name}[/bold blue]")
 
-    async def perform_restart():
+    async def perform_restart() -> None:
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
@@ -550,7 +552,7 @@ def restart_deployment(name: str):
 @click.option("--follow", "-f", is_flag=True, help="Follow log output")
 @click.option("--tail", "-t", default=100, type=int, help="Number of lines to show")
 @handle_deployment_error
-def view_deployment_logs(name: str, follow: bool, tail: int):
+def view_deployment_logs(name: str, follow: bool, tail: int) -> None:
     """View production deployment logs.
 
     Displays container logs with optional real-time following.
@@ -585,7 +587,7 @@ def view_deployment_logs(name: str, follow: bool, tail: int):
 @click.option("--template", "-t", is_flag=True, help="Generate configuration template")
 @click.option("--output", "-o", help="Output file path")
 @handle_deployment_error
-def manage_deployment_config(template: bool, output: str | None):
+def manage_deployment_config(template: bool, output: str | None) -> None:
     """Manage deployment configuration.
 
     Generate configuration templates or validate existing configurations.
@@ -656,13 +658,13 @@ def manage_deployment_config(template: bool, output: str | None):
 
 
 # Register commands with the main CLI
-def setup_deployment_commands(cli_group):
+def setup_deployment_commands(cli_group: Any) -> None:
     """Setup deployment commands with the main CLI group."""
     cli_group.add_command(deployment_group)
 
 
 # Testing function for CLI commands
-def test_deployment_commands():
+def test_deployment_commands() -> None:
     """Test deployment CLI commands."""
     console.print("[bold blue]🧪 Testing Deployment CLI Commands[/bold blue]")
 

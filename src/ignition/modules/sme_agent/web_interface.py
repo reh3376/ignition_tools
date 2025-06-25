@@ -23,7 +23,7 @@ import time
 import uuid
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import Any
+from typing import Self, Any
 
 import uvicorn
 from fastapi import FastAPI, HTTPException
@@ -42,7 +42,7 @@ sme_agent_instance = None
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> None:
     """Application lifespan management with proper resource cleanup."""
     global sme_agent_instance
 
@@ -115,7 +115,7 @@ class ChatRequest(BaseModel):
     stream: bool = Field(True, description="Enable streaming response")
 
     @validator("complexity")
-    def validate_complexity(cls, v):
+    def validate_complexity(cls, v) -> None:
         """Validate complexity level."""
         allowed = ["basic", "standard", "advanced", "enterprise"]
         if v not in allowed:
@@ -123,7 +123,7 @@ class ChatRequest(BaseModel):
         return v
 
     @validator("question")
-    def validate_question(cls, v):
+    def validate_question(cls, v) -> None:
         """Validate question content."""
         if not v.strip():
             raise ValueError("Question cannot be empty or whitespace only")
@@ -153,7 +153,7 @@ class AnalysisRequest(BaseModel):
     complexity: str = Field("standard", description="Analysis complexity level")
 
     @validator("complexity")
-    def validate_complexity(cls, v):
+    def validate_complexity(cls, v) -> None:
         """Validate complexity level."""
         allowed = ["basic", "standard", "advanced", "enterprise"]
         if v not in allowed:
@@ -177,7 +177,7 @@ start_time = time.time()
 
 
 @app.get("/", tags=["Health"])
-async def root():
+async def root() -> None:
     """Root endpoint with basic information."""
     return {
         "message": "SME Agent Web Interface - Phase 11.3",
@@ -195,7 +195,7 @@ async def root():
 
 
 @app.get("/health", tags=["Health"])
-async def health_check():
+async def health_check() -> None:
     """Health check endpoint with detailed status."""
     global sme_agent_instance
 
@@ -220,7 +220,7 @@ async def health_check():
 
 
 @app.post("/chat", response_model=ChatResponse, tags=["Chat"])
-async def chat_endpoint(request: ChatRequest):
+async def chat_endpoint(request: ChatRequest) -> None:
     """Standard chat endpoint with complete response."""
     global sme_agent_instance
 
@@ -272,7 +272,7 @@ async def chat_endpoint(request: ChatRequest):
 
 
 @app.post("/chat/stream", tags=["Chat"])
-async def chat_stream_endpoint(request: ChatRequest):
+async def chat_stream_endpoint(request: ChatRequest) -> None:
     """Streaming chat endpoint with real-time responses."""
     global sme_agent_instance
 
@@ -282,7 +282,7 @@ async def chat_stream_endpoint(request: ChatRequest):
     # Generate session ID if not provided
     session_id = request.session_id or str(uuid.uuid4())
 
-    async def generate_stream():
+    async def generate_stream() -> None:
         """Generate streaming response."""
         try:
             # Send initial metadata
@@ -356,7 +356,7 @@ async def chat_stream_endpoint(request: ChatRequest):
 
 
 @app.post("/analyze", tags=["Analysis"])
-async def analyze_endpoint(request: AnalysisRequest):
+async def analyze_endpoint(request: AnalysisRequest) -> None:
     """File analysis endpoint."""
     global sme_agent_instance
 
@@ -388,7 +388,7 @@ async def analyze_endpoint(request: AnalysisRequest):
 
 
 @app.get("/status", response_model=StatusResponse, tags=["Status"])
-async def status_endpoint():
+async def status_endpoint() -> None:
     """Detailed system status endpoint."""
     global sme_agent_instance
 
@@ -418,7 +418,7 @@ async def status_endpoint():
 
 
 @app.get("/sessions/{session_id}", tags=["Sessions"])
-async def get_session_history(session_id: str):
+async def get_session_history(session_id: str) -> None:
     """Get conversation history for a session."""
     if session_id not in conversation_sessions:
         raise HTTPException(status_code=404, detail="Session not found")
@@ -431,7 +431,7 @@ async def get_session_history(session_id: str):
 
 
 @app.delete("/sessions/{session_id}", tags=["Sessions"])
-async def clear_session_history(session_id: str):
+async def clear_session_history(session_id: str) -> None:
     """Clear conversation history for a session."""
     if session_id in conversation_sessions:
         del conversation_sessions[session_id]
@@ -442,12 +442,12 @@ async def clear_session_history(session_id: str):
 
 # Background task for cleanup
 @app.on_event("startup")
-async def startup_event():
+async def startup_event() -> None:
     """Additional startup tasks."""
     logger.info("🌐 SME Agent Web Interface ready for connections")
 
 
-def run_server(host: str = "0.0.0.0", port: int = 8000, reload: bool = False):
+def run_server(host: str = "0.0.0.0", port: int = 8000, reload: bool = False) -> None:
     """Run the FastAPI server with uvicorn.
 
     Args:

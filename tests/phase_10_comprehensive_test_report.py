@@ -27,7 +27,7 @@ import sys
 import traceback
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Self, Any
 
 from rich.console import Console
 from rich.progress import (
@@ -76,7 +76,7 @@ class Phase10ComprehensiveTestReporter:
     6. Resource Management and Cleanup
     """
 
-    def __init__(self):
+    def __init__(self: Self):
         """Initialize comprehensive test reporter."""
         self.console = Console()
         self.logger = logging.getLogger(__name__)
@@ -109,7 +109,7 @@ class Phase10ComprehensiveTestReporter:
             "resource_management",
         ]
 
-    def run_comprehensive_tests(self) -> dict[str, Any]:
+    def run_comprehensive_tests(self: Self) -> dict[str, Any]:
         """
         Run comprehensive tests for Phase 10 Enterprise Integration & Deployment.
 
@@ -216,7 +216,7 @@ class Phase10ComprehensiveTestReporter:
             # Step 6: Resource Management and Cleanup
             self._cleanup_test_resources()
 
-    def _test_enterprise_architecture_module(self) -> dict[str, Any]:
+    def _test_enterprise_architecture_module(self: Self) -> dict[str, Any]:
         """
         Test Category 1: Enterprise Architecture Module
 
@@ -274,7 +274,7 @@ class Phase10ComprehensiveTestReporter:
 
         return test_results
 
-    def _test_architecture_environment_validation(self) -> dict[str, Any]:
+    def _test_architecture_environment_validation(self: Self) -> dict[str, Any]:
         """Test enterprise architecture environment validation."""
         try:
             if not Phase10EnterpriseIntegration:
@@ -313,7 +313,7 @@ class Phase10ComprehensiveTestReporter:
         except Exception as e:
             return {"status": "failed", "score": 0, "error": str(e)}
 
-    def _test_architecture_configuration_loading(self) -> dict[str, Any]:
+    def _test_architecture_configuration_loading(self: Self) -> dict[str, Any]:
         """Test enterprise architecture configuration loading."""
         try:
             if not Phase10EnterpriseIntegration:
@@ -346,7 +346,7 @@ class Phase10ComprehensiveTestReporter:
         except Exception as e:
             return {"status": "failed", "score": 0, "error": str(e)}
 
-    def _test_architecture_component_initialization(self) -> dict[str, Any]:
+    def _test_architecture_component_initialization(self: Self) -> dict[str, Any]:
         """Test enterprise architecture component initialization."""
         try:
             if not Phase10EnterpriseIntegration:
@@ -377,7 +377,7 @@ class Phase10ComprehensiveTestReporter:
         except Exception as e:
             return {"status": "failed", "score": 0, "error": str(e)}
 
-    def _test_architecture_deployment_functionality(self) -> dict[str, Any]:
+    def _test_architecture_deployment_functionality(self: Self) -> dict[str, Any]:
         """Test enterprise architecture deployment functionality."""
         try:
             if not Phase10EnterpriseIntegration:
@@ -408,7 +408,7 @@ class Phase10ComprehensiveTestReporter:
         except Exception as e:
             return {"status": "failed", "score": 0, "error": str(e)}
 
-    def _test_architecture_error_handling(self) -> dict[str, Any]:
+    def _test_architecture_error_handling(self: Self) -> dict[str, Any]:
         """Test enterprise architecture error handling."""
         try:
             if not Phase10EnterpriseIntegration:
@@ -439,7 +439,7 @@ class Phase10ComprehensiveTestReporter:
         except Exception as e:
             return {"status": "failed", "score": 0, "error": str(e)}
 
-    def _test_cloud_integration_module(self) -> dict[str, Any]:
+    def _test_cloud_integration_module(self: Self) -> dict[str, Any]:
         """
         Test Category 2: Cloud Integration Module
 
@@ -490,7 +490,7 @@ class Phase10ComprehensiveTestReporter:
 
         return test_results
 
-    def _test_cloud_environment_validation(self) -> dict[str, Any]:
+    def _test_cloud_environment_validation(self: Self) -> dict[str, Any]:
         """Test cloud integration environment validation."""
         try:
             # Test basic cloud module functionality
@@ -517,7 +517,7 @@ class Phase10ComprehensiveTestReporter:
         except Exception as e:
             return {"status": "failed", "score": 0, "error": str(e)}
 
-    def _test_cloud_configuration_loading(self) -> dict[str, Any]:
+    def _test_cloud_configuration_loading(self: Self) -> dict[str, Any]:
         """Test cloud integration configuration loading."""
         try:
             # Test cloud configuration
@@ -540,7 +540,7 @@ class Phase10ComprehensiveTestReporter:
         except Exception as e:
             return {"status": "failed", "score": 0, "error": str(e)}
 
-    def _test_cloud_deployment_functionality(self) -> dict[str, Any]:
+    def _test_cloud_deployment_functionality(self: Self) -> dict[str, Any]:
         """Test cloud integration deployment functionality."""
         try:
             # Test cloud deployment
@@ -564,7 +564,7 @@ class Phase10ComprehensiveTestReporter:
         except Exception as e:
             return {"status": "failed", "score": 0, "error": str(e)}
 
-    def _test_cloud_error_handling(self) -> dict[str, Any]:
+    def _test_cloud_error_handling(self: Self) -> dict[str, Any]:
         """Test cloud integration error handling."""
         try:
             # Test cloud error handling
@@ -590,7 +590,7 @@ class Phase10ComprehensiveTestReporter:
         except Exception as e:
             return {"status": "failed", "score": 0, "error": str(e)}
 
-    def _test_advanced_analytics_module(self) -> dict[str, Any]:
+    def _test_advanced_analytics_module(self: Self) -> dict[str, Any]:
         """
         Test Category 3: Advanced Analytics Platform Module
 
@@ -643,7 +643,7 @@ class Phase10ComprehensiveTestReporter:
 
         return test_results
 
-    def _test_analytics_environment_validation(self) -> dict[str, Any]:
+    def _test_analytics_environment_validation(self: Self) -> dict[str, Any]:
         """Test analytics platform environment validation."""
         try:
             # Test analytics module functionality
@@ -670,7 +670,7 @@ class Phase10ComprehensiveTestReporter:
         except Exception as e:
             return {"status": "failed", "score": 0, "error": str(e)}
 
-    def _test_analytics_configuration_loading(self) -> dict[str, Any]:
+    def _test_analytics_configuration_loading(self: Self) -> dict[str, Any]:
         """Test analytics platform configuration loading."""
         try:
             # Test analytics configuration
@@ -693,7 +693,7 @@ class Phase10ComprehensiveTestReporter:
         except Exception as e:
             return {"status": "failed", "score": 0, "error": str(e)}
 
-    def _test_analytics_deployment_functionality(self) -> dict[str, Any]:
+    def _test_analytics_deployment_functionality(self: Self) -> dict[str, Any]:
         """Test analytics platform deployment functionality."""
         try:
             # Test analytics deployment
@@ -717,7 +717,7 @@ class Phase10ComprehensiveTestReporter:
         except Exception as e:
             return {"status": "failed", "score": 0, "error": str(e)}
 
-    def _test_analytics_error_handling(self) -> dict[str, Any]:
+    def _test_analytics_error_handling(self: Self) -> dict[str, Any]:
         """Test analytics platform error handling."""
         try:
             # Test analytics error handling
@@ -733,7 +733,7 @@ class Phase10ComprehensiveTestReporter:
         except Exception as e:
             return {"status": "failed", "score": 0, "error": str(e)}
 
-    def _test_cli_integration(self) -> dict[str, Any]:
+    def _test_cli_integration(self: Self) -> dict[str, Any]:
         """
         Test Category 4: CLI Integration
 
@@ -775,7 +775,7 @@ class Phase10ComprehensiveTestReporter:
 
         return test_results
 
-    def _test_cli_group_loading(self) -> dict[str, Any]:
+    def _test_cli_group_loading(self: Self) -> dict[str, Any]:
         """Test CLI group loading."""
         try:
             # Test CLI group loading
@@ -797,7 +797,7 @@ class Phase10ComprehensiveTestReporter:
         except Exception as e:
             return {"status": "failed", "score": 0, "error": str(e)}
 
-    def _test_command_structure(self) -> dict[str, Any]:
+    def _test_command_structure(self: Self) -> dict[str, Any]:
         """Test command structure."""
         try:
             # Test command structure
@@ -820,7 +820,7 @@ class Phase10ComprehensiveTestReporter:
         except Exception as e:
             return {"status": "failed", "score": 0, "error": str(e)}
 
-    def _test_command_execution(self) -> dict[str, Any]:
+    def _test_command_execution(self: Self) -> dict[str, Any]:
         """Test command execution."""
         try:
             # Basic command execution test
@@ -833,7 +833,7 @@ class Phase10ComprehensiveTestReporter:
         except Exception as e:
             return {"status": "failed", "score": 0, "error": str(e)}
 
-    def _test_progressive_complexity(self) -> dict[str, Any]:
+    def _test_progressive_complexity(self: Self) -> dict[str, Any]:
         """
         Test Category 5: Progressive Complexity
 
@@ -872,7 +872,7 @@ class Phase10ComprehensiveTestReporter:
 
         return test_results
 
-    def _test_complexity_level(self, level: str) -> dict[str, Any]:
+    def _test_complexity_level(self: Self, level: str) -> dict[str, Any]:
         """Test specific complexity level."""
         try:
             # Test complexity level with architecture module
@@ -902,7 +902,7 @@ class Phase10ComprehensiveTestReporter:
         except Exception as e:
             return {"status": "failed", "score": 0, "error": str(e)}
 
-    def _test_resource_management(self) -> dict[str, Any]:
+    def _test_resource_management(self: Self) -> dict[str, Any]:
         """
         Test Category 6: Resource Management
 
@@ -946,7 +946,7 @@ class Phase10ComprehensiveTestReporter:
 
         return test_results
 
-    def _test_resource_allocation(self) -> dict[str, Any]:
+    def _test_resource_allocation(self: Self) -> dict[str, Any]:
         """Test resource allocation."""
         try:
             # Test resource allocation tracking
@@ -976,7 +976,7 @@ class Phase10ComprehensiveTestReporter:
         except Exception as e:
             return {"status": "failed", "score": 0, "error": str(e)}
 
-    def _test_resource_cleanup(self) -> dict[str, Any]:
+    def _test_resource_cleanup(self: Self) -> dict[str, Any]:
         """Test resource cleanup."""
         try:
             # Test resource cleanup functionality
@@ -1007,7 +1007,7 @@ class Phase10ComprehensiveTestReporter:
         except Exception as e:
             return {"status": "failed", "score": 0, "error": str(e)}
 
-    def _test_memory_management(self) -> dict[str, Any]:
+    def _test_memory_management(self: Self) -> dict[str, Any]:
         """Test memory management."""
         try:
             # Basic memory management test
@@ -1020,7 +1020,7 @@ class Phase10ComprehensiveTestReporter:
         except Exception as e:
             return {"status": "failed", "score": 0, "error": str(e)}
 
-    def _calculate_final_metrics(self):
+    def _calculate_final_metrics(self: Self):
         """Calculate final test metrics."""
         total_tests = 0
         passed_tests = 0
@@ -1050,7 +1050,7 @@ class Phase10ComprehensiveTestReporter:
             }
         )
 
-    def _display_comprehensive_results(self):
+    def _display_comprehensive_results(self: Self):
         """Display comprehensive test results."""
         self.console.print(
             "\\n📊 Phase 10: Comprehensive Test Results", style="bold blue"
@@ -1152,7 +1152,7 @@ class Phase10ComprehensiveTestReporter:
             f"  • Duration: {self.test_metrics['test_duration']:.2f} seconds"
         )
 
-    def _generate_detailed_report(self) -> dict[str, Any]:
+    def _generate_detailed_report(self: Self) -> dict[str, Any]:
         """Generate detailed test report."""
         category_scores = [
             results["overall_score"]
@@ -1185,7 +1185,7 @@ class Phase10ComprehensiveTestReporter:
             "timestamp": datetime.now().isoformat(),
         }
 
-    def _generate_recommendations(self) -> list[str]:
+    def _generate_recommendations(self: Self) -> list[str]:
         """Generate recommendations based on test results."""
         recommendations = []
 
@@ -1206,7 +1206,7 @@ class Phase10ComprehensiveTestReporter:
 
         return recommendations
 
-    def _cleanup_test_resources(self):
+    def _cleanup_test_resources(self: Self):
         """
         Step 6: Resource Management and Cleanup
 

@@ -12,7 +12,7 @@ Following crawl_mcp.py methodology:
 import logging
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Self, Any
 
 import click
 from rich.console import Console
@@ -25,10 +25,10 @@ console = Console()
 logger = logging.getLogger(__name__)
 
 
-def handle_sme_agent_error(func):
+def handle_sme_agent_error(func: Any) -> None:
     """Decorator for handling SME Agent errors with user-friendly messages."""
 
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> None:
         try:
             return func(*args, **kwargs)
         except SMEAgentValidationError as e:
@@ -44,7 +44,7 @@ def handle_sme_agent_error(func):
 
 @click.group(name="sme")
 @click.pass_context
-def sme_agent_cli(ctx):
+def sme_agent_cli(ctx: Any) -> None:
     """SME Agent CLI - Ignition Subject Matter Expert Assistant
 
     Phase 11: Process SME Agent & AI Enhancement Platform
@@ -55,7 +55,7 @@ def sme_agent_cli(ctx):
 
 @sme_agent_cli.command("validate-env")
 @handle_sme_agent_error
-def validate_environment():
+def validate_environment() -> None:
     """Step 1: Environment Validation First
 
     Validate SME Agent environment and dependencies.
@@ -86,7 +86,7 @@ def validate_environment():
 
 @sme_agent_cli.command("status")
 @handle_sme_agent_error
-def get_status():
+def get_status() -> None:
     """Step 4: Modular Component Testing
 
     Get current status of SME Agent components.
@@ -111,7 +111,7 @@ def get_status():
     help="Complexity level for initialization",
 )
 @handle_sme_agent_error
-def initialize_components(complexity: str):
+def initialize_components(complexity: str) -> None:
     """Step 5: Progressive Complexity Support
 
     Initialize SME Agent components with specified complexity level.
@@ -142,7 +142,7 @@ def initialize_components(complexity: str):
     default="basic",
 )
 @handle_sme_agent_error
-def ask_question(question: str, context: str | None, complexity: str):
+def ask_question(question: str, context: str | None, complexity: str) -> None:
     """Step 2: Comprehensive Input Validation
     Step 3: Error Handling and User-Friendly Messages
 
@@ -178,7 +178,7 @@ def ask_question(question: str, context: str | None, complexity: str):
     default="standard",
 )
 @handle_sme_agent_error
-def analyze_file(file_path: str, complexity: str):
+def analyze_file(file_path: str, complexity: str) -> None:
     """Analyze a file using SME Agent capabilities."""
     console.print("[bold blue]🔍 SME Agent File Analysis[/bold blue]")
     console.print(f"Analyzing: [italic]{file_path}[/italic]")
@@ -209,7 +209,7 @@ def analyze_file(file_path: str, complexity: str):
 
 @sme_agent_cli.command("test-all")
 @handle_sme_agent_error
-def test_all_components():
+def test_all_components() -> None:
     """Step 4: Modular Component Testing
 
     Test all SME Agent components across complexity levels.
@@ -264,7 +264,7 @@ def test_all_components():
 
 @sme_agent_cli.command("list-batches")
 @handle_sme_agent_error
-def list_evaluation_batches():
+def list_evaluation_batches() -> None:
     """List all evaluation batches for human review."""
     console.print("[bold blue]📋 SME Agent Evaluation Batches[/bold blue]")
 
@@ -320,7 +320,7 @@ def list_evaluation_batches():
     help="Export format",
 )
 @handle_sme_agent_error
-def export_evaluation_batch(batch_id: str, export_format: str):
+def export_evaluation_batch(batch_id: str, export_format: str) -> None:
     """Export evaluation batch for human SME review."""
     console.print("[bold blue]📤 Exporting Evaluation Batch[/bold blue]")
     console.print(f"Batch ID: [italic]{batch_id}[/italic]")
@@ -366,7 +366,7 @@ def export_evaluation_batch(batch_id: str, export_format: str):
     "--sme-id", required=True, help="ID of the human SME who performed the evaluation"
 )
 @handle_sme_agent_error
-def import_human_evaluation(batch_id: str, evaluation_file: str, sme_id: str):
+def import_human_evaluation(batch_id: str, evaluation_file: str, sme_id: str) -> None:
     """Import human SME evaluation results and incorporate feedback."""
     console.print("[bold blue]📥 Importing Human Evaluation[/bold blue]")
     console.print(f"Batch ID: [italic]{batch_id}[/italic]")
@@ -427,7 +427,7 @@ def import_human_evaluation(batch_id: str, evaluation_file: str, sme_id: str):
 
 @sme_agent_cli.command("rl-summary")
 @handle_sme_agent_error
-def reinforcement_learning_summary():
+def reinforcement_learning_summary() -> None:
     """Display comprehensive reinforcement learning summary."""
     console.print("[bold blue]🧠 Reinforcement Learning Summary[/bold blue]")
 
@@ -524,7 +524,7 @@ def reinforcement_learning_summary():
 @sme_agent_cli.command("create-test-batch")
 @click.option("--size", default=5, help="Number of test decisions to create")
 @handle_sme_agent_error
-def create_test_evaluation_batch(size: int):
+def create_test_evaluation_batch(size: int) -> None:
     """Create a test evaluation batch for demonstration purposes."""
     console.print("[bold blue]🧪 Creating Test Evaluation Batch[/bold blue]")
     console.print(f"Creating {size} test decisions...")
@@ -565,7 +565,7 @@ def create_test_evaluation_batch(size: int):
         sys.exit(1)
 
 
-def _display_validation_results(validation_result: dict[str, Any]):
+def _display_validation_results(validation_result: dict[str, Any]) -> None:
     """Display environment validation results."""
     table = Table(title="Environment Validation Results")
     table.add_column("Component", style="cyan")
@@ -604,7 +604,7 @@ def _display_validation_results(validation_result: dict[str, Any]):
             console.print(f"  • {warning}")
 
 
-def _display_status(status: dict[str, Any]):
+def _display_status(status: dict[str, Any]) -> None:
     """Display SME Agent status."""
     # Main status panel
     status_text = "🟢 Initialized" if status["initialized"] else "🔴 Not Initialized"
@@ -648,7 +648,7 @@ def _display_status(status: dict[str, Any]):
     console.print(components_table)
 
 
-def _display_initialization_results(result: dict[str, Any]):
+def _display_initialization_results(result: dict[str, Any]) -> None:
     """Display initialization results."""
     if result["success"]:
         console.print("[green]✅ Initialization successful![/green]")
@@ -677,7 +677,7 @@ def _display_initialization_results(result: dict[str, Any]):
             console.print(f"  ⚠️  {warning}")
 
 
-def _display_response(response):
+def _display_response(response: Any) -> None:
     """Display SME Agent response."""
     # Response panel
     console.print(
@@ -698,7 +698,7 @@ def _display_response(response):
     console.print(metadata_table)
 
 
-def _display_reinforcement_learning_insights(insights: dict[str, Any]):
+def _display_reinforcement_learning_insights(insights: dict[str, Any]) -> None:
     """Display reinforcement learning insights."""
     console.print("\n[bold blue]🧠 Reinforcement Learning Insights[/bold blue]")
 
@@ -751,7 +751,7 @@ def _display_reinforcement_learning_insights(insights: dict[str, Any]):
 
 @sme_agent_cli.command("llm-status")
 @handle_sme_agent_error
-def llm_status():
+def llm_status() -> None:
     """Display LLM infrastructure status and capabilities."""
     try:
         from rich.console import Console
@@ -884,7 +884,7 @@ def llm_status():
 
 @sme_agent_cli.command("env-optimize")
 @handle_sme_agent_error
-def env_optimize():
+def env_optimize() -> None:
     """Display environment-specific optimization recommendations for LLM deployment."""
     try:
         from rich.console import Console
@@ -1030,7 +1030,7 @@ def env_optimize():
 @click.option("--use-docker", is_flag=True, help="Deploy using Docker container")
 @click.option("--gpu", is_flag=True, help="Enable GPU acceleration")
 @handle_sme_agent_error
-def deploy_llm_infrastructure(model: str, complexity: str, use_docker: bool, gpu: bool):
+def deploy_llm_infrastructure(model: str, complexity: str, use_docker: bool, gpu: bool) -> None:
     """Deploy 8B parameter LLM infrastructure."""
     try:
         from rich.console import Console
@@ -1069,7 +1069,7 @@ def deploy_llm_infrastructure(model: str, complexity: str, use_docker: bool, gpu
             # Create LLM infrastructure
             import asyncio
 
-            async def deploy():
+            async def deploy() -> None:
                 llm_infra = await create_llm_infrastructure(
                     complexity_level=complexity,
                     model_type=model,
@@ -1131,7 +1131,7 @@ def deploy_llm_infrastructure(model: str, complexity: str, use_docker: bool, gpu
 @handle_sme_agent_error
 def extract_knowledge_dataset(
     types: tuple[str], max_records: int | None, output_format: str
-):
+) -> None:
     """Extract knowledge dataset from Neo4j for fine-tuning."""
     try:
         from rich.console import Console
@@ -1168,7 +1168,7 @@ def extract_knowledge_dataset(
             # Create dataset
             import asyncio
 
-            async def extract():
+            async def extract() -> None:
                 return await create_knowledge_dataset(
                     extraction_types=[t.value for t in extraction_types],
                     output_format=output_format,
@@ -1223,7 +1223,7 @@ def extract_knowledge_dataset(
 @handle_sme_agent_error
 def enhance_vector_embeddings(
     model: str, search_mode: str, enable_gpu: bool, rerank: bool
-):
+) -> None:
     """Enhance vector embeddings with domain-specific knowledge."""
     try:
         from rich.console import Console
@@ -1263,7 +1263,7 @@ def enhance_vector_embeddings(
             # Create enhanced vector search
             import asyncio
 
-            async def enhance():
+            async def enhance() -> None:
                 # Get documents from Neo4j (placeholder for now)
                 documents = []  # This would be populated from Neo4j
 
@@ -1309,7 +1309,7 @@ def enhance_vector_embeddings(
 
 @sme_agent_cli.command("infrastructure-status")
 @handle_sme_agent_error
-def infrastructure_status():
+def infrastructure_status() -> None:
     """Display comprehensive infrastructure status for all SME Agent components."""
     try:
         from rich.columns import Columns

@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import TYPE_CHECKING, Any
+from typing import Self, TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from .abstract_module import AbstractIgnitionModule
@@ -49,7 +49,7 @@ class LifecycleEvent:
         self.new_state = new_state
         self.data = data or {}
 
-    def __str__(self) -> str:
+    def __str__(self: Self) -> str:
         """String representation of the event."""
         return f"{self.timestamp}: {self.event_type} ({self.old_state.value} -> {self.new_state.value})"
 
@@ -61,7 +61,7 @@ class ModuleLifecycleManager:
     event handling, health monitoring, and automatic recovery capabilities.
     """
 
-    def __init__(self, module: "AbstractIgnitionModule"):
+    def __init__(self: Self, module: "AbstractIgnitionModule"):
         """Initialize the lifecycle manager.
 
         Args:
@@ -104,50 +104,50 @@ class ModuleLifecycleManager:
     # Properties
 
     @property
-    def start_time(self) -> datetime | None:
+    def start_time(self: Self) -> datetime | None:
         """Get module start time."""
         return self._start_time
 
     @property
-    def uptime(self) -> timedelta:
+    def uptime(self: Self) -> timedelta:
         """Get module uptime."""
         if self._start_time and self._module.state == ModuleState.RUNNING:
             return datetime.now() - self._start_time + self._uptime
         return self._uptime
 
     @property
-    def restart_count(self) -> int:
+    def restart_count(self: Self) -> int:
         """Get number of restarts."""
         return self._restart_count
 
     @property
-    def error_count(self) -> int:
+    def error_count(self: Self) -> int:
         """Get number of errors."""
         return self._error_count
 
     @property
-    def last_error(self) -> str | None:
+    def last_error(self: Self) -> str | None:
         """Get last error message."""
         return self._last_error
 
     @property
-    def health_status(self) -> str:
+    def health_status(self: Self) -> str:
         """Get current health status."""
         return self._health_status
 
     @property
-    def events(self) -> list[LifecycleEvent]:
+    def events(self: Self) -> list[LifecycleEvent]:
         """Get lifecycle events."""
         return self._events.copy()
 
     @property
-    def performance_metrics(self) -> dict[str, Any]:
+    def performance_metrics(self: Self) -> dict[str, Any]:
         """Get performance metrics."""
         return self._performance_metrics.copy()
 
     # State change handling
 
-    def on_state_changed(self, old_state: ModuleState, new_state: ModuleState):
+    def on_state_changed(self: Self, old_state: ModuleState, new_state: ModuleState):
         """Handle module state change.
 
         Args:
@@ -181,7 +181,7 @@ class ModuleLifecycleManager:
         elif new_state == ModuleState.ERROR:
             self._on_module_error()
 
-    def add_state_change_callback(self, callback: Callable[[ModuleState, ModuleState], None]):
+    def add_state_change_callback(self: Self, callback: Callable[[ModuleState, ModuleState], None]):
         """Add a state change callback.
 
         Args:
@@ -189,7 +189,7 @@ class ModuleLifecycleManager:
         """
         self._state_change_callbacks.append(callback)
 
-    def remove_state_change_callback(self, callback: Callable[[ModuleState, ModuleState], None]):
+    def remove_state_change_callback(self: Self, callback: Callable[[ModuleState, ModuleState], None]):
         """Remove a state change callback.
 
         Args:
@@ -200,7 +200,7 @@ class ModuleLifecycleManager:
 
     # Event management
 
-    def _add_event(self, event: LifecycleEvent):
+    def _add_event(self: Self, event: LifecycleEvent):
         """Add an event to the history.
 
         Args:
@@ -212,7 +212,7 @@ class ModuleLifecycleManager:
         if len(self._events) > self._max_events:
             self._events = self._events[-self._max_events :]
 
-    def get_events_since(self, since: datetime) -> list[LifecycleEvent]:
+    def get_events_since(self: Self, since: datetime) -> list[LifecycleEvent]:
         """Get events since a specific time.
 
         Args:
@@ -223,7 +223,7 @@ class ModuleLifecycleManager:
         """
         return [event for event in self._events if event.timestamp >= since]
 
-    def get_events_by_type(self, event_type: str) -> list[LifecycleEvent]:
+    def get_events_by_type(self: Self, event_type: str) -> list[LifecycleEvent]:
         """Get events of a specific type.
 
         Args:
@@ -236,7 +236,7 @@ class ModuleLifecycleManager:
 
     # Lifecycle tracking
 
-    def _update_lifecycle_tracking(self, old_state: ModuleState, new_state: ModuleState):
+    def _update_lifecycle_tracking(self: Self, old_state: ModuleState, new_state: ModuleState):
         """Update lifecycle tracking metrics.
 
         Args:
@@ -280,18 +280,18 @@ class ModuleLifecycleManager:
             self._last_error = self._module.error_state
             self._last_error_time = now
 
-    def _on_module_started(self):
+    def _on_module_started(self: Self):
         """Handle module started event."""
         self._module.logger.info("Module lifecycle: Started successfully")
         self._health_status = "healthy"
         self._last_health_check = datetime.now()
 
-    def _on_module_stopped(self):
+    def _on_module_stopped(self: Self):
         """Handle module stopped event."""
         self._module.logger.info("Module lifecycle: Stopped successfully")
         self._health_status = "stopped"
 
-    def _on_module_error(self):
+    def _on_module_error(self: Self):
         """Handle module error event."""
         self._module.logger.error(f"Module lifecycle: Error occurred - {self._last_error}")
         self._health_status = "error"
@@ -302,7 +302,7 @@ class ModuleLifecycleManager:
 
     # Health monitoring
 
-    def check_health(self) -> dict[str, Any]:
+    def check_health(self: Self) -> dict[str, Any]:
         """Perform health check on the module.
 
         Returns:
@@ -340,7 +340,7 @@ class ModuleLifecycleManager:
         health_data["status"] = self._health_status
         return health_data
 
-    def is_healthy(self) -> bool:
+    def is_healthy(self: Self) -> bool:
         """Check if the module is healthy.
 
         Returns:
@@ -350,7 +350,7 @@ class ModuleLifecycleManager:
 
     # Auto-recovery
 
-    def _schedule_auto_recovery(self):
+    def _schedule_auto_recovery(self: Self):
         """Schedule automatic recovery attempt."""
         if self._restart_count >= self._max_restart_attempts:
             self._module.logger.error(
@@ -367,7 +367,7 @@ class ModuleLifecycleManager:
         # For now, we'll just log the intent
         self._restart_count += 1
 
-    def enable_auto_recovery(self, max_attempts: int = 3, delay: int = 5):
+    def enable_auto_recovery(self: Self, max_attempts: int = 3, delay: int = 5):
         """Enable automatic recovery.
 
         Args:
@@ -381,14 +381,14 @@ class ModuleLifecycleManager:
 
         self._module.logger.info(f"Auto-recovery enabled: max_attempts={max_attempts}, delay={delay}s")
 
-    def disable_auto_recovery(self):
+    def disable_auto_recovery(self: Self):
         """Disable automatic recovery."""
         self._auto_recovery_enabled = False
         self._module.logger.info("Auto-recovery disabled")
 
     # Statistics and reporting
 
-    def get_statistics(self) -> dict[str, Any]:
+    def get_statistics(self: Self) -> dict[str, Any]:
         """Get comprehensive lifecycle statistics.
 
         Returns:
@@ -413,7 +413,7 @@ class ModuleLifecycleManager:
             "performance_metrics": self._performance_metrics,
         }
 
-    def get_uptime_report(self) -> dict[str, Any]:
+    def get_uptime_report(self: Self) -> dict[str, Any]:
         """Get detailed uptime report.
 
         Returns:
@@ -442,7 +442,7 @@ class ModuleLifecycleManager:
             "last_shutdown_time": self._performance_metrics.get("shutdown_time"),
         }
 
-    def reset_statistics(self):
+    def reset_statistics(self: Self):
         """Reset all lifecycle statistics."""
         self._restart_count = 0
         self._error_count = 0
@@ -459,11 +459,11 @@ class ModuleLifecycleManager:
 
         self._module.logger.info("Lifecycle statistics reset")
 
-    def __str__(self) -> str:
+    def __str__(self: Self) -> str:
         """String representation of the lifecycle manager."""
         return f"LifecycleManager({self._module.metadata.name}, {self._module.state.value})"
 
-    def __repr__(self) -> str:
+    def __repr__(self: Self) -> str:
         """Detailed string representation of the lifecycle manager."""
         return (
             f"ModuleLifecycleManager(module='{self._module.metadata.name}', "
