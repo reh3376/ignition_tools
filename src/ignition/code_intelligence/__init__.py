@@ -15,6 +15,8 @@ For new agents/chat sessions, use the knowledge discovery system:
 This will automatically discover and connect to all available knowledge bases.
 """
 
+from typing import Any
+
 # Import key components for easy access
 try:
     from .cli_commands import refactor_commands

@@ -1,6 +1,7 @@
 """CLI commands for Ignition Module development."""
 
 from pathlib import Path
+from typing import Any
 
 import click
 from rich.console import Console
