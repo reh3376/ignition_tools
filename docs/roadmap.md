@@ -1707,7 +1707,7 @@ Finalize the IGN Scripts platform for production deployment with a comprehensive
   - [ ] Implement dark/light theme toggle with system preference detection
 
 #### **CLI Feature Migration**
-- [ ] **Enhanced CLI to Web Interface**
+- [ ] Enhanced CLI to Web Interface, use the CLI
   - [ ] **Script Generation Dashboard**: Visual script template selection and customization
   - [ ] **Database Management Console**: Connection testing, query builder, schema browser
   - [ ] **OPC-UA Browser**: Real-time server browsing, tag monitoring, and diagnostics
