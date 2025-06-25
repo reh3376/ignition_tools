@@ -32,7 +32,7 @@ class ImportResult:
     execution_time: float = 0.0
     imported_resources: dict[str, list[str]] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.imported_resources is None:
             self.imported_resources = {}
 
@@ -40,7 +40,7 @@ class ImportResult:
 class IgnitionProjectImporter:
     """Basic Ignition project importer."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the project importer."""
         self.import_id = str(uuid4())
 
@@ -65,7 +65,9 @@ class IgnitionProjectImporter:
             ImportResult with information about the import operation
         """
         start_time = datetime.now()
-        logger.info(f"Starting project import from {import_path} with mode {mode.value}")
+        logger.info(
+            f"Starting project import from {import_path} with mode {mode.value}"
+        )
 
         try:
             # Validate file exists

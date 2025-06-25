@@ -17,7 +17,7 @@ from .workflow_integration import (
 console = Console()
 
 
-def _initialize_workflow_systems():
+def _initialize_workflow_systems() -> Any:
     """Initialize the workflow integration systems."""
     try:
         from src.ignition.graph.client import IgnitionGraphClient

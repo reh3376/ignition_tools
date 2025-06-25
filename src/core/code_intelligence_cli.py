@@ -14,14 +14,14 @@ logger = logging.getLogger(__name__)
 
 
 @click.group()
-def code():
+def code() -> None:
     """Code Intelligence commands for analyzing and searching code."""
     pass
 
 
 @code.command()
 @click.option("--detailed", is_flag=True, help="Show detailed information")
-def status(detailed: bool):
+def status(detailed: bool) -> None:
     """Show code intelligence system status."""
     try:
         from src.ignition.code_intelligence import CodeIntelligenceManager
@@ -68,7 +68,9 @@ def status(detailed: bool):
             console.print("\n🗄️ Database Schema", style="bold")
             console.print(f"Constraints: {len(schema_info.get('constraints', []))}")
             console.print(f"Indexes: {len(schema_info.get('indexes', []))}")
-            console.print(f"Schema Version: {schema_info.get('schema_version', 'Unknown')}")
+            console.print(
+                f"Schema Version: {schema_info.get('schema_version', 'Unknown')}"
+            )
 
             # Node counts
             node_counts = schema_info.get("node_counts", {})
@@ -87,7 +89,7 @@ def status(detailed: bool):
 @code.command()
 @click.argument("file_path", type=click.Path(exists=True))
 @click.option("--detailed", is_flag=True, help="Show detailed analysis")
-def analyze(file_path: str, detailed: bool):
+def analyze(file_path: str, detailed: bool) -> None:
     """Analyze a specific file and store results."""
     try:
         from src.ignition.code_intelligence import CodeIntelligenceManager
@@ -127,10 +129,14 @@ def analyze(file_path: str, detailed: bool):
                     file_info = context.get("file", {})
                     console.print(f"Lines: {file_info.get('lines', 'N/A')}")
                     console.print(f"Complexity: {file_info.get('complexity', 'N/A')}")
-                    console.print(f"Maintainability: {file_info.get('maintainability_index', 'N/A'):.1f}")
+                    console.print(
+                        f"Maintainability: {file_info.get('maintainability_index', 'N/A'):.1f}"
+                    )
 
                     classes = context.get("classes", [])
-                    methods = context.get("class_methods", []) + context.get("file_methods", [])
+                    methods = context.get("class_methods", []) + context.get(
+                        "file_methods", []
+                    )
                     imports = context.get("imports", [])
 
                     console.print(f"Classes: {len(classes)}")
@@ -140,12 +146,16 @@ def analyze(file_path: str, detailed: bool):
                     if classes:
                         console.print("\n📦 Classes:")
                         for cls in classes[:5]:  # Show first 5
-                            console.print(f"  • {cls.get('name')} (complexity: {cls.get('complexity')})")
+                            console.print(
+                                f"  • {cls.get('name')} (complexity: {cls.get('complexity')})"
+                            )
 
                     if methods:
                         console.print("\n🔧 Methods:")
                         for method in methods[:5]:  # Show first 5
-                            console.print(f"  • {method.get('name')} (complexity: {method.get('complexity')})")
+                            console.print(
+                                f"  • {method.get('name')} (complexity: {method.get('complexity')})"
+                            )
         else:
             console.print(f"❌ Failed to analyze: {file_path}", style="red")
 
@@ -157,7 +167,7 @@ def analyze(file_path: str, detailed: bool):
 @code.command()
 @click.argument("directory_path", type=click.Path(exists=True))
 @click.option("--recursive/--no-recursive", default=True, help="Analyze subdirectories")
-def scan(directory_path: str, recursive: bool):
+def scan(directory_path: str, recursive: bool) -> None:
     """Scan and analyze all Python files in a directory."""
     try:
         from src.ignition.code_intelligence import CodeIntelligenceManager
@@ -183,7 +193,9 @@ def scan(directory_path: str, recursive: bool):
             progress.update(task, description=f"Scanning {directory_path}...")
             results = manager.analyze_and_store_directory(dir_path, recursive)
 
-        console.print(f"\n📂 Directory Scan Results: {directory_path}", style="bold blue")
+        console.print(
+            f"\n📂 Directory Scan Results: {directory_path}", style="bold blue"
+        )
         console.print(f"Files processed: {results['files_processed']}")
         console.print(f"Files successful: {results['files_successful']}", style="green")
         console.print(
@@ -214,7 +226,7 @@ def scan(directory_path: str, recursive: bool):
     help="Type of code elements to search",
 )
 @click.option("--limit", default=10, help="Maximum number of results")
-def search(query: str, search_type: str, limit: int):
+def search(query: str, search_type: str, limit: int) -> None:
     """Search for code elements by name or content."""
     try:
         from src.ignition.code_intelligence import CodeIntelligenceManager
@@ -239,8 +251,12 @@ def search(query: str, search_type: str, limit: int):
             console.print(f"No results found for '{query}'", style="yellow")
             return
 
-        console.print(f"\n🔍 Search Results for '{query}' ({search_type})", style="bold blue")
-        console.print(f"Found {len(results)} results (showing first {min(limit, len(results))})")
+        console.print(
+            f"\n🔍 Search Results for '{query}' ({search_type})", style="bold blue"
+        )
+        console.print(
+            f"Found {len(results)} results (showing first {min(limit, len(results))})"
+        )
 
         # Create results table
         table = Table()
@@ -268,7 +284,7 @@ def search(query: str, search_type: str, limit: int):
 
 @code.command()
 @click.argument("file_path")
-def context(file_path: str):
+def context(file_path: str) -> None:
     """Get comprehensive context for a file."""
     try:
         from src.ignition.code_intelligence import CodeIntelligenceManager
@@ -291,7 +307,9 @@ def context(file_path: str):
 
         if not context_data or not context_data.get("file"):
             console.print(f"No context found for '{file_path}'", style="yellow")
-            console.print("Make sure the file has been analyzed first using 'ign code analyze'")
+            console.print(
+                "Make sure the file has been analyzed first using 'ign code analyze'"
+            )
             return
 
         console.print(f"\n📁 File Context: {file_path}", style="bold blue")
@@ -325,7 +343,9 @@ def context(file_path: str):
         if all_methods:
             console.print(f"\n🔧 Methods ({len(all_methods)}):")
             for method in all_methods:
-                class_info = f" [{method.get('class_name')}]" if method.get("class_name") else ""
+                class_info = (
+                    f" [{method.get('class_name')}]" if method.get("class_name") else ""
+                )
                 console.print(
                     f"  • {method.get('name')}{class_info} (line {method.get('start_line')}, complexity: {method.get('complexity')})"
                 )

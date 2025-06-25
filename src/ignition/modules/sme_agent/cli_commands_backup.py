@@ -12,7 +12,7 @@ Following crawl_mcp.py methodology:
 import logging
 import sys
 from pathlib import Path
-from typing import Self, Any
+from typing import Any
 
 import click
 from rich.console import Console
@@ -1030,7 +1030,9 @@ def env_optimize() -> None:
 @click.option("--use-docker", is_flag=True, help="Deploy using Docker container")
 @click.option("--gpu", is_flag=True, help="Enable GPU acceleration")
 @handle_sme_agent_error
-def deploy_llm_infrastructure(model: str, complexity: str, use_docker: bool, gpu: bool) -> None:
+def deploy_llm_infrastructure(
+    model: str, complexity: str, use_docker: bool, gpu: bool
+) -> None:
     """Deploy 8B parameter LLM infrastructure."""
     try:
         from rich.console import Console

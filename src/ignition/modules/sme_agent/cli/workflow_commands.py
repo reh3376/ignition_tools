@@ -10,6 +10,7 @@ This module provides CLI commands for:
 """
 
 import asyncio
+from typing import Any
 
 import click
 
@@ -18,7 +19,6 @@ from ..development_workflow_integration import (
     get_development_workflow_info,
     validate_development_workflow_environment,
 )
-from typing import Any, Self
 from ..real_time_knowledge_updates import (
     RealTimeKnowledgeUpdater,
     get_knowledge_update_info,

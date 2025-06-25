@@ -81,7 +81,7 @@ class EnterpriseArchitectureModule:
     6. Resource Management and Cleanup
     """
 
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize Enterprise Architecture Module following crawl_mcp.py patterns."""
         self.console = Console()
         self.logger = logging.getLogger(__name__)
@@ -365,7 +365,7 @@ class EnterpriseArchitectureModule:
 
         return errors
 
-    def _initialize_components(self):
+    def _initialize_components(self) -> Any:
         """Initialize enterprise architecture components."""
         try:
             self.console.print(
@@ -395,7 +395,9 @@ class EnterpriseArchitectureModule:
             self.logger.error(f"Failed to initialize components: {e}")
             raise
 
-    def _display_environment_validation(self, validation_results: dict[str, Any]):
+    def _display_environment_validation(
+        self, validation_results: dict[str, Any]
+    ) -> Any:
         """Display environment validation results following crawl_mcp.py patterns."""
         table = Table(title="Enterprise Architecture - Environment Validation")
         table.add_column("Variable", style="cyan")
@@ -655,7 +657,7 @@ class EnterpriseArchitectureModule:
         else:
             return f"Deployment error: {error}"
 
-    def cleanup_resources(self):
+    def cleanup_resources(self) -> Any:
         """Step 6: Resource Management and Cleanup
 
         Clean up allocated resources following crawl_mcp.py patterns.

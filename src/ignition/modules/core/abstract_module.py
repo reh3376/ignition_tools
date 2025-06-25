@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Self, Any
+from typing import Any, Self
 
 from .config import ModuleConfigurationManager
 from .lifecycle import ModuleLifecycleManager, ModuleState
@@ -32,7 +32,7 @@ class ModuleMetadata:
     min_ignition_version: str = "8.1.0"
     dependencies: list[str] | None = None
 
-    def __post_init__(self: Self):
+    def __post_init__(self: Self) -> None:
         """Initialize default values."""
         if self.dependencies is None:
             self.dependencies = []
@@ -127,7 +127,7 @@ class AbstractIgnitionModule(ABC):
         return self._diagnostics_manager
 
     @property
-    def logger(self: Self):
+    def logger(self: Self) -> Any:
         """Get module logger."""
         return self._logger
 
@@ -236,7 +236,9 @@ class AbstractIgnitionModule(ABC):
 
     # Lifecycle management methods
 
-    def _set_state(self: Self, new_state: ModuleState, error_message: str | None = None):
+    def _set_state(
+        self: Self, new_state: ModuleState, error_message: str | None = None
+    ):
         """Set module state.
 
         Args:
@@ -388,7 +390,7 @@ class AbstractIgnitionModule(ABC):
         # Call user shutdown
         return self.shutdown_module()
 
-    def _initialize_hooks(self: Self):
+    def _initialize_hooks(self: Self) -> Any:
         """Initialize module hooks."""
         if ModuleScope.GATEWAY in self._metadata.scopes:
             self._gateway_hook = self.create_gateway_hook()
@@ -405,7 +407,7 @@ class AbstractIgnitionModule(ABC):
             if self._client_hook:
                 self._logger.info("Client hook created")
 
-    def _startup_hooks(self: Self):
+    def _startup_hooks(self: Self) -> Any:
         """Start module hooks."""
         if self._gateway_hook and hasattr(self._gateway_hook, "startup"):
             try:
@@ -428,7 +430,7 @@ class AbstractIgnitionModule(ABC):
             except Exception as e:
                 self._logger.exception(f"Client hook startup failed: {e}")
 
-    def _shutdown_hooks(self: Self):
+    def _shutdown_hooks(self: Self) -> Any:
         """Shutdown module hooks."""
         if self._gateway_hook and hasattr(self._gateway_hook, "shutdown"):
             try:

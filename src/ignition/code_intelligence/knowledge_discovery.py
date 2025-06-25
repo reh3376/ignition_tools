@@ -781,7 +781,7 @@ def initialize_agent_knowledge() -> dict[str, Any]:
     return context
 
 
-def main():
+def main() -> Any:
     """Main function for testing knowledge discovery."""
     context = initialize_agent_knowledge()
 

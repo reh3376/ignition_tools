@@ -759,7 +759,7 @@ class DevelopmentWorkflowIntegrator:
         self, metrics: dict[str, Any]
     ) -> dict[str, list[str]]:
         """Generate SME Agent health recommendations."""
-        recommendations = {
+        recommendations: Any = {
             "general": [],
             "priority": [],
         }
@@ -886,7 +886,7 @@ class DevelopmentWorkflowIntegrator:
         self, commit_info: dict[str, Any], change_analysis: dict[str, Any]
     ) -> dict[str, Any]:
         """Generate SME Agent insights for commit."""
-        insights = {
+        insights: Any = {
             "recommendations": [],
             "potential_issues": [],
             "improvement_suggestions": [],
@@ -937,7 +937,7 @@ class DevelopmentWorkflowIntegrator:
         self, target_paths: list[str]
     ) -> dict[str, Any]:
         """Analyze code structure for documentation generation."""
-        analysis = {
+        analysis: Any = {
             "modules": [],
             "classes": [],
             "functions": [],
@@ -1007,7 +1007,7 @@ class DevelopmentWorkflowIntegrator:
         self, code_analysis: dict[str, Any]
     ) -> dict[str, Any]:
         """Generate documentation content from code analysis."""
-        content = {
+        content: Any = {
             "api_docs": {},
             "user_guides": {},
             "tutorials": {},
@@ -1034,7 +1034,7 @@ class DevelopmentWorkflowIntegrator:
         self, content: dict[str, Any]
     ) -> dict[str, Any]:
         """Write documentation files to disk."""
-        result = {
+        result: Any = {
             "generated_files": [],
             "updated_files": [],
         }

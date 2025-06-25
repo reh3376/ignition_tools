@@ -407,7 +407,7 @@ class TestEnvironmentManager:
     and configuration.
     """
 
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize test environment manager."""
         self.environments: dict[str, TestEnvironment] = {}
         self.config = self._load_config()

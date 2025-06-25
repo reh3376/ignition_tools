@@ -60,7 +60,7 @@ class SigningConfig:
         default_factory=lambda: Path(tempfile.gettempdir()) / "ignition-signing"
     )
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate configuration after initialization."""
         self.output_directory.mkdir(parents=True, exist_ok=True)
         self.temp_directory.mkdir(parents=True, exist_ok=True)

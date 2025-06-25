@@ -68,7 +68,7 @@ class DeploymentConfig:
         default_factory=lambda: os.getenv("DEPLOYMENT_NOTIFICATION_EMAIL", "")
     )
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Initialize component configurations if not provided."""
         if self.packaging_config is None:
             self.packaging_config = PackagingConfig()

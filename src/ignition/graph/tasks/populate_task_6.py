@@ -21,7 +21,7 @@ from src.ignition.graph.client import IgnitionGraphClient
 from src.ignition.graph.tasks.task_6_utility_system import get_utility_system_functions
 
 
-def populate_task_6_utility_system():
+def populate_task_6_utility_system() -> Any:
     """Populate Task 6: Utility System Expansion functions into Neo4j database.
 
     This function:
@@ -175,7 +175,9 @@ def populate_task_6_utility_system():
                     MERGE (s:Scope {name: $scope})
                     MERGE (f)-[:AVAILABLE_IN]->(s)
                     """
-                    client.execute_query(scope_query, {"name": func_name, "scope": scope})
+                    client.execute_query(
+                        scope_query, {"name": func_name, "scope": scope}
+                    )
 
                 # Create parameter relationships
                 for param in func_data["parameters"]:
@@ -207,7 +209,9 @@ def populate_task_6_utility_system():
                     MERGE (pat:Pattern {name: $pattern})
                     MERGE (f)-[:IMPLEMENTS]->(pat)
                     """
-                    client.execute_query(pattern_query, {"name": func_name, "pattern": pattern})
+                    client.execute_query(
+                        pattern_query, {"name": func_name, "pattern": pattern}
+                    )
 
                 success_count += 1
 
@@ -259,7 +263,9 @@ def populate_task_6_utility_system():
 
         print("\n📊 **Updated Database Statistics:**")
         print(f"   📈 Total functions: {total_functions}")
-        print(f"   🎯 Completion: {(total_functions / 400) * 100:.1f}% (target: 400 functions)")
+        print(
+            f"   🎯 Completion: {(total_functions / 400) * 100:.1f}% (target: 400 functions)"
+        )
 
         return success_count == len(functions)
 
@@ -284,7 +290,9 @@ if __name__ == "__main__":
     if success:
         print("\n✅ **TASK 6 POPULATION SUCCESSFUL**")
         print("📋 Next: Run validation tests")
-        print("🔧 Command: python scripts/testing/automated_task_validation.py --task 6")
+        print(
+            "🔧 Command: python scripts/testing/automated_task_validation.py --task 6"
+        )
     else:
         print("\n❌ **TASK 6 POPULATION FAILED**")
         print("🔧 Check error messages above and retry")

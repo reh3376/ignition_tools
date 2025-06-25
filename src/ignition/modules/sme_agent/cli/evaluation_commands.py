@@ -7,7 +7,7 @@ Following crawl_mcp.py methodology:
 
 import logging
 import sys
-from typing import Self, Any
+from typing import Any
 
 import click
 from rich.console import Console

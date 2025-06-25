@@ -132,41 +132,59 @@ class KnowledgeValidator:
         self.class_cache: dict[str, dict[str, Any]] = {}
         self.method_cache: dict[str, list[dict[str, Any]]] = {}
         self.repo_cache: dict[str, str] = {}  # module_name -> repo_name
-        self.knowledge_graph_modules: set[str] = set()  # Track modules in knowledge graph
+        self.knowledge_graph_modules: set[str] = (
+            set()
+        )  # Track modules in knowledge graph
 
-    async def initialize(self):
+    async def initialize(self) -> None:
         """Initialize Neo4j connection."""
         try:
-            self.driver = AsyncGraphDatabase.driver(self.neo4j_uri, auth=(self.neo4j_user, self.neo4j_password))
+            self.driver = AsyncGraphDatabase.driver(
+                self.neo4j_uri, auth=(self.neo4j_user, self.neo4j_password)
+            )
             logger.info("Knowledge graph validator initialized")
         except Exception as e:
             logger.error(f"Failed to initialize Neo4j connection: {e}")
             raise
 
-    async def close(self):
+    async def close(self) -> None:
         """Close Neo4j connection."""
         if self.driver:
             await self.driver.close()
 
-    async def validate_script(self, analysis_result: AnalysisResult) -> ScriptValidationResult:
+    async def validate_script(
+        self, analysis_result: AnalysisResult
+    ) -> ScriptValidationResult:
         """Validate entire script analysis against knowledge graph."""
-        result = ScriptValidationResult(script_path=analysis_result.file_path, analysis_result=analysis_result)
+        result = ScriptValidationResult(
+            script_path=analysis_result.file_path, analysis_result=analysis_result
+        )
 
         try:
             # Validate imports first (builds context for other validations)
-            result.import_validations = await self._validate_imports(analysis_result.imports)
+            result.import_validations = await self._validate_imports(
+                analysis_result.imports
+            )
 
             # Validate class instantiations
-            result.class_validations = await self._validate_class_instantiations(analysis_result.class_instantiations)
+            result.class_validations = await self._validate_class_instantiations(
+                analysis_result.class_instantiations
+            )
 
             # Validate method calls
-            result.method_validations = await self._validate_method_calls(analysis_result.method_calls)
+            result.method_validations = await self._validate_method_calls(
+                analysis_result.method_calls
+            )
 
             # Validate attribute accesses
-            result.attribute_validations = await self._validate_attribute_accesses(analysis_result.attribute_accesses)
+            result.attribute_validations = await self._validate_attribute_accesses(
+                analysis_result.attribute_accesses
+            )
 
             # Validate function calls
-            result.function_validations = await self._validate_function_calls(analysis_result.function_calls)
+            result.function_validations = await self._validate_function_calls(
+                analysis_result.function_calls
+            )
 
             # Calculate overall confidence and detect hallucinations
             result.overall_confidence = self._calculate_overall_confidence(result)
@@ -185,7 +203,9 @@ class KnowledgeValidator:
 
         return result
 
-    async def _validate_imports(self, imports: list[ImportInfo]) -> list[ImportValidation]:
+    async def _validate_imports(
+        self, imports: list[ImportInfo]
+    ) -> list[ImportValidation]:
         """Validate all imports against knowledge graph."""
         validations = []
         for import_info in imports:
@@ -193,9 +213,13 @@ class KnowledgeValidator:
             validations.append(validation)
         return validations
 
-    async def _validate_single_import(self, import_info: ImportInfo) -> ImportValidation:
+    async def _validate_single_import(
+        self, import_info: ImportInfo
+    ) -> ImportValidation:
         """Validate a single import."""
-        search_module = import_info.module if import_info.is_from_import else import_info.name
+        search_module = (
+            import_info.module if import_info.is_from_import else import_info.name
+        )
 
         # Check cache first
         if search_module in self.module_cache:
@@ -228,7 +252,9 @@ class KnowledgeValidator:
             available_functions=[],
         )
 
-    async def _validate_class_instantiations(self, instantiations: list[ClassInstantiation]) -> list[ClassValidation]:
+    async def _validate_class_instantiations(
+        self, instantiations: list[ClassInstantiation]
+    ) -> list[ClassValidation]:
         """Validate all class instantiations."""
         validations = []
         for instantiation in instantiations:
@@ -236,7 +262,9 @@ class KnowledgeValidator:
             validations.append(validation)
         return validations
 
-    async def _validate_single_class_instantiation(self, instantiation: ClassInstantiation) -> ClassValidation:
+    async def _validate_single_class_instantiation(
+        self, instantiation: ClassInstantiation
+    ) -> ClassValidation:
         """Validate a single class instantiation."""
         class_info = await self._find_class(instantiation.class_name)
 
@@ -263,7 +291,9 @@ class KnowledgeValidator:
             constructor_params=constructor_params,
         )
 
-    async def _validate_method_calls(self, method_calls: list[MethodCall]) -> list[MethodValidation]:
+    async def _validate_method_calls(
+        self, method_calls: list[MethodCall]
+    ) -> list[MethodValidation]:
         """Validate all method calls."""
         validations = []
         for method_call in method_calls:
@@ -271,12 +301,16 @@ class KnowledgeValidator:
             validations.append(validation)
         return validations
 
-    async def _validate_single_method_call(self, method_call: MethodCall) -> MethodValidation:
+    async def _validate_single_method_call(
+        self, method_call: MethodCall
+    ) -> MethodValidation:
         """Validate a single method call."""
         # Try to find the method in the knowledge graph
         method_info = None
         if method_call.object_type:
-            method_info = await self._find_method(method_call.object_type, method_call.method_name)
+            method_info = await self._find_method(
+                method_call.object_type, method_call.method_name
+            )
 
         if method_info:
             validation = ValidationResult(
@@ -290,13 +324,17 @@ class KnowledgeValidator:
             # Try to find similar methods
             similar_methods = []
             if method_call.object_type:
-                similar_methods = await self._find_similar_methods(method_call.object_type, method_call.method_name)
+                similar_methods = await self._find_similar_methods(
+                    method_call.object_type, method_call.method_name
+                )
 
             validation = ValidationResult(
                 status=ValidationStatus.NOT_FOUND,
                 confidence=0.2,
                 message=f"Method '{method_call.method_name}' not found",
-                suggestions=[f"Did you mean '{method}'?" for method in similar_methods[:3]],
+                suggestions=[
+                    f"Did you mean '{method}'?" for method in similar_methods[:3]
+                ],
             )
             expected_params = []
 
@@ -317,11 +355,15 @@ class KnowledgeValidator:
             validations.append(validation)
         return validations
 
-    async def _validate_single_attribute_access(self, attr_access: AttributeAccess) -> AttributeValidation:
+    async def _validate_single_attribute_access(
+        self, attr_access: AttributeAccess
+    ) -> AttributeValidation:
         """Validate a single attribute access."""
         attr_info = None
         if attr_access.object_type:
-            attr_info = await self._find_attribute(attr_access.object_type, attr_access.attribute_name)
+            attr_info = await self._find_attribute(
+                attr_access.object_type, attr_access.attribute_name
+            )
 
         if attr_info:
             validation = ValidationResult(
@@ -343,7 +385,9 @@ class KnowledgeValidator:
             expected_type=attr_info.get("type") if attr_info else None,
         )
 
-    async def _validate_function_calls(self, function_calls: list[FunctionCall]) -> list[FunctionValidation]:
+    async def _validate_function_calls(
+        self, function_calls: list[FunctionCall]
+    ) -> list[FunctionValidation]:
         """Validate all function calls."""
         validations = []
         for func_call in function_calls:
@@ -351,7 +395,9 @@ class KnowledgeValidator:
             validations.append(validation)
         return validations
 
-    async def _validate_single_function_call(self, func_call: FunctionCall) -> FunctionValidation:
+    async def _validate_single_function_call(
+        self, func_call: FunctionCall
+    ) -> FunctionValidation:
         """Validate a single function call."""
         func_info = await self._find_function(func_call.function_name)
 
@@ -431,7 +477,9 @@ class KnowledgeValidator:
 
         return None
 
-    async def _find_method(self, class_name: str, method_name: str) -> dict[str, Any] | None:
+    async def _find_method(
+        self, class_name: str, method_name: str
+    ) -> dict[str, Any] | None:
         """Find method information in the knowledge graph."""
         if not self.driver:
             return None
@@ -443,7 +491,9 @@ class KnowledgeValidator:
 
         try:
             async with self.driver.session() as session:
-                result = await session.run(query, class_name=class_name, method_name=method_name)
+                result = await session.run(
+                    query, class_name=class_name, method_name=method_name
+                )
                 record = await result.single()
                 if record:
                     return {
@@ -456,7 +506,9 @@ class KnowledgeValidator:
 
         return None
 
-    async def _find_attribute(self, class_name: str, attr_name: str) -> dict[str, Any] | None:
+    async def _find_attribute(
+        self, class_name: str, attr_name: str
+    ) -> dict[str, Any] | None:
         """Find attribute information in the knowledge graph."""
         if not self.driver:
             return None
@@ -468,7 +520,9 @@ class KnowledgeValidator:
 
         try:
             async with self.driver.session() as session:
-                result = await session.run(query, class_name=class_name, attr_name=attr_name)
+                result = await session.run(
+                    query, class_name=class_name, attr_name=attr_name
+                )
                 record = await result.single()
                 if record:
                     return {
@@ -528,7 +582,9 @@ class KnowledgeValidator:
 
         return []
 
-    async def _find_similar_methods(self, class_name: str, method_name: str) -> list[str]:
+    async def _find_similar_methods(
+        self, class_name: str, method_name: str
+    ) -> list[str]:
         """Find similar method names using fuzzy matching."""
         if not self.driver:
             return []
@@ -542,7 +598,9 @@ class KnowledgeValidator:
 
         try:
             async with self.driver.session() as session:
-                result = await session.run(query, class_name=class_name, partial_name=method_name.lower())
+                result = await session.run(
+                    query, class_name=class_name, partial_name=method_name.lower()
+                )
                 records = await result.data()
                 return [record["name"] for record in records]
         except Exception as e:
@@ -565,24 +623,43 @@ class KnowledgeValidator:
         total_confidence = sum(v.confidence for v in all_validations)
         return total_confidence / len(all_validations)
 
-    def _detect_hallucinations(self, result: ScriptValidationResult) -> list[dict[str, Any]]:
+    def _detect_hallucinations(
+        self, result: ScriptValidationResult
+    ) -> list[dict[str, Any]]:
         """Detect potential hallucinations in the validation results."""
         hallucinations = []
 
         # Check for low-confidence validations
         all_validations = []
-        all_validations.extend([(v.validation, f"import {v.import_info.name}") for v in result.import_validations])
         all_validations.extend(
-            [(v.validation, f"class {v.class_instantiation.class_name}") for v in result.class_validations]
+            [
+                (v.validation, f"import {v.import_info.name}")
+                for v in result.import_validations
+            ]
         )
         all_validations.extend(
-            [(v.validation, f"method {v.method_call.method_name}") for v in result.method_validations]
+            [
+                (v.validation, f"class {v.class_instantiation.class_name}")
+                for v in result.class_validations
+            ]
         )
         all_validations.extend(
-            [(v.validation, f"attribute {v.attribute_access.attribute_name}") for v in result.attribute_validations]
+            [
+                (v.validation, f"method {v.method_call.method_name}")
+                for v in result.method_validations
+            ]
         )
         all_validations.extend(
-            [(v.validation, f"function {v.function_call.function_name}") for v in result.function_validations]
+            [
+                (v.validation, f"attribute {v.attribute_access.attribute_name}")
+                for v in result.attribute_validations
+            ]
+        )
+        all_validations.extend(
+            [
+                (v.validation, f"function {v.function_call.function_name}")
+                for v in result.function_validations
+            ]
         )
 
         for validation, description in all_validations:

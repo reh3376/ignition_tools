@@ -471,7 +471,9 @@ class TypeAnnotationManager:
             fixes_applied += self._apply_parameter_annotation_fixes(file_path, content)
             content = file_path.read_text(encoding="utf-8")  # Re-read after fixes
 
-            fixes_applied += self._apply_return_type_annotation_fixes(file_path, content)
+            fixes_applied += self._apply_return_type_annotation_fixes(
+                file_path, content
+            )
 
             # Step 5: Progressive complexity - Verify fixes worked
             final_analysis = self.analyzer.analyze_file(file_path)
@@ -622,22 +624,19 @@ class TypeAnnotationManager:
             patterns = [
                 # Functions with no parameters: def func():
                 (r"def (\w+)\(\):", r"def \1() -> None:"),
-                
                 # Functions with only self parameter: def func(self):
                 (r"def (\w+)\(self\):", r"def \1(self) -> None:"),
-                
                 # Functions with self and other parameters: def func(self, param):
                 (r"def (\w+)\(self, ([^)]+)\):", r"def \1(self, \2) -> None:"),
-                
                 # Functions with typed self: def func(self: Self):
                 (r"def (\w+)\(self: Self\):", r"def \1(self: Self) -> None:"),
-                
                 # Functions with typed self and other params: def func(self: Self, param):
-                (r"def (\w+)\(self: Self, ([^)]+)\):", r"def \1(self: Self, \2) -> None:"),
-                
+                (
+                    r"def (\w+)\(self: Self, ([^)]+)\):",
+                    r"def \1(self: Self, \2) -> None:",
+                ),
                 # Regular functions with parameters: def func(param):
                 (r"def (\w+)\(([^)]+)\):", r"def \1(\2) -> None:"),
-                
                 # Click command decorators - these should return None
                 # Already handled by above patterns, but let's be explicit
             ]
@@ -650,7 +649,19 @@ class TypeAnnotationManager:
                     full_match = match.group(0)
                     # Skip if already has return type annotation
                     if " -> " not in full_match:
-                        new_content = re.sub(re.escape(full_match), replacement.replace("\\1", match.group(1)).replace("\\2", match.group(2) if match.lastindex and match.lastindex >= 2 else ""), new_content, count=1)
+                        new_content = re.sub(
+                            re.escape(full_match),
+                            replacement.replace("\\1", match.group(1)).replace(
+                                "\\2",
+                                (
+                                    match.group(2)
+                                    if match.lastindex and match.lastindex >= 2
+                                    else ""
+                                ),
+                            ),
+                            new_content,
+                            count=1,
+                        )
                         fixes_applied += 1
 
             if new_content != content:

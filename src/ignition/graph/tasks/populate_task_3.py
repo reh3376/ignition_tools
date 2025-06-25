@@ -27,7 +27,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def populate_gui_system_functions():
+def populate_gui_system_functions() -> bool:
     """Populate Neo4j database with Task 3 GUI system functions."""
     # Initialize Neo4j connection
     db_manager = Neo4jManager()
@@ -135,7 +135,9 @@ def populate_gui_system_functions():
                 CREATE (f)-[:AVAILABLE_IN]->(s)
                 """
 
-                db_manager.execute_query(create_scope_query, {"func_name": func["name"], "scope_name": scope})
+                db_manager.execute_query(
+                    create_scope_query, {"func_name": func["name"], "scope_name": scope}
+                )
 
             # Create common pattern relationships
             for pattern in func["common_patterns"]:

@@ -27,7 +27,7 @@ import sys
 import traceback
 from datetime import datetime
 from pathlib import Path
-from typing import Self, Any
+from typing import Any, Self
 
 from rich.console import Console
 from rich.progress import (

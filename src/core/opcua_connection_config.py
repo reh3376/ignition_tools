@@ -57,7 +57,7 @@ class OPCUAConnectionConfig:
     created_at: str = ""
     verified: bool = False
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.dns_names is None:
             self.dns_names = []
         if self.ip_addresses is None:
@@ -67,7 +67,7 @@ class OPCUAConnectionConfig:
 class OPCUAConnectionWizard:
     """Interactive wizard for OPC-UA connection configuration."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.console = Console()
 
     async def run_interactive_setup(self) -> OPCUAConnectionConfig:
@@ -497,7 +497,7 @@ CONFIG_CREATED={config.created_at}
 class OPCUAConfigManager:
     """Manage OPC-UA connection configurations."""
 
-    def __init__(self):
+    def __init__(self) -> Any:
         self.config_dir = Path("configs/opcua")
         self.config_dir.mkdir(parents=True, exist_ok=True)
 

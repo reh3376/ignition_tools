@@ -941,7 +941,7 @@ class ProactiveDevelopmentAssistance:
         complexity: str,
     ) -> dict[str, Any]:
         """Generate architecture pattern suggestions."""
-        suggestions = {
+        suggestions: Any = {
             "recommended_patterns": [],
             "implementation_guidance": {},
             "trade_offs": {},
@@ -982,7 +982,7 @@ class ProactiveDevelopmentAssistance:
         complexity: str,
     ) -> dict[str, Any]:
         """Generate component optimization recommendations."""
-        optimizations = {
+        optimizations: Any = {
             "component_recommendations": [],
             "configuration_optimizations": {},
             "performance_improvements": [],
@@ -1018,7 +1018,7 @@ class ProactiveDevelopmentAssistance:
         complexity: str,
     ) -> dict[str, Any]:
         """Generate performance bottleneck analysis."""
-        analysis = {
+        analysis: Any = {
             "identified_bottlenecks": [],
             "root_cause_analysis": [],
             "resolution_recommendations": [],

@@ -100,7 +100,7 @@ st.markdown(
 )
 
 
-def initialize_session_state():
+def initialize_session_state() -> None:
     """Initialize session state variables."""
     if "session_id" not in st.session_state:
         st.session_state.session_id = str(uuid.uuid4())
@@ -122,7 +122,7 @@ def initialize_session_state():
 
 
 @st.cache_resource
-def get_sme_agent():
+def get_sme_agent() -> Any:
     """Get or create SME Agent instance with caching."""
     try:
         # Step 1: Environment Validation First
@@ -151,7 +151,7 @@ def get_sme_agent():
         return None, {"success": False, "error": str(e)}
 
 
-def display_header():
+def display_header() -> Any:
     """Display the main header and navigation."""
     st.markdown(
         '<div class="main-header">🤖 SME Agent - Ignition Expert Assistant</div>',
@@ -167,7 +167,7 @@ def display_header():
     return tab1, tab2, tab3, tab4
 
 
-def display_sidebar():
+def display_sidebar() -> None:
     """Display sidebar with session info and controls."""
     with st.sidebar:
         st.header("🔧 Session Control")
@@ -222,7 +222,7 @@ def display_sidebar():
             )
 
 
-def display_conversation_history():
+def display_conversation_history() -> None:
     """Display the conversation history."""
     if not st.session_state.conversation_history:
         st.info("💡 Start a conversation by asking a question below!")
@@ -262,7 +262,7 @@ def display_conversation_history():
             )
 
 
-def chat_interface():
+def chat_interface() -> None:
     """Main chat interface."""
     # Get SME Agent
     agent, agent_info = get_sme_agent()
@@ -346,7 +346,7 @@ def chat_interface():
             st.warning("⚠️ Please enter a question before submitting.")
 
 
-def file_analysis_interface():
+def file_analysis_interface() -> None:
     """File analysis interface."""
     st.subheader("📄 File Analysis")
     st.markdown("Upload a file or paste content for analysis by the SME Agent.")
@@ -441,7 +441,7 @@ def file_analysis_interface():
                     logger.error(f"Analysis error: {e}")
 
 
-def status_interface():
+def status_interface() -> None:
     """System status interface."""
     st.subheader("📊 System Status")
 
@@ -535,7 +535,7 @@ def status_interface():
             st.metric("Avg Confidence", f"{sum(confidences) / len(confidences):.2%}")
 
 
-def settings_interface():
+def settings_interface() -> None:
     """Settings and configuration interface."""
     st.subheader("⚙️ Settings")
 
@@ -592,7 +592,7 @@ def settings_interface():
     )
 
 
-def main():
+def main() -> None:
     """Main Streamlit application."""
     # Step 1: Environment Validation First (handled in get_sme_agent)
     initialize_session_state()

@@ -46,7 +46,9 @@ class ValidationResult:
 
     def has_critical_issues(self) -> bool:
         """Check if there are any critical validation issues."""
-        return any(issue.severity == ValidationSeverity.CRITICAL for issue in self.issues)
+        return any(
+            issue.severity == ValidationSeverity.CRITICAL for issue in self.issues
+        )
 
     def add_issue(
         self,
@@ -77,11 +79,13 @@ class ValidationResult:
 class ImportFileValidator:
     """Validates import files for Ignition projects and resources."""
 
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize the validator."""
         self.supported_formats = {".json", ".zip", ".proj", ".gwbk"}
 
-    def validate_file(self, file_path: Path, expected_type: str | None = None) -> ValidationResult:
+    def validate_file(
+        self, file_path: Path, expected_type: str | None = None
+    ) -> ValidationResult:
         """Validate an import file.
 
         Args:
@@ -114,7 +118,9 @@ class ImportFileValidator:
                     suggested_action=f"Verify file is correct {expected_type} format",
                 )
 
-            logger.info(f"Validation completed for {file_path}: {len(result.issues)} issues found")
+            logger.info(
+                f"Validation completed for {file_path}: {len(result.issues)} issues found"
+            )
             return result
 
         except Exception as e:
@@ -169,7 +175,9 @@ class ImportFileValidator:
             result.file_size = file_size
 
             if file_size == 0:
-                result.add_issue(ValidationSeverity.CRITICAL, "File is empty", "file", str(file_path))
+                result.add_issue(
+                    ValidationSeverity.CRITICAL, "File is empty", "file", str(file_path)
+                )
             elif file_size > 100 * 1024 * 1024:  # 100MB
                 result.add_issue(
                     ValidationSeverity.WARNING,

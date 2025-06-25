@@ -21,7 +21,7 @@ from src.ignition.graph.client import IgnitionGraphClient
 from src.ignition.graph.tasks.task_8_print_system import get_print_system_functions
 
 
-def populate_task_8_print_system():
+def populate_task_8_print_system() -> bool:
     """Populate Task 8: Print System Expansion functions into Neo4j database.
 
     This function:
@@ -68,7 +68,9 @@ def populate_task_8_print_system():
             missing_fields = [field for field in required_fields if field not in func]
 
             if missing_fields:
-                print(f"❌ Function {func.get('name', 'UNKNOWN')} missing fields: {missing_fields}")
+                print(
+                    f"❌ Function {func.get('name', 'UNKNOWN')} missing fields: {missing_fields}"
+                )
                 continue
 
             # Count metrics
@@ -77,7 +79,9 @@ def populate_task_8_print_system():
             categories.add(func["category"])
             scopes.update(func["scope"])
 
-            print(f"✅ {func['name']} - {len(func['parameters'])} params, {len(func['patterns'])} patterns")
+            print(
+                f"✅ {func['name']} - {len(func['parameters'])} params, {len(func['patterns'])} patterns"
+            )
 
         print("\n📊 Function Metrics:")
         print(f"   • Total Functions: {len(print_functions)}")
@@ -93,7 +97,9 @@ def populate_task_8_print_system():
 
         for i, func_data in enumerate(print_functions, 1):
             try:
-                print(f"   [{i:2d}/{len(print_functions)}] Loading {func_data['name']}...")
+                print(
+                    f"   [{i:2d}/{len(print_functions)}] Loading {func_data['name']}..."
+                )
 
                 # Create function with relationships using direct query execution
                 query = """
@@ -139,7 +145,9 @@ def populate_task_8_print_system():
                     # Convert empty dict defaults to string representation
                     if "default" in cleaned_param and cleaned_param["default"] == {}:
                         cleaned_param["default"] = "{}"
-                    elif "default" in cleaned_param and isinstance(cleaned_param["default"], dict):
+                    elif "default" in cleaned_param and isinstance(
+                        cleaned_param["default"], dict
+                    ):
                         cleaned_param["default"] = str(cleaned_param["default"])
                     cleaned_parameters.append(cleaned_param)
 
@@ -169,7 +177,9 @@ def populate_task_8_print_system():
         print("\n📈 Loading Results:")
         print(f"   • Successful: {successful_loads}")
         print(f"   • Failed: {failed_loads}")
-        print(f"   • Success Rate: {(successful_loads / len(print_functions) * 100):.1f}%")
+        print(
+            f"   • Success Rate: {(successful_loads / len(print_functions) * 100):.1f}%"
+        )
 
         # Validate database state
         print("\n🔍 Validating database state...")
@@ -185,7 +195,9 @@ def populate_task_8_print_system():
         task8_functions = result[0]["task8_count"] if result else 0
 
         # Count relationships
-        result = client.execute_query("MATCH ()-[r]->() RETURN count(r) as total_relationships")
+        result = client.execute_query(
+            "MATCH ()-[r]->() RETURN count(r) as total_relationships"
+        )
         total_relationships = result[0]["total_relationships"] if result else 0
 
         # Count print-specific relationships
@@ -204,13 +216,17 @@ def populate_task_8_print_system():
         print(f"   • Task 8 Relationships: {task8_relationships}")
 
         # Expected relationships calculation
-        expected_relationships = total_parameters + total_patterns + len(scopes) * len(print_functions)
+        expected_relationships = (
+            total_parameters + total_patterns + len(scopes) * len(print_functions)
+        )
         print(f"   • Expected Task 8 Relationships: ~{expected_relationships}")
 
         if task8_functions == len(print_functions):
             print("✅ All print functions loaded successfully!")
         else:
-            print(f"⚠️  Expected {len(print_functions)} functions, found {task8_functions}")
+            print(
+                f"⚠️  Expected {len(print_functions)} functions, found {task8_functions}"
+            )
 
         print("\n🎉 Task 8: Print System Expansion Population Complete!")
         print(f"   • Successfully loaded {task8_functions} print functions")
@@ -232,7 +248,7 @@ def populate_task_8_print_system():
             pass
 
 
-def main():
+def main() -> None:
     """Main entry point for Task 8 population."""
     print("Task 8: Print System Expansion - Neo4j Population")
     print("=" * 55)

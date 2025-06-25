@@ -24,7 +24,7 @@ import sys
 from pathlib import Path
 
 
-def main():
+def main() -> Any:
     """Launch the IGN Scripts Streamlit web application."""
     print("🚀 Starting IGN Scripts Web UI...")
     print("=" * 50)
@@ -98,7 +98,7 @@ def main():
         return 1
 
 
-def launch_ui():
+def launch_ui() -> Any:
     """Alternative entry point for backwards compatibility."""
     return main()
 

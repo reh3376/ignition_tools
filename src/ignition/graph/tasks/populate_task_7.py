@@ -21,7 +21,7 @@ from src.ignition.graph.client import IgnitionGraphClient
 from src.ignition.graph.tasks.task_7_alarm_system import get_alarm_system_functions
 
 
-def populate_task_7_alarm_system():
+def populate_task_7_alarm_system() -> bool:
     """Populate Task 7: Alarm System Expansion functions into Neo4j database.
 
     This function:
@@ -68,7 +68,9 @@ def populate_task_7_alarm_system():
             missing_fields = [field for field in required_fields if field not in func]
 
             if missing_fields:
-                print(f"❌ Function {func.get('name', 'UNKNOWN')} missing fields: {missing_fields}")
+                print(
+                    f"❌ Function {func.get('name', 'UNKNOWN')} missing fields: {missing_fields}"
+                )
                 continue
 
             # Count metrics
@@ -77,7 +79,9 @@ def populate_task_7_alarm_system():
             categories.add(func["category"])
             scopes.update(func["scope"])
 
-            print(f"✅ {func['name']} - {len(func['parameters'])} params, {len(func['patterns'])} patterns")
+            print(
+                f"✅ {func['name']} - {len(func['parameters'])} params, {len(func['patterns'])} patterns"
+            )
 
         print("\n📊 Function Metrics:")
         print(f"   • Total Functions: {len(alarm_functions)}")
@@ -93,7 +97,9 @@ def populate_task_7_alarm_system():
 
         for i, func_data in enumerate(alarm_functions, 1):
             try:
-                print(f"   [{i:2d}/{len(alarm_functions)}] Loading {func_data['name']}...")
+                print(
+                    f"   [{i:2d}/{len(alarm_functions)}] Loading {func_data['name']}..."
+                )
 
                 # Create function with relationships using direct query execution
                 query = """
@@ -158,7 +164,9 @@ def populate_task_7_alarm_system():
         print("\n📈 Loading Results:")
         print(f"   • Successful: {successful_loads}")
         print(f"   • Failed: {failed_loads}")
-        print(f"   • Success Rate: {(successful_loads / len(alarm_functions) * 100):.1f}%")
+        print(
+            f"   • Success Rate: {(successful_loads / len(alarm_functions) * 100):.1f}%"
+        )
 
         # Validate database state
         print("\n🔍 Validating database state...")
@@ -174,7 +182,9 @@ def populate_task_7_alarm_system():
         task7_functions = result[0]["task7_count"] if result else 0
 
         # Count relationships
-        result = client.execute_query("MATCH ()-[r]->() RETURN count(r) as total_relationships")
+        result = client.execute_query(
+            "MATCH ()-[r]->() RETURN count(r) as total_relationships"
+        )
         total_relationships = result[0]["total_relationships"] if result else 0
 
         # Count alarm-specific relationships
@@ -193,13 +203,17 @@ def populate_task_7_alarm_system():
         print(f"   • Task 7 Relationships: {task7_relationships}")
 
         # Expected relationships calculation
-        expected_relationships = total_parameters + total_patterns + len(scopes) * len(alarm_functions)
+        expected_relationships = (
+            total_parameters + total_patterns + len(scopes) * len(alarm_functions)
+        )
         print(f"   • Expected Task 7 Relationships: ~{expected_relationships}")
 
         if task7_functions == len(alarm_functions):
             print("✅ All alarm functions loaded successfully!")
         else:
-            print(f"⚠️  Expected {len(alarm_functions)} functions, found {task7_functions}")
+            print(
+                f"⚠️  Expected {len(alarm_functions)} functions, found {task7_functions}"
+            )
 
         print("\n🎉 Task 7: Alarm System Expansion Population Complete!")
         print(f"   • Successfully loaded {task7_functions} alarm functions")
@@ -221,7 +235,7 @@ def populate_task_7_alarm_system():
             pass
 
 
-def main():
+def main() -> None:
     """Main entry point for Task 7 population."""
     print("Task 7: Alarm System Expansion - Neo4j Population")
     print("=" * 55)

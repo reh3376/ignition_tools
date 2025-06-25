@@ -22,7 +22,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def populate_task_4_functions():
+def populate_task_4_functions() -> bool:
     """Populate Neo4j database with Task 4 Perspective system functions."""
     # Initialize Neo4j connection
     db_manager = Neo4jManager()
@@ -130,7 +130,9 @@ def populate_task_4_functions():
                 CREATE (f)-[:AVAILABLE_IN]->(s)
                 """
 
-                db_manager.execute_query(create_scope_query, {"func_name": func["name"], "scope_name": scope})
+                db_manager.execute_query(
+                    create_scope_query, {"func_name": func["name"], "scope_name": scope}
+                )
 
             # Create common pattern relationships
             for pattern in func["common_patterns"]:
@@ -192,7 +194,9 @@ def populate_task_4_functions():
         result = db_manager.execute_query(verify_query)
         function_count = result[0]["function_count"]
 
-        logger.info(f"Successfully populated {function_count} Perspective system functions")
+        logger.info(
+            f"Successfully populated {function_count} Perspective system functions"
+        )
 
         # Get relationship counts
         rel_query = """

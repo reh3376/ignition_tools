@@ -241,7 +241,7 @@ class ToolNode:
 class RepositorySchema:
     """Manages Neo4j schema for repository analysis."""
 
-    def __init__(self, graph_client):
+    def __init__(self, graph_client) -> bool:
         """Initialize with graph client."""
         self.client = graph_client
 
@@ -384,7 +384,9 @@ class RepositorySchema:
                 self.client.execute_query(index_info["query"])
                 logger.info(f"Created vector index: {index_info['name']}")
             except Exception as e:
-                logger.debug(f"Vector index {index_info['name']} may already exist: {e}")
+                logger.debug(
+                    f"Vector index {index_info['name']} may already exist: {e}"
+                )
 
     def get_repository_schema_info(self) -> dict[str, Any]:
         """Get information about the repository schema."""
@@ -405,7 +407,9 @@ class RepositorySchema:
             ]
 
             for node_type in node_types:
-                count_result = self.client.execute_query(f"MATCH (n:{node_type}) RETURN count(n) as count")
+                count_result = self.client.execute_query(
+                    f"MATCH (n:{node_type}) RETURN count(n) as count"
+                )
                 node_counts[node_type] = count_result[0]["count"] if count_result else 0
 
             # Get relationship counts
@@ -428,8 +432,12 @@ class RepositorySchema:
             ]
 
             for rel_type in relationship_types:
-                count_result = self.client.execute_query(f"MATCH ()-[r:{rel_type}]->() RETURN count(r) as count")
-                relationship_counts[rel_type] = count_result[0]["count"] if count_result else 0
+                count_result = self.client.execute_query(
+                    f"MATCH ()-[r:{rel_type}]->() RETURN count(r) as count"
+                )
+                relationship_counts[rel_type] = (
+                    count_result[0]["count"] if count_result else 0
+                )
 
             return {
                 "node_counts": node_counts,

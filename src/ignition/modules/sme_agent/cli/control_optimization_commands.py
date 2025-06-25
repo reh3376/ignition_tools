@@ -12,7 +12,7 @@ import json
 import logging
 import os
 from datetime import datetime
-from typing import Self, Any
+from typing import Any
 
 import click
 from dotenv import load_dotenv

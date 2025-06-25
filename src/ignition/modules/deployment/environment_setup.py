@@ -50,7 +50,7 @@ class ValidationResult:
     value: str | None = None
     suggestions: list[str] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.suggestions is None:
             self.suggestions = []
 
@@ -67,7 +67,7 @@ class Phase97EnvironmentSetup:
     - Step 6: Resource Management
     """
 
-    def __init__(self):
+    def __init__(self) -> Any:
         self.console = Console()
         self.setup_results: dict[str, Any] = {
             "environment_validation": {},
@@ -1020,7 +1020,7 @@ class Phase97EnvironmentSetup:
                 self.console.print(f"  • {step}")
 
 
-def main():
+def main() -> None:
     """Main function for interactive environment setup."""
     setup = Phase97EnvironmentSetup()
 

@@ -73,7 +73,7 @@ class PackagingConfig:
         default_factory=lambda: os.getenv("MODULE_REPOSITORY_URL", "")
     )
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate configuration after initialization."""
         self.output_directory.mkdir(parents=True, exist_ok=True)
         self.temp_directory.mkdir(parents=True, exist_ok=True)

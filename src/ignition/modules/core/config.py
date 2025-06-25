@@ -4,7 +4,7 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Self, TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 
 if TYPE_CHECKING:
     from .abstract_module import AbstractIgnitionModule
@@ -25,7 +25,7 @@ class ConfigurationValidator:
         self._required_keys: list[str] = []
         self._optional_keys: list[str] = []
 
-    def add_validator(self: Self, key: str, validator: callable):
+    def add_validator(self: Self, key: str, validator: callable) -> Any:
         """Add a validator function for a configuration key.
 
         Args:
@@ -34,7 +34,7 @@ class ConfigurationValidator:
         """
         self._validators[key] = validator
 
-    def add_required_key(self: Self, key: str):
+    def add_required_key(self: Self, key: str) -> Any:
         """Add a required configuration key.
 
         Args:
@@ -43,7 +43,7 @@ class ConfigurationValidator:
         if key not in self._required_keys:
             self._required_keys.append(key)
 
-    def add_optional_key(self: Self, key: str):
+    def add_optional_key(self: Self, key: str) -> Any:
         """Add an optional configuration key.
 
         Args:
@@ -122,12 +122,12 @@ class ModuleConfigurationManager:
         # Ensure directories exist
         self._ensure_directories()
 
-    def _ensure_directories(self: Self):
+    def _ensure_directories(self: Self) -> None:
         """Ensure configuration directories exist."""
         self._config_path.mkdir(parents=True, exist_ok=True)
         self._backup_dir.mkdir(parents=True, exist_ok=True)
 
-    def _setup_default_validation(self: Self):
+    def _setup_default_validation(self: Self) -> None:
         """Set up default configuration validation rules."""
         # Add common validation rules
         self._validator.add_required_key("module_id")
@@ -174,7 +174,7 @@ class ModuleConfigurationManager:
 
     # Default configuration management
 
-    def set_default_configuration(self: Self, config: dict[str, Any]):
+    def set_default_configuration(self: Self, config: dict[str, Any]) -> Any:
         """Set default configuration values.
 
         Args:
@@ -320,7 +320,7 @@ class ModuleConfigurationManager:
 
     # Environment variable integration
 
-    def _apply_environment_variables(self: Self):
+    def _apply_environment_variables(self: Self) -> Any:
         """Apply environment variable overrides to configuration."""
         env_overrides = {}
 
@@ -434,7 +434,7 @@ class ModuleConfigurationManager:
 
     # Backup and recovery
 
-    def _create_backup(self: Self):
+    def _create_backup(self: Self) -> Any:
         """Create backup of current configuration."""
         try:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -494,7 +494,7 @@ class ModuleConfigurationManager:
             self._module.logger.exception(f"Failed to restore backup: {e}")
             return False
 
-    def cleanup_backups(self: Self, keep_count: int = 5):
+    def cleanup_backups(self: Self, keep_count: int = 5) -> Any:
         """Clean up old backup files.
 
         Args:
@@ -513,7 +513,7 @@ class ModuleConfigurationManager:
 
     # Configuration history
 
-    def _add_to_history(self: Self, config: dict[str, Any]):
+    def _add_to_history(self: Self, config: dict[str, Any]) -> Any:
         """Add configuration to history.
 
         Args:

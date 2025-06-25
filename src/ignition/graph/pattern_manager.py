@@ -25,7 +25,9 @@ class PatternManager:
             client: IgnitionGraphClient instance for database operations
         """
         self.client = client
-        self.max_pattern_age_days = 90  # Patterns older than 90 days get reduced relevance
+        self.max_pattern_age_days = (
+            90  # Patterns older than 90 days get reduced relevance
+        )
         self.min_relevance_threshold = 0.1  # Patterns below this get archived
 
     def get_patterns_by_type(
@@ -88,7 +90,9 @@ class PatternManager:
 
         return patterns
 
-    def get_patterns_by_entity(self, entity_name: str, entity_type: str = "function") -> list[dict[str, Any]]:
+    def get_patterns_by_entity(
+        self, entity_name: str, entity_type: str = "function"
+    ) -> list[dict[str, Any]]:
         """Get all patterns involving a specific entity (function or template).
 
         Args:
@@ -261,7 +265,9 @@ class PatternManager:
                 if success_feedback:
                     confidence = min(1.0, confidence * 1.05)  # Slight boost for success
                 else:
-                    confidence = max(0.1, confidence * 0.95)  # Slight penalty for failure
+                    confidence = max(
+                        0.1, confidence * 0.95
+                    )  # Slight penalty for failure
 
             # Calculate usage factor (more used patterns get higher relevance)
             usage_factor = min(1.0, current_usage / 10.0)  # Normalize to max of 1.0
@@ -289,14 +295,18 @@ class PatternManager:
                 },
             )
 
-            logger.debug(f"Updated pattern {pattern_id} relevance to {new_relevance:.3f}")
+            logger.debug(
+                f"Updated pattern {pattern_id} relevance to {new_relevance:.3f}"
+            )
             return True
 
         except Exception as e:
             logger.error(f"Failed to update pattern relevance: {e}")
             return False
 
-    def cleanup_old_patterns(self, max_age_days: int = 180, min_usage_threshold: int = 2) -> int:
+    def cleanup_old_patterns(
+        self, max_age_days: int = 180, min_usage_threshold: int = 2
+    ) -> int:
         """Clean up old and unused patterns.
 
         Args:
@@ -332,7 +342,9 @@ class PatternManager:
             """
 
             try:
-                self.client.execute_write_query(delete_query, {"pattern_id": pattern_id})
+                self.client.execute_write_query(
+                    delete_query, {"pattern_id": pattern_id}
+                )
                 cleanup_count += 1
             except Exception as e:
                 logger.error(f"Failed to delete pattern {pattern_id}: {e}")
@@ -390,7 +402,9 @@ class PatternManager:
                 if pattern_type == "function_co_occurrence":
                     summary_item = {
                         "functions": [pattern["function_1"], pattern["function_2"]],
-                        "confidence": max(pattern["confidence_1_to_2"], pattern["confidence_2_to_1"]),
+                        "confidence": max(
+                            pattern["confidence_1_to_2"], pattern["confidence_2_to_1"]
+                        ),
                         "support": pattern["support"],
                     }
                 elif pattern_type == "template_usage":
@@ -416,7 +430,9 @@ class PatternManager:
 
         return summary
 
-    def export_patterns(self, pattern_type: str | None = None, file_path: str | None = None) -> dict[str, Any]:
+    def export_patterns(
+        self, pattern_type: str | None = None, file_path: str | None = None
+    ) -> dict[str, Any]:
         """Export patterns for backup or analysis.
 
         Args:
@@ -449,7 +465,7 @@ class PatternManager:
 
         result = self.client.execute_query(query, params)
 
-        export_data = {
+        export_data: Any = {
             "export_timestamp": datetime.now().isoformat(),
             "pattern_type_filter": pattern_type,
             "total_patterns": len(result),
@@ -465,7 +481,9 @@ class PatternManager:
                     "confidence": record["confidence"],
                     "support": record["support"],
                     "relevance": record["relevance"],
-                    "created": (record["created"].isoformat() if record["created"] else None),
+                    "created": (
+                        record["created"].isoformat() if record["created"] else None
+                    ),
                     "usage_count": record["usage_count"],
                     "pattern_data": pattern_data,
                 }
@@ -476,7 +494,9 @@ class PatternManager:
         if file_path:
             with open(file_path, "w") as f:
                 json.dump(export_data, f, indent=2, default=str)
-            logger.info(f"Exported {len(export_data['patterns'])} patterns to {file_path}")
+            logger.info(
+                f"Exported {len(export_data['patterns'])} patterns to {file_path}"
+            )
 
         return export_data
 

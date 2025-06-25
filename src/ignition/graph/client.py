@@ -81,7 +81,7 @@ class IgnitionGraphClient:
         return self._connected and self.driver is not None
 
     @contextmanager
-    def session(self):
+    def session(self) -> None:
         """Context manager for database sessions."""
         if not self.is_connected() and not self.connect():
             raise RuntimeError("Cannot connect to Neo4j database")

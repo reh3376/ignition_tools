@@ -16,7 +16,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Self, Any
+from typing import Any, Self
 
 from dotenv import load_dotenv
 
@@ -117,7 +117,9 @@ class BaseDomainManager(ABC):
 
         self.logger.info(f"Initialized {domain_name} domain manager")
 
-    def validate_input(self: Self, query: str, context: dict[str, Any] | None = None) -> bool:
+    def validate_input(
+        self: Self, query: str, context: dict[str, Any] | None = None
+    ) -> bool:
         """Step 2: Comprehensive Input Validation.
 
         Args:
@@ -195,7 +197,7 @@ class BaseDomainManager(ABC):
         """Get domain statistics."""
         return self.statistics.copy()
 
-    def update_statistics(self: Self):
+    def update_statistics(self: Self) -> bool:
         """Update domain statistics."""
         total_items = len(self.knowledge_items)
         avg_confidence = sum(
@@ -361,7 +363,7 @@ class GatewayScriptingDomainManager(BaseDomainManager):
             self.logger.error(f"Failed to load gateway scripting knowledge: {e}")
             return False
 
-    def _create_initial_knowledge_base(self: Self):
+    def _create_initial_knowledge_base(self: Self) -> None:
         """Create initial knowledge base for gateway scripting."""
         # Startup script examples
         startup_examples = [
@@ -624,7 +626,9 @@ def valueChanged(tag, tagPath, previousValue, currentValue, initialChange, misse
 
         return min(score, 1.0)  # Cap at 1.0
 
-    def _generate_suggestions(self: Self, results: list[DomainKnowledgeItem]) -> list[str]:
+    def _generate_suggestions(
+        self: Self, results: list[DomainKnowledgeItem]
+    ) -> list[str]:
         """Generate suggestions based on query and results."""
         suggestions = []
 
@@ -783,7 +787,7 @@ class SystemFunctionsDomainManager(BaseDomainManager):
     Provides expertise in Ignition system functions with Neo4j integration.
     """
 
-    def __init__(self: Self, neo4j_client=None, data_dir: str | None = None):
+    def __init__(self: Self, neo4j_client=None, data_dir: str | None = None) -> bool:
         """Initialize System Functions domain manager.
 
         Args:
@@ -821,7 +825,7 @@ class SystemFunctionsDomainManager(BaseDomainManager):
             self.logger.error(f"Failed to load system functions knowledge: {e}")
             return False
 
-    def _load_from_neo4j(self: Self):
+    def _load_from_neo4j(self: Self) -> Any:
         """Load system functions from Neo4j knowledge graph."""
         try:
             # Query for all system functions
@@ -868,7 +872,7 @@ class SystemFunctionsDomainManager(BaseDomainManager):
             self.logger.error(f"Failed to load from Neo4j: {e}")
             self._create_initial_knowledge_base()
 
-    def _create_initial_knowledge_base(self: Self):
+    def _create_initial_knowledge_base(self: Self) -> Any:
         """Create initial knowledge base for system functions."""
         # Common Ignition system functions
         system_functions = [
@@ -964,7 +968,9 @@ class SystemFunctionsDomainManager(BaseDomainManager):
         else:
             return "utility"
 
-    def _generate_function_tags(self: Self, function_name: str, module: str) -> list[str]:
+    def _generate_function_tags(
+        self: Self, function_name: str, module: str
+    ) -> list[str]:
         """Generate tags for a function."""
         tags = []
 

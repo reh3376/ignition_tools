@@ -23,7 +23,7 @@ import os
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Self, Any
+from typing import Any, Self
 
 logger = logging.getLogger(__name__)
 
@@ -712,7 +712,9 @@ class EnhancedCodeIntelligence:
                 issues=[{"type": "analysis_error", "message": str(e)}],
             )
 
-    def _calculate_code_metrics(self: Self, tree: ast.AST, content: str) -> dict[str, Any]:
+    def _calculate_code_metrics(
+        self: Self, tree: ast.AST, content: str
+    ) -> dict[str, Any]:
         """Calculate code metrics from AST."""
         metrics = {
             "lines_of_code": len(content.splitlines()),
@@ -1112,19 +1114,19 @@ class CyclomaticComplexityVisitor(ast.NodeVisitor):
     def __init__(self: Self):
         self.complexity = 1  # Base complexity
 
-    def visit_If(self: Self, node: Any):
+    def visit_If(self: Self, node: Any) -> None:
         self.complexity += 1
         self.generic_visit(node)
 
-    def visit_While(self: Self, node: Any):
+    def visit_While(self: Self, node: Any) -> None:
         self.complexity += 1
         self.generic_visit(node)
 
-    def visit_For(self: Self, node: Any):
+    def visit_For(self: Self, node: Any) -> None:
         self.complexity += 1
         self.generic_visit(node)
 
-    def visit_ExceptHandler(self: Self, node: Any):
+    def visit_ExceptHandler(self: Self, node: Any) -> None:
         self.complexity += 1
         self.generic_visit(node)
 
@@ -1135,7 +1137,7 @@ class CodeIssueVisitor(ast.NodeVisitor):
     def __init__(self: Self):
         self.issues = []
 
-    def visit_FunctionDef(self: Self, node: Any):
+    def visit_FunctionDef(self: Self, node: Any) -> None:
         # Check for long parameter lists
         if len(node.args.args) > 5:
             self.issues.append(

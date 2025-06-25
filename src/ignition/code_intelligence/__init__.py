@@ -35,10 +35,12 @@ try:
     # Package metadata
     __version__ = "8.1.0"
     __author__ = "IGN Scripts Team"
-    __description__ = "Comprehensive Code Intelligence System with automated refactoring"
+    __description__ = (
+        "Comprehensive Code Intelligence System with automated refactoring"
+    )
 
     # Quick access function for new agents
-    def quick_start():
+    def quick_start() -> Any:
         """Quick start function for new agents.
         Returns project context and connection information.
         """
@@ -48,13 +50,13 @@ except ImportError as e:
     # Graceful fallback if dependencies aren't available
     print(f"⚠️ Some code intelligence features unavailable: {e}")
 
-    def initialize_agent_knowledge():
+    def initialize_agent_knowledge() -> Any:
         return {
             "error": "Knowledge discovery system not available",
             "message": "Some dependencies may be missing",
         }
 
-    def quick_start():
+    def quick_start() -> Any:
         return initialize_agent_knowledge()
 
     __all__ = ["initialize_agent_knowledge", "quick_start"]

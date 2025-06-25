@@ -8,7 +8,7 @@ Following crawl_mcp.py methodology:
 import asyncio
 import logging
 import sys
-from typing import Self, Any
+from typing import Any
 
 import click
 from rich.console import Console
@@ -102,7 +102,9 @@ def env_optimize() -> None:
 @click.option("--use-docker", is_flag=True, help="Deploy using Docker container")
 @click.option("--gpu", is_flag=True, help="Enable GPU acceleration")
 @handle_sme_agent_error
-def deploy_llm_infrastructure(model: str, complexity: str, use_docker: bool, gpu: bool) -> None:
+def deploy_llm_infrastructure(
+    model: str, complexity: str, use_docker: bool, gpu: bool
+) -> None:
     """Deploy Local LLM Infrastructure"""
     console.print(f"[bold blue]🚀 Deploying LLM Infrastructure: {model}[/bold blue]")
     console.print(f"Complexity: {complexity}, Docker: {use_docker}, GPU: {gpu}")

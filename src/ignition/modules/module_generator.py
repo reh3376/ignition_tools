@@ -153,7 +153,7 @@ class ModuleGenerator:
         Returns:
             Analysis results with recommendations
         """
-        analysis = {
+        analysis: Any = {
             "recommended_template": None,
             "required_functions": [],
             "suggested_functions": [],

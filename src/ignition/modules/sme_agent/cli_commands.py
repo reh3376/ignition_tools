@@ -35,7 +35,7 @@ console = Console()
 
 @click.group(name="sme")
 @click.pass_context
-def sme_agent_cli(ctx):
+def sme_agent_cli(ctx) -> None:
     """SME Agent CLI - Ignition Subject Matter Expert Assistant
 
     Phase 11: Process SME Agent & AI Enhancement Platform
@@ -94,14 +94,14 @@ sme_agent_cli.add_command(dataset_curation)
 # Backward compatibility aliases for commonly used commands
 @sme_agent_cli.command("validate-env")
 @click.pass_context
-def validate_env_alias(ctx):
+def validate_env_alias(ctx) -> None:
     """Alias for core validate-env command"""
     ctx.invoke(core_commands.commands["validate-env"])
 
 
 @sme_agent_cli.command("status")
 @click.pass_context
-def status_alias(ctx):
+def status_alias(ctx) -> None:
     """Alias for core status command"""
     ctx.invoke(core_commands.commands["status"])
 
@@ -115,7 +115,7 @@ def status_alias(ctx):
     default="basic",
 )
 @click.pass_context
-def ask_alias(ctx, question: str, context: str | None, complexity: str):
+def ask_alias(ctx, question: str, context: str | None, complexity: str) -> None:
     """Alias for core ask command"""
     ctx.invoke(
         core_commands.commands["ask"],

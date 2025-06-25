@@ -29,13 +29,13 @@ console = Console()
 
 
 @click.group(name="enterprise")
-def enterprise_cli():
+def enterprise_cli() -> None:
     """Phase 10: Enterprise Integration & Deployment commands."""
     pass
 
 
 @enterprise_cli.group(name="architecture")
-def architecture_group():
+def architecture_group() -> None:
     """Enterprise Architecture commands (Phase 10.1)."""
     pass
 
@@ -47,7 +47,7 @@ def architecture_group():
     type=click.Choice(["table", "json"]),
     help="Output format for validation results",
 )
-def validate_architecture_env(output_format: str):
+def validate_architecture_env(output_format: str) -> None:
     """Validate enterprise architecture environment variables."""
     try:
         console.print(
@@ -91,7 +91,7 @@ def validate_architecture_env(output_format: str):
     type=click.Choice(["basic", "standard", "advanced", "enterprise"]),
     help="Deployment complexity level",
 )
-def deploy_architecture(complexity: str):
+def deploy_architecture(complexity: str) -> None:
     """Deploy enterprise architecture with progressive complexity."""
     try:
         console.print(
@@ -143,13 +143,13 @@ def deploy_architecture(complexity: str):
 
 
 @enterprise_cli.group(name="cloud")
-def cloud_group():
+def cloud_group() -> None:
     """Cloud Integration commands (Phase 10.2)."""
     pass
 
 
 @cloud_group.command(name="validate-env")
-def validate_cloud_env():
+def validate_cloud_env() -> None:
     """Validate cloud integration environment variables."""
     try:
         console.print(
@@ -185,7 +185,7 @@ def validate_cloud_env():
     type=click.Choice(["basic", "standard", "advanced", "enterprise"]),
     help="Deployment complexity level",
 )
-def deploy_cloud(complexity: str):
+def deploy_cloud(complexity: str) -> None:
     """Deploy cloud infrastructure with progressive complexity."""
     try:
         console.print(
@@ -223,13 +223,13 @@ def deploy_cloud(complexity: str):
 
 
 @enterprise_cli.group(name="analytics")
-def analytics_group():
+def analytics_group() -> None:
     """Advanced Analytics Platform commands (Phase 10.3)."""
     pass
 
 
 @analytics_group.command(name="validate-env")
-def validate_analytics_env():
+def validate_analytics_env() -> None:
     """Validate analytics platform environment variables."""
     try:
         console.print(
@@ -266,7 +266,7 @@ def validate_analytics_env():
     type=click.Choice(["basic", "standard", "advanced", "enterprise"]),
     help="Deployment complexity level",
 )
-def deploy_analytics(complexity: str):
+def deploy_analytics(complexity: str) -> None:
     """Deploy analytics platform with progressive complexity."""
     try:
         console.print(
@@ -308,7 +308,7 @@ def deploy_analytics(complexity: str):
     type=click.Choice(["basic", "standard", "advanced", "enterprise"]),
     help="Test complexity level",
 )
-def test_all_components(complexity: str):
+def test_all_components(complexity: str) -> Any:
     """Test all enterprise components comprehensively."""
     try:
         console.print(
@@ -441,7 +441,7 @@ def test_all_components(complexity: str):
 
 
 # Export the CLI group
-def get_enterprise_cli():
+def get_enterprise_cli() -> Any:
     """Get the enterprise CLI group for integration with main CLI."""
     return enterprise_cli
 

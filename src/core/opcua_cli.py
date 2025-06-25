@@ -6,6 +6,7 @@ Integration with comprehensive connection configuration system.
 import asyncio
 import json
 from pathlib import Path
+from typing import Any
 
 import click
 from rich.console import Console
@@ -24,7 +25,6 @@ from .opcua_connection_config import (
     load_config,
 )
 from .opcua_integration import OPCUAClient
-from typing import Any, Self
 
 console = Console()
 

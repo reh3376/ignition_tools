@@ -23,7 +23,7 @@ import time
 import uuid
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import Self, Any
+from typing import Any
 
 import uvicorn
 from fastapi import FastAPI, HTTPException

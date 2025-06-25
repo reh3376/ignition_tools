@@ -77,7 +77,7 @@ class PIDParameters(BaseModel):
 
     @field_validator("kp", "ki", "kd")
     @classmethod
-    def validate_gains(cls, v):
+    def validate_gains(cls, v) -> Any:
         if v < 0:
             raise ValueError("PID gains must be non-negative")
         return v
@@ -94,7 +94,7 @@ class ProcessData(BaseModel):
 
     @field_validator("quality_code")
     @classmethod
-    def validate_quality(cls, v):
+    def validate_quality(cls, v) -> Any:
         if v not in [192, 128, 64, 32]:  # Good, Uncertain, Bad, Error
             raise ValueError("Invalid quality code")
         return v
@@ -111,7 +111,7 @@ class ConstraintConfig(BaseModel):
 
     @field_validator("max_value")
     @classmethod
-    def validate_constraints(cls, v, info):
+    def validate_constraints(cls, v, info) -> Any:
         if (
             hasattr(info, "data")
             and info.data.get("min_value") is not None
@@ -139,7 +139,7 @@ class MPCConfig(BaseModel):
 
     @field_validator("control_horizon")
     @classmethod
-    def validate_horizons(cls, v, info):
+    def validate_horizons(cls, v, info) -> Any:
         if hasattr(info, "data") and info.data.get("prediction_horizon") is not None:
             if v > info.data["prediction_horizon"]:
                 raise ValueError("Control horizon must not exceed prediction horizon")
@@ -157,7 +157,7 @@ class OPCUAConfig(BaseModel):
 
     @field_validator("server_url")
     @classmethod
-    def validate_url(cls, v):
+    def validate_url(cls, v) -> Any:
         if not v.startswith(("opc.tcp://", "http://", "https://")):
             raise ValueError("Invalid OPC-UA server URL format")
         return v
@@ -675,7 +675,7 @@ async def test_basic_functionality() -> dict[str, Any]:
 
 if __name__ == "__main__":
     # Basic module testing
-    async def main():
+    async def main() -> None:
         logger.info("🚀 AI Control Supervisor - Phase 11.6 Testing")
 
         # Test environment validation

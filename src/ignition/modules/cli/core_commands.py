@@ -8,7 +8,7 @@ from ignition.modules.examples.basic_module import create_basic_example_module
 
 
 @click.group(name="core")
-def core_group():
+def core_group() -> None:
     """Core module framework commands."""
     pass
 
@@ -76,7 +76,9 @@ def demo_command(
         if verbose:
             module.diagnostics_manager.set_log_level("DEBUG")
 
-        click.echo(f"✅ Module created: {module.metadata.name} v{module.metadata.version}")
+        click.echo(
+            f"✅ Module created: {module.metadata.name} v{module.metadata.version}"
+        )
 
         # Load configuration
         click.echo("\nLoading module configuration...")
@@ -158,7 +160,9 @@ def demo_command(
         if module.config_manager.update(new_config):
             click.echo("✅ Configuration updated successfully")
             click.echo(f"  New batch_size: {module.config_manager.get('batch_size')}")
-            click.echo(f"  New timeout_seconds: {module.config_manager.get('timeout_seconds')}")
+            click.echo(
+                f"  New timeout_seconds: {module.config_manager.get('timeout_seconds')}"
+            )
         else:
             click.echo("❌ Configuration update failed")
 
@@ -203,7 +207,7 @@ def demo_command(
     is_flag=True,
     help="Enable verbose output",
 )
-def test_command(module_path: Path, verbose: bool):
+def test_command(module_path: Path, verbose: bool) -> bool:
     """Test the core module framework components."""
     click.echo("🧪 Core Module Framework Tests")
     click.echo("=" * 50)
@@ -233,7 +237,7 @@ def test_command(module_path: Path, verbose: bool):
             return False
 
     # Test 1: Module Creation
-    def test_module_creation():
+    def test_module_creation() -> Any:
         module = create_basic_example_module(
             module_path=module_path,
             config_path=module_path / "config",
@@ -244,7 +248,7 @@ def test_command(module_path: Path, verbose: bool):
         return module is not None and module.metadata.name == "Basic Example Module"
 
     # Test 2: Configuration Loading
-    def test_configuration_loading():
+    def test_configuration_loading() -> Any:
         module = create_basic_example_module(
             module_path=module_path,
             config_path=module_path / "config",
@@ -255,7 +259,7 @@ def test_command(module_path: Path, verbose: bool):
         return module.config_manager.load_configuration()
 
     # Test 3: Module Lifecycle
-    def test_module_lifecycle():
+    def test_module_lifecycle() -> bool:
         module = create_basic_example_module(
             module_path=module_path,
             config_path=module_path / "config",
@@ -277,7 +281,7 @@ def test_command(module_path: Path, verbose: bool):
         return module.shutdown_module()
 
     # Test 4: Health Monitoring
-    def test_health_monitoring():
+    def test_health_monitoring() -> Any:
         module = create_basic_example_module(
             module_path=module_path,
             config_path=module_path / "config",
@@ -290,7 +294,7 @@ def test_command(module_path: Path, verbose: bool):
         return isinstance(health, dict) and "overall_status" in health
 
     # Test 5: Configuration Management
-    def test_configuration_management():
+    def test_configuration_management() -> bool:
         module = create_basic_example_module(
             module_path=module_path,
             config_path=module_path / "config",
@@ -338,7 +342,7 @@ def test_command(module_path: Path, verbose: bool):
 
 
 @core_group.command("info")
-def info_command():
+def info_command() -> None:
     """Display information about the core module framework."""
     click.echo("📋 Core Module Framework Information")
     click.echo("=" * 50)
@@ -380,6 +384,6 @@ def info_command():
 
 
 # Register the command group
-def register_commands(cli):
+def register_commands(cli) -> None:
     """Register core framework commands with the CLI."""
     cli.add_command(core_group)

@@ -55,7 +55,7 @@ class Phase98Status:
     environment_validated: bool = False
     testing_complete: bool = False
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if self.components_implemented is None:
             self.components_implemented = []
 

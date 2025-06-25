@@ -62,7 +62,7 @@ class Phase10EnterpriseIntegration:
     6. Resource Management and Cleanup
     """
 
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize Phase 10 Enterprise Integration following crawl_mcp.py patterns."""
         self.console = Console()
         self.logger = logging.getLogger(__name__)
@@ -74,7 +74,7 @@ class Phase10EnterpriseIntegration:
         # Initialize components after validation
         self._initialize_components()
 
-    def _initialize_components(self):
+    def _initialize_components(self) -> Any:
         """Initialize components after environment validation."""
         try:
             # Step 1: Environment Variable Validation First
@@ -469,7 +469,9 @@ class Phase10EnterpriseIntegration:
             details={"deployment_env": os.getenv("DEPLOYMENT_ENVIRONMENT")},
         )
 
-    def _display_environment_validation(self, validation_results: dict[str, Any]):
+    def _display_environment_validation(
+        self, validation_results: dict[str, Any]
+    ) -> Any:
         """Display environment validation results in a rich table."""
         table = Table(title="Phase 10 Enterprise Integration - Environment Validation")
         table.add_column("Component", style="cyan")

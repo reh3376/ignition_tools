@@ -20,6 +20,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 
 import click
 from rich.console import Console
@@ -39,7 +40,6 @@ from ignition.modules.advanced_features.integration_hub import (
     IntegrationHubModule,
 )
 from ignition.modules.advanced_features.security_module import (
-from typing import Any, Self
     SecurityComplianceModule,
     SecurityConfig,
 )
@@ -448,7 +448,9 @@ def integration_commands(ctx: Any) -> None:
     help="Integration level",
 )
 @click.option("--show-details", is_flag=True, help="Show detailed validation results")
-def validate_integration_environment(integration_level: str, show_details: bool) -> None:
+def validate_integration_environment(
+    integration_level: str, show_details: bool
+) -> None:
     """Validate integration environment following crawl_mcp.py methodology.
 
     Step 1: Environment Variable Validation First
@@ -583,7 +585,9 @@ def register_api_endpoint(
 )
 @click.option("--source", default="unknown", help="Webhook source system")
 @click.option("--event", help="Event type")
-def process_webhook_data(webhook_file: str | None, source: str, event: str | None) -> None:
+def process_webhook_data(
+    webhook_file: str | None, source: str, event: str | None
+) -> None:
     """Process webhook data following crawl_mcp.py methodology."""
     try:
         console.print("🔌 Processing Webhook Data", style="cyan")

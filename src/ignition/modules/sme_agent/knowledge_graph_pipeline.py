@@ -102,7 +102,7 @@ class KnowledgeGraphConfig:
     enable_caching: bool = True
     cache_directory: str = "cache"
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate configuration after initialization."""
         if not self.neo4j_uri or not self.neo4j_user or not self.neo4j_password:
             raise ValueError("Neo4j connection parameters required")
@@ -337,7 +337,7 @@ class KnowledgeGraphPipeline:
                 f"Knowledge graph pipeline initialization failed: {e}"
             )
 
-    def _create_directories(self):
+    def _create_directories(self) -> None:
         """Create necessary directories."""
         Path(self.config.output_directory).mkdir(parents=True, exist_ok=True)
         if self.config.enable_caching:
@@ -633,7 +633,7 @@ class KnowledgeGraphPipeline:
             ),
         }
 
-    async def _generate_embeddings(self):
+    async def _generate_embeddings(self) -> Any:
         """Generate embeddings for extracted records."""
         if not self.embedding_model:
             return
@@ -703,18 +703,18 @@ class KnowledgeGraphPipeline:
 
         return output_path
 
-    def _save_as_jsonl(self, examples: list[dict[str, str]], output_path: str):
+    def _save_as_jsonl(self, examples: list[dict[str, str]], output_path: str) -> Any:
         """Save examples as JSONL format."""
         with open(output_path, "w", encoding="utf-8") as f:
             for example in examples:
                 f.write(json.dumps(example, ensure_ascii=False) + "\n")
 
-    def _save_as_csv(self, examples: list[dict[str, str]], output_path: str):
+    def _save_as_csv(self, examples: list[dict[str, str]], output_path: str) -> Any:
         """Save examples as CSV format."""
         df = pd.DataFrame(examples)
         df.to_csv(output_path, index=False, encoding="utf-8")
 
-    def _save_as_parquet(self, examples: list[dict[str, str]], output_path: str):
+    def _save_as_parquet(self, examples: list[dict[str, str]], output_path: str) -> Any:
         """Save examples as Parquet format."""
         df = pd.DataFrame(examples)
         df.to_parquet(output_path, index=False)
@@ -739,7 +739,7 @@ class KnowledgeGraphPipeline:
             type_counts[record.type] = type_counts.get(record.type, 0) + 1
         return type_counts
 
-    async def cleanup(self):
+    async def cleanup(self) -> None:
         """Cleanup resources following crawl_mcp.py methodology."""
         try:
             if self.driver:
@@ -753,12 +753,12 @@ class KnowledgeGraphPipeline:
         except Exception as e:
             print(f"Warning: Error during knowledge graph pipeline cleanup: {e}")
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> Any:
         """Async context manager entry."""
         await self.initialize()
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
         """Async context manager exit."""
         await self.cleanup()
 

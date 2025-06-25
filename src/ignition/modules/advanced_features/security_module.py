@@ -26,7 +26,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Self, Any
+from typing import Any, Self
 
 # Add src to path for imports
 sys.path.append(str(Path(__file__).parent.parent.parent))
@@ -70,7 +70,7 @@ class SecurityConfig:
     # Progressive complexity settings
     security_level: str = "standard"  # basic, standard, high, critical
 
-    def __post_init__(self: Self):
+    def __post_init__(self: Self) -> None:
         """Validate configuration following crawl_mcp.py methodology."""
         if not self.security_temp_dir:
             self.security_temp_dir = os.getenv(
@@ -110,7 +110,7 @@ class SecurityEvent:
     details: dict[str, Any] = field(default_factory=dict)
     severity: str = "info"  # info, warning, error, critical
 
-    def __post_init__(self: Self):
+    def __post_init__(self: Self) -> None:
         """Validate security event structure."""
         if not isinstance(self.timestamp, datetime):
             raise ValueError("timestamp must be datetime object")
@@ -363,7 +363,9 @@ class SecurityComplianceModule:
 
         return ValidationResult(valid=True, security_level="secure")
 
-    def _display_validation_results(self: Self, results: dict[str, ValidationResult]) -> None:
+    def _display_validation_results(
+        self: Self, results: dict[str, ValidationResult]
+    ) -> None:
         """Display validation results with security-focused formatting."""
         table = Table(title="Security Environment Validation")
         table.add_column("Component", style="cyan")
@@ -784,7 +786,9 @@ class BasicIncidentDetector:
     def __init__(self: Self, config: SecurityConfig):
         self.config = config
 
-    def detect_incidents(self: Self, events: list[SecurityEvent]) -> list[dict[str, Any]]:
+    def detect_incidents(
+        self: Self, events: list[SecurityEvent]
+    ) -> list[dict[str, Any]]:
         """Detect basic security incidents."""
         incidents = []
 
@@ -827,7 +831,9 @@ class AdvancedIncidentDetector:
     def __init__(self: Self, config: SecurityConfig):
         self.config = config
 
-    def detect_incidents(self: Self, events: list[SecurityEvent]) -> list[dict[str, Any]]:
+    def detect_incidents(
+        self: Self, events: list[SecurityEvent]
+    ) -> list[dict[str, Any]]:
         """Detect advanced security incidents using pattern analysis."""
         incidents = []
 
@@ -867,7 +873,7 @@ class EnterpriseAuditLogger:
 
 
 # Main function for testing
-def main():
+def main() -> None:
     """Test the security module following crawl_mcp.py methodology."""
     console.print(
         Panel.fit("🔒 Phase 9.8 Security and Compliance Module Test", style="red bold")

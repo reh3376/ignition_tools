@@ -15,6 +15,7 @@ import asyncio
 import json
 import logging
 from pathlib import Path
+from typing import Any
 
 import click
 
@@ -26,7 +27,6 @@ from ..proactive_development_assistance import (
     ProactiveDevelopmentAssistance,
     validate_proactive_development_environment,
 )
-from typing import Any, Self
 from ..specialized_domain_expertise import (
     SpecializedDomainExpertise,
     validate_specialized_domain_environment,

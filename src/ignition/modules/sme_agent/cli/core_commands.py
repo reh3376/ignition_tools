@@ -12,7 +12,7 @@ Following crawl_mcp.py methodology:
 import logging
 import sys
 from pathlib import Path
-from typing import Self, Any
+from typing import Any
 
 import click
 from rich.console import Console
@@ -25,10 +25,10 @@ console = Console()
 logger = logging.getLogger(__name__)
 
 
-def handle_sme_agent_error(func: Any):
+def handle_sme_agent_error(func: Any) -> Any:
     """Decorator for handling SME Agent errors with user-friendly messages."""
 
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         try:
             return func(*args, **kwargs)
         except SMEAgentValidationError as e:
@@ -43,14 +43,14 @@ def handle_sme_agent_error(func: Any):
 
 
 @click.group(name="core")
-def core_commands():
+def core_commands() -> None:
     """SME Agent Core Commands - Basic Operations"""
     pass
 
 
 @core_commands.command("validate-env")
 @handle_sme_agent_error
-def validate_environment():
+def validate_environment() -> None:
     """Step 1: Environment Validation First
 
     Validate SME Agent environment and dependencies.
@@ -81,7 +81,7 @@ def validate_environment():
 
 @core_commands.command("status")
 @handle_sme_agent_error
-def get_status():
+def get_status() -> None:
     """Step 4: Modular Component Testing
 
     Get current status of SME Agent components.
@@ -106,7 +106,7 @@ def get_status():
     help="Complexity level for initialization",
 )
 @handle_sme_agent_error
-def initialize_components(complexity: str):
+def initialize_components(complexity: str) -> None:
     """Step 5: Progressive Complexity Support
 
     Initialize SME Agent components with specified complexity level.
@@ -137,7 +137,7 @@ def initialize_components(complexity: str):
     default="basic",
 )
 @handle_sme_agent_error
-def ask_question(question: str, context: str | None, complexity: str):
+def ask_question(question: str, context: str | None, complexity: str) -> None:
     """Step 2: Comprehensive Input Validation
     Step 3: Error Handling and User-Friendly Messages
 
@@ -173,7 +173,7 @@ def ask_question(question: str, context: str | None, complexity: str):
     default="standard",
 )
 @handle_sme_agent_error
-def analyze_file(file_path: str, complexity: str):
+def analyze_file(file_path: str, complexity: str) -> None:
     """Analyze a file using SME Agent capabilities."""
     console.print("[bold blue]🔍 SME Agent File Analysis[/bold blue]")
     console.print(f"Analyzing: [italic]{file_path}[/italic]")
@@ -203,7 +203,7 @@ def analyze_file(file_path: str, complexity: str):
 
 
 # Display helper functions
-def _display_validation_results(validation_result: dict[str, Any]):
+def _display_validation_results(validation_result: dict[str, Any]) -> None:
     """Display environment validation results in a formatted table."""
     table = Table(title="Environment Validation Results")
     table.add_column("Component", style="cyan")
@@ -218,7 +218,7 @@ def _display_validation_results(validation_result: dict[str, Any]):
     console.print(table)
 
 
-def _display_status(status: dict[str, Any]):
+def _display_status(status: dict[str, Any]) -> None:
     """Display SME Agent status in a formatted panel."""
     status_text = f"""
 **Overall Status**: {status.get("status", "Unknown")}
@@ -229,7 +229,7 @@ def _display_status(status: dict[str, Any]):
     console.print(Panel(status_text, title="SME Agent Status", border_style="blue"))
 
 
-def _display_initialization_results(result: dict[str, Any]):
+def _display_initialization_results(result: dict[str, Any]) -> None:
     """Display initialization results."""
     if result.get("success", False):
         console.print(
@@ -241,7 +241,7 @@ def _display_initialization_results(result: dict[str, Any]):
         console.print(f"Error: {result.get('error', 'Unknown error')}")
 
 
-def _display_response(response: Any):
+def _display_response(response: Any) -> None:
     """Display SME Agent response."""
     if isinstance(response, dict):
         if "answer" in response:

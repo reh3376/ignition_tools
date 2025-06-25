@@ -18,7 +18,7 @@ from .sme_agent.cli_commands import sme_agent_cli
 console = Console()
 
 
-def _initialize_module_systems():
+def _initialize_module_systems() -> Any:
     """Initialize the module development systems."""
     try:
         sdk_manager = IgnitionSDKManager()

@@ -32,7 +32,7 @@ class IgnitionOPCUAClient:
     - Industrial alarm and event handling
     """
 
-    def __init__(self, url: str, **kwargs):
+    def __init__(self, url: str, **kwargs) -> None:
         """Initialize OPC-UA client.
 
         Args:
@@ -67,12 +67,12 @@ class IgnitionOPCUAClient:
             "error_count": 0,
         }
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> Any:
         """Async context manager entry."""
         await self.connect()
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
         """Async context manager exit."""
         await self.disconnect()
 
@@ -137,7 +137,9 @@ class IgnitionOPCUAClient:
             except Exception as e:
                 logger.error("Error during disconnect: %s", e)
 
-    async def browse_tree(self, node_id: str = "i=85", max_depth: int = 3) -> dict[str, Any]:
+    async def browse_tree(
+        self, node_id: str = "i=85", max_depth: int = 3
+    ) -> dict[str, Any]:
         """Browse OPC-UA address space tree.
 
         Args:
@@ -233,7 +235,9 @@ class IgnitionOPCUAClient:
         if not self.connected:
             raise RuntimeError("Not connected to OPC-UA server")
 
-        return await self.subscription_manager.create_subscription(node_ids, callback, interval)
+        return await self.subscription_manager.create_subscription(
+            node_ids, callback, interval
+        )
 
     async def unsubscribe(self, subscription_id: str) -> bool:
         """Remove a subscription.
@@ -246,7 +250,9 @@ class IgnitionOPCUAClient:
         """
         return await self.subscription_manager.remove_subscription(subscription_id)
 
-    async def execute_method(self, object_id: str, method_id: str, args: list[Any] | None = None) -> Any:
+    async def execute_method(
+        self, object_id: str, method_id: str, args: list[Any] | None = None
+    ) -> Any:
         """Execute OPC-UA method on server.
 
         Args:
@@ -306,7 +312,7 @@ class IgnitionOPCUAClient:
             logger.error("Error getting server info: %s", e)
             raise
 
-    def _update_activity(self):
+    def _update_activity(self) -> None:
         """Update last activity timestamp."""
         self._connection_stats["last_activity"] = datetime.now()
 

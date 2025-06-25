@@ -101,7 +101,7 @@ class ProjectAnalyzer:
     - Step 6: Resource management and cleanup
     """
 
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize the project analyzer."""
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -359,7 +359,9 @@ class ContextAwareResponseGenerator:
     Following crawl_mcp.py methodology for systematic response generation.
     """
 
-    def __init__(self, domain_managers=None, learning_engine=None, llm_manager=None):
+    def __init__(
+        self, domain_managers=None, learning_engine=None, llm_manager=None
+    ) -> None:
         """Initialize the context-aware response generator.
 
         Args:

@@ -94,7 +94,7 @@ class LLMConfig:
     enable_versioning: bool = True
     max_versions: int = 3
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate configuration after initialization."""
         if self.model_type == ModelType.CUSTOM and not self.custom_model_name:
             raise ValueError("custom_model_name required when model_type is CUSTOM")
@@ -305,7 +305,7 @@ class LLMInfrastructure:
             )
 
         # Step 2: Progressive complexity initialization
-        init_result = {
+        init_result: Any = {
             "status": "success",
             "complexity_level": self.config.complexity_level.value,
             "model_type": self.config.model_type.value,
@@ -348,7 +348,7 @@ class LLMInfrastructure:
                 f"LLM infrastructure initialization failed: {e}"
             )
 
-    async def _initialize_basic(self):
+    async def _initialize_basic(self) -> None:
         """Initialize basic CPU-only deployment."""
         if not TRANSFORMERS_AVAILABLE:
             raise SMEAgentValidationError("Transformers library not available")
@@ -368,7 +368,7 @@ class LLMInfrastructure:
             low_cpu_mem_usage=True,
         )
 
-    async def _initialize_standard(self):
+    async def _initialize_standard(self) -> None:
         """Initialize standard deployment with GPU and 8-bit quantization."""
         if not TRANSFORMERS_AVAILABLE:
             raise SMEAgentValidationError("Transformers library not available")
@@ -397,7 +397,7 @@ class LLMInfrastructure:
             low_cpu_mem_usage=True,
         )
 
-    async def _initialize_advanced(self):
+    async def _initialize_advanced(self) -> None:
         """Initialize advanced deployment with 4-bit quantization and flash attention."""
         if not TRANSFORMERS_AVAILABLE:
             raise SMEAgentValidationError("Transformers library not available")
@@ -431,7 +431,7 @@ class LLMInfrastructure:
 
         self.model = AutoModelForCausalLM.from_pretrained(model_name, **model_kwargs)
 
-    async def _initialize_enterprise(self):
+    async def _initialize_enterprise(self) -> Any:
         """Initialize enterprise deployment with Docker and multi-GPU support."""
         if not DOCKER_AVAILABLE:
             raise SMEAgentValidationError(
@@ -491,7 +491,7 @@ class LLMInfrastructure:
         """Get default Docker image for model type."""
         return "huggingface/text-generation-inference:latest"
 
-    async def _wait_for_container_ready(self, timeout: int = 300):
+    async def _wait_for_container_ready(self, timeout: int = 300) -> Any:
         """Wait for Docker container to be ready."""
         import time
 
@@ -512,7 +512,7 @@ class LLMInfrastructure:
 
         raise SMEAgentValidationError("Container failed to become ready within timeout")
 
-    def _setup_versioning(self):
+    def _setup_versioning(self) -> Any:
         """Setup model versioning system."""
         self.model_versions[self.config.model_version] = {
             "model_name": self._get_model_name(),
@@ -544,7 +544,7 @@ class LLMInfrastructure:
             "validation": self.validation_result,
         }
 
-    async def cleanup(self):
+    async def cleanup(self) -> None:
         """Cleanup resources following crawl_mcp.py methodology."""
         try:
             # Clean up model resources
@@ -574,12 +574,12 @@ class LLMInfrastructure:
             # Log cleanup errors but don't raise
             print(f"Warning: Error during LLM infrastructure cleanup: {e}")
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> Any:
         """Async context manager entry."""
         await self.initialize()
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
         """Async context manager exit."""
         await self.cleanup()
 

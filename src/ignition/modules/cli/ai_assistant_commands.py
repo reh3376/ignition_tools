@@ -9,6 +9,7 @@ import json
 import logging
 import os
 from pathlib import Path
+from typing import Any
 
 import click
 from rich.console import Console
@@ -18,7 +19,6 @@ from rich.table import Table
 
 from ..ai_assistant import create_ai_assistant_module
 from ..ai_assistant.ai_assistant_module import CodeAnalysisRequest
-from typing import Any, Self
 
 console = Console()
 logger = logging.getLogger(__name__)
@@ -68,8 +68,12 @@ def analyze(
 
         try:
             # Initialize module
-            with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}")) as progress:
-                task = progress.add_task("Initializing AI Assistant Module...", total=None)
+            with Progress(
+                SpinnerColumn(), TextColumn("[progress.description]{task.description}")
+            ) as progress:
+                task = progress.add_task(
+                    "Initializing AI Assistant Module...", total=None
+                )
                 initialized = await ai_module.initialize()
 
                 if not initialized:
@@ -119,7 +123,9 @@ def analyze(
     help="Enable/disable knowledge graph validation",
 )
 @click.option("--verbose", "-v", is_flag=True, help="Verbose output")
-def quick_check(code: str | None, file_path: str | None, validate: bool, verbose: bool) -> None:
+def quick_check(
+    code: str | None, file_path: str | None, validate: bool, verbose: bool
+) -> None:
     """Quick code analysis for immediate feedback."""
     if not code and not file_path:
         console.print("[red]Error: Either --code or --file must be provided[/red]")
@@ -152,7 +158,9 @@ def quick_check(code: str | None, file_path: str | None, validate: bool, verbose
 @ai_assistant_commands.command()
 @click.argument("directory", type=click.Path(exists=True, file_okay=False))
 @click.option("--pattern", default="*.py", help="File pattern to match")
-@click.option("--output-dir", type=click.Path(), help="Directory to save analysis reports")
+@click.option(
+    "--output-dir", type=click.Path(), help="Directory to save analysis reports"
+)
 @click.option(
     "--validate/--no-validate",
     default=True,
@@ -179,7 +187,9 @@ def batch_analyze(
             python_files = list(dir_path.rglob(pattern))
 
             if not python_files:
-                console.print(f"[yellow]No files matching '{pattern}' found in {directory}[/yellow]")
+                console.print(
+                    f"[yellow]No files matching '{pattern}' found in {directory}[/yellow]"
+                )
                 return
 
             console.print(f"[blue]Found {len(python_files)} files to analyze[/blue]")
@@ -257,7 +267,9 @@ def info() -> None:
             }
 
             for feature in info_data["features"]:
-                description = feature_descriptions.get(feature, "Advanced code analysis feature")
+                description = feature_descriptions.get(
+                    feature, "Advanced code analysis feature"
+                )
                 features_table.add_row(feature, description)
 
             console.print(features_table)
@@ -293,7 +305,9 @@ def info() -> None:
 @click.option("--neo4j-uri", help="Neo4j URI")
 @click.option("--neo4j-user", help="Neo4j username")
 @click.option("--neo4j-password", help="Neo4j password")
-def test_connection(neo4j_uri: str | None, neo4j_user: str | None, neo4j_password: str | None) -> None:
+def test_connection(
+    neo4j_uri: str | None, neo4j_user: str | None, neo4j_password: str | None
+) -> None:
     """Test Neo4j knowledge graph connection."""
 
     async def _test_connection() -> None:
@@ -324,7 +338,9 @@ def test_connection(neo4j_uri: str | None, neo4j_user: str | None, neo4j_passwor
 
         except Exception as e:
             console.print(f"[red]✗ Connection failed: {e}[/red]")
-            console.print("[yellow]Make sure Neo4j is running and credentials are correct[/yellow]")
+            console.print(
+                "[yellow]Make sure Neo4j is running and credentials are correct[/yellow]"
+            )
 
     asyncio.run(_test_connection())
 
@@ -347,7 +363,9 @@ def _display_analysis_console(response, verbose: bool) -> None:
     summary_table.add_column("Count", style="white")
 
     summary_table.add_row("Imports", str(len(analysis.imports)))
-    summary_table.add_row("Class Instantiations", str(len(analysis.class_instantiations)))
+    summary_table.add_row(
+        "Class Instantiations", str(len(analysis.class_instantiations))
+    )
     summary_table.add_row("Method Calls", str(len(analysis.method_calls)))
     summary_table.add_row("Function Calls", str(len(analysis.function_calls)))
     summary_table.add_row("Attribute Accesses", str(len(analysis.attribute_accesses)))
@@ -367,22 +385,58 @@ def _display_analysis_console(response, verbose: bool) -> None:
         validation_table.add_row(
             "Imports",
             str(len(validation.import_validations)),
-            str(sum(1 for v in validation.import_validations if v.validation.status.value == "VALID")),
-            str(sum(1 for v in validation.import_validations if v.validation.status.value != "VALID")),
+            str(
+                sum(
+                    1
+                    for v in validation.import_validations
+                    if v.validation.status.value == "VALID"
+                )
+            ),
+            str(
+                sum(
+                    1
+                    for v in validation.import_validations
+                    if v.validation.status.value != "VALID"
+                )
+            ),
         )
 
         validation_table.add_row(
             "Classes",
             str(len(validation.class_validations)),
-            str(sum(1 for v in validation.class_validations if v.validation.status.value == "VALID")),
-            str(sum(1 for v in validation.class_validations if v.validation.status.value != "VALID")),
+            str(
+                sum(
+                    1
+                    for v in validation.class_validations
+                    if v.validation.status.value == "VALID"
+                )
+            ),
+            str(
+                sum(
+                    1
+                    for v in validation.class_validations
+                    if v.validation.status.value != "VALID"
+                )
+            ),
         )
 
         validation_table.add_row(
             "Methods",
             str(len(validation.method_validations)),
-            str(sum(1 for v in validation.method_validations if v.validation.status.value == "VALID")),
-            str(sum(1 for v in validation.method_validations if v.validation.status.value != "VALID")),
+            str(
+                sum(
+                    1
+                    for v in validation.method_validations
+                    if v.validation.status.value == "VALID"
+                )
+            ),
+            str(
+                sum(
+                    1
+                    for v in validation.method_validations
+                    if v.validation.status.value != "VALID"
+                )
+            ),
         )
 
         console.print(validation_table)
@@ -395,7 +449,9 @@ def _display_analysis_console(response, verbose: bool) -> None:
 
     # Hallucinations
     if response.hallucinations_detected:
-        console.print(f"\n[bold red]Potential Issues Detected ({len(response.hallucinations_detected)}):[/bold red]")
+        console.print(
+            f"\n[bold red]Potential Issues Detected ({len(response.hallucinations_detected)}):[/bold red]"
+        )
         for hallucination in response.hallucinations_detected:
             console.print(f"  • {hallucination.get('description', 'Unknown issue')}")
             if verbose and "message" in hallucination:
@@ -411,17 +467,29 @@ def _display_analysis_console(response, verbose: bool) -> None:
 def _display_quick_summary(response, verbose: bool) -> None:
     """Display quick analysis summary."""
     status_color = (
-        "green" if response.confidence_score > 0.7 else "yellow" if response.confidence_score > 0.4 else "red"
+        "green"
+        if response.confidence_score > 0.7
+        else "yellow" if response.confidence_score > 0.4 else "red"
     )
-    status_icon = "✓" if response.confidence_score > 0.7 else "⚠" if response.confidence_score > 0.4 else "✗"
+    status_icon = (
+        "✓"
+        if response.confidence_score > 0.7
+        else "⚠" if response.confidence_score > 0.4 else "✗"
+    )
 
-    console.print(f"[{status_color}]{status_icon} Confidence: {response.confidence_score:.1%}[/{status_color}]")
+    console.print(
+        f"[{status_color}]{status_icon} Confidence: {response.confidence_score:.1%}[/{status_color}]"
+    )
 
     if response.suggestions:
-        console.print(f"[blue]📝 {len(response.suggestions)} suggestions available[/blue]")
+        console.print(
+            f"[blue]📝 {len(response.suggestions)} suggestions available[/blue]"
+        )
 
     if response.hallucinations_detected:
-        console.print(f"[red]⚠ {len(response.hallucinations_detected)} potential issues detected[/red]")
+        console.print(
+            f"[red]⚠ {len(response.hallucinations_detected)} potential issues detected[/red]"
+        )
 
     if response.errors:
         console.print(f"[red]❌ {len(response.errors)} errors found[/red]")
@@ -516,7 +584,9 @@ def _display_batch_summary(results, summary_only: bool) -> None:
     avg_confidence = total_confidence / total_files if total_files > 0 else 0
 
     high_confidence = sum(1 for r in results if r["response"].confidence_score > 0.7)
-    medium_confidence = sum(1 for r in results if 0.4 <= r["response"].confidence_score <= 0.7)
+    medium_confidence = sum(
+        1 for r in results if 0.4 <= r["response"].confidence_score <= 0.7
+    )
     low_confidence = sum(1 for r in results if r["response"].confidence_score < 0.4)
 
     # Summary table

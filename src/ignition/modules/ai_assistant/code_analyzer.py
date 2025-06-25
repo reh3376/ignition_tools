@@ -91,7 +91,7 @@ class AnalysisResult:
 class CodeAnalyzer:
     """Analyzes AI-generated Python scripts for validation against knowledge graph."""
 
-    def __init__(self):
+    def __init__(self) -> Any:
         self.import_map: dict[str, str] = {}  # alias -> actual_module_name
         self.variable_types: dict[str, str] = {}  # variable_name -> class_type
         self.context_manager_vars: dict[str, tuple[int, int, str]] = (
@@ -177,7 +177,7 @@ class CodeAnalyzer:
             result.errors.append(error_msg)
             return result
 
-    def _extract_imports(self, node: ast.AST, result: AnalysisResult):
+    def _extract_imports(self, node: ast.AST, result: AnalysisResult) -> Any:
         """Extract import information and build import mapping."""
         line_num = getattr(node, "lineno", 0)
 
@@ -221,7 +221,7 @@ class CodeAnalyzer:
                 else:
                     self.import_map[alias_name] = import_name
 
-    def _analyze_node(self, node: ast.AST, result: AnalysisResult):
+    def _analyze_node(self, node: ast.AST, result: AnalysisResult) -> Any:
         """Analyze individual AST nodes for usage patterns."""
         # Assignments (class instantiations and method call results)
         if isinstance(node, ast.Assign):
@@ -258,7 +258,9 @@ class CodeAnalyzer:
             else:
                 self._handle_with(node, result)
 
-    def _extract_class_instantiation(self, node: ast.Assign, result: AnalysisResult):
+    def _extract_class_instantiation(
+        self, node: ast.Assign, result: AnalysisResult
+    ) -> Any:
         """Extract class instantiation from assignment."""
         if not isinstance(node.value, ast.Call):
             return
@@ -299,7 +301,7 @@ class CodeAnalyzer:
             # Track variable type for future method calls
             self.variable_types[var_name] = func_name
 
-    def _extract_method_call(self, node: ast.Call, result: AnalysisResult):
+    def _extract_method_call(self, node: ast.Call, result: AnalysisResult) -> Any:
         """Extract method call information."""
         if not isinstance(node.func, ast.Attribute):
             return
@@ -332,7 +334,7 @@ class CodeAnalyzer:
         )
         result.method_calls.append(method_call)
 
-    def _extract_function_call(self, node: ast.Call, result: AnalysisResult):
+    def _extract_function_call(self, node: ast.Call, result: AnalysisResult) -> Any:
         """Extract function call information."""
         if not isinstance(node.func, ast.Name):
             return
@@ -359,7 +361,9 @@ class CodeAnalyzer:
         )
         result.function_calls.append(function_call)
 
-    def _extract_attribute_access(self, node: ast.Attribute, result: AnalysisResult):
+    def _extract_attribute_access(
+        self, node: ast.Attribute, result: AnalysisResult
+    ) -> Any:
         """Extract attribute access information."""
         line_num = getattr(node, "lineno", 0)
 
@@ -376,7 +380,7 @@ class CodeAnalyzer:
         )
         result.attribute_accesses.append(attribute_access)
 
-    def _infer_object_types(self, result: AnalysisResult):
+    def _infer_object_types(self, result: AnalysisResult) -> Any:
         """Infer object types for method calls and attribute accesses."""
         # set object types for method calls
         for method_call in result.method_calls:
@@ -466,12 +470,14 @@ class CodeAnalyzer:
 
         return False
 
-    def _track_method_result_assignment(self, call_node: ast.Call, var_name: str):
+    def _track_method_result_assignment(
+        self, call_node: ast.Call, var_name: str
+    ) -> Any:
         """Track variable assignments from method calls for type inference."""
         # This could be enhanced to infer return types from method calls
         pass
 
-    def _handle_async_with(self, node: ast.AsyncWith, result: AnalysisResult):
+    def _handle_async_with(self, node: ast.AsyncWith, result: AnalysisResult) -> Any:
         """Handle async with statements for context manager tracking."""
         for item in node.items:
             if item.optional_vars and isinstance(item.optional_vars, ast.Name):
@@ -504,7 +510,7 @@ class CodeAnalyzer:
                     )
                     self._extract_class_instantiation(fake_assign, result)
 
-    def _handle_with(self, node: ast.With, result: AnalysisResult):
+    def _handle_with(self, node: ast.With, result: AnalysisResult) -> Any:
         """Handle regular with statements for context manager tracking."""
         for item in node.items:
             if item.optional_vars and isinstance(item.optional_vars, ast.Name):

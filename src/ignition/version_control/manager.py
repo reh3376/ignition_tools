@@ -60,7 +60,9 @@ class VersionControlManager:
         self._initialized = False
         self._cache = {}
 
-        logger.info(f"VersionControlManager initialized for repository: {config.repository_path}")
+        logger.info(
+            f"VersionControlManager initialized for repository: {config.repository_path}"
+        )
 
     def initialize(self) -> bool:
         """Initialize the version control manager and all components.
@@ -71,18 +73,26 @@ class VersionControlManager:
         try:
             # Validate repository path
             if not self.config.repository_path.exists():
-                logger.error(f"Repository path does not exist: {self.config.repository_path}")
+                logger.error(
+                    f"Repository path does not exist: {self.config.repository_path}"
+                )
                 return False
 
             # Check if it's a git repository
             if self.config.git_enabled:
                 git_dir = self.config.repository_path / ".git"
                 if not git_dir.exists():
-                    logger.warning(f"Git repository not found at {self.config.repository_path}")
+                    logger.warning(
+                        f"Git repository not found at {self.config.repository_path}"
+                    )
                     self.config.git_enabled = False
 
             # Initialize graph database schema if available
-            if self.graph_client and hasattr(self.graph_client, "is_connected") and self.graph_client.is_connected:
+            if (
+                self.graph_client
+                and hasattr(self.graph_client, "is_connected")
+                and self.graph_client.is_connected
+            ):
                 self._initialize_graph_schema()
 
             # Set up file system monitoring if enabled
@@ -98,7 +108,7 @@ class VersionControlManager:
             return False
 
     @property
-    def change_tracker(self):
+    def change_tracker(self) -> Any:
         """Get the change tracker instance (lazy loading)."""
         if self._change_tracker is None:
             from .change_tracker import ChangeTracker
@@ -110,7 +120,7 @@ class VersionControlManager:
         return self._change_tracker
 
     @property
-    def dependency_analyzer(self):
+    def dependency_analyzer(self) -> Any:
         """Get the dependency analyzer instance (lazy loading)."""
         if self._dependency_analyzer is None:
             from .dependency_analyzer import DependencyAnalyzer
@@ -123,7 +133,7 @@ class VersionControlManager:
         return self._dependency_analyzer
 
     @property
-    def impact_analyzer(self):
+    def impact_analyzer(self) -> Any:
         """Get the impact analyzer instance (lazy loading)."""
         if self._impact_analyzer is None:
             from .impact_analyzer import CommitImpactAnalyzer
@@ -136,7 +146,7 @@ class VersionControlManager:
         return self._impact_analyzer
 
     @property
-    def conflict_predictor(self):
+    def conflict_predictor(self) -> Any:
         """Get the conflict predictor instance (lazy loading)."""
         if self._conflict_predictor is None:
             from .conflict_predictor import MergeConflictPredictor
@@ -149,7 +159,7 @@ class VersionControlManager:
         return self._conflict_predictor
 
     @property
-    def release_planner(self):
+    def release_planner(self) -> Any:
         """Get the release planner instance (lazy loading)."""
         if self._release_planner is None:
             from .release_planner import ReleasePlanner
@@ -181,7 +191,9 @@ class VersionControlManager:
             return {"error": "Impact analysis is disabled"}
 
         try:
-            return self.impact_analyzer.analyze_impact(commit_hash=commit_hash, files=files, detailed=detailed)
+            return self.impact_analyzer.analyze_impact(
+                commit_hash=commit_hash, files=files, detailed=detailed
+            )
         except Exception as e:
             logger.error(f"Failed to analyze commit impact: {e}")
             return {"error": str(e)}
@@ -371,7 +383,9 @@ class VersionControlManager:
                 capture_output=True,
                 text=True,
             )
-            current_branch = result.stdout.strip() if result.returncode == 0 else "unknown"
+            current_branch = (
+                result.stdout.strip() if result.returncode == 0 else "unknown"
+            )
 
             # Get status
             result = subprocess.run(
@@ -434,7 +448,9 @@ class VersionControlManager:
         # This will be implemented with graph database queries
         return []
 
-    def _save_report(self, data: dict[str, Any], output_path: Path, format: str) -> None:
+    def _save_report(
+        self, data: dict[str, Any], output_path: Path, format: str
+    ) -> None:
         """Save report to file in specified format."""
         try:
             if format == "json":

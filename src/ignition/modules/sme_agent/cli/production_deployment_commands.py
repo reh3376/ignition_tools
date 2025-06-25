@@ -13,8 +13,7 @@ import asyncio
 import json
 import logging
 import sys
-from pathlib import Path
-from typing import Self, Any
+from typing import Any
 
 import click
 from rich.console import Console

@@ -74,7 +74,7 @@ class AdvancedAnalyticsPlatformModule:
     6. Resource Management and Cleanup
     """
 
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize Advanced Analytics Platform Module following crawl_mcp.py patterns."""
         self.console = Console()
         self.logger = logging.getLogger(__name__)
@@ -339,7 +339,7 @@ class AdvancedAnalyticsPlatformModule:
 
         return errors
 
-    def _initialize_components(self):
+    def _initialize_components(self) -> Any:
         """Initialize analytics components after validation."""
         try:
             self.analytics_engine = AnalyticsEngine(self.config)
@@ -355,7 +355,9 @@ class AdvancedAnalyticsPlatformModule:
             self.logger.error(f"Failed to initialize analytics components: {e}")
             raise
 
-    def _display_environment_validation(self, validation_results: dict[str, Any]):
+    def _display_environment_validation(
+        self, validation_results: dict[str, Any]
+    ) -> Any:
         """Display environment validation results in a formatted table."""
         table = Table(title="Advanced Analytics Platform - Environment Validation")
         table.add_column("Variable", style="cyan")
@@ -566,7 +568,7 @@ class AdvancedAnalyticsPlatformModule:
 
         return user_friendly_message
 
-    def cleanup_resources(self):
+    def cleanup_resources(self) -> Any:
         """Step 6: Resource Management and Cleanup
 
         Clean up allocated resources.

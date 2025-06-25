@@ -458,7 +458,7 @@ def collect_all_recommendations(
     return unique_recommendations
 
 
-async def main():
+async def main() -> Any:
     """Main function to run the integration test."""
     try:
         results = await run_phase_96_integration_test()

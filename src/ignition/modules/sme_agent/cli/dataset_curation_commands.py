@@ -40,7 +40,6 @@ from ..industrial_dataset_curation import (
     validate_environment,
 )
 from ..variable_type_classifier import VariableTypeClassifier
-from typing import Any, Self
 
 # Load environment variables
 load_dotenv()

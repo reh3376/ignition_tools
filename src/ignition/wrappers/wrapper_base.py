@@ -10,7 +10,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
 from functools import wraps
-from typing import Self, Any
+from typing import Any, Self
 
 # Mock system functions for development/testing environment
 try:
@@ -102,7 +102,9 @@ except ImportError:
 class WrapperError(Exception):
     """Base exception for wrapper-related errors."""
 
-    def __init__(self: Self, message: str, original_error: Exception | None = None) -> None:
+    def __init__(
+        self: Self, message: str, original_error: Exception | None = None
+    ) -> None:
         super().__init__(message)
         self.original_error = original_error
 

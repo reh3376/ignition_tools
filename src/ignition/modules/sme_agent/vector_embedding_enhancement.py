@@ -108,7 +108,7 @@ class VectorConfig:
     cache_directory: str = "embedding_cache"
     enable_persistence: bool = True
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate configuration after initialization."""
         if self.embedding_model == EmbeddingModel.CUSTOM and not self.custom_model_path:
             raise ValueError(
@@ -378,7 +378,7 @@ class VectorEmbeddingEnhancement:
                 raise SMEAgentValidationError("Custom model path not provided")
         return self.config.embedding_model.value
 
-    def _initialize_faiss_index(self):
+    def _initialize_faiss_index(self) -> None:
         """Initialize FAISS index for vector similarity search."""
         if self.config.faiss_index_type == "IndexFlatIP":
             # Inner Product (cosine similarity for normalized vectors)
@@ -408,12 +408,12 @@ class VectorEmbeddingEnhancement:
             except Exception:
                 pass  # Fall back to CPU
 
-    def _create_directories(self):
+    def _create_directories(self) -> None:
         """Create necessary directories."""
         Path(self.config.index_directory).mkdir(parents=True, exist_ok=True)
         Path(self.config.cache_directory).mkdir(parents=True, exist_ok=True)
 
-    def _load_persistent_index(self):
+    def _load_persistent_index(self) -> None:
         """Load persistent index and document store if available."""
         try:
             index_path = Path(self.config.index_directory) / "faiss_index.bin"
@@ -790,7 +790,7 @@ class VectorEmbeddingEnhancement:
         else:
             return str(error)
 
-    def _save_persistent_index(self):
+    def _save_persistent_index(self) -> Any:
         """Save persistent index and document store."""
         try:
             index_path = Path(self.config.index_directory) / "faiss_index.bin"
@@ -828,7 +828,7 @@ class VectorEmbeddingEnhancement:
             "validation": self.validation_result,
         }
 
-    async def cleanup(self):
+    async def cleanup(self) -> None:
         """Cleanup resources following crawl_mcp.py methodology."""
         try:
             # Save persistent state
@@ -857,12 +857,12 @@ class VectorEmbeddingEnhancement:
         except Exception as e:
             print(f"Warning: Error during vector embedding cleanup: {e}")
 
-    async def __aenter__(self):
+    async def __aenter__(self) -> Any:
         """Async context manager entry."""
         await self.initialize()
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> None:
         """Async context manager exit."""
         await self.cleanup()
 

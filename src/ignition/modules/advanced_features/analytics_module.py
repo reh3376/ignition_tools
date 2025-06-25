@@ -24,7 +24,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Self, Any
+from typing import Any, Self
 
 # Add src to path for imports
 sys.path.append(str(Path(__file__).parent.parent.parent))
@@ -63,7 +63,7 @@ class AnalyticsConfig:
     # Progressive complexity settings
     complexity_level: str = "basic"  # basic, intermediate, advanced
 
-    def __post_init__(self: Self):
+    def __post_init__(self: Self) -> None:
         """Validate configuration following crawl_mcp.py methodology."""
         if not self.analytics_temp_dir:
             self.analytics_temp_dir = os.getenv(
@@ -94,7 +94,7 @@ class AnalyticsData:
     values: dict[str, int | float]
     metadata: dict[str, Any] = field(default_factory=dict)
 
-    def __post_init__(self: Self):
+    def __post_init__(self: Self) -> None:
         """Validate data structure."""
         if not isinstance(self.timestamp, datetime):
             raise ValueError("timestamp must be datetime object")
@@ -291,7 +291,9 @@ class RealTimeAnalyticsModule:
 
         return ValidationResult(valid=True)
 
-    def _display_validation_results(self: Self, results: dict[str, ValidationResult]) -> None:
+    def _display_validation_results(
+        self: Self, results: dict[str, ValidationResult]
+    ) -> None:
         """Display validation results with user-friendly formatting."""
         table = Table(title="Analytics Environment Validation")
         table.add_column("Component", style="cyan")
@@ -659,7 +661,9 @@ class AdvancedDashboardGenerator:
     def __init__(self: Self, config: AnalyticsConfig):
         self.config = config
 
-    def generate_realtime_dashboard(self: Self, data: list[AnalyticsData]) -> dict[str, Any]:
+    def generate_realtime_dashboard(
+        self: Self, data: list[AnalyticsData]
+    ) -> dict[str, Any]:
         """Generate advanced real-time dashboard."""
         return {
             "dashboard_type": "advanced_realtime",
@@ -674,7 +678,7 @@ class AdvancedDashboardGenerator:
 
 
 # Main function for testing
-def main():
+def main() -> None:
     """Test the analytics module following crawl_mcp.py methodology."""
     console.print(
         Panel.fit("🚀 Phase 9.8 Real-time Analytics Module Test", style="green bold")

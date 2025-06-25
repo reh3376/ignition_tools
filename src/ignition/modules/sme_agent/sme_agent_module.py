@@ -13,7 +13,7 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Self, Any
+from typing import Any, Self
 
 from dotenv import load_dotenv
 
@@ -168,7 +168,7 @@ class SMEAgentConfig:
     data_dir: str = "data"
     evaluation_dir: str = "evaluation"
 
-    def __post_init__(self: Self):
+    def __post_init__(self: Self) -> None:
         """Validate configuration after initialization."""
         # Convert string booleans
         if isinstance(self.gpu_enabled, str):
@@ -347,7 +347,9 @@ class SMEAgentModule:
 
         return self.validation_result
 
-    def initialize_components(self: Self, complexity_level: str = "basic") -> dict[str, Any]:
+    def initialize_components(
+        self: Self, complexity_level: str = "basic"
+    ) -> dict[str, Any]:
         """Step 5: Progressive Complexity Support
 
         Initialize SME Agent components based on complexity level.
@@ -409,7 +411,7 @@ class SMEAgentModule:
         initialization_result["initialization_time"] = time.time() - start_time
         return initialization_result
 
-    def _initialize_logging(self: Self):
+    def _initialize_logging(self: Self) -> None:
         """Initialize logging configuration."""
         log_level = getattr(logging, self.config.log_level.upper(), logging.INFO)
         logging.basicConfig(
@@ -418,7 +420,7 @@ class SMEAgentModule:
         )
         self.logger.info("Logging initialized")
 
-    def _initialize_directories(self: Self):
+    def _initialize_directories(self: Self) -> None:
         """Initialize required directories."""
         dirs = [self.config.cache_dir, self.config.data_dir, "logs"]
         for dir_name in dirs:
@@ -426,7 +428,7 @@ class SMEAgentModule:
             dir_path.mkdir(exist_ok=True)
         self.logger.info("Directories initialized")
 
-    def _initialize_neo4j(self: Self):
+    def _initialize_neo4j(self: Self) -> None:
         """Initialize Neo4j connection."""
         try:
             if self.validation_result["components_available"]["neo4j"]:
@@ -443,7 +445,7 @@ class SMEAgentModule:
             self.logger.error(f"Neo4j initialization failed: {e}")
             raise
 
-    def _initialize_llm_placeholder(self: Self):
+    def _initialize_llm_placeholder(self: Self) -> None:
         """Initialize LLM model with real integration."""
         try:
             # Import LLM integration module
@@ -495,7 +497,7 @@ class SMEAgentModule:
             self.logger.warning(f"LLM integration failed, using placeholder: {e}")
             self.logger.info(f"LLM placeholder initialized: {self.config.model_name}")
 
-    def _initialize_vector_store_placeholder(self: Self):
+    def _initialize_vector_store_placeholder(self: Self) -> None:
         """Initialize vector store (placeholder implementation)."""
         # Placeholder for vector store initialization
         self.vector_store = {
@@ -635,12 +637,12 @@ class SMEAgentModule:
             self.logger.error(f"Question processing failed: {e}")
             raise SMEAgentValidationError(f"Question processing failed: {e}")
 
-    def _check_evaluation_batch_creation(self: Self):
+    def _check_evaluation_batch_creation(self: Self) -> Any:
         """Check if it's time to create a new evaluation batch."""
         if len(self.decision_logs) >= self.config.evaluation_batch_size:
             self._create_evaluation_batch()
 
-    def _create_evaluation_batch(self: Self):
+    def _create_evaluation_batch(self: Self) -> Any:
         """Create a new evaluation batch from pending decision logs."""
         if not self.decision_logs:
             return
@@ -665,7 +667,7 @@ class SMEAgentModule:
             f"Created evaluation batch {batch.batch_id} with {len(batch.decision_logs)} decisions"
         )
 
-    def _save_evaluation_batch(self: Self, batch: HumanEvaluationBatch):
+    def _save_evaluation_batch(self: Self, batch: HumanEvaluationBatch) -> Any:
         """Save evaluation batch to file for human review."""
         if not hasattr(self, "evaluation_dir") or self.evaluation_dir is None:
             self.evaluation_dir = Path(self.config.evaluation_dir)
@@ -943,7 +945,7 @@ class SMEAgentModule:
         self, batch: HumanEvaluationBatch
     ) -> dict[str, Any]:
         """Generate insights for reinforcement learning from human evaluation."""
-        insights = {
+        insights: Any = {
             "performance_metrics": {},
             "improvement_patterns": [],
             "common_issues": [],
@@ -1135,7 +1137,7 @@ class SMEAgentModule:
             "validation": self.validation_result,
         }
 
-    def cleanup(self: Self):
+    def cleanup(self: Self) -> Any:
         """Step 6: Resource Management and Cleanup
 
         Clean up resources and connections.
@@ -1154,10 +1156,10 @@ class SMEAgentModule:
         except Exception as e:
             self.logger.error(f"Cleanup failed: {e}")
 
-    def __enter__(self: Self):
+    def __enter__(self: Self) -> Any:
         """Context manager entry."""
         return self
 
-    def __exit__(self: Self, exc_type, exc_val, exc_tb):
+    def __exit__(self: Self, exc_type, exc_val, exc_tb) -> None:
         """Context manager exit with cleanup."""
         self.cleanup()

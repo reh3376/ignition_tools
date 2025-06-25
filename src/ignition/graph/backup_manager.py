@@ -237,7 +237,7 @@ class Neo4jBackupManager:
 
     def _extract_database_data(self) -> dict[str, Any]:
         """Extract all data from the Neo4j database."""
-        data = {"nodes": [], "relationships": [], "statistics": {}}
+        data: dict[str, Any] = {"nodes": [], "relationships": [], "statistics": {}}
 
         try:
             # Extract all nodes
@@ -459,7 +459,7 @@ class Neo4jBackupManager:
         metadata_file = self.backup_dir / self.metadata_file
 
         # Load existing metadata
-        all_metadata = {"backups": []}
+        all_metadata: dict[str, Any] = {"backups": []}
         if metadata_file.exists():
             try:
                 with open(metadata_file, encoding="utf-8") as f:

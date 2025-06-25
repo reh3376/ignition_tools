@@ -34,7 +34,7 @@ class GatewayConfig:
     description: str = ""
     tags: list[str] = field(default_factory=list)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate configuration after initialization."""
         if not self.host:
             raise ValueError("Gateway host is required")
@@ -89,7 +89,7 @@ class GatewayConfigManager:
         self._load_environment()
         self._load_gateway_configs()
 
-    def _load_environment(self):
+    def _load_environment(self) -> list[Any]:
         """Load environment variables from .env file."""
         env_path = Path(self.env_file)
         if env_path.exists():
@@ -98,7 +98,7 @@ class GatewayConfigManager:
         else:
             logger.warning(f"Environment file {env_path} not found")
 
-    def _load_gateway_configs(self):
+    def _load_gateway_configs(self) -> list[Any]:
         """Load gateway configurations from environment variables."""
         # Get list of configured gateways
         gateway_names = self._get_gateway_names()
@@ -115,7 +115,9 @@ class GatewayConfigManager:
         """Get list of configured gateway names from environment."""
         gateways_env = os.getenv("IGN_GATEWAYS", "")
         if not gateways_env:
-            logger.warning("No gateways configured. Set IGN_GATEWAYS environment variable")
+            logger.warning(
+                "No gateways configured. Set IGN_GATEWAYS environment variable"
+            )
             return []
 
         return [name.strip() for name in gateways_env.split(",") if name.strip()]
@@ -170,7 +172,7 @@ class GatewayConfigManager:
         """Check if a gateway configuration exists."""
         return name in self.configs
 
-    def add_config(self, config: GatewayConfig):
+    def add_config(self, config: GatewayConfig) -> bool:
         """Add a new gateway configuration."""
         self.configs[config.name] = config
         logger.info(f"Added configuration for gateway: {config.name}")
@@ -199,7 +201,9 @@ class GatewayConfigManager:
                 # Validate authentication
                 if config.auth_type == "basic":
                     if not config.username or not config.password:
-                        config_errors.append("Username and password required for basic auth")
+                        config_errors.append(
+                            "Username and password required for basic auth"
+                        )
                 elif config.auth_type == "token" and not config.token:
                     config_errors.append("Token required for token auth")
 

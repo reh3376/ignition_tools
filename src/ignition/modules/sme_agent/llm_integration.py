@@ -275,7 +275,7 @@ class LLMConfig:
     log_level: str = "INFO"
     model_download_timeout: int = 3600  # 1 hour
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate configuration after initialization."""
         # Validate quantization
         valid_quantization = ["auto", "none", "int8", "int4", "fp16"]
@@ -364,7 +364,7 @@ class LLMConfig:
 
         return optimized_config
 
-    def _optimize_for_nvidia_gpu(self, system_env: SystemEnvironment):
+    def _optimize_for_nvidia_gpu(self, system_env: SystemEnvironment) -> None:
         """Optimize configuration for NVIDIA GPU environment (Env01)."""
         self.environment_type = "nvidia_gpu"
         self.target_device = "cuda" if not self.force_cpu else "cpu"
@@ -405,7 +405,7 @@ class LLMConfig:
             if self.quantization in ["none", "fp16"]:
                 self.quantization = "int8"
 
-    def _optimize_for_macos_unified(self, system_env: SystemEnvironment):
+    def _optimize_for_macos_unified(self, system_env: SystemEnvironment) -> None:
         """Optimize configuration for macOS unified memory environment (Env02)."""
         self.environment_type = "macos_unified"
         self.target_device = "mps" if not self.force_cpu else "cpu"
@@ -446,7 +446,7 @@ class LLMConfig:
             if self.quantization in ["none", "fp16"]:
                 self.quantization = "int8"
 
-    def _optimize_for_cpu_only(self, system_env: SystemEnvironment):
+    def _optimize_for_cpu_only(self, system_env: SystemEnvironment) -> None:
         """Optimize configuration for CPU-only environment."""
         self.environment_type = "cpu_only"
         self.target_device = "cpu"
@@ -934,7 +934,7 @@ class LLMModelManager:
 
         return status
 
-    def unload_model(self):
+    def unload_model(self) -> Any:
         """Step 6: Resource Management and Cleanup
 
         Unload model and free resources.
@@ -955,10 +955,10 @@ class LLMModelManager:
             self.device = None
             self.logger.info("Model unloaded successfully")
 
-    def __enter__(self):
+    def __enter__(self) -> Any:
         """Context manager entry."""
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         """Context manager exit with cleanup."""
         self.unload_model()

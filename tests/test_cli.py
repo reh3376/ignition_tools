@@ -3,12 +3,12 @@
 import json
 import tempfile
 from pathlib import Path
+from typing import Any, Self
 
 import pytest
 from click.testing import CliRunner
 
 from src.core.enhanced_cli import main as cli
-from typing import Any, Self
 
 
 class TestCLI:
@@ -40,7 +40,10 @@ class TestCLI:
         result = runner.invoke(cli, ["template", "list"])
         assert result.exit_code == 0
         # Should show available templates
-        assert "Available templates" in result.output or "button_click_handler" in result.output
+        assert (
+            "Available templates" in result.output
+            or "button_click_handler" in result.output
+        )
 
     @pytest.mark.unit
     def test_script_generate_help(self: Self, runner: Any):

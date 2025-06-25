@@ -21,10 +21,10 @@ console = Console()
 logger = logging.getLogger(__name__)
 
 
-def handle_sme_agent_error(func):
+def handle_sme_agent_error(func) -> Any:
     """Decorator for handling SME Agent errors with user-friendly messages."""
 
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         try:
             return func(*args, **kwargs)
         except SMEAgentValidationError as e:
@@ -39,7 +39,7 @@ def handle_sme_agent_error(func):
 
 
 @click.group(name="knowledge")
-def knowledge_commands():
+def knowledge_commands() -> None:
     """SME Agent Knowledge Commands - Knowledge Extraction and Vector Enhancement"""
     pass
 
@@ -200,7 +200,7 @@ async def _enhance_vectors_async(
 
 
 # Display helper functions
-def _display_extraction_result(result: dict[str, Any]):
+def _display_extraction_result(result: dict[str, Any]) -> None:
     """Display knowledge extraction result."""
     if result.get("success", False):
         console.print("[green]✅ Knowledge extraction completed![/green]")
@@ -223,7 +223,7 @@ def _display_extraction_result(result: dict[str, Any]):
         console.print(f"Error: {result.get('error', 'Unknown error')}")
 
 
-def _display_enhancement_result(result: dict[str, Any]):
+def _display_enhancement_result(result: dict[str, Any]) -> None:
     """Display vector enhancement result."""
     if result.get("success", False):
         console.print("[green]✅ Vector enhancement completed![/green]")

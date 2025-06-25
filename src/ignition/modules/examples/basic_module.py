@@ -1,7 +1,7 @@
 """Basic example module demonstrating the Ignition module framework."""
 
 from pathlib import Path
-from typing import Self, Any
+from typing import Any, Self
 
 from ignition.modules.core import AbstractIgnitionModule
 from ignition.modules.core.abstract_module import (
@@ -196,7 +196,7 @@ class BasicExampleModule(AbstractIgnitionModule):
 
     # Optional hook implementations
 
-    def create_gateway_hook(self: Self):
+    def create_gateway_hook(self: Self) -> Any:
         """Create Gateway-specific functionality."""
         self.logger.info("Creating Gateway hook for Basic Example Module")
 
@@ -207,17 +207,17 @@ class BasicExampleModule(AbstractIgnitionModule):
                 self.module = module
                 self.logger = module.logger
 
-            def startup(self: Self):
+            def startup(self: Self) -> None:
                 self.logger.info("Gateway hook started")
                 # Initialize Gateway-specific resources
 
-            def shutdown(self: Self):
+            def shutdown(self: Self) -> None:
                 self.logger.info("Gateway hook shutdown")
                 # Clean up Gateway-specific resources
 
         return BasicGatewayHook(self)
 
-    def create_designer_hook(self: Self):
+    def create_designer_hook(self: Self) -> Any:
         """Create Designer-specific functionality."""
         self.logger.info("Creating Designer hook for Basic Example Module")
 
@@ -228,11 +228,11 @@ class BasicExampleModule(AbstractIgnitionModule):
                 self.module = module
                 self.logger = module.logger
 
-            def startup(self: Self):
+            def startup(self: Self) -> None:
                 self.logger.info("Designer hook started")
                 # Initialize Designer-specific resources
 
-            def shutdown(self: Self):
+            def shutdown(self: Self) -> None:
                 self.logger.info("Designer hook shutdown")
                 # Clean up Designer-specific resources
 
@@ -240,7 +240,7 @@ class BasicExampleModule(AbstractIgnitionModule):
 
     # Module-specific methods
 
-    def _setup_data_processing(self: Self):
+    def _setup_data_processing(self: Self) -> bool:
         """Set up data processing components."""
         self.logger.debug("Setting up data processing")
 
@@ -252,7 +252,7 @@ class BasicExampleModule(AbstractIgnitionModule):
             f"Data processing setup complete - batch_size: {batch_size}, timeout: {timeout}"
         )
 
-    def _start_processing(self: Self):
+    def _start_processing(self: Self) -> bool:
         """Start data processing."""
         if self._custom_config.get("processing_enabled", False):
             self.logger.info("Starting data processing")
@@ -260,12 +260,12 @@ class BasicExampleModule(AbstractIgnitionModule):
         else:
             self.logger.info("Data processing disabled in configuration")
 
-    def _stop_processing(self: Self):
+    def _stop_processing(self: Self) -> bool:
         """Stop data processing."""
         self.logger.info("Stopping data processing")
         # In a real implementation, this would stop background processing
 
-    def _cleanup_resources(self: Self):
+    def _cleanup_resources(self: Self) -> bool:
         """Clean up module resources."""
         self.logger.debug("Cleaning up module resources")
         # Clean up any resources allocated during initialization
@@ -310,7 +310,7 @@ class BasicExampleModule(AbstractIgnitionModule):
             "timeout_seconds": self._custom_config.get("timeout_seconds", 30),
         }
 
-    def reset_processing_stats(self: Self):
+    def reset_processing_stats(self: Self) -> None:
         """Reset processing statistics."""
         self._data_processed = 0
         self.logger.info("Processing statistics reset")

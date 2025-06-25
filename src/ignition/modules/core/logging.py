@@ -49,7 +49,7 @@ class ModuleDiagnosticsManager:
         # Initialize logging
         self._setup_logging()
 
-    def _setup_logging(self):
+    def _setup_logging(self) -> None:
         """Set up logging configuration."""
         try:
             # Ensure log directory exists
@@ -141,7 +141,7 @@ class ModuleDiagnosticsManager:
         """Get the module logger."""
         return self.logger
 
-    def set_log_level(self, level: int | str):
+    def set_log_level(self, level: int | str) -> Any:
         """Set logging level."""
         if isinstance(level, str):
             level = getattr(logging, level.upper())
@@ -152,7 +152,7 @@ class ModuleDiagnosticsManager:
 
         self._logger.info(f"Log level set to {logging.getLevelName(level)}")
 
-    def log_error(self, error: Exception, context: str | None = None):
+    def log_error(self, error: Exception, context: str | None = None) -> Any:
         """Log error with context and tracking."""
         self._error_count += 1
         self._last_error = str(error)
@@ -164,7 +164,7 @@ class ModuleDiagnosticsManager:
         else:
             self._logger.error(f"Error: {error}", exc_info=True)
 
-    def log_warning(self, message: str, **kwargs):
+    def log_warning(self, message: str, **kwargs) -> Any:
         """Log warning with tracking."""
         self._warning_count += 1
         self._logger.warning(message, **kwargs)

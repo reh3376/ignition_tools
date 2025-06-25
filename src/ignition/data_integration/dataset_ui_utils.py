@@ -16,7 +16,7 @@ from .dataset_manager_models import DataQuality
 class DatasetUIUtils:
     """Utility functions for dataset UI operations."""
 
-    def __init__(self, manager):
+    def __init__(self, manager) -> None:
         """Initialize with dataset manager reference."""
         self.manager = manager
 
@@ -26,7 +26,9 @@ class DatasetUIUtils:
             with st.spinner("Processing dataset..."):
                 processed_data = self.manager.process_dataset(dataset_id)
 
-            st.success(f"✅ Dataset processed successfully! Generated {len(processed_data)} rows.")
+            st.success(
+                f"✅ Dataset processed successfully! Generated {len(processed_data)} rows."
+            )
 
             # Show preview of processed data
             if not processed_data.empty:
@@ -167,7 +169,11 @@ class DatasetUIUtils:
 
         fig = go.Figure()
 
-        fig.add_trace(go.Scatterpolar(r=values, theta=categories, fill="toself", name="Quality Scores"))
+        fig.add_trace(
+            go.Scatterpolar(
+                r=values, theta=categories, fill="toself", name="Quality Scores"
+            )
+        )
 
         fig.update_layout(
             polar={"radialaxis": {"visible": True, "range": [0, 100]}},

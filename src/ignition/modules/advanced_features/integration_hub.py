@@ -24,7 +24,7 @@ from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Self, Any
+from typing import Any, Self
 from urllib.parse import urlparse
 
 # Add src to path for imports
@@ -71,7 +71,7 @@ class IntegrationConfig:
     # Progressive complexity settings
     integration_level: str = "basic"  # basic, standard, advanced, enterprise
 
-    def __post_init__(self: Self):
+    def __post_init__(self: Self) -> None:
         """Validate configuration following crawl_mcp.py methodology."""
         if not self.integration_temp_dir:
             self.integration_temp_dir = os.getenv(
@@ -112,7 +112,7 @@ class APIEndpoint:
     auth_credentials: dict[str, str] = field(default_factory=dict)
     timeout: int = 30
 
-    def __post_init__(self: Self):
+    def __post_init__(self: Self) -> None:
         """Validate API endpoint configuration."""
         if not self.name:
             raise ValueError("API endpoint name is required")
@@ -147,7 +147,7 @@ class IntegrationEvent:
     status: str = "pending"  # pending, success, failed, retry
     error_message: str = ""
 
-    def __post_init__(self: Self):
+    def __post_init__(self: Self) -> None:
         """Validate integration event structure."""
         if not isinstance(self.timestamp, datetime):
             raise ValueError("timestamp must be datetime object")
@@ -402,7 +402,9 @@ class IntegrationHubModule:
                 integration_status="offline",
             )
 
-    def _display_validation_results(self: Self, results: dict[str, ValidationResult]) -> None:
+    def _display_validation_results(
+        self: Self, results: dict[str, ValidationResult]
+    ) -> None:
         """Display validation results with integration-focused formatting."""
         table = Table(title="Integration Hub Environment Validation")
         table.add_column("Component", style="cyan")
@@ -657,7 +659,9 @@ class IntegrationHubModule:
 
         return {"valid": True, "endpoint": api_endpoint}
 
-    async def call_api_endpoint(self: Self, endpoint_name: str, **kwargs) -> dict[str, Any]:
+    async def call_api_endpoint(
+        self: Self, endpoint_name: str, **kwargs
+    ) -> dict[str, Any]:
         """Call registered API endpoint with rate limiting and error handling."""
         try:
             if endpoint_name not in self.api_endpoints:
@@ -857,7 +861,9 @@ class BasicRESTClient:
     def __init__(self: Self, config: IntegrationConfig):
         self.config = config
 
-    async def call_endpoint(self: Self, endpoint: APIEndpoint, **kwargs) -> dict[str, Any]:
+    async def call_endpoint(
+        self: Self, endpoint: APIEndpoint, **kwargs
+    ) -> dict[str, Any]:
         """Make basic REST API call."""
         try:
             import requests
@@ -914,7 +920,9 @@ class AsyncRESTClient:
     def __init__(self: Self, config: IntegrationConfig):
         self.config = config
 
-    async def call_endpoint(self: Self, endpoint: APIEndpoint, **kwargs) -> dict[str, Any]:
+    async def call_endpoint(
+        self: Self, endpoint: APIEndpoint, **kwargs
+    ) -> dict[str, Any]:
         """Make async REST API call."""
         try:
             import aiohttp
@@ -963,7 +971,9 @@ class EnterpriseRESTClient:
     def __init__(self: Self, config: IntegrationConfig):
         self.config = config
 
-    async def call_endpoint(self: Self, endpoint: APIEndpoint, **kwargs) -> dict[str, Any]:
+    async def call_endpoint(
+        self: Self, endpoint: APIEndpoint, **kwargs
+    ) -> dict[str, Any]:
         """Make enterprise-grade REST API call with retry and circuit breaker."""
         # Would implement advanced features like:
         # - Circuit breaker pattern
@@ -1058,7 +1068,7 @@ class EnterpriseMessageQueueManager:
 
 
 # Main function for testing
-def main():
+def main() -> None:
     """Test the integration hub following crawl_mcp.py methodology."""
     console.print(
         Panel.fit("🔌 Phase 9.8 Integration Hub Module Test", style="cyan bold")

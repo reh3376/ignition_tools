@@ -41,7 +41,7 @@ class FOPDTModel(BaseModel):
 
     @field_validator("gain")
     @classmethod
-    def validate_gain(cls, v):
+    def validate_gain(cls, v) -> Any:
         if abs(v) < 1e-6:
             raise ValueError("Process gain cannot be zero")
         return v
@@ -57,7 +57,7 @@ class StateSpaceModel(BaseModel):
 
     @field_validator("A", "B", "C", "D")
     @classmethod
-    def validate_matrices(cls, v):
+    def validate_matrices(cls, v) -> Any:
         if not v or not all(isinstance(row, list) for row in v):
             raise ValueError("Matrix must be a list of lists")
         return v
@@ -75,7 +75,7 @@ class ConstraintSet(BaseModel):
 
     @field_validator("u_min", "u_max", "du_min", "du_max", "y_min", "y_max")
     @classmethod
-    def validate_constraint_lengths(cls, v):
+    def validate_constraint_lengths(cls, v) -> Any:
         if v is not None and len(v) == 0:
             raise ValueError("Constraint list cannot be empty")
         return v
@@ -90,7 +90,7 @@ class MPCObjective(BaseModel):
 
     @field_validator("Q", "R", "S")
     @classmethod
-    def validate_weight_matrices(cls, v):
+    def validate_weight_matrices(cls, v) -> Any:
         if v is None:
             return v
         if not v or not all(isinstance(row, list) for row in v):
@@ -346,7 +346,7 @@ class HybridMPCController:
     _state_estimate: np.ndarray | None = field(default=None, init=False)
     _last_control: np.ndarray | None = field(default=None, init=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Initialize MPC controller after creation."""
         if self.control_horizon > self.prediction_horizon:
             raise ValueError("Control horizon cannot exceed prediction horizon")
@@ -464,7 +464,7 @@ class HybridMPCController:
             u_sequence = np.zeros((self.control_horizon, n_inputs))
 
             # Define cost function
-            def cost_function(u_flat):
+            def cost_function(u_flat) -> Any:
                 u_seq = u_flat.reshape((self.control_horizon, n_inputs))
                 return self._calculate_cost(u_seq, setpoint)
 
@@ -739,7 +739,7 @@ async def test_mpc_controller() -> dict[str, Any]:
 
 if __name__ == "__main__":
     # Basic module testing
-    async def main():
+    async def main() -> None:
         logger.info("🚀 Hybrid MPC Controller - Phase 11.6 Testing")
 
         # Test environment validation

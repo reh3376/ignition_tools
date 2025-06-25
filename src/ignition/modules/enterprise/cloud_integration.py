@@ -74,7 +74,7 @@ class CloudIntegrationModule:
     6. Resource Management and Cleanup
     """
 
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize Cloud Integration Module following crawl_mcp.py patterns."""
         self.console = Console()
         self.logger = logging.getLogger(__name__)
@@ -314,7 +314,7 @@ class CloudIntegrationModule:
 
         return errors
 
-    def _initialize_components(self):
+    def _initialize_components(self) -> Any:
         """Initialize cloud components after validation."""
         try:
             self.cloud_manager = CloudManager(self.config)
@@ -328,7 +328,9 @@ class CloudIntegrationModule:
             self.logger.error(f"Failed to initialize cloud components: {e}")
             raise
 
-    def _display_environment_validation(self, validation_results: dict[str, Any]):
+    def _display_environment_validation(
+        self, validation_results: dict[str, Any]
+    ) -> Any:
         """Display environment validation results in a formatted table."""
         table = Table(title="Cloud Integration - Environment Validation")
         table.add_column("Variable", style="cyan")
@@ -528,7 +530,7 @@ class CloudIntegrationModule:
 
         return user_friendly_message
 
-    def cleanup_resources(self):
+    def cleanup_resources(self) -> Any:
         """Step 6: Resource Management and Cleanup
 
         Clean up allocated resources.

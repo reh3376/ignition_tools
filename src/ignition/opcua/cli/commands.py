@@ -10,7 +10,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Self, Any
+from typing import Any
 
 import click
 from rich.console import Console
@@ -70,7 +70,9 @@ def opcua(verbose: bool, log_level: str) -> None:
     default="None",
     help="Security policy (None, Basic256Sha256, etc.)",
 )
-@click.option("--security-mode", default="None", help="Security mode (None, Sign, SignAndEncrypt)")
+@click.option(
+    "--security-mode", default="None", help="Security mode (None, Sign, SignAndEncrypt)"
+)
 @click.option("--timeout", default=10.0, help="Connection timeout in seconds")
 @click.option("--save-config", help="Save connection config to file")
 def connect(
@@ -184,14 +186,24 @@ async def _connect_impl(
 
                     with open(save_config, "w") as f:
                         json.dump(config_to_save, f, indent=2)
-                    console.print(f"💾 Configuration saved to: [blue]{save_config}[/blue]")
+                    console.print(
+                        f"💾 Configuration saved to: [blue]{save_config}[/blue]"
+                    )
 
                 # Display available commands
                 console.print("\n[bold]Next steps:[/bold]")
-                console.print("• [cyan]ignition opcua info[/cyan] - Get server information")
-                console.print("• [cyan]ignition opcua browse[/cyan] - Browse address space")
-                console.print("• [cyan]ignition opcua read <node-id>[/cyan] - Read node value")
-                console.print("• [cyan]ignition opcua disconnect[/cyan] - Disconnect from server")
+                console.print(
+                    "• [cyan]ignition opcua info[/cyan] - Get server information"
+                )
+                console.print(
+                    "• [cyan]ignition opcua browse[/cyan] - Browse address space"
+                )
+                console.print(
+                    "• [cyan]ignition opcua read <node-id>[/cyan] - Read node value"
+                )
+                console.print(
+                    "• [cyan]ignition opcua disconnect[/cyan] - Disconnect from server"
+                )
 
             except Exception as e:
                 progress.update(task, description="❌ Connection failed!")
@@ -284,9 +296,13 @@ async def _info_impl() -> None:
         # Connection stats
         stats = server_info.get("stats", {})
         if stats.get("connect_time"):
-            table.add_row("Connected At", stats["connect_time"].strftime("%Y-%m-%d %H:%M:%S"))
+            table.add_row(
+                "Connected At", stats["connect_time"].strftime("%Y-%m-%d %H:%M:%S")
+            )
         if stats.get("last_activity"):
-            table.add_row("Last Activity", stats["last_activity"].strftime("%Y-%m-%d %H:%M:%S"))
+            table.add_row(
+                "Last Activity", stats["last_activity"].strftime("%Y-%m-%d %H:%M:%S")
+            )
 
         console.print(table)
 
@@ -301,7 +317,9 @@ async def _info_impl() -> None:
 
 
 @opcua.command()
-@click.option("--node", "-n", default="i=85", help="Starting node ID (default: Objects folder)")
+@click.option(
+    "--node", "-n", default="i=85", help="Starting node ID (default: Objects folder)"
+)
 @click.option("--depth", "-d", default=2, help="Maximum browsing depth")
 @click.option("--filter", "-f", help="Filter nodes by browse name (case-insensitive)")
 @click.option("--variables-only", is_flag=True, help="Show only variable nodes")
@@ -318,7 +336,9 @@ def browse(node: str, depth: int, filter: str | None, variables_only: bool) -> N
     asyncio.run(_browse_impl(node, depth, filter, variables_only))
 
 
-async def _browse_impl(node: str, depth: int, filter: str | None, variables_only: bool) -> None:
+async def _browse_impl(
+    node: str, depth: int, filter: str | None, variables_only: bool
+) -> None:
     """Implementation of browse command."""
     if not _current_client or not _current_client.connected:
         console.print("❌ Not connected to any OPC-UA server. Use 'connect' first.")
@@ -352,7 +372,9 @@ async def _browse_impl(node: str, depth: int, filter: str | None, variables_only
         console.print(f"❌ [bold red]Browse error:[/bold red] {e!s}")
 
 
-def _build_tree_display(tree: Tree, node_data: dict[str, Any], filter: str | None, variables_only: bool) -> None:
+def _build_tree_display(
+    tree: Tree, node_data: dict[str, Any], filter: str | None, variables_only: bool
+) -> None:
     """Build rich tree display from node data."""
     children = node_data.get("children", [])
 
@@ -368,7 +390,11 @@ def _build_tree_display(tree: Tree, node_data: dict[str, Any], filter: str | Non
             continue
 
         # Choose icon based on node class
-        icon = "📊" if "Variable" in node_class else "📁" if "Object" in node_class else "🔧"
+        icon = (
+            "📊"
+            if "Variable" in node_class
+            else "📁" if "Object" in node_class else "🔧"
+        )
 
         # Add value if it's a variable
         display_text = f"{icon} {browse_name}"
@@ -429,7 +455,9 @@ async def _read_impl(node_id: str, format: str) -> None:
         value = await _current_client.read_values(node_id)
 
         # Get additional node information
-        node_info = await _current_client.browser.get_node_info(_current_client.client.get_node(node_id))
+        node_info = await _current_client.browser.get_node_info(
+            _current_client.client.get_node(node_id)
+        )
 
         # Display based on format
         if format == "json":
@@ -511,7 +539,9 @@ async def _status_impl() -> None:
         # Subscription status
         sub_status = health.get("subscriptions", {})
         if sub_status.get("active_subscriptions", 0) > 0:
-            console.print(f"\n📊 Active Subscriptions: {sub_status['active_subscriptions']}")
+            console.print(
+                f"\n📊 Active Subscriptions: {sub_status['active_subscriptions']}"
+            )
 
     except Exception as e:
         console.print(f"❌ [bold red]Status error:[/bold red] {e!s}")
@@ -519,7 +549,9 @@ async def _status_impl() -> None:
 
 @opcua.command()
 @click.argument("node_ids", nargs=-1, required=True)
-@click.option("--interval", "-i", default=1000, help="Subscription interval in milliseconds")
+@click.option(
+    "--interval", "-i", default=1000, help="Subscription interval in milliseconds"
+)
 @click.option(
     "--duration",
     "-t",
@@ -534,7 +566,9 @@ async def _status_impl() -> None:
     help="Output format for monitored data",
 )
 @click.option("--output", "-o", help="Output file path (default: console)")
-def monitor(node_ids: tuple, interval: int, duration: int, format: str, output: str | None) -> None:
+def monitor(
+    node_ids: tuple, interval: int, duration: int, format: str, output: str | None
+) -> None:
     """Monitor OPC-UA nodes for real-time data changes.
 
     🔒 READ-ONLY: Safely monitor data changes without modifications.
@@ -547,7 +581,9 @@ def monitor(node_ids: tuple, interval: int, duration: int, format: str, output: 
     asyncio.run(_monitor_impl(list(node_ids), interval, duration, format, output))
 
 
-async def _monitor_impl(node_ids: list, interval: int, duration: int, format: str, output: str | None) -> None:
+async def _monitor_impl(
+    node_ids: list, interval: int, duration: int, format: str, output: str | None
+) -> None:
     """Implementation of monitor command."""
     if not _current_client or not _current_client.connected:
         console.print("❌ Not connected to any OPC-UA server. Use 'connect' first.")
@@ -555,7 +591,9 @@ async def _monitor_impl(node_ids: list, interval: int, duration: int, format: st
 
     try:
         console.print(f"📊 Starting real-time monitoring of {len(node_ids)} node(s)")
-        console.print(f"⏱️  Interval: {interval}ms, Duration: {duration}s {'(indefinite)' if duration == 0 else ''}")
+        console.print(
+            f"⏱️  Interval: {interval}ms, Duration: {duration}s {'(indefinite)' if duration == 0 else ''}"
+        )
 
         # Prepare data collection
         monitoring_data = []
@@ -594,7 +632,9 @@ async def _monitor_impl(node_ids: list, interval: int, duration: int, format: st
             # Display real-time update
             if not output or output == "console":
                 if format == "table":
-                    console.print(f"[{timestamp.strftime('%H:%M:%S')}] {node_id}: [green]{value}[/green]")
+                    console.print(
+                        f"[{timestamp.strftime('%H:%M:%S')}] {node_id}: [green]{value}[/green]"
+                    )
                 elif format == "json":
                     console.print(
                         json.dumps(

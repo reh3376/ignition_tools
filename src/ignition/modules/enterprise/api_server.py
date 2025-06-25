@@ -29,7 +29,7 @@ Usage:
 import asyncio
 import logging
 from datetime import datetime
-from typing import Self, Any
+from typing import Any
 
 import uvicorn
 from fastapi import BackgroundTasks, FastAPI, HTTPException
@@ -439,7 +439,9 @@ async def deploy_architecture(
 
 
 @app.post("/api/v1/deployment/cloud", response_model=DeploymentResponse)
-async def deploy_cloud(request: DeploymentRequest, background_tasks: BackgroundTasks) -> None:
+async def deploy_cloud(
+    request: DeploymentRequest, background_tasks: BackgroundTasks
+) -> None:
     """Deploy cloud infrastructure with progressive complexity."""
     if not cloud_module:
         raise HTTPException(

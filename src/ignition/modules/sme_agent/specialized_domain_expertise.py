@@ -835,7 +835,7 @@ class SpecializedDomainExpertise:
         self, patterns: list[DatabaseIntegrationPattern], complexity: str
     ) -> dict[str, Any]:
         """Compile database advice from matching patterns."""
-        combined_advice = {
+        combined_advice: Any = {
             "optimization_tips": [],
             "security_considerations": [],
             "ignition_configuration": {},
@@ -907,7 +907,7 @@ class SpecializedDomainExpertise:
         complexity: str,
     ) -> dict[str, Any]:
         """Compile OPC-UA diagnosis from matching cases."""
-        diagnosis = {
+        diagnosis: Any = {
             "root_causes": [],
             "diagnostic_steps": [],
             "solutions": [],

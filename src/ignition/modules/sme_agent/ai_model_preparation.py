@@ -20,7 +20,7 @@ import logging
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Self, Any
+from typing import Any, Self
 
 import numpy as np
 import pandas as pd
@@ -59,7 +59,7 @@ class FeatureEngineeringConfig(BaseModel):
     )
 
     @validator("window_sizes")
-    def validate_window_sizes(cls, v):
+    def validate_window_sizes(cls, v) -> Any:
         if not all(w > 0 for w in v):
             raise ValueError("Window sizes must be positive")
         return v
@@ -90,7 +90,7 @@ class ModelPreparationConfig(BaseModel):
     )
 
     @validator("train_split", "validation_split", "test_split")
-    def validate_splits(cls, v, values):
+    def validate_splits(cls, v, values) -> Any:
         # Check that splits sum to approximately 1.0
         if "train_split" in values and "validation_split" in values:
             total = values["train_split"] + values["validation_split"] + v

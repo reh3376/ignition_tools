@@ -1,7 +1,8 @@
 """Tests for the IgnitionScriptGenerator class."""
 
-import pytest
 from typing import Any, Self
+
+import pytest
 
 
 class TestIgnitionScriptGenerator:
@@ -23,10 +24,14 @@ class TestIgnitionScriptGenerator:
         assert any("button_click_handler" in template for template in templates)
 
     @pytest.mark.unit
-    def test_generate_script_with_navigation(self: Self, script_generator, sample_button_config, captured_logs):
+    def test_generate_script_with_navigation(
+        self: Self, script_generator, sample_button_config, captured_logs
+    ):
         """Test generating a navigation script."""
         with captured_logs as logs:
-            result = script_generator.generate_script(sample_button_config["template"], sample_button_config)
+            result = script_generator.generate_script(
+                sample_button_config["template"], sample_button_config
+            )
 
         assert result is not None
         assert isinstance(result, str)
@@ -40,9 +45,13 @@ class TestIgnitionScriptGenerator:
         assert any("Generating script" in msg for msg in log_messages)
 
     @pytest.mark.unit
-    def test_generate_script_with_tag_write(self: Self, script_generator, sample_tag_write_config):
+    def test_generate_script_with_tag_write(
+        self: Self, script_generator, sample_tag_write_config
+    ):
         """Test generating a tag write script."""
-        result = script_generator.generate_script(sample_tag_write_config["template"], sample_tag_write_config)
+        result = script_generator.generate_script(
+            sample_tag_write_config["template"], sample_tag_write_config
+        )
 
         assert result is not None
         assert "TagWriteButton" in result
@@ -51,9 +60,13 @@ class TestIgnitionScriptGenerator:
         assert "test_value" in result
 
     @pytest.mark.unit
-    def test_generate_script_with_custom_code(self: Self, script_generator, sample_custom_config):
+    def test_generate_script_with_custom_code(
+        self: Self, script_generator, sample_custom_config
+    ):
         """Test generating a script with custom code."""
-        result = script_generator.generate_script(sample_custom_config["template"], sample_custom_config)
+        result = script_generator.generate_script(
+            sample_custom_config["template"], sample_custom_config
+        )
 
         assert result is not None
         assert "CustomButton" in result
@@ -85,7 +98,9 @@ class TestIgnitionScriptGenerator:
         }
 
         # Should still work but might produce incomplete script
-        result = script_generator.generate_script(incomplete_config["template"], incomplete_config)
+        result = script_generator.generate_script(
+            incomplete_config["template"], incomplete_config
+        )
         assert result is not None
 
     @pytest.mark.unit
@@ -109,13 +124,17 @@ class TestIgnitionScriptGenerator:
         assert "None" in result  # Python None -> Jython None
 
     @pytest.mark.performance
-    def test_generation_performance(self: Self, script_generator, sample_button_config, performance_monitor):
+    def test_generation_performance(
+        self: Self, script_generator, sample_button_config, performance_monitor
+    ):
         """Test script generation performance."""
         performance_monitor.start()
 
         # Generate multiple scripts
         for _ in range(10):
-            script_generator.generate_script(sample_button_config["template"], sample_button_config)
+            script_generator.generate_script(
+                sample_button_config["template"], sample_button_config
+            )
 
         performance_monitor.stop()
 
@@ -134,7 +153,9 @@ class TestIgnitionScriptGenerator:
         }
 
         templates = script_generator.list_templates()
-        button_template = next((t for t in templates if "button_click_handler" in t), None)
+        button_template = next(
+            (t for t in templates if "button_click_handler" in t), None
+        )
 
         if button_template:
             result = script_generator.generate_script(button_template, config)
@@ -157,7 +178,9 @@ class TestIgnitionScriptGenerator:
         }
 
         templates = script_generator.list_templates()
-        button_template = next((t for t in templates if "button_click_handler" in t), None)
+        button_template = next(
+            (t for t in templates if "button_click_handler" in t), None
+        )
 
         if button_template:
             result = script_generator.generate_script(button_template, config)
@@ -185,7 +208,9 @@ class TestIgnitionScriptGenerator:
         }
 
         templates = script_generator.list_templates()
-        button_template = next((t for t in templates if "button_click_handler" in t), None)
+        button_template = next(
+            (t for t in templates if "button_click_handler" in t), None
+        )
 
         if button_template:
             for error_config in configs:
@@ -214,7 +239,9 @@ class TestIgnitionScriptGenerator:
         }
 
         templates = script_generator.list_templates()
-        button_template = next((t for t in templates if "button_click_handler" in t), None)
+        button_template = next(
+            (t for t in templates if "button_click_handler" in t), None
+        )
 
         if button_template:
             for log_config in configs:
