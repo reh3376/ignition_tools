@@ -1,0 +1,155 @@
+version: '3.8'
+
+# Phase 12.6: Staging Environment Configuration
+# Following crawl_mcp.py methodology with comprehensive validation and monitoring
+
+services:
+  ign-scripts-api:
+    image: ${DOCKER_IMAGE:-ghcr.io/ign-scripts/api:staging}
+    container_name: ign-scripts-api-staging
+    environment:
+      - DEPLOYMENT_ENVIRONMENT=staging
+      - API_VERSION=${API_VERSION:-staging}
+      - LOG_LEVEL=DEBUG
+      - ENABLE_METRICS=true
+      - HEALTH_CHECK_ENABLED=true
+    ports:
+      - "8001:8000"  # Different port for staging
+    volumes:
+      - staging_logs:/app/logs
+      - staging_data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - ign-staging
+    labels:
+      - "com.ign-scripts.environment=staging"
+      - "com.ign-scripts.version=${API_VERSION:-staging}"
+      - "traefik.enable=true"
+      - "traefik.http.routers.ign-staging.rule=Host(`staging.ign-scripts.local`)"
+      - "traefik.http.services.ign-staging.loadbalancer.server.port=8000"
+
+  neo4j:
+    image: neo4j:5.15
+    container_name: neo4j-staging
+    environment:
+      - NEO4J_AUTH=${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD}
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+      - NEO4J_dbms_security_procedures_allowlist=apoc.*
+      - NEO4J_dbms_memory_heap_initial_size=512m
+      - NEO4J_dbms_memory_heap_max_size=1G
+      - NEO4J_dbms_memory_pagecache_size=512m
+    ports:
+      - "7475:7474"  # Different ports for staging
+      - "7688:7687"
+    volumes:
+      - staging_neo4j_data:/data
+      - staging_neo4j_logs:/logs
+      - staging_neo4j_conf:/conf
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "${NEO4J_USER:-neo4j}", "-p", "${NEO4J_PASSWORD}", "RETURN 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - ign-staging
+    labels:
+      - "com.ign-scripts.environment=staging"
+      - "com.ign-scripts.service=neo4j"
+
+  # Monitoring and observability for staging
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-staging
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./monitoring/prometheus-staging.yml:/etc/prometheus/prometheus.yml
+      - staging_prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=7d'
+      - '--web.enable-lifecycle'
+    networks:
+      - ign-staging
+    labels:
+      - "com.ign-scripts.environment=staging"
+      - "com.ign-scripts.service=prometheus"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-staging
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-staging123}
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - staging_grafana_data:/var/lib/grafana
+      - ./monitoring/grafana-staging.ini:/etc/grafana/grafana.ini
+    networks:
+      - ign-staging
+    labels:
+      - "com.ign-scripts.environment=staging"
+      - "com.ign-scripts.service=grafana"
+
+volumes:
+  staging_logs:
+    driver: local
+    labels:
+      - "com.ign-scripts.environment=staging"
+      - "com.ign-scripts.volume=logs"
+  
+  staging_data:
+    driver: local
+    labels:
+      - "com.ign-scripts.environment=staging"
+      - "com.ign-scripts.volume=data"
+  
+  staging_neo4j_data:
+    driver: local
+    labels:
+      - "com.ign-scripts.environment=staging"
+      - "com.ign-scripts.volume=neo4j-data"
+  
+  staging_neo4j_logs:
+    driver: local
+    labels:
+      - "com.ign-scripts.environment=staging"
+      - "com.ign-scripts.volume=neo4j-logs"
+  
+  staging_neo4j_conf:
+    driver: local
+    labels:
+      - "com.ign-scripts.environment=staging"
+      - "com.ign-scripts.volume=neo4j-conf"
+  
+  staging_prometheus_data:
+    driver: local
+    labels:
+      - "com.ign-scripts.environment=staging"
+      - "com.ign-scripts.volume=prometheus-data"
+  
+  staging_grafana_data:
+    driver: local
+    labels:
+      - "com.ign-scripts.environment=staging"
+      - "com.ign-scripts.volume=grafana-data"
+
+networks:
+  ign-staging:
+    driver: bridge
+    labels:
+      - "com.ign-scripts.environment=staging"
+      - "com.ign-scripts.network=main" 
