@@ -56,6 +56,30 @@ except ImportError as e:
     print(f"Advanced features commands not available: {e}")
     pass
 
+# Import Phase 13.1 LLM Infrastructure commands
+try:
+    from src.ignition.modules.llm_infrastructure.cli_commands import (
+        llm_infrastructure_cli,
+    )
+
+    main.add_command(llm_infrastructure_cli)
+except ImportError as e:
+    # LLM Infrastructure commands not available
+    print(f"LLM Infrastructure commands not available: {e}")
+    pass
+
+# Import Phase 13.2 Fine-tuning commands
+try:
+    from src.ignition.modules.llm_infrastructure.fine_tuning_cli import (
+        fine_tuning_cli,
+    )
+
+    main.add_command(fine_tuning_cli)
+except ImportError as e:
+    # Fine-tuning commands not available
+    print(f"Fine-tuning commands not available: {e}")
+    pass
+
 # Register command groups with main CLI
 main.add_command(script)
 main.add_command(template)

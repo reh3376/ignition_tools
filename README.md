@@ -1,8 +1,8 @@
 # IGN Scripts - Comprehensive Ignition SCADA Development Platform
 
-**Version**: 0.4.0 | **Phase**: 11.1 Complete - SME Agent Infrastructure & Human Evaluation | **Status**: SME Agent Foundation Ready
+**Version**: 0.4.0 | **Phase**: 13.2 Complete - Model Fine-tuning & Specialization | **Status**: Production-Ready LLM Fine-tuning System
 
-IGN Scripts is an intelligent, AI-enhanced development platform for Ignition SCADA systems that combines script generation, code intelligence, module development, and industrial automation capabilities into a unified ecosystem. With the ability to plug directly into the Ignition framework to offer highly relevant services that are not currently avaliable to the platform.
+IGN Scripts is an intelligent, AI-enhanced development platform for Ignition SCADA systems that combines script generation, code intelligence, module development, industrial automation capabilities, and specialized LLM fine-tuning into a unified ecosystem. With the ability to plug directly into the Ignition framework to offer highly relevant services that are not currently available to the platform.
 
 ## 🏭 **Core Services & Capabilities**
 
@@ -62,7 +62,42 @@ IGN Scripts is an intelligent, AI-enhanced development platform for Ignition SCA
 - **Batch Management**: Human expert review workflow with export/import capabilities
 - **Reinforcement Learning**: Continuous improvement through human feedback analysis
 
-## 🏗️ **Recent Major Achievement: Phase 11.1 SME Agent Infrastructure & Human Evaluation** ✅ **January 29, 2025**
+### **9. 🤖 LLM Fine-tuning & Specialization Infrastructure** ✅ **Phase 13.2 Complete**
+- **8B Parameter LLM Support**: Production-ready infrastructure with auto-detecting GPU acceleration
+- **Neo4j Knowledge Graph Integration**: Extract training data from 11,608+ specialized nodes
+- **Parameter-Efficient Fine-tuning**: LoRA/QLoRA configuration with rank, alpha, dropout optimization
+- **Quality-Controlled Data Pipeline**: Configurable quality thresholds (0.0-1.0) with multi-factor scoring
+- **Data Augmentation**: Instruction variations with configurable augmentation factors
+- **CLI Fine-tuning Interface**: 3 comprehensive commands (extract-data, train, status)
+- **Resource Management**: Async context managers with proper cleanup and monitoring
+- **Apple Silicon MPS Support**: Auto-detecting GPU configuration for Apple Silicon, CUDA, and CPU fallback
+
+## 🏗️ **Recent Major Achievement: Phase 13.2 Model Fine-tuning & Specialization** ✅ **June 26, 2025**
+
+**Complete LLM Fine-tuning Infrastructure with Neo4j Knowledge Graph Integration:**
+- **Fine-tuning Manager**: 1,000+ lines of production-ready fine-tuning infrastructure following crawl_mcp.py methodology
+- **Neo4j Knowledge Graph Integration**: Extract training data from 11,608+ nodes (Method, Class, Function, Pattern, CodeFile)
+- **Quality-Controlled Data Pipeline**: Successfully extracted 1,012 Method records, filtered to 46 high-quality samples
+- **Data Augmentation**: Generated 92 training samples with instruction variations and configurable factors
+- **Parameter-Efficient Fine-tuning**: LoRA/QLoRA configuration with comprehensive hyperparameter validation
+- **CLI Interface**: 3 comprehensive commands with extensive configuration options
+- **Auto-Detecting GPU Support**: Apple Silicon MPS, NVIDIA CUDA, and CPU-only fallback
+- **Resource Management**: Async context managers with proper cleanup and monitoring
+
+**Key LLM Fine-tuning CLI Commands:**
+1. **`ign fine-tuning extract-data`** - Extract training data from Neo4j knowledge graph with quality control
+2. **`ign fine-tuning train`** - Execute fine-tuning training process with comprehensive monitoring
+3. **`ign fine-tuning status`** - Show system status, available datasets, models, and configuration
+
+**Technical Achievements:**
+- **crawl_mcp.py Methodology**: 100% compliance with 6-step systematic development approach
+- **Pydantic Validation**: Comprehensive input validation with field constraints and error handling
+- **Quality Scoring**: Multi-factor quality assessment (documentation, type info, parameters, examples)
+- **Training Data Format**: Instruction-tuning format with Input/Output structure for specialized models
+- **GPU Acceleration**: Auto-detecting configuration with 64GB memory support on Apple Silicon
+- **Production Ready**: Complete fine-tuning pipeline with metadata preservation and validation
+
+## 🏗️ **Previous Major Achievement: Phase 11.1 SME Agent Infrastructure & Human Evaluation** ✅ **January 29, 2025**
 
 **Complete SME Agent Foundation with Human Evaluation System:**
 - **SME Agent Module**: Intelligent assistant with progressive complexity deployment and context-aware responses

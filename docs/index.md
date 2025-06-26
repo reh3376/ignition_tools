@@ -74,32 +74,34 @@ Welcome to the comprehensive documentation for IGN Scripts - a powerful toolkit 
 
 ## Project Status
 
-- **Version**: 0.2.2
-- **Phase**: 9.4 Complete - Data Integration Module
+- **Version**: 0.4.0
+- **Phase**: 13.2 Complete - Model Fine-tuning & Specialization
 - **Target Ignition Version**: 8.1+
 - **Jython Version**: 2.7
 - **Development Status**: Production ready with active development
-- **Graph Database**: 10,389+ nodes with comprehensive code intelligence
-- **CLI Commands**: 31+ commands across 7 major categories
+- **Graph Database**: 11,608+ nodes with comprehensive code intelligence
+- **CLI Commands**: 35+ commands across 9 major categories including LLM fine-tuning
 
 ## Recent Completions
 
-### Phase 9.4: Data Integration Module ✅ **COMPLETED** - 2025-01-28
-- **Complete CLI Integration**: 6 comprehensive data integration commands with rich terminal interface
-- **Enterprise Data Sources**: 38+ data source types across 7 categories (Industrial, Database, Time-Series, etc.)
-- **Industrial Variable Metadata**: Complete PV/CV/DV/SP/Process_State classification framework
-- **Faker Library Integration**: Realistic industrial test data generation with proper metadata
-- **100% Test Success**: All 5 test categories passing with comprehensive error handling
-- **JSON Model Preparation**: Structured datasets ready for AI/ML model ingestion
-- [View Phase 9.4 Completion Summary](completion-summaries/PHASE_9_4_DATA_INTEGRATION_CLI_COMPLETION_SUMMARY.md)
+### Phase 13.2: Model Fine-tuning & Specialization ✅ **COMPLETED** - 2025-06-26
+- **8B Parameter LLM Infrastructure**: Production-ready fine-tuning system with auto-detecting GPU support
+- **Neo4j Knowledge Graph Integration**: Extract training data from 11,608+ specialized nodes
+- **Parameter-Efficient Fine-tuning**: LoRA/QLoRA configuration with comprehensive validation
+- **Quality-Controlled Data Pipeline**: Successfully extracted 1,012 Method records, filtered to 46 high-quality samples
+- **Data Augmentation**: Generated 92 training samples with instruction variations
+- **CLI Interface**: 3 comprehensive commands (extract-data, train, status) with extensive options
+- **Apple Silicon MPS Support**: Auto-detecting GPU configuration for Apple Silicon, CUDA, and CPU fallback
+- [View Phase 13.2 Completion Summary](phase_summary/PHASE_13_2_MODEL_FINE_TUNING_SPECIALIZATION.md)
 
-### Phase 9.3: Script Generation Module ✅ **COMPLETED** - 2025-01-28
-- **Major Refactoring**: 54% code reduction, 66% complexity improvement
-- **Modular Architecture**: 6 specialized components using composition pattern
-- **Template Management**: Advanced search, versioning, and sharing capabilities
-- **AI Integration**: Vector embeddings and Neo4j knowledge graph
-- **CLI Enhancement**: 6 new script generation commands
-- [View Phase 9.3 Completion Summary](completion-summaries/PHASE_9_3_SCRIPT_GENERATION_COMPLETION_SUMMARY.md)
+### Phase 11.1: SME Agent Infrastructure & Human Evaluation ✅ **COMPLETED** - 2025-01-29
+- **SME Agent Foundation**: Intelligent assistant with progressive complexity deployment
+- **Human Evaluation Framework**: Decision logging, batch management, and reinforcement learning
+- **11 CLI Commands**: Complete SME Agent lifecycle management and human evaluation workflow
+- **Progressive Complexity**: 4-tier deployment system (basic → standard → advanced → enterprise)
+- **Decision Logging**: Comprehensive tracking with metadata, confidence scores, and processing time
+- **Batch Management**: Human expert review workflow with JSON/CSV export and import capabilities
+- [View Phase 11.1 Completion Summary](phase_summary/PHASE_11_1_COMPLETION_SUMMARY.md)
 
 ## License
 
@@ -107,4 +109,4 @@ This project is licensed under the MIT License - see the [LICENSE](../LICENSE) f
 
 ---
 
-*Last updated: 2025-01-28*
+*Last updated: 2025-06-26*

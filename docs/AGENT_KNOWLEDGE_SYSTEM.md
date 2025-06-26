@@ -135,6 +135,20 @@ The system automatically discovers and connects to:
   - Reinforcement learning insights
   - Progressive complexity deployment
 
+### 7. **LLM Fine-tuning Infrastructure**
+- **Type:** `llm_fine_tuning`
+- **Purpose:** 8B parameter LLM fine-tuning with Neo4j knowledge graph integration
+- **Location:** `src/ignition/modules/llm_infrastructure/`
+- **Capabilities:**
+  - Extract training data from Neo4j knowledge graph (11,608+ nodes)
+  - Quality-controlled data pipeline with configurable thresholds
+  - Parameter-efficient fine-tuning (LoRA/QLoRA)
+  - Data augmentation with instruction variations
+  - Auto-detecting GPU support (Apple Silicon MPS, CUDA, CPU)
+  - Comprehensive CLI interface (extract-data, train, status)
+  - Resource management with async context managers
+  - Training data format: Instruction-tuning with Input/Output structure
+
 ## 🔧 Connection Instructions
 
 ### Neo4j Graph Database
@@ -175,14 +189,36 @@ agent = SMEAgentModule()
 response = await agent.ask_question('How do I optimize PID control?')
 ```
 
+### LLM Fine-tuning Infrastructure
+```python
+from src.ignition.modules.llm_infrastructure.fine_tuning_manager import FineTuningManager
+
+# Initialize fine-tuning manager
+manager = FineTuningManager()
+
+# Extract training data from Neo4j
+async with manager.create_fine_tuning_context() as context:
+    dataset = await manager.extract_training_data(
+        dataset_name="ignition_knowledge",
+        extraction_types=["Method", "Class", "Function"],
+        max_records=1000,
+        quality_threshold=0.8
+    )
+
+# CLI Usage
+# python -m src.main fine-tuning extract-data --dataset-name test --max-records 100
+# python -m src.main fine-tuning status --show-datasets
+# python -m src.main fine-tuning train --dataset-name test --lora-rank 16
+```
+
 ## 📋 Project Context Information
 
 The system provides comprehensive project context including:
 
 ### Current Project State
 - **Project Name:** IGN Scripts - Code Intelligence System
-- **Current Phase:** 11.1 (Completed)
-- **Completed Phases:** 1.0 through 11.1
+- **Current Phase:** 13.2 (Completed) - Model Fine-tuning & Specialization
+- **Completed Phases:** 1.0 through 13.2
 
 ### Key Capabilities
 - Automated Code Refactoring
@@ -190,7 +226,7 @@ The system provides comprehensive project context including:
 - Code Splitting with AST Analysis
 - Git Integration & Evolution Tracking
 - Architecture Diagram Generation
-- Neo4j Graph Database Integration
+- Neo4j Graph Database Integration (11,608+ nodes)
 - Comprehensive CLI Interface
 - Refactoring Impact Analysis
 - Enterprise Integration & Deployment
@@ -198,9 +234,11 @@ The system provides comprehensive project context including:
 - Advanced Analytics Platform
 - Industrial Data Integration
 - SME Agent with Human Evaluation
-- Decision Logging & Batch Management
-- Reinforcement Learning Insights
-- Progressive Complexity Deployment
+- **LLM Fine-tuning Infrastructure** (Phase 13.2)
+- **Parameter-Efficient Fine-tuning** (LoRA/QLoRA)
+- **Knowledge Graph Training Data Extraction**
+- **Quality-Controlled Data Pipeline**
+- **Auto-Detecting GPU Support** (Apple Silicon MPS, CUDA, CPU)
 
 ### Available CLI Commands
 ```bash
@@ -232,9 +270,19 @@ ign module sme export-batch    # Export batch for human review
 ign module sme import-evaluation # Import human evaluations
 ign module sme rl-summary      # Show reinforcement learning insights
 ign module sme create-test-batch # Create test evaluation batches
+
+# LLM Fine-tuning Commands (Phase 13.2)
+ign fine-tuning extract-data   # Extract training data from Neo4j knowledge graph
+ign fine-tuning train          # Execute fine-tuning training process
+ign fine-tuning status         # Show system status, datasets, and configuration
 ```
 
 ### Recent Developments
+- **Phase 13.2 Completion** (June 2025) - Model Fine-tuning & Specialization
+- **LLM Fine-tuning Infrastructure** - Complete 8B parameter LLM fine-tuning system
+- **Neo4j Knowledge Graph Integration** - Extract training data from 11,608+ nodes
+- **Parameter-Efficient Fine-tuning** - LoRA/QLoRA with auto-detecting GPU support
+- **Quality-Controlled Data Pipeline** - Configurable thresholds and data augmentation
 - **Phase 11.1 Completion** (January 2025) - SME Agent Infrastructure & Human Evaluation Enhancement
 - **SME Agent System** - Complete infrastructure with human evaluation and reinforcement learning
 - **Progressive Complexity** - Support for basic/standard/advanced/enterprise deployment levels
@@ -273,7 +321,7 @@ The system automatically saves agent context to `.agent_context.json`:
 {
   "project_context": {
     "project_name": "IGN Scripts - Code Intelligence System",
-    "current_phase": "8.1 (Completed)",
+    "current_phase": "13.2 (Completed) - Model Fine-tuning & Specialization",
     "key_capabilities": [...],
     "cli_commands": [...]
   },
@@ -325,18 +373,20 @@ Include this in your system prompt or initialization:
 
 ```
 SYSTEM CONTEXT: This is the IGN Scripts project with a comprehensive Code Intelligence System.
-Phase 8.1 has been completed, providing automated refactoring capabilities.
+Phase 13.2 has been completed, providing Model Fine-tuning & Specialization capabilities.
 
 Available knowledge bases have been discovered and connected:
-- Neo4j Graph Database for code structure analysis
+- Neo4j Graph Database for code structure analysis (11,608+ nodes)
 - Git History Integration for evolution tracking
 - Refactoring Tracking System for operation documentation
 - Vector Embeddings for semantic code search
+- LLM Fine-tuning Infrastructure for specialized model training
 
 Key capabilities include automated refactoring, large file detection, git integration,
-architecture diagram generation, and comprehensive impact analysis.
+architecture diagram generation, comprehensive impact analysis, SME Agent with human evaluation,
+and 8B parameter LLM fine-tuning with Neo4j knowledge graph integration.
 
-Use the CLI commands starting with 'refactor' to access system functionality.
+Use the CLI commands starting with 'refactor', 'module sme', and 'fine-tuning' to access system functionality.
 ```
 
 ## 🔄 Automatic Updates

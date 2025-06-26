@@ -1,9 +1,12 @@
 """CLI commands for the core module framework."""
 
+import logging
 from pathlib import Path
 from typing import Any
 
 import click
+
+logger = logging.getLogger(__name__)
 
 from ignition.modules.examples.basic_module import create_basic_example_module
 
@@ -389,11 +392,24 @@ def register_commands(cli) -> None:
 
     # Register LLM Infrastructure commands (Phase 13.1)
     try:
-        from ignition.modules.llm_infrastructure.cli_commands import (
+        from src.ignition.modules.llm_infrastructure.cli_commands import (
             llm_infrastructure_cli,
         )
 
         cli.add_command(llm_infrastructure_cli)
-    except ImportError:
+    except ImportError as e:
         # LLM Infrastructure module not available
+        logger.warning(f"LLM Infrastructure module not available: {e}")
+        pass
+
+    # Register Fine-tuning commands (Phase 13.2)
+    try:
+        from src.ignition.modules.llm_infrastructure.fine_tuning_cli import (
+            fine_tuning_cli,
+        )
+
+        cli.add_command(fine_tuning_cli)
+    except ImportError as e:
+        # Fine-tuning module not available
+        logger.warning(f"Fine-tuning module not available: {e}")
         pass
