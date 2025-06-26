@@ -80,7 +80,9 @@ def demo_command(
         if verbose:
             module.diagnostics_manager.set_log_level("DEBUG")
 
-        click.echo(f"✅ Module created: {module.metadata.name} v{module.metadata.version}")
+        click.echo(
+            f"✅ Module created: {module.metadata.name} v{module.metadata.version}"
+        )
 
         # Load configuration
         click.echo("\nLoading module configuration...")
@@ -162,7 +164,9 @@ def demo_command(
         if module.config_manager.update(new_config):
             click.echo("✅ Configuration updated successfully")
             click.echo(f"  New batch_size: {module.config_manager.get('batch_size')}")
-            click.echo(f"  New timeout_seconds: {module.config_manager.get('timeout_seconds')}")
+            click.echo(
+                f"  New timeout_seconds: {module.config_manager.get('timeout_seconds')}"
+            )
         else:
             click.echo("❌ Configuration update failed")
 

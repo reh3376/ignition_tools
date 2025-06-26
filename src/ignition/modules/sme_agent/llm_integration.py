@@ -521,7 +521,7 @@ def validate_llm_environment() -> dict[str, Any]:
     Returns:
         dict containing validation results
     """
-        validation_result: dict[str, Any] = {
+    validation_result: dict[str, Any] = {
         "valid": True,
         "errors": [],
         "warnings": [],
@@ -731,7 +731,7 @@ class LLMModelManager:
         self.cache_dir.mkdir(exist_ok=True)
 
         # Validate environment
-self.validation_result: dict[str, Any] = validate_llm_environment()
+        self.validation_result: dict[str, Any] = validate_llm_environment()
         if not self.validation_result["valid"]:
             raise LLMValidationError(
                 f"Environment validation failed: {self.validation_result['errors']}"

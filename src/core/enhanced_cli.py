@@ -80,6 +80,18 @@ except ImportError as e:
     print(f"Fine-tuning commands not available: {e}")
     pass
 
+# Import Phase 13.3 Adaptive Learning commands
+try:
+    from src.ignition.modules.llm_infrastructure.adaptive_learning_cli import (
+        adaptive_learning_cli,
+    )
+
+    main.add_command(adaptive_learning_cli)
+except ImportError as e:
+    # Adaptive learning commands not available
+    print(f"Adaptive learning commands not available: {e}")
+    pass
+
 # Register command groups with main CLI
 main.add_command(script)
 main.add_command(template)

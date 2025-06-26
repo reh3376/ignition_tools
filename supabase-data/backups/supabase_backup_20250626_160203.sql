@@ -69,7 +69,7 @@ CREATE EXTENSION IF NOT EXISTS pg_net WITH SCHEMA extensions;
 
 
 --
--- Name: EXTENSION pg_net; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pg_net; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION pg_net IS 'Async HTTP';
@@ -128,7 +128,7 @@ CREATE EXTENSION IF NOT EXISTS pg_graphql WITH SCHEMA graphql;
 
 
 --
--- Name: EXTENSION pg_graphql; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pg_graphql; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION pg_graphql IS 'pg_graphql: GraphQL support';
@@ -142,7 +142,7 @@ CREATE EXTENSION IF NOT EXISTS pg_stat_statements WITH SCHEMA extensions;
 
 
 --
--- Name: EXTENSION pg_stat_statements; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pg_stat_statements; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION pg_stat_statements IS 'track planning and execution statistics of all SQL statements executed';
@@ -156,7 +156,7 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;
 
 
 --
--- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
@@ -170,7 +170,7 @@ CREATE EXTENSION IF NOT EXISTS pgjwt WITH SCHEMA extensions;
 
 
 --
--- Name: EXTENSION pgjwt; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION pgjwt; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION pgjwt IS 'JSON Web Token API for Postgresql';
@@ -184,7 +184,7 @@ CREATE EXTENSION IF NOT EXISTS supabase_vault WITH SCHEMA vault;
 
 
 --
--- Name: EXTENSION supabase_vault; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION supabase_vault; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION supabase_vault IS 'Supabase Vault Extension';
@@ -198,7 +198,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA extensions;
 
 
 --
--- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: 
+-- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner:
 --
 
 COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
@@ -352,7 +352,7 @@ ALTER TYPE realtime.wal_rls OWNER TO supabase_admin;
 CREATE FUNCTION auth.email() RETURNS text
     LANGUAGE sql STABLE
     AS $$
-  select 
+  select
   coalesce(
     nullif(current_setting('request.jwt.claim.email', true), ''),
     (nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'email')
@@ -376,7 +376,7 @@ COMMENT ON FUNCTION auth.email() IS 'Deprecated. Use auth.jwt() -> ''email'' ins
 CREATE FUNCTION auth.jwt() RETURNS jsonb
     LANGUAGE sql STABLE
     AS $$
-  select 
+  select
     coalesce(
         nullif(current_setting('request.jwt.claim', true), ''),
         nullif(current_setting('request.jwt.claims', true), '')
@@ -393,7 +393,7 @@ ALTER FUNCTION auth.jwt() OWNER TO supabase_auth_admin;
 CREATE FUNCTION auth.role() RETURNS text
     LANGUAGE sql STABLE
     AS $$
-  select 
+  select
   coalesce(
     nullif(current_setting('request.jwt.claim.role', true), ''),
     (nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'role')
@@ -417,7 +417,7 @@ COMMENT ON FUNCTION auth.role() IS 'Deprecated. Use auth.jwt() -> ''role'' inste
 CREATE FUNCTION auth.uid() RETURNS uuid
     LANGUAGE sql STABLE
     AS $$
-  select 
+  select
   coalesce(
     nullif(current_setting('request.jwt.claim.sub', true), ''),
     (nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub')
@@ -2106,7 +2106,7 @@ CREATE FUNCTION storage.update_updated_at_column() RETURNS trigger
     AS $$
 BEGIN
     NEW.updated_at = now();
-    RETURN NEW; 
+    RETURN NEW;
 END;
 $$;
 
@@ -3028,8 +3028,8 @@ COPY _realtime.tenants (id, name, external_id, jwt_secret, max_concurrent_users,
 --
 
 COPY auth.audit_log_entries (instance_id, id, payload, created_at, ip_address) FROM stdin;
-00000000-0000-0000-0000-000000000000	c9dcdd9d-8a52-4076-8101-d36711fa20ce	{"action":"user_signedup","actor_id":"00000000-0000-0000-0000-000000000000","actor_username":"service_role","actor_via_sso":false,"log_type":"team","traits":{"user_email":"rogerhenley345@gmail.com","user_id":"6613a97f-6e14-45a9-b565-d7553f600986","user_phone":""}}	2025-05-09 09:04:11.348739+00	
-00000000-0000-0000-0000-000000000000	469c52a8-cd7b-4047-bdc5-48b42578ed1d	{"action":"user_recovery_requested","actor_id":"6613a97f-6e14-45a9-b565-d7553f600986","actor_username":"rogerhenley345@gmail.com","actor_via_sso":false,"log_type":"user"}	2025-05-09 09:35:16.540294+00	
+00000000-0000-0000-0000-000000000000	c9dcdd9d-8a52-4076-8101-d36711fa20ce	{"action":"user_signedup","actor_id":"00000000-0000-0000-0000-000000000000","actor_username":"service_role","actor_via_sso":false,"log_type":"team","traits":{"user_email":"rogerhenley345@gmail.com","user_id":"6613a97f-6e14-45a9-b565-d7553f600986","user_phone":""}}	2025-05-09 09:04:11.348739+00
+00000000-0000-0000-0000-000000000000	469c52a8-cd7b-4047-bdc5-48b42578ed1d	{"action":"user_recovery_requested","actor_id":"6613a97f-6e14-45a9-b565-d7553f600986","actor_username":"rogerhenley345@gmail.com","actor_via_sso":false,"log_type":"user"}	2025-05-09 09:35:16.540294+00
 \.
 
 
@@ -5878,4 +5878,3 @@ ALTER EVENT TRIGGER pgrst_drop_watch OWNER TO supabase_admin;
 --
 -- PostgreSQL database dump complete
 --
-
