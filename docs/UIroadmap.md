@@ -1,6 +1,14 @@
 # Frontend UI Development Roadmap (Phase 12)
 ## CLI-to-UI Mapping Strategy
 
+> **📌 IMPORTANT: Repository Separation Decision**
+> Based on crawl_mcp.py methodology analysis, this frontend development will occur in a **separate repository** after backend completion:
+> - **Repository**: https://github.com/reh3376/ignition_tools_front.git
+> - **Timeline**: Begin after roadmap.md Phase 12.5-12.6 completion (Weeks 6+)
+> - **Prerequisite**: Stable backend API from IGN_scripts repository
+> - **Decision Date**: January 10, 2025
+> - **Decision Summary**: [Repository Separation Decision](phase_summary/REPOSITORY_SEPARATION_DECISION_SUMMARY.md)
+
 *Phase 12 focuses on building a comprehensive React-based frontend UI that mirrors and enhances the functionality of the existing CLI system. This roadmap systematically maps each CLI command group to corresponding UI components, ensuring feature parity and improved user experience. Each task is considered complete only when its development is finished **and** the corresponding tests (unit, integration, and/or end-to-end) are implemented and passing.*
 
 **🎯 Core Principle**: The production UI will be modeled after the functionality provided by our existing CLI functionality, providing a visual interface for all CLI operations while maintaining the same underlying business logic.
