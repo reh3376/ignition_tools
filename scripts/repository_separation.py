@@ -480,8 +480,8 @@ def main():
             frontend_repo_url="https://github.com/reh3376/ignition_tools_front.git",
             backend_cleanup=True,
             preserve_git_history=True,
-            dry_run=True,  # Start with dry run for safety
-            force_overwrite=False,
+            dry_run=False,  # Execute actual separation
+            force_overwrite=True,  # Force overwrite for separation
         )
 
         # Execute separation
