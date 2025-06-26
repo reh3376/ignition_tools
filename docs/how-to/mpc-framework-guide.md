@@ -294,7 +294,7 @@ python -m src.main module mpc-framework controller validate \
 
 **Validation Metrics:**
 - **MSE**: Mean Squared Error
-- **MAE**: Mean Absolute Error  
+- **MAE**: Mean Absolute Error
 - **R²**: Coefficient of Determination
 - **Fit Percentage**: Model fit quality
 

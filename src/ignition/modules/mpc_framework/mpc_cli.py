@@ -19,7 +19,6 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 import click
 from rich.console import Console
@@ -27,22 +26,12 @@ from rich.panel import Panel
 from rich.table import Table
 
 from .mpc_controller import (
-    ProductionMPCController,
-    MPCConfiguration,
-    ProcessModel,
-    ControlConstraints,
-    validate_mpc_environment,
     test_mpc_controller,
+    validate_mpc_environment,
 )
 from .safety_system import (
-    ProductionSafetySystem,
-    SafetyConfiguration,
-    SafetyLimit,
-    EmergencyProcedure,
-    SafetyLevel,
-    AlarmPriority,
-    validate_safety_environment,
     test_safety_system,
+    validate_safety_environment,
 )
 
 # Configure logging
@@ -54,9 +43,9 @@ console = Console()
 @click.group(name="mpc-framework")
 def mpc_framework_cli() -> None:
     """Phase 14: MPC Framework & Production Control 🎛️
-    
+
     Comprehensive Model Predictive Control framework with production control capabilities.
-    
+
     Following crawl_mcp.py methodology for reliable industrial automation.
     """
     pass
@@ -65,50 +54,52 @@ def mpc_framework_cli() -> None:
 @mpc_framework_cli.command("validate-env")
 def validate_environment() -> None:
     """Step 1: Validate MPC Framework environment setup."""
-    console.print("[bold blue]🔍 Phase 14: MPC Framework Environment Validation[/bold blue]")
-    
+    console.print(
+        "[bold blue]🔍 Phase 14: MPC Framework Environment Validation[/bold blue]"
+    )
+
     # Validate MPC environment
     console.print("\n[yellow]Validating MPC Controller Environment...[/yellow]")
     mpc_validation = validate_mpc_environment()
-    
+
     if mpc_validation["valid"]:
         console.print("[green]✅ MPC Environment: VALID[/green]")
     else:
         console.print("[red]❌ MPC Environment: INVALID[/red]")
         for error in mpc_validation["errors"]:
             console.print(f"[red]  • {error}[/red]")
-    
+
     if mpc_validation["warnings"]:
         console.print("[yellow]⚠️  MPC Warnings:[/yellow]")
         for warning in mpc_validation["warnings"]:
             console.print(f"[yellow]  • {warning}[/yellow]")
-    
+
     # Validate Safety System environment
     console.print("\n[yellow]Validating Safety System Environment...[/yellow]")
     safety_validation = validate_safety_environment()
-    
+
     if safety_validation["valid"]:
         console.print("[green]✅ Safety Environment: VALID[/green]")
     else:
         console.print("[red]❌ Safety Environment: INVALID[/red]")
         for error in safety_validation["errors"]:
             console.print(f"[red]  • {error}[/red]")
-    
+
     if safety_validation["warnings"]:
         console.print("[yellow]⚠️  Safety Warnings:[/yellow]")
         for warning in safety_validation["warnings"]:
             console.print(f"[yellow]  • {warning}[/yellow]")
-    
+
     # Overall status
     overall_valid = mpc_validation["valid"] and safety_validation["valid"]
     safety_critical = safety_validation.get("safety_critical", True)
-    
-    console.print(f"\n[bold]Overall Environment Status:[/bold]")
+
+    console.print("\n[bold]Overall Environment Status:[/bold]")
     if overall_valid:
         console.print("[bold green]✅ READY FOR PRODUCTION[/bold green]")
     else:
         console.print("[bold red]❌ ENVIRONMENT ISSUES DETECTED[/bold red]")
-    
+
     if not safety_critical:
         console.print("[bold red]⚠️  SAFETY-CRITICAL ISSUES DETECTED[/bold red]")
 
@@ -122,10 +113,20 @@ def controller_group() -> None:
 
 @controller_group.command("create-config")
 @click.option("--name", "-n", required=True, help="Configuration name")
-@click.option("--prediction-horizon", "-p", type=int, default=10, help="Prediction horizon")
+@click.option(
+    "--prediction-horizon", "-p", type=int, default=10, help="Prediction horizon"
+)
 @click.option("--control-horizon", "-c", type=int, default=3, help="Control horizon")
-@click.option("--sample-time", "-s", type=float, default=1.0, help="Sample time in seconds")
-@click.option("--model-type", "-m", type=click.Choice(["FOPDT", "StateSpace", "ARX"]), default="FOPDT", help="Process model type")
+@click.option(
+    "--sample-time", "-s", type=float, default=1.0, help="Sample time in seconds"
+)
+@click.option(
+    "--model-type",
+    "-m",
+    type=click.Choice(["FOPDT", "StateSpace", "ARX"]),
+    default="FOPDT",
+    help="Process model type",
+)
 @click.option("--output", "-o", type=click.Path(), help="Output configuration file")
 def create_controller_config(
     name: str,
@@ -136,16 +137,18 @@ def create_controller_config(
     output: str | None,
 ) -> None:
     """Create MPC controller configuration."""
-    console.print(f"[bold blue]🎛️ Creating MPC Controller Configuration: {name}[/bold blue]")
-    
+    console.print(
+        f"[bold blue]🎛️ Creating MPC Controller Configuration: {name}[/bold blue]"
+    )
+
     try:
         # Step 2: Input validation
         if control_horizon > prediction_horizon:
             raise ValueError("Control horizon cannot exceed prediction horizon")
-        
+
         if sample_time <= 0:
             raise ValueError("Sample time must be positive")
-        
+
         # Create configuration
         config_data = {
             "name": name,
@@ -174,70 +177,84 @@ def create_controller_config(
             "optimization_timeout": 5.0,
             "created_at": datetime.now().isoformat(),
         }
-        
+
         # Display configuration
         config_table = Table(title=f"MPC Controller Configuration: {name}")
         config_table.add_column("Parameter", style="cyan")
         config_table.add_column("Value", style="green")
         config_table.add_column("Description", style="yellow")
-        
-        config_table.add_row("Prediction Horizon", str(prediction_horizon), "Steps ahead to predict")
-        config_table.add_row("Control Horizon", str(control_horizon), "Control moves to optimize")
-        config_table.add_row("Sample Time", f"{sample_time:.1f}s", "Control execution interval")
+
+        config_table.add_row(
+            "Prediction Horizon", str(prediction_horizon), "Steps ahead to predict"
+        )
+        config_table.add_row(
+            "Control Horizon", str(control_horizon), "Control moves to optimize"
+        )
+        config_table.add_row(
+            "Sample Time", f"{sample_time:.1f}s", "Control execution interval"
+        )
         config_table.add_row("Model Type", model_type, "Process model type")
         config_table.add_row("Optimization Timeout", "5.0s", "Maximum solver time")
-        
+
         console.print(config_table)
-        
+
         # Save configuration
         if output:
             output_path = Path(output)
             output_path.parent.mkdir(parents=True, exist_ok=True)
-            
+
             with open(output_path, "w") as f:
                 json.dump(config_data, f, indent=2)
-            
+
             console.print(f"[green]✅ Configuration saved to: {output}[/green]")
         else:
             console.print("\n[yellow]Configuration JSON:[/yellow]")
             console.print(json.dumps(config_data, indent=2))
-        
-        console.print("[green]✅ MPC controller configuration created successfully[/green]")
-        
+
+        console.print(
+            "[green]✅ MPC controller configuration created successfully[/green]"
+        )
+
     except Exception as e:
         console.print(f"[red]❌ Configuration creation failed: {e}[/red]")
 
 
 @controller_group.command("test")
-@click.option("--config-file", "-c", type=click.Path(exists=True), help="Configuration file")
+@click.option(
+    "--config-file", "-c", type=click.Path(exists=True), help="Configuration file"
+)
 @click.option("--verbose", "-v", is_flag=True, help="Verbose output")
 def test_controller(config_file: str | None, verbose: bool) -> None:
     """Test MPC controller functionality."""
     console.print("[bold blue]🧪 Testing MPC Controller[/bold blue]")
-    
+
     async def run_test():
         try:
             # Run controller test
             test_result = await test_mpc_controller()
-            
+
             if test_result.success:
-                console.print(f"[green]✅ MPC Controller test passed in {test_result.execution_time:.2f}s[/green]")
-                
+                console.print(
+                    f"[green]✅ MPC Controller test passed in {test_result.execution_time:.2f}s[/green]"
+                )
+
                 if verbose and test_result.performance_metrics:
                     metrics_table = Table(title="Performance Metrics")
                     metrics_table.add_column("Metric", style="cyan")
                     metrics_table.add_column("Value", style="green")
-                    
+
                     for metric, value in test_result.performance_metrics.items():
                         metrics_table.add_row(metric, str(value))
-                    
+
                     console.print(metrics_table)
             else:
-                console.print(f"[red]❌ MPC Controller test failed: {test_result.error_message}[/red]")
-        
+                console.print(
+                    f"[red]❌ MPC Controller test failed: {test_result.error_message}[/red]"
+                )
+
         except Exception as e:
             console.print(f"[red]❌ Test execution failed: {e}[/red]")
-    
+
     asyncio.run(run_test())
 
 
@@ -250,8 +267,16 @@ def safety_group() -> None:
 
 @safety_group.command("create-config")
 @click.option("--name", "-n", required=True, help="Safety system name")
-@click.option("--safety-level", "-l", type=click.Choice(["SIL_1", "SIL_2", "SIL_3", "SIL_4"]), default="SIL_2", help="Safety integrity level")
-@click.option("--watchdog-interval", "-w", type=float, default=1.0, help="Watchdog check interval")
+@click.option(
+    "--safety-level",
+    "-l",
+    type=click.Choice(["SIL_1", "SIL_2", "SIL_3", "SIL_4"]),
+    default="SIL_2",
+    help="Safety integrity level",
+)
+@click.option(
+    "--watchdog-interval", "-w", type=float, default=1.0, help="Watchdog check interval"
+)
 @click.option("--output", "-o", type=click.Path(), help="Output configuration file")
 def create_safety_config(
     name: str,
@@ -260,13 +285,15 @@ def create_safety_config(
     output: str | None,
 ) -> None:
     """Create safety system configuration."""
-    console.print(f"[bold blue]🛡️ Creating Safety System Configuration: {name}[/bold blue]")
-    
+    console.print(
+        f"[bold blue]🛡️ Creating Safety System Configuration: {name}[/bold blue]"
+    )
+
     try:
         # Step 2: Input validation
         if watchdog_interval <= 0:
             raise ValueError("Watchdog interval must be positive")
-        
+
         # Create configuration
         config_data = {
             "system_name": name,
@@ -311,70 +338,88 @@ def create_safety_config(
             "escalation_enabled": True,
             "created_at": datetime.now().isoformat(),
         }
-        
+
         # Display configuration
         config_table = Table(title=f"Safety System Configuration: {name}")
         config_table.add_column("Parameter", style="cyan")
         config_table.add_column("Value", style="green")
         config_table.add_column("Description", style="yellow")
-        
+
         config_table.add_row("System Name", name, "Safety system identifier")
         config_table.add_row("Safety Level", safety_level, "Safety integrity level")
-        config_table.add_row("Watchdog Interval", f"{watchdog_interval:.1f}s", "Monitoring frequency")
-        config_table.add_row("Safety Limits", str(len(config_data["safety_limits"])), "Monitored parameters")
-        config_table.add_row("Emergency Procedures", str(len(config_data["emergency_procedures"])), "Configured procedures")
-        
+        config_table.add_row(
+            "Watchdog Interval", f"{watchdog_interval:.1f}s", "Monitoring frequency"
+        )
+        config_table.add_row(
+            "Safety Limits",
+            str(len(config_data["safety_limits"])),
+            "Monitored parameters",
+        )
+        config_table.add_row(
+            "Emergency Procedures",
+            str(len(config_data["emergency_procedures"])),
+            "Configured procedures",
+        )
+
         console.print(config_table)
-        
+
         # Save configuration
         if output:
             output_path = Path(output)
             output_path.parent.mkdir(parents=True, exist_ok=True)
-            
+
             with open(output_path, "w") as f:
                 json.dump(config_data, f, indent=2)
-            
+
             console.print(f"[green]✅ Configuration saved to: {output}[/green]")
         else:
             console.print("\n[yellow]Configuration JSON:[/yellow]")
             console.print(json.dumps(config_data, indent=2))
-        
-        console.print("[green]✅ Safety system configuration created successfully[/green]")
-        
+
+        console.print(
+            "[green]✅ Safety system configuration created successfully[/green]"
+        )
+
     except Exception as e:
         console.print(f"[red]❌ Configuration creation failed: {e}[/red]")
 
 
 @safety_group.command("test")
-@click.option("--config-file", "-c", type=click.Path(exists=True), help="Configuration file")
+@click.option(
+    "--config-file", "-c", type=click.Path(exists=True), help="Configuration file"
+)
 @click.option("--verbose", "-v", is_flag=True, help="Verbose output")
 def test_safety_system_cmd(config_file: str | None, verbose: bool) -> None:
     """Test safety system functionality."""
     console.print("[bold blue]🧪 Testing Safety System[/bold blue]")
-    
+
     async def run_test():
         try:
             # Run safety system test
             test_result = await test_safety_system()
-            
+
             if test_result["success"]:
-                console.print(f"[green]✅ Safety system test passed in {test_result['execution_time']:.2f}s[/green]")
-                
+                console.print(
+                    f"[green]✅ Safety system test passed in {test_result['execution_time']:.2f}s[/green]"
+                )
+
                 if verbose and "tests_passed" in test_result:
                     tests_table = Table(title="Tests Passed")
                     tests_table.add_column("Test", style="cyan")
                     tests_table.add_column("Status", style="green")
-                    
+
                     for test in test_result["tests_passed"]:
                         tests_table.add_row(test, "✅ PASSED")
-                    
+
                     console.print(tests_table)
             else:
-                console.print(f"[red]❌ Safety system test failed: {test_result['error']}[/red]")
-        
+                console.print(
+                    f"[red]❌ Safety system test failed: {test_result['error']}[/red]"
+                )
+
         except Exception as e:
             console.print(f"[red]❌ Test execution failed: {e}[/red]")
-    
+
     asyncio.run(run_test())
 
 
@@ -386,28 +431,30 @@ def test_safety_system_cmd(config_file: str | None, verbose: bool) -> None:
 def show_status(show_config: bool, show_performance: bool, show_alarms: bool) -> None:
     """Show MPC Framework system status."""
     console.print("[bold blue]📊 MPC Framework System Status[/bold blue]")
-    
+
     # Environment status
     console.print("\n[yellow]Environment Status:[/yellow]")
     mpc_validation = validate_mpc_environment()
     safety_validation = validate_safety_environment()
-    
+
     status_table = Table()
     status_table.add_column("Component", style="cyan")
     status_table.add_column("Status", style="white")
     status_table.add_column("Issues", style="yellow")
-    
+
     mpc_status = "✅ VALID" if mpc_validation["valid"] else "❌ INVALID"
     mpc_issues = len(mpc_validation["errors"]) + len(mpc_validation["warnings"])
-    
+
     safety_status = "✅ VALID" if safety_validation["valid"] else "❌ INVALID"
-    safety_issues = len(safety_validation["errors"]) + len(safety_validation["warnings"])
-    
+    safety_issues = len(safety_validation["errors"]) + len(
+        safety_validation["warnings"]
+    )
+
     status_table.add_row("MPC Controller", mpc_status, str(mpc_issues))
     status_table.add_row("Safety System", safety_status, str(safety_issues))
-    
+
     console.print(status_table)
-    
+
     # Configuration details
     if show_config:
         console.print("\n[yellow]Configuration Status:[/yellow]")
@@ -422,7 +469,7 @@ def show_status(show_config: bool, show_performance: bool, show_alarms: bool) ->
             border_style="blue",
         )
         console.print(config_panel)
-    
+
     # Performance metrics
     if show_performance:
         console.print("\n[yellow]Performance Metrics:[/yellow]")
@@ -437,14 +484,12 @@ def show_status(show_config: bool, show_performance: bool, show_alarms: bool) ->
             border_style="green",
         )
         console.print(perf_panel)
-    
+
     # Active alarms
     if show_alarms:
         console.print("\n[yellow]Active Alarms:[/yellow]")
         alarm_panel = Panel(
-            "[bold]Alarm Status[/bold]\n\n"
-            "• No active alarms\n\n"
-            "[dim]Start safety system to monitor alarms[/dim]",
+            "[bold]Alarm Status[/bold]\n\n• No active alarms\n\n[dim]Start safety system to monitor alarms[/dim]",
             title="🚨 Alarms",
             border_style="red",
         )
@@ -458,17 +503,17 @@ def show_status(show_config: bool, show_performance: bool, show_alarms: bool) ->
 def run_test_suite(verbose: bool, output: str | None) -> None:
     """Run comprehensive MPC Framework test suite."""
     console.print("[bold blue]🧪 Running MPC Framework Test Suite[/bold blue]")
-    
+
     async def run_tests():
         test_results = []
         start_time = datetime.now()
-        
+
         try:
             # Test 1: Environment validation
             console.print("\n[yellow]Test 1: Environment Validation[/yellow]")
             mpc_env = validate_mpc_environment()
             safety_env = validate_safety_environment()
-            
+
             env_test = {
                 "test_name": "Environment Validation",
                 "success": mpc_env["valid"] and safety_env["valid"],
@@ -480,58 +525,70 @@ def run_test_suite(verbose: bool, output: str | None) -> None:
                 },
             }
             test_results.append(env_test)
-            
+
             if env_test["success"]:
                 console.print("[green]✅ Environment validation passed[/green]")
             else:
                 console.print("[red]❌ Environment validation failed[/red]")
-            
+
             # Test 2: MPC Controller
             console.print("\n[yellow]Test 2: MPC Controller[/yellow]")
             mpc_test = await test_mpc_controller()
-            test_results.append({
-                "test_name": "MPC Controller",
-                "success": mpc_test.success,
-                "execution_time": mpc_test.execution_time,
-                "error": mpc_test.error_message,
-                "performance_metrics": mpc_test.performance_metrics,
-            })
-            
+            test_results.append(
+                {
+                    "test_name": "MPC Controller",
+                    "success": mpc_test.success,
+                    "execution_time": mpc_test.execution_time,
+                    "error": mpc_test.error_message,
+                    "performance_metrics": mpc_test.performance_metrics,
+                }
+            )
+
             if mpc_test.success:
-                console.print(f"[green]✅ MPC Controller test passed ({mpc_test.execution_time:.2f}s)[/green]")
+                console.print(
+                    f"[green]✅ MPC Controller test passed ({mpc_test.execution_time:.2f}s)[/green]"
+                )
             else:
-                console.print(f"[red]❌ MPC Controller test failed: {mpc_test.error_message}[/red]")
-            
+                console.print(
+                    f"[red]❌ MPC Controller test failed: {mpc_test.error_message}[/red]"
+                )
+
             # Test 3: Safety System
             console.print("\n[yellow]Test 3: Safety System[/yellow]")
             safety_test = await test_safety_system()
-            test_results.append({
-                "test_name": "Safety System",
-                "success": safety_test["success"],
-                "execution_time": safety_test["execution_time"],
-                "error": safety_test.get("error"),
-                "tests_passed": safety_test.get("tests_passed", []),
-            })
-            
+            test_results.append(
+                {
+                    "test_name": "Safety System",
+                    "success": safety_test["success"],
+                    "execution_time": safety_test["execution_time"],
+                    "error": safety_test.get("error"),
+                    "tests_passed": safety_test.get("tests_passed", []),
+                }
+            )
+
             if safety_test["success"]:
-                console.print(f"[green]✅ Safety System test passed ({safety_test['execution_time']:.2f}s)[/green]")
+                console.print(
+                    f"[green]✅ Safety System test passed ({safety_test['execution_time']:.2f}s)[/green]"
+                )
             else:
-                console.print(f"[red]❌ Safety System test failed: {safety_test['error']}[/red]")
-            
+                console.print(
+                    f"[red]❌ Safety System test failed: {safety_test['error']}[/red]"
+                )
+
             # Test summary
             total_time = (datetime.now() - start_time).total_seconds()
             passed_tests = sum(1 for test in test_results if test["success"])
             total_tests = len(test_results)
-            
-            console.print(f"\n[bold]Test Suite Summary:[/bold]")
+
+            console.print("\n[bold]Test Suite Summary:[/bold]")
             console.print(f"Tests Passed: {passed_tests}/{total_tests}")
             console.print(f"Total Time: {total_time:.2f}s")
-            
+
             if passed_tests == total_tests:
                 console.print("[bold green]✅ ALL TESTS PASSED[/bold green]")
             else:
                 console.print("[bold red]❌ SOME TESTS FAILED[/bold red]")
-            
+
             # Detailed results
             if verbose:
                 results_table = Table(title="Detailed Test Results")
@@ -539,16 +596,16 @@ def run_test_suite(verbose: bool, output: str | None) -> None:
                 results_table.add_column("Status", style="white")
                 results_table.add_column("Time", style="yellow")
                 results_table.add_column("Details", style="white")
-                
+
                 for test in test_results:
                     status = "✅ PASS" if test["success"] else "❌ FAIL"
                     time_str = f"{test.get('execution_time', 0):.2f}s"
                     details = test.get("error", "OK") if not test["success"] else "OK"
-                    
+
                     results_table.add_row(test["test_name"], status, time_str, details)
-                
+
                 console.print(results_table)
-            
+
             # Save results
             if output:
                 results_data = {
@@ -559,18 +616,18 @@ def run_test_suite(verbose: bool, output: str | None) -> None:
                     "total_tests": total_tests,
                     "results": test_results,
                 }
-                
+
                 output_path = Path(output)
                 output_path.parent.mkdir(parents=True, exist_ok=True)
-                
+
                 with open(output_path, "w") as f:
                     json.dump(results_data, f, indent=2)
-                
+
                 console.print(f"[green]✅ Test results saved to: {output}[/green]")
-        
+
         except Exception as e:
             console.print(f"[red]❌ Test suite execution failed: {e}[/red]")
-    
+
     asyncio.run(run_tests())
 
 
@@ -582,21 +639,21 @@ def run_test_suite(verbose: bool, output: str | None) -> None:
 def cleanup_resources(temp_files: bool, logs: bool, clean_all: bool) -> None:
     """Clean up MPC Framework resources."""
     console.print("[bold blue]🧹 Cleaning MPC Framework Resources[/bold blue]")
-    
+
     try:
         import os
         import shutil
         from pathlib import Path
-        
+
         cleaned_items = []
-        
+
         # Clean temporary files
         if temp_files or clean_all:
             temp_dir = Path(os.getenv("MPC_TEMP_DIR", "/tmp/mpc_framework"))
             if temp_dir.exists():
                 shutil.rmtree(temp_dir)
                 cleaned_items.append(f"Temporary directory: {temp_dir}")
-        
+
         # Clean log files
         if logs or clean_all:
             log_dir = Path("logs/mpc_framework")
@@ -605,22 +662,22 @@ def cleanup_resources(temp_files: bool, logs: bool, clean_all: bool) -> None:
                     if log_file.stat().st_size > 100 * 1024 * 1024:  # > 100MB
                         log_file.unlink()
                         cleaned_items.append(f"Large log file: {log_file}")
-        
+
         # Display results
         if cleaned_items:
             cleanup_table = Table(title="Cleaned Resources")
             cleanup_table.add_column("Resource", style="cyan")
             cleanup_table.add_column("Status", style="green")
-            
+
             for item in cleaned_items:
                 cleanup_table.add_row(item, "✅ Cleaned")
-            
+
             console.print(cleanup_table)
         else:
             console.print("[yellow]No resources to clean[/yellow]")
-        
+
         console.print("[green]✅ Resource cleanup completed[/green]")
-        
+
     except Exception as e:
         console.print(f"[red]❌ Cleanup failed: {e}[/red]")
 
@@ -628,12 +685,12 @@ def cleanup_resources(temp_files: bool, logs: bool, clean_all: bool) -> None:
 # Main CLI registration
 class MPCFrameworkCLI:
     """MPC Framework CLI wrapper for integration."""
-    
+
     @staticmethod
     def get_cli() -> click.Group:
         """Get the MPC Framework CLI group."""
         return mpc_framework_cli
-    
+
     @staticmethod
     def register_commands(main_cli: click.Group) -> None:
         """Register MPC Framework commands with main CLI."""
@@ -641,4 +698,4 @@ class MPCFrameworkCLI:
 
 
 if __name__ == "__main__":
-    mpc_framework_cli() 
+    mpc_framework_cli()
