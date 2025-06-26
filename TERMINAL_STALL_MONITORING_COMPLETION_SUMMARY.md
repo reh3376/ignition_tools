@@ -186,7 +186,7 @@ result = await wrapper.execute_command(
 
 ### ✅ Core Functionality
 - [x] Automatic stall detection
-- [x] Progressive recovery strategies  
+- [x] Progressive recovery strategies
 - [x] Concurrent command monitoring
 - [x] Comprehensive error handling
 - [x] Statistics and performance tracking
@@ -255,4 +255,4 @@ The system can be immediately integrated into the IGN Scripts project to address
 
 ---
 
-*Developed following crawl_mcp.py methodology with environment validation, comprehensive input validation, robust error handling, modular testing, progressive complexity, and proper resource management.* 
+*Developed following crawl_mcp.py methodology with environment validation, comprehensive input validation, robust error handling, modular testing, progressive complexity, and proper resource management.*

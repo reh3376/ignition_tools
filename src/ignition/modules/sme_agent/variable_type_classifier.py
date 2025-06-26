@@ -1,5 +1,4 @@
-"""
-Variable Type Classification & Metadata System
+"""Variable Type Classification & Metadata System
 
 Following the crawl_mcp.py methodology for structured development:
 - Comprehensive validation and error handling
@@ -19,9 +18,8 @@ This module implements:
 
 import logging
 import re
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
-import numpy as np
 import pandas as pd
 from dotenv import load_dotenv
 
@@ -40,8 +38,7 @@ logger = logging.getLogger(__name__)
 
 
 class VariableTypeClassifier:
-    """
-    Variable type classification and metadata management system.
+    """Variable type classification and metadata management system.
 
     Following crawl_mcp.py methodology for comprehensive validation
     and error handling in variable classification.
@@ -50,8 +47,8 @@ class VariableTypeClassifier:
     def __init__(self, curator: IndustrialDatasetCurator):
         """Initialize variable type classifier."""
         self.curator = curator
-        self.classification_rules: Dict[str, Any] = {}
-        self.classification_stats: Dict[str, Any] = {}
+        self.classification_rules: dict[str, Any] = {}
+        self.classification_stats: dict[str, Any] = {}
         self._load_default_classification_rules()
 
     def _load_default_classification_rules(self) -> None:
@@ -89,9 +86,8 @@ class VariableTypeClassifier:
         self,
         dataset_name: str,
         confidence_threshold: float = 0.7
-    ) -> Dict[str, Any]:
-        """
-        Automatically classify variables from a dataset.
+    ) -> dict[str, Any]:
+        """Automatically classify variables from a dataset.
 
         Args:
             dataset_name: Name of dataset to classify
@@ -176,9 +172,8 @@ class VariableTypeClassifier:
         variable_name: str,
         data_series: pd.Series,
         confidence_threshold: float
-    ) -> Dict[str, Any]:
-        """
-        Classify a single variable using pattern matching and data analysis.
+    ) -> dict[str, Any]:
+        """Classify a single variable using pattern matching and data analysis.
 
         Args:
             variable_name: Name of the variable
@@ -231,7 +226,7 @@ class VariableTypeClassifier:
                 "data_analysis": {}
             }
 
-    def _calculate_pattern_scores(self, variable_name: str) -> Dict[str, float]:
+    def _calculate_pattern_scores(self, variable_name: str) -> dict[str, float]:
         """Calculate pattern matching scores for variable name."""
         scores = {}
         variable_name_lower = variable_name.lower()
@@ -251,7 +246,7 @@ class VariableTypeClassifier:
 
         return scores
 
-    def _analyze_variable_data(self, data_series: pd.Series) -> Dict[str, Any]:
+    def _analyze_variable_data(self, data_series: pd.Series) -> dict[str, Any]:
         """Analyze variable data characteristics."""
         try:
             analysis = {
@@ -308,12 +303,11 @@ class VariableTypeClassifier:
 
     def _combine_classification_methods(
         self,
-        pattern_scores: Dict[str, float],
-        data_analysis: Dict[str, Any],
+        pattern_scores: dict[str, float],
+        data_analysis: dict[str, Any],
         variable_name: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Combine pattern matching and data analysis for final classification."""
-
         # Find highest pattern score
         best_pattern_type = max(pattern_scores.keys(), key=lambda k: pattern_scores[k])
         best_pattern_score = pattern_scores[best_pattern_type]
@@ -336,7 +330,7 @@ class VariableTypeClassifier:
                 reasons.append("Discrete values suggest state variable")
 
             # Boost setpoint score for stable values
-            if data_analysis.get("std_value", float('inf')) < 0.1 * data_analysis.get("mean_value", 1):
+            if data_analysis.get("std_value", float("inf")) < 0.1 * data_analysis.get("mean_value", 1):
                 adjusted_scores["setpoint_patterns"] += 0.1
                 reasons.append("Low variability suggests setpoint")
 
@@ -376,8 +370,8 @@ class VariableTypeClassifier:
     def _suggest_engineering_metadata(
         self,
         variable_type: VariableType,
-        data_analysis: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        data_analysis: dict[str, Any]
+    ) -> dict[str, Any]:
         """Suggest engineering units and limits based on variable type and data."""
         suggestions = {}
 
@@ -430,9 +424,8 @@ class VariableTypeClassifier:
         self,
         variable_name: str,
         proposed_type: VariableType
-    ) -> Dict[str, Any]:
-        """
-        Validate a proposed variable classification.
+    ) -> dict[str, Any]:
+        """Validate a proposed variable classification.
 
         Args:
             variable_name: Name of variable to validate
@@ -519,7 +512,7 @@ class VariableTypeClassifier:
                 "confidence": 0.0
             }
 
-    def get_classification_summary(self) -> Dict[str, Any]:
+    def get_classification_summary(self) -> dict[str, Any]:
         """Get summary of all classification activities."""
         try:
             total_datasets = len(self.classification_stats)

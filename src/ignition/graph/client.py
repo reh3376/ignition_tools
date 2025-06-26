@@ -10,9 +10,9 @@ from contextlib import contextmanager
 from typing import Any
 
 from dotenv import load_dotenv
-from neo4j.exceptions import AuthError, ServiceUnavailable
 
 from neo4j import GraphDatabase
+from neo4j.exceptions import AuthError, ServiceUnavailable
 
 from .schema import GraphNode, GraphRelationship, IgnitionGraphSchema
 

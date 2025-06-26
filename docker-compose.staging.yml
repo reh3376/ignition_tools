@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 # Phase 12.6: Staging Environment Configuration
 # Following crawl_mcp.py methodology with comprehensive validation and monitoring
@@ -14,7 +14,7 @@ services:
       - ENABLE_METRICS=true
       - HEALTH_CHECK_ENABLED=true
     ports:
-      - "8001:8000"  # Different port for staging
+      - "8001:8000" # Different port for staging
     volumes:
       - staging_logs:/app/logs
       - staging_data:/app/data
@@ -46,14 +46,23 @@ services:
       - NEO4J_dbms_memory_heap_max_size=1G
       - NEO4J_dbms_memory_pagecache_size=512m
     ports:
-      - "7475:7474"  # Different ports for staging
+      - "7475:7474" # Different ports for staging
       - "7688:7687"
     volumes:
       - staging_neo4j_data:/data
       - staging_neo4j_logs:/logs
       - staging_neo4j_conf:/conf
     healthcheck:
-      test: ["CMD", "cypher-shell", "-u", "${NEO4J_USER:-neo4j}", "-p", "${NEO4J_PASSWORD}", "RETURN 1"]
+      test:
+        [
+          "CMD",
+          "cypher-shell",
+          "-u",
+          "${NEO4J_USER:-neo4j}",
+          "-p",
+          "${NEO4J_PASSWORD}",
+          "RETURN 1",
+        ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -75,12 +84,12 @@ services:
       - ./monitoring/prometheus-staging.yml:/etc/prometheus/prometheus.yml
       - staging_prometheus_data:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--web.console.libraries=/etc/prometheus/console_libraries'
-      - '--web.console.templates=/etc/prometheus/consoles'
-      - '--storage.tsdb.retention.time=7d'
-      - '--web.enable-lifecycle'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--storage.tsdb.retention.time=7d"
+      - "--web.enable-lifecycle"
     networks:
       - ign-staging
     labels:
@@ -110,37 +119,37 @@ volumes:
     labels:
       - "com.ign-scripts.environment=staging"
       - "com.ign-scripts.volume=logs"
-  
+
   staging_data:
     driver: local
     labels:
       - "com.ign-scripts.environment=staging"
       - "com.ign-scripts.volume=data"
-  
+
   staging_neo4j_data:
     driver: local
     labels:
       - "com.ign-scripts.environment=staging"
       - "com.ign-scripts.volume=neo4j-data"
-  
+
   staging_neo4j_logs:
     driver: local
     labels:
       - "com.ign-scripts.environment=staging"
       - "com.ign-scripts.volume=neo4j-logs"
-  
+
   staging_neo4j_conf:
     driver: local
     labels:
       - "com.ign-scripts.environment=staging"
       - "com.ign-scripts.volume=neo4j-conf"
-  
+
   staging_prometheus_data:
     driver: local
     labels:
       - "com.ign-scripts.environment=staging"
       - "com.ign-scripts.volume=prometheus-data"
-  
+
   staging_grafana_data:
     driver: local
     labels:
@@ -152,4 +161,4 @@ networks:
     driver: bridge
     labels:
       - "com.ign-scripts.environment=staging"
-      - "com.ign-scripts.network=main" 
+      - "com.ign-scripts.network=main"

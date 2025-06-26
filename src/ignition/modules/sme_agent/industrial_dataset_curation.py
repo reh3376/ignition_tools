@@ -1,5 +1,4 @@
-"""
-Industrial Dataset Curation & AI Model Preparation Module
+"""Industrial Dataset Curation & AI Model Preparation Module
 
 Following the crawl_mcp.py methodology for structured development:
 - Comprehensive validation and error handling
@@ -15,14 +14,13 @@ This module implements Phase 11.5 of the IGN Scripts roadmap:
 - Dataset augmentation and feature engineering
 """
 
-import asyncio
 import logging
 import os
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -34,7 +32,7 @@ load_dotenv()
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -74,12 +72,12 @@ class VariableMetadata:
     name: str
     variable_type: VariableType
     engineering_units: str
-    high_limit: Optional[float] = None
-    low_limit: Optional[float] = None
-    description: Optional[str] = None
-    data_source: Optional[DataSourceType] = None
-    quality_code_column: Optional[str] = None
-    normalization_factor: Optional[float] = None
+    high_limit: float | None = None
+    low_limit: float | None = None
+    description: str | None = None
+    data_source: DataSourceType | None = None
+    quality_code_column: str | None = None
+    normalization_factor: float | None = None
 
 
 @dataclass
@@ -89,17 +87,16 @@ class ControllerMetadata:
     controller_type: ControllerType
     controlled_variable: str
     process_variable: str
-    setpoint_variable: Optional[str] = None
-    kc_kp: Optional[float] = None  # Proportional gain
-    ti_ki: Optional[float] = None  # Integral time/gain
-    td_kd: Optional[float] = None  # Derivative time/gain
+    setpoint_variable: str | None = None
+    kc_kp: float | None = None  # Proportional gain
+    ti_ki: float | None = None  # Integral time/gain
+    td_kd: float | None = None  # Derivative time/gain
     dependent_gains: bool = False
-    description: Optional[str] = None
+    description: str | None = None
 
 
-def validate_environment() -> Dict[str, bool]:
-    """
-    Validate environment configuration following crawl_mcp.py patterns.
+def validate_environment() -> dict[str, bool]:
+    """Validate environment configuration following crawl_mcp.py patterns.
 
     Returns:
         Dict with validation results for each component
@@ -148,9 +145,8 @@ def validate_environment() -> Dict[str, bool]:
     return validation_results
 
 
-def validate_data_source(source_path: str, source_type: DataSourceType) -> Dict[str, Any]:
-    """
-    Validate data source following crawl_mcp.py validation patterns.
+def validate_data_source(source_path: str, source_type: DataSourceType) -> dict[str, Any]:
+    """Validate data source following crawl_mcp.py validation patterns.
 
     Args:
         source_path: Path to data source
@@ -167,12 +163,12 @@ def validate_data_source(source_path: str, source_type: DataSourceType) -> Dict[
         if not source_file.exists():
             return {"valid": False, "error": f"Data file not found: {source_path}"}
 
-        if not source_file.suffix.lower() in ['.csv', '.xlsx', '.xls']:
+        if source_file.suffix.lower() not in [".csv", ".xlsx", ".xls"]:
             return {"valid": False, "error": "Only CSV and Excel files are supported"}
 
         try:
             # Test file readability
-            if source_file.suffix.lower() == '.csv':
+            if source_file.suffix.lower() == ".csv":
                 pd.read_csv(source_path, nrows=1)
             else:
                 pd.read_excel(source_path, nrows=1)
@@ -213,8 +209,7 @@ def format_validation_error(error: Exception, context: str) -> str:
 
 
 class IndustrialDatasetCurator:
-    """
-    Main class for industrial dataset curation and AI model preparation.
+    """Main class for industrial dataset curation and AI model preparation.
 
     Following crawl_mcp.py methodology:
     - Environment validation on initialization
@@ -224,16 +219,15 @@ class IndustrialDatasetCurator:
     """
 
     def __init__(self, complexity_level: str = "standard"):
-        """
-        Initialize the dataset curator.
+        """Initialize the dataset curator.
 
         Args:
             complexity_level: Deployment complexity (basic/standard/advanced/enterprise)
         """
         self.complexity_level = complexity_level
-        self.variables: Dict[str, VariableMetadata] = {}
-        self.controllers: Dict[str, ControllerMetadata] = {}
-        self.datasets: Dict[str, pd.DataFrame] = {}
+        self.variables: dict[str, VariableMetadata] = {}
+        self.controllers: dict[str, ControllerMetadata] = {}
+        self.datasets: dict[str, pd.DataFrame] = {}
         self.validation_results = {}
 
         # Validate environment on initialization
@@ -274,7 +268,7 @@ class IndustrialDatasetCurator:
             logger.error(f"Initialization failed: {format_validation_error(e, 'Environment validation')}")
             raise
 
-    def get_validation_status(self) -> Dict[str, Any]:
+    def get_validation_status(self) -> dict[str, Any]:
         """Get current validation status."""
         return {
             "environment_validation": self.validation_results,
@@ -286,8 +280,7 @@ class IndustrialDatasetCurator:
         }
 
     def add_variable(self, metadata: VariableMetadata) -> bool:
-        """
-        Add variable metadata with validation.
+        """Add variable metadata with validation.
 
         Args:
             metadata: Variable metadata to add
@@ -320,8 +313,7 @@ class IndustrialDatasetCurator:
             return False
 
     def add_controller(self, metadata: ControllerMetadata) -> bool:
-        """
-        Add controller metadata with validation.
+        """Add controller metadata with validation.
 
         Args:
             metadata: Controller metadata to add
@@ -356,8 +348,7 @@ logger.info("Industrial Dataset Curation module loaded successfully")
 
 
 class DataIngestionFramework:
-    """
-    Multi-format data ingestion framework following crawl_mcp.py methodology.
+    """Multi-format data ingestion framework following crawl_mcp.py methodology.
 
     Supports:
     - CSV/XLS historical data import
@@ -370,17 +361,16 @@ class DataIngestionFramework:
     def __init__(self, curator: IndustrialDatasetCurator):
         """Initialize data ingestion framework."""
         self.curator = curator
-        self.active_connections: Dict[str, Any] = {}
-        self.ingestion_stats: Dict[str, Any] = {}
+        self.active_connections: dict[str, Any] = {}
+        self.ingestion_stats: dict[str, Any] = {}
 
     async def ingest_csv_data(
         self,
         file_path: str,
         timestamp_column: str = "timestamp",
         **kwargs
-    ) -> Dict[str, Any]:
-        """
-        Ingest CSV/XLS data with comprehensive validation.
+    ) -> dict[str, Any]:
+        """Ingest CSV/XLS data with comprehensive validation.
 
         Args:
             file_path: Path to CSV/XLS file
@@ -402,7 +392,7 @@ class DataIngestionFramework:
 
             # Read data based on file type
             file_path_obj = Path(file_path)
-            if file_path_obj.suffix.lower() == '.csv':
+            if file_path_obj.suffix.lower() == ".csv":
                 df = pd.read_csv(file_path, **kwargs)
             else:
                 df = pd.read_excel(file_path, **kwargs)
@@ -471,11 +461,10 @@ class DataIngestionFramework:
     async def setup_opcua_streaming(
         self,
         server_url: str,
-        node_ids: List[str],
+        node_ids: list[str],
         sampling_interval: float = 1000.0
-    ) -> Dict[str, Any]:
-        """
-        Set up OPC-UA real-time data streaming.
+    ) -> dict[str, Any]:
+        """Set up OPC-UA real-time data streaming.
 
         Args:
             server_url: OPC-UA server URL
@@ -550,9 +539,8 @@ class DataIngestionFramework:
         connection_string: str,
         historian_type: DataSourceType,
         table_name: str
-    ) -> Dict[str, Any]:
-        """
-        Connect to database historian (InfluxDB, TimescaleDB, Canary Labs).
+    ) -> dict[str, Any]:
+        """Connect to database historian (InfluxDB, TimescaleDB, Canary Labs).
 
         Args:
             connection_string: Database connection string
@@ -609,9 +597,8 @@ class DataIngestionFramework:
                 "connection_established": False
             }
 
-    def _validate_data_quality(self, df: pd.DataFrame) -> Dict[str, Any]:
-        """
-        Validate data quality following crawl_mcp.py patterns.
+    def _validate_data_quality(self, df: pd.DataFrame) -> dict[str, Any]:
+        """Validate data quality following crawl_mcp.py patterns.
 
         Args:
             df: DataFrame to validate
@@ -722,7 +709,7 @@ class DataIngestionFramework:
         except Exception:
             return "irregular"
 
-    def _detect_time_gaps(self, time_index: pd.DatetimeIndex) -> Dict[str, Any]:
+    def _detect_time_gaps(self, time_index: pd.DatetimeIndex) -> dict[str, Any]:
         """Detect significant time gaps in the data."""
         try:
             if len(time_index) < 2:
@@ -747,7 +734,7 @@ class DataIngestionFramework:
     def _calculate_quality_score(
         self,
         missing_percentage: pd.Series,
-        outlier_summary: Dict[str, Any],
+        outlier_summary: dict[str, Any],
         total_rows: int
     ) -> float:
         """Calculate overall data quality score (0-100)."""
@@ -780,8 +767,7 @@ class DataIngestionFramework:
 
 
 class VariableTypeClassifier:
-    """
-    Variable type classification and metadata management system.
+    """Variable type classification and metadata management system.
 
     Following crawl_mcp.py methodology for comprehensive validation
     and error handling in variable classification.
@@ -790,7 +776,7 @@ class VariableTypeClassifier:
     def __init__(self, curator: IndustrialDatasetCurator):
         """Initialize variable type classifier."""
         self.curator = curator
-        self.classification_rules: Dict[str, Any] = {}
+        self.classification_rules: dict[str, Any] = {}
         self._load_default_classification_rules()
 
     def _load_default_classification_rules(self) -> None:

@@ -82,7 +82,7 @@ The system strictly follows the development methodology outlined in `docs/crawl 
 - **Coverage**: Environment validation, basic execution, timeout detection, stall detection, recovery mechanisms, concurrent monitoring, error handling, statistics collection
 
 ### Integration Tests
-- **Total Tests**: 7  
+- **Total Tests**: 7
 - **Passed**: 7 (100% success rate)
 - **Coverage**: Environment validation, wrapper initialization, basic command execution, stall detection integration, error handling integration, helper functions, statistics tracking
 
@@ -98,7 +98,7 @@ from src.terminal_command_wrapper import execute_terminal_command
 async def main():
     # Execute a simple command
     result = await execute_terminal_command(["echo", "Hello, World!"])
-    
+
     if result.success:
         print(f"Output: {result.stdout}")
     else:
@@ -116,10 +116,10 @@ async def long_running_command():
         auto_recover=True,  # Enable automatic recovery
         critical=False  # Not a critical command
     )
-    
+
     print(f"Command completed: {result.state}")
     print(f"Duration: {result.duration:.2f}s")
-    
+
     if result.stall_detected:
         print(f"Stall detected - Recovery: {'successful' if result.recovery_successful else 'failed'}")
         print(f"Recovery attempts: {result.recovery_attempts}")
@@ -164,7 +164,7 @@ config = TerminalWrapperConfig(
 # Run stall detector tests
 python tests/test_terminal_stall_detector.py
 
-# Run integration tests  
+# Run integration tests
 python tests/test_terminal_wrapper_integration.py
 
 # Both should show 100% success rate
@@ -210,7 +210,7 @@ The Terminal Stall Monitoring and Auto-Recovery System provides a robust, produc
 
 **Key Benefits:**
 - ✅ Automatic stall detection and recovery
-- ✅ 100% test success rate  
+- ✅ 100% test success rate
 - ✅ Drop-in replacement for existing subprocess calls
 - ✅ Comprehensive error handling and logging
 - ✅ Following crawl_mcp.py methodology

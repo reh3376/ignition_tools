@@ -4,7 +4,7 @@
 Following crawl_mcp.py methodology for systematic testing:
 1. Environment validation first
 2. Comprehensive input validation
-3. Robust error handling testing 
+3. Robust error handling testing
 4. Modular testing approach
 5. Progressive complexity validation
 6. Proper resource management
@@ -17,7 +17,6 @@ import os
 import subprocess
 import time
 from datetime import datetime
-from pathlib import Path
 from typing import Any
 
 try:
@@ -103,13 +102,18 @@ class Phase125ComprehensiveTester:
             try:
                 async with httpx.AsyncClient(timeout=TEST_TIMEOUT) as client:
                     response = await client.get(f"{self.api_base}/health")
-                    validation_results["api_server_running"] = response.status_code == 200
+                    validation_results["api_server_running"] = (
+                        response.status_code == 200
+                    )
                     self.log_test_result(
                         "API Server Health Check",
                         "environment",
                         validation_results["api_server_running"],
                         f"API server status: {response.status_code}",
-                        {"url": f"{self.api_base}/health", "status": response.status_code},
+                        {
+                            "url": f"{self.api_base}/health",
+                            "status": response.status_code,
+                        },
                         time.time() - start_time,
                     )
             except Exception as e:
@@ -191,8 +195,15 @@ class Phase125ComprehensiveTester:
                     "Required Packages",
                     "environment",
                     validation_results["required_packages"],
-                    f"Missing packages: {missing_packages}" if missing_packages else "All packages available",
-                    {"missing": missing_packages, "total_required": len(required_packages)},
+                    (
+                        f"Missing packages: {missing_packages}"
+                        if missing_packages
+                        else "All packages available"
+                    ),
+                    {
+                        "missing": missing_packages,
+                        "total_required": len(required_packages),
+                    },
                     time.time() - start_time,
                 )
             except Exception as e:
@@ -208,14 +219,23 @@ class Phase125ComprehensiveTester:
             # Test environment variables
             try:
                 required_env_vars = ["NEO4J_URI", "NEO4J_USER", "NEO4J_PASSWORD"]
-                missing_env_vars = [var for var in required_env_vars if not os.getenv(var)]
+                missing_env_vars = [
+                    var for var in required_env_vars if not os.getenv(var)
+                ]
                 validation_results["environment_variables"] = len(missing_env_vars) == 0
                 self.log_test_result(
                     "Environment Variables",
                     "environment",
                     validation_results["environment_variables"],
-                    f"Missing env vars: {missing_env_vars}" if missing_env_vars else "All env vars present",
-                    {"missing": missing_env_vars, "total_required": len(required_env_vars)},
+                    (
+                        f"Missing env vars: {missing_env_vars}"
+                        if missing_env_vars
+                        else "All env vars present"
+                    ),
+                    {
+                        "missing": missing_env_vars,
+                        "total_required": len(required_env_vars),
+                    },
                     time.time() - start_time,
                 )
             except Exception as e:
@@ -229,8 +249,12 @@ class Phase125ComprehensiveTester:
                 )
 
             # Overall environment validation result
-            overall_success = sum(validation_results.values()) >= 3  # At least 3/5 must pass
-            success_rate = sum(validation_results.values()) / len(validation_results) * 100
+            overall_success = (
+                sum(validation_results.values()) >= 3
+            )  # At least 3/5 must pass
+            success_rate = (
+                sum(validation_results.values()) / len(validation_results) * 100
+            )
 
             print(f"   📊 Environment Validation: {success_rate:.1f}% success rate")
             return overall_success
@@ -287,7 +311,9 @@ class Phase125ComprehensiveTester:
                 for test in functionality_tests:
                     test_start = time.time()
                     try:
-                        response = await client.get(f"{self.api_base}{test['endpoint']}")
+                        response = await client.get(
+                            f"{self.api_base}{test['endpoint']}"
+                        )
                         success = response.status_code == test["expected_status"]
                         if success:
                             passed_tests += 1
@@ -301,7 +327,9 @@ class Phase125ComprehensiveTester:
                                 "status_code": response.status_code,
                                 "expected": test["expected_status"],
                                 "endpoint": test["endpoint"],
-                                "response_time_ms": round((time.time() - test_start) * 1000, 2),
+                                "response_time_ms": round(
+                                    (time.time() - test_start) * 1000, 2
+                                ),
                             },
                             time.time() - test_start,
                         )
@@ -342,22 +370,30 @@ class Phase125ComprehensiveTester:
         start_time = time.time()
 
         test_results = {}
-        
+
         try:
             # Step 1: Environment validation first (critical)
-            test_results["environment_validation"] = await self.test_environment_validation()
-            
+            test_results["environment_validation"] = (
+                await self.test_environment_validation()
+            )
+
             # Step 2: API functionality testing
             test_results["api_functionality"] = await self.test_api_functionality()
-            
+
         except Exception as e:
             print(f"❌ Test suite execution failed: {e}")
             test_results["execution_error"] = str(e)
 
         # Calculate overall results
-        passed_categories = sum(1 for v in test_results.values() if isinstance(v, bool) and v)
-        total_categories = len([k for k, v in test_results.items() if isinstance(v, bool)])
-        overall_success_rate = passed_categories / total_categories * 100 if total_categories > 0 else 0
+        passed_categories = sum(
+            1 for v in test_results.values() if isinstance(v, bool) and v
+        )
+        total_categories = len(
+            [k for k, v in test_results.items() if isinstance(v, bool)]
+        )
+        overall_success_rate = (
+            passed_categories / total_categories * 100 if total_categories > 0 else 0
+        )
         overall_success = overall_success_rate >= 75
 
         execution_time = time.time() - start_time
@@ -371,7 +407,9 @@ class Phase125ComprehensiveTester:
             "overall_success_rate": round(overall_success_rate, 1),
             "categories_passed": passed_categories,
             "categories_total": total_categories,
-            "completion_status": "COMPLETED" if overall_success else "NEEDS_IMPROVEMENT",
+            "completion_status": (
+                "COMPLETED" if overall_success else "NEEDS_IMPROVEMENT"
+            ),
             "test_results": test_results,
             "detailed_results": [result.dict() for result in self.test_results],
             "recommendations": self._generate_recommendations(test_results),
@@ -410,14 +448,16 @@ class Phase125ComprehensiveTester:
             recommendations.append(
                 "🔧 Fix environment setup: Ensure API server, Neo4j, and CLI commands are properly configured"
             )
-        
+
         if not test_results.get("api_functionality", True):
             recommendations.append(
                 "⚙️ Fix API functionality: Debug failing endpoints and ensure proper responses"
             )
 
         if not recommendations:
-            recommendations.append("🎉 Excellent! All test categories passed. Ready for Phase 12.6 deployment.")
+            recommendations.append(
+                "🎉 Excellent! All test categories passed. Ready for Phase 12.6 deployment."
+            )
 
         return recommendations
 
@@ -436,7 +476,7 @@ async def main():
     results_file = "phase_12_5_test_results.json"
     with open(results_file, "w") as f:
         json.dump(results, f, indent=2, default=str)
-    
+
     print(f"\n📄 Detailed results saved to: {results_file}")
 
     # Exit with appropriate code

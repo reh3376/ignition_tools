@@ -1,4 +1,4 @@
-name: 'Phase 12.6: Production Deployment Pipeline'
+name: "Phase 12.6: Production Deployment Pipeline"
 
 on:
   push:
@@ -11,15 +11,15 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Deployment environment'
+        description: "Deployment environment"
         required: true
-        default: 'staging'
+        default: "staging"
         type: choice
         options:
-        - staging
-        - production
+          - staging
+          - production
       force_deploy:
-        description: 'Force deployment (skip some checks)'
+        description: "Force deployment (skip some checks)"
         required: false
         default: false
         type: boolean
@@ -27,31 +27,31 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  PYTHON_VERSION: '3.12'
+  PYTHON_VERSION: "3.12"
 
 jobs:
   # Step 1: Environment Validation (crawl_mcp.py methodology)
   environment-validation:
-    name: 'Environment Validation'
+    name: "Environment Validation"
     runs-on: ubuntu-latest
     outputs:
       environment: ${{ steps.determine-env.outputs.environment }}
       should_deploy: ${{ steps.determine-env.outputs.should_deploy }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-      
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      
+
       - name: Determine deployment environment
         id: determine-env
         run: |
@@ -68,7 +68,7 @@ jobs:
             echo "environment=development" >> $GITHUB_OUTPUT
             echo "should_deploy=false" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: Validate deployment environment
         run: |
           python src/phase_12_6_comprehensive_deployment.py
@@ -76,10 +76,10 @@ jobs:
 
   # Step 2: Comprehensive Testing (crawl_mcp.py methodology)
   comprehensive-testing:
-    name: 'Comprehensive Testing Suite'
+    name: "Comprehensive Testing Suite"
     runs-on: ubuntu-latest
     needs: environment-validation
-    
+
     services:
       neo4j:
         image: neo4j:5.15
@@ -94,37 +94,37 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-      
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      
+
       - name: Set up environment variables
         run: |
           echo "NEO4J_URI=bolt://localhost:7687" >> $GITHUB_ENV
           echo "NEO4J_USER=neo4j" >> $GITHUB_ENV
           echo "NEO4J_PASSWORD=testpassword" >> $GITHUB_ENV
-      
+
       - name: Run Phase 12.5 Testing Suite
         run: |
           python tests/phase_12_5_master_test_runner.py
           echo "✅ Phase 12.5 testing completed"
-      
+
       - name: Run Phase 12.6 Deployment Testing
         run: |
           python src/phase_12_6_comprehensive_deployment.py
           echo "✅ Phase 12.6 deployment testing completed"
-      
+
       - name: Upload test results
         uses: actions/upload-artifact@v3
         if: always()
@@ -137,29 +137,29 @@ jobs:
 
   # Step 3: Docker Build and Push (Progressive Complexity)
   build-and-push:
-    name: 'Build and Push Docker Images'
+    name: "Build and Push Docker Images"
     runs-on: ubuntu-latest
     needs: [environment-validation, comprehensive-testing]
     if: needs.environment-validation.outputs.should_deploy == 'true'
-    
+
     permissions:
       contents: read
       packages: write
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      
+
       - name: Log in to Container Registry
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Extract metadata
         id: meta
         uses: docker/metadata-action@v5
@@ -171,7 +171,7 @@ jobs:
             type=sha,prefix={{branch}}-
             type=raw,value=latest,enable={{is_default_branch}}
             type=raw,value=${{ needs.environment-validation.outputs.environment }}
-      
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -188,51 +188,51 @@ jobs:
 
   # Step 4: Security Scanning (Enterprise Level)
   security-scanning:
-    name: 'Security Scanning'
+    name: "Security Scanning"
     runs-on: ubuntu-latest
     needs: [environment-validation, build-and-push]
     if: needs.environment-validation.outputs.should_deploy == 'true'
-    
+
     permissions:
       security-events: write
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.environment-validation.outputs.environment }}
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-      
+          format: "sarif"
+          output: "trivy-results.sarif"
+
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
         if: always()
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: "trivy-results.sarif"
 
   # Step 5: Deployment (Production Ready)
   deploy:
-    name: 'Deploy to ${{ needs.environment-validation.outputs.environment }}'
+    name: "Deploy to ${{ needs.environment-validation.outputs.environment }}"
     runs-on: ubuntu-latest
     needs: [environment-validation, comprehensive-testing, build-and-push]
     if: needs.environment-validation.outputs.should_deploy == 'true'
-    
+
     environment:
       name: ${{ needs.environment-validation.outputs.environment }}
       url: ${{ steps.deploy.outputs.url }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up environment variables
         run: |
           echo "DEPLOYMENT_ENVIRONMENT=${{ needs.environment-validation.outputs.environment }}" >> $GITHUB_ENV
           echo "IMAGE_TAG=${{ needs.environment-validation.outputs.environment }}" >> $GITHUB_ENV
-      
+
       - name: Deploy with Docker Compose
         id: deploy
         run: |
@@ -241,19 +241,19 @@ jobs:
           export NEO4J_PASSWORD="${{ secrets.NEO4J_PASSWORD }}"
           export NEO4J_USER="${{ secrets.NEO4J_USER }}"
           export NEO4J_URI="${{ secrets.NEO4J_URI }}"
-          
+
           # Deploy using docker-compose
           docker-compose -f docker-compose.yml -f docker-compose.${{ needs.environment-validation.outputs.environment }}.yml up -d
-          
+
           # Wait for services to be ready
           sleep 30
-          
+
           # Health check
           curl -f http://localhost:8000/health || exit 1
-          
+
           echo "url=http://localhost:8000" >> $GITHUB_OUTPUT
           echo "✅ Deployment to ${{ needs.environment-validation.outputs.environment }} completed"
-      
+
       - name: Run post-deployment tests
         run: |
           # Run health checks and smoke tests
@@ -271,7 +271,7 @@ jobs:
               print(f'❌ Health check error: {e}')
               sys.exit(1)
           "
-      
+
       - name: Notify deployment status
         if: always()
         run: |
@@ -283,43 +283,43 @@ jobs:
 
   # Step 6: Post-Deployment Monitoring
   post-deployment-monitoring:
-    name: 'Post-Deployment Monitoring'
+    name: "Post-Deployment Monitoring"
     runs-on: ubuntu-latest
     needs: [environment-validation, deploy]
     if: needs.environment-validation.outputs.should_deploy == 'true' && success()
-    
+
     steps:
       - name: Set up monitoring
         run: |
           echo "🔍 Setting up monitoring for ${{ needs.environment-validation.outputs.environment }}"
           # Add monitoring setup here (Prometheus, Grafana, etc.)
-      
+
       - name: Create deployment summary
         run: |
           cat << EOF > deployment-summary.md
           # Phase 12.6: Deployment Summary
-          
+
           ## Deployment Details
           - **Environment**: ${{ needs.environment-validation.outputs.environment }}
           - **Image**: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.environment-validation.outputs.environment }}
           - **Timestamp**: $(date -u)
           - **Commit**: ${{ github.sha }}
           - **Branch**: ${{ github.ref_name }}
-          
+
           ## Methodology
           - ✅ Environment validation first (crawl_mcp.py)
           - ✅ Comprehensive testing with validation
           - ✅ Progressive complexity deployment
           - ✅ Production-ready infrastructure
           - ✅ Security scanning and monitoring
-          
+
           ## Status: SUCCESS 🎉
           EOF
-          
+
           echo "📄 Deployment summary created"
-      
+
       - name: Upload deployment summary
         uses: actions/upload-artifact@v3
         with:
           name: deployment-summary-${{ needs.environment-validation.outputs.environment }}
-          path: deployment-summary.md 
+          path: deployment-summary.md

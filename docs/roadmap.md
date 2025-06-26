@@ -1,7 +1,7 @@
 # IGN Scripts Repository Roadmap
 
 ## Project Overview
-This repository contains tools for working with process control and automation frameworks, specifically it integrates with Ignition to provide advanced functionality.  From generating Jython scripts for Ignition SCADA systems to comprehensive AI-enhanced development capabilities for industrial automation. The application creates, validates, tests, and exports Jython code that can be deployed to Ignition gateways for use in production environments. As well as facilitating development of Ignition Modules, PID loop testing, MPCCC instantiation - training - testing - monitoring - and deployment. 
+This repository contains tools for working with process control and automation frameworks, specifically it integrates with Ignition to provide advanced functionality.  From generating Jython scripts for Ignition SCADA systems to comprehensive AI-enhanced development capabilities for industrial automation. The application creates, validates, tests, and exports Jython code that can be deployed to Ignition gateways for use in production environments. As well as facilitating development of Ignition Modules, PID loop testing, MPCCC instantiation - training - testing - monitoring - and deployment.
 
 ## Major Project Goals Summary
 
@@ -2858,7 +2858,7 @@ Phase 13 implements a specialized Process SME (Subject Matter Expert) Agent powe
 ### **Phase 13.1: 8B Parameter LLM Foundation** 🧠 **Week 1-2**
 
 #### **LLM Architecture & Training Infrastructure**
-- [ ] **Model Architecture Design** 
+- [ ] **Model Architecture Design**
   - [ ] Environment validation following crawl_mcp.py methodology
   - [ ] 8B parameter transformer architecture specification
   - [ ] Multi-head attention optimization for process control domains
