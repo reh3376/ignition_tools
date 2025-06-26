@@ -92,6 +92,16 @@ except ImportError as e:
     print(f"Adaptive learning commands not available: {e}")
     pass
 
+# Import Phase 14 MPC Framework commands
+try:
+    from src.ignition.modules.mpc_framework.mpc_cli import mpc_framework_cli
+
+    main.add_command(mpc_framework_cli)
+except ImportError as e:
+    # MPC Framework commands not available
+    print(f"MPC Framework commands not available: {e}")
+    pass
+
 # Register command groups with main CLI
 main.add_command(script)
 main.add_command(template)

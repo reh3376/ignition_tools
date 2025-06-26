@@ -53,6 +53,14 @@ module_group.add_command(ai_assistant_commands)
 # Add SME Agent commands (Phase 11)
 module_group.add_command(sme_agent_cli)
 
+# Add MPC Framework commands (Phase 14)
+try:
+    from .mpc_framework.mpc_cli import mpc_framework_cli
+    module_group.add_command(mpc_framework_cli)
+except ImportError as e:
+    console.print(f"⚠️ MPC Framework commands not available: {e}")
+    pass
+
 
 @module_group.command()
 def status() -> None:

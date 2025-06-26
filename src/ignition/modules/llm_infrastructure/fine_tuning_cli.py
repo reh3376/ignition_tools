@@ -72,7 +72,11 @@ def fine_tuning_cli(ctx: click.Context) -> None:
     "--augmentation-factor", default=3, type=int, help="Data augmentation factor"
 )
 def extract_data(
-    dataset_name: str, extraction_types: str, max_records: int, quality_threshold: float, augmentation_factor: int
+    dataset_name: str,
+    extraction_types: str,
+    max_records: int,
+    quality_threshold: float,
+    augmentation_factor: int,
 ) -> None:
     """Extract training data from Neo4j knowledge graph.
 
