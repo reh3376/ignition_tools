@@ -94,9 +94,7 @@ class CodeIntelligenceIntegration:
         if self.enable_ai_suggestions:
             self.embedding_generator = CodeEmbeddingGenerator()
             self.semantic_search = (
-                SemanticCodeSearch(self.graph_client, self.embedding_generator)
-                if self.graph_client
-                else None
+                SemanticCodeSearch(self.graph_client, self.embedding_generator) if self.graph_client else None
             )
         else:
             self.embedding_generator = None
@@ -188,15 +186,11 @@ class CodeIntelligenceIntegration:
 
         try:
             # Get function suggestions from graph
-            function_suggestions = self._get_function_suggestions(
-                template_name, context
-            )
+            function_suggestions = self._get_function_suggestions(template_name, context)
             suggestions.extend(function_suggestions)
 
             # Get pattern suggestions
-            pattern_suggestions = self._get_pattern_suggestions(
-                template_name, parameters
-            )
+            pattern_suggestions = self._get_pattern_suggestions(template_name, parameters)
             suggestions.extend(pattern_suggestions)
 
             # Get best practice suggestions
@@ -211,9 +205,7 @@ class CodeIntelligenceIntegration:
 
         return suggestions[:10]  # Limit to top 10 suggestions
 
-    def _get_function_suggestions(
-        self, template_name: str, context: str
-    ) -> list[CodeSuggestion]:
+    def _get_function_suggestions(self, template_name: str, context: str) -> list[CodeSuggestion]:
         """Get function suggestions from graph.
 
         Args:
@@ -239,9 +231,7 @@ class CodeIntelligenceIntegration:
             LIMIT 5
             """
 
-            results = self.graph_client.execute_query(
-                query, {"template_name": template_name, "context": context}
-            )
+            results = self.graph_client.execute_query(query, {"template_name": template_name, "context": context})
 
             for record in results:
                 function_name = record.get("function_name", "")
@@ -267,9 +257,7 @@ class CodeIntelligenceIntegration:
 
         return suggestions
 
-    def _get_pattern_suggestions(
-        self, template_name: str, parameters: dict[str, Any]
-    ) -> list[CodeSuggestion]:
+    def _get_pattern_suggestions(self, template_name: str, parameters: dict[str, Any]) -> list[CodeSuggestion]:
         """Get pattern suggestions based on parameters.
 
         Args:
@@ -417,12 +405,8 @@ if validateTagPath(tagPath):
             lines = metrics.get("lines_of_code", 1)
 
             # Calculate scores (0-1 scale)
-            complexity_score = (
-                max(0, 1 - (complexity - 10) / 20) if complexity > 10 else 1.0
-            )
-            maintainability_score = (
-                max(0, 1 - (lines - 50) / 100) if lines > 50 else 1.0
-            )
+            complexity_score = max(0, 1 - (complexity - 10) / 20) if complexity > 10 else 1.0
+            maintainability_score = max(0, 1 - (lines - 50) / 100) if lines > 50 else 1.0
 
             # Overall score
             overall_score = (complexity_score + maintainability_score) / 2
@@ -452,9 +436,7 @@ if validateTagPath(tagPath):
                 maintainability_score=0.8,
             )
 
-    def get_refactoring_suggestions(
-        self, script_content: str, max_suggestions: int = 3
-    ) -> list[CodeSuggestion]:
+    def get_refactoring_suggestions(self, script_content: str, max_suggestions: int = 3) -> list[CodeSuggestion]:
         """Get refactoring suggestions for script.
 
         Args:
@@ -494,9 +476,7 @@ if validateTagPath(tagPath):
 
         return suggestions
 
-    def validate_script_context(
-        self, script_content: str, expected_context: str
-    ) -> tuple[bool, list[str]]:
+    def validate_script_context(self, script_content: str, expected_context: str) -> tuple[bool, list[str]]:
         """Validate script is appropriate for context.
 
         Args:
@@ -533,9 +513,7 @@ if validateTagPath(tagPath):
         # Check for forbidden elements
         for forbidden in rules.get("forbidden", []):
             if forbidden in script_content:
-                issues.append(
-                    f"'{forbidden}' is not available in {expected_context} context"
-                )
+                issues.append(f"'{forbidden}' is not available in {expected_context} context")
 
         # Check for required elements in tag scripts
         if expected_context == "tag":
@@ -712,9 +690,7 @@ debug_log("Script completed")
                    t.help_text as description
             """
 
-            results = self.graph_client.execute_query(
-                template_query, {"template_name": template_name}
-            )
+            results = self.graph_client.execute_query(template_query, {"template_name": template_name})
 
             if results:
                 record = results[0]

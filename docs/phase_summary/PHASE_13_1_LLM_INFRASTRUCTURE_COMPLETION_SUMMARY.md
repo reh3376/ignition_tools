@@ -12,41 +12,73 @@ Phase 13.1 has been successfully completed, delivering a production-ready **8B P
 - **Functionality**: Automatic detection and optimization for:
   - **NVIDIA CUDA GPU acceleration** (Linux/Windows)
   - **Apple Silicon MPS acceleration** (macOS)
-  - **CPU-only fallback** with optimizations
-- **Features**:
-  - Platform-specific optimization
-  - Memory requirements analysis
-  - Quantization strategy selection
-  - Hardware requirements validation
+  - **CPU-only optimizations** (all platforms)
+- **Features**: Memory analysis, precision selection, quantization optimization
+- **Integration**: Environment variable configuration with sensible defaults
 
 #### **2. Infrastructure Manager** ✅
-- **File**: `src/ignition/modules/llm_infrastructure/infrastructure_manager.py`
-- **Core Class**: `InfrastructureManager`
-- **Capabilities**:
-  - Model loading with auto-detected GPU configuration
-  - Comprehensive environment validation
-  - Resource management with async context managers
-  - Performance monitoring and metrics collection
-  - Error handling with user-friendly messages
+- **File**: `src/ignition/modules/llm_infrastructure/infrastructure_manager.py` (419 lines)
+- **Architecture**: AsyncIO-based resource management with context managers
+- **Features**:
+  - **Pydantic Model Validation**: `ModelConfig` class with comprehensive validation
+  - **Managed Inference Context**: `managed_inference()` async context manager
+  - **Resource Cleanup**: Automatic cleanup with `_cleanup_resources()`
+  - **Error Handling**: User-friendly error messages with detailed logging
 
-#### **3. CLI Interface** ✅
-- **File**: `src/ignition/modules/llm_infrastructure/cli_commands.py`
-- **Commands Implemented**:
-  - `detect-gpu`: Auto-detect available GPU acceleration
-  - `initialize`: Initialize LLM Infrastructure with validation
-  - `generate`: Generate text with auto-detected GPU optimization
-  - `benchmark`: Performance benchmarking
-  - `status`: Infrastructure status reporting
+#### **3. CLI Commands System** ✅ **NEW FEATURE**
+- **File**: `src/ignition/modules/llm_infrastructure/cli_commands.py` (381 lines)
+- **Integration**: Fully integrated into main CLI system via `core_commands.py`
+- **Command Group**: `llm-infrastructure` with 5 comprehensive commands
+
+**Available Commands**:
+
+1. **`detect-gpu`** - Auto-detect available GPU acceleration
+   - **Purpose**: Environment validation with auto-detection (crawl_mcp.py Step 1)
+   - **Features**: NVIDIA CUDA, Apple Silicon MPS, CPU-only fallback detection
+   - **Options**: `--detailed` for comprehensive GPU information
+   - **Output**: Platform details, GPU type, memory, optimal configuration
+   - **Example**: `ign module llm-infrastructure detect-gpu --detailed`
+
+2. **`initialize`** - Initialize LLM Infrastructure with validation
+   - **Purpose**: Progressive complexity initialization (crawl_mcp.py Step 2)
+   - **Features**: 8B parameter model setup with auto-detected GPU config
+   - **Options**: `--model-name`, `--quantization`, `--max-context`, `--test-prompt`
+   - **Validation**: Pydantic input validation, comprehensive error handling
+   - **Example**: `ign module llm-infrastructure initialize --model-name llama3.1-8b --quantization fp16`
+
+3. **`generate`** - Generate text with auto-detected GPU optimization
+   - **Purpose**: Production deployment text generation (crawl_mcp.py Step 5)
+   - **Features**: Optimized inference with performance metrics
+   - **Options**: `--prompt`, `--max-tokens`, `--temperature`, `--top-p`, `--output-file`
+   - **Output**: Generated text, performance stats, optional file export
+   - **Example**: `ign module llm-infrastructure generate --prompt "Explain machine learning" --max-tokens 256`
+
+4. **`benchmark`** - Performance benchmarking with auto-detected configuration
+   - **Purpose**: Modular testing and validation (crawl_mcp.py Step 4)
+   - **Features**: Concurrent request testing, comprehensive metrics
+   - **Options**: `--duration`, `--concurrent-requests`
+   - **Metrics**: Requests/second, tokens/second, error rates, inference times
+   - **Example**: `ign module llm-infrastructure benchmark --duration 120 --concurrent-requests 2`
+
+5. **`status`** - Current LLM Infrastructure status and configuration
+   - **Purpose**: System monitoring and environment reporting
+   - **Features**: Real-time GPU status, configuration display, environment variables
+   - **Output**: Platform info, GPU type, memory, configuration details
+   - **Example**: `ign module llm-infrastructure status`
+
+**CLI Integration Features**:
+- ✅ **Core CLI Integration**: Commands registered in `src/ignition/modules/cli/core_commands.py`
+- ✅ **Module CLI Integration**: Available through `ign module llm-infrastructure [command]`
+- ✅ **Error Handling**: Comprehensive exception handling with user-friendly messages
+- ✅ **Input Validation**: Pydantic models for all command parameters
+- ✅ **Resource Management**: Proper AsyncIO context managers and cleanup
+- ✅ **Testing**: All commands tested and validated with real GPU detection
 
 #### **4. Comprehensive Testing Suite** ✅
-- **File**: `tests/test_llm_infrastructure.py`
-- **Test Coverage**:
-  - GPU auto-detection testing
-  - Model configuration validation
-  - Infrastructure manager testing
-  - Resource management validation
-  - Progressive complexity testing
-  - Integration scenarios
+- **File**: `tests/test_llm_infrastructure.py` (414 lines)
+- **Coverage**: Infrastructure manager, GPU detection, CLI commands
+- **Methodology**: Following crawl_mcp.py patterns with modular testing
+- **Features**: Mock testing, async testing, error condition testing
 
 ## **Key Deliverables - Phase 13.1**
 
@@ -81,57 +113,56 @@ Phase 13.1 has been successfully completed, delivering a production-ready **8B P
 
 #### **Step 1: Environment Validation** ✅
 ```python
-async def _validate_environment(self) -> Dict[str, Any]:
-    """Validate environment for LLM deployment."""
-    # Check PyTorch installation
-    # Check transformers library
-    # Validate GPU configuration
-    # Check available memory
+def auto_detect_gpu_configuration() -> dict[str, Any]:
+    """Auto-detect optimal GPU configuration for 8B parameter LLM deployment."""
+    # Comprehensive platform and hardware detection
+    # Memory analysis and optimization recommendations
+    # Fallback strategies for unsupported configurations
 ```
 
-#### **Step 2: Input Validation using Pydantic** ✅
+#### **Step 2: Input Validation** ✅
 ```python
 class ModelConfig(BaseModel):
-    """Input validation using Pydantic models"""
+    """Pydantic model for LLM configuration validation."""
     model_name: str = Field(default="llama3.1-8b")
-    quantization: str = Field(default="int8")
-    max_context_length: int = Field(default=4096, ge=512, le=32768)
-    temperature: float = Field(default=0.7, ge=0.0, le=2.0)
+    quantization: str = Field(default="auto")
+    max_context_length: int = Field(default=8192)
+    # Comprehensive validation with sensible defaults
 ```
 
 #### **Step 3: Comprehensive Error Handling** ✅
 ```python
-def _format_error(self, error: Exception) -> str:
-    """User-friendly error formatting"""
-    error_str = str(error).lower()
-    if "cuda out of memory" in error_str:
-        return "GPU memory exhausted. Try reducing batch size or using quantization."
-    elif "model not found" in error_str:
-        return "Model not found. Check model name and availability."
+async def initialize(self) -> dict[str, Any]:
+    """Initialize LLM infrastructure with comprehensive error handling."""
+    try:
+        # Detailed initialization with step-by-step validation
+        # User-friendly error messages
+        # Resource cleanup on failure
+    except Exception as e:
+        return {"success": False, "error": f"Initialization failed: {e}"}
 ```
 
 #### **Step 4: Modular Testing** ✅
 - **Unit Tests**: Individual component testing
 - **Integration Tests**: End-to-end workflow testing
-- **Performance Tests**: Benchmarking and validation
-- **Resource Tests**: Memory and cleanup validation
+- **CLI Tests**: Command-line interface validation
+- **Error Condition Tests**: Comprehensive failure scenario testing
 
 #### **Step 5: Progressive Complexity** ✅
 - **Basic**: GPU detection and configuration
-- **Standard**: Model loading and simple inference
-- **Advanced**: Performance optimization and monitoring
-- **Enterprise**: Production deployment and scaling
+- **Standard**: Model initialization and basic inference
+- **Advanced**: Performance benchmarking and optimization
+- **Enterprise**: Production deployment with monitoring
 
 #### **Step 6: Resource Management** ✅
 ```python
-@asynccontextmanager
-async def managed_inference(self) -> AsyncGenerator[Dict[str, Any], None]:
-    """Proper resource lifecycle management"""
+async def managed_inference(self) -> AsyncGenerator[dict[str, Any], None]:
+    """Managed inference context with automatic resource cleanup."""
     try:
         # Initialize resources
-        yield context
+        yield {"gpu_config": self.gpu_config, "model": self.model}
     finally:
-        # Clean up resources
+        # Guaranteed resource cleanup
         await self._cleanup_resources()
 ```
 

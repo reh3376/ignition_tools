@@ -1,4 +1,4 @@
-"""Phase 10.1: Enterprise Architecture Module
+"""Phase 10.1: Enterprise Architecture Module.
 
 This module implements scalable deployment architecture, high availability,
 disaster recovery, and performance optimization following crawl_mcp.py methodology.
@@ -111,13 +111,11 @@ class EnterpriseArchitectureModule:
             self._initialize_components()
 
     def _validate_environment_variables(self) -> dict[str, Any]:
-        """Step 1: Environment Variable Validation First
+        """Step 1: Environment Variable Validation First.
 
         Validate enterprise architecture environment variables following crawl_mcp.py patterns.
         """
-        self.console.print(
-            "🔍 Enterprise Architecture: Environment Validation", style="bold blue"
-        )
+        self.console.print("🔍 Enterprise Architecture: Environment Validation", style="bold blue")
 
         required_vars = {
             "ENTERPRISE_DEPLOYMENT_MODE": {
@@ -186,7 +184,7 @@ class EnterpriseArchitectureModule:
     def _validate_single_environment_variable(
         self, var_name: str, var_config: dict[str, Any]
     ) -> ArchitectureValidationResult:
-        """Step 2: Comprehensive Input Validation
+        """Step 2: Comprehensive Input Validation.
 
         Validate a single environment variable with comprehensive checks.
         """
@@ -238,9 +236,7 @@ class EnterpriseArchitectureModule:
 
         # Validate format
         if "format" in var_config and value:
-            format_validation = self._validate_format(
-                value, var_config["format"], var_name
-            )
+            format_validation = self._validate_format(value, var_config["format"], var_name)
             if not format_validation.valid:
                 return format_validation
 
@@ -251,17 +247,11 @@ class EnterpriseArchitectureModule:
             details={"value": value, "description": var_config.get("description")},
         )
 
-    def _validate_format(
-        self, value: str, format_type: str, var_name: str
-    ) -> ArchitectureValidationResult:
+    def _validate_format(self, value: str, format_type: str, var_name: str) -> ArchitectureValidationResult:
         """Validate value format following crawl_mcp.py patterns."""
         try:
             if format_type == "url":
-                if not (
-                    value.startswith("http://")
-                    or value.startswith("https://")
-                    or value.startswith("tcp://")
-                ):
+                if not (value.startswith("http://") or value.startswith("https://") or value.startswith("tcp://")):
                     return ArchitectureValidationResult(
                         valid=False,
                         component=var_name,
@@ -298,39 +288,26 @@ class EnterpriseArchitectureModule:
             )
 
     def _load_and_validate_config(self) -> DeploymentConfig:
-        """Step 2: Comprehensive Input Validation
+        """Step 2: Comprehensive Input Validation.
 
         Load and validate deployment configuration.
         """
         try:
             config = DeploymentConfig(
                 deployment_mode=os.getenv("ENTERPRISE_DEPLOYMENT_MODE", "standalone"),
-                high_availability=os.getenv(
-                    "HIGH_AVAILABILITY_ENABLED", "false"
-                ).lower()
-                == "true",
-                disaster_recovery=os.getenv(
-                    "DISASTER_RECOVERY_ENABLED", "false"
-                ).lower()
-                == "true",
+                high_availability=os.getenv("HIGH_AVAILABILITY_ENABLED", "false").lower() == "true",
+                disaster_recovery=os.getenv("DISASTER_RECOVERY_ENABLED", "false").lower() == "true",
                 load_balancer_url=os.getenv("LOAD_BALANCER_URL"),
-                cluster_nodes=[
-                    node.strip()
-                    for node in os.getenv("CLUSTER_NODES", "").split(",")
-                    if node.strip()
-                ],
+                cluster_nodes=[node.strip() for node in os.getenv("CLUSTER_NODES", "").split(",") if node.strip()],
                 backup_strategy=os.getenv("BACKUP_STRATEGY", "daily"),
-                monitoring_enabled=os.getenv("MONITORING_ENABLED", "true").lower()
-                == "true",
+                monitoring_enabled=os.getenv("MONITORING_ENABLED", "true").lower() == "true",
                 performance_tuning=os.getenv("PERFORMANCE_TUNING_LEVEL", "standard"),
             )
 
             # Validate configuration consistency
             validation_errors = self._validate_config_consistency(config)
             if validation_errors:
-                self.logger.warning(
-                    f"Configuration validation warnings: {validation_errors}"
-                )
+                self.logger.warning(f"Configuration validation warnings: {validation_errors}")
 
             return config
 
@@ -345,9 +322,7 @@ class EnterpriseArchitectureModule:
 
         # Validate cluster mode requirements
         if config.deployment_mode == "cluster" and not config.cluster_nodes:
-            errors.append(
-                "Cluster deployment mode requires cluster nodes to be specified"
-            )
+            errors.append("Cluster deployment mode requires cluster nodes to be specified")
 
         # Validate high availability requirements
         if config.high_availability and config.deployment_mode == "standalone":
@@ -355,9 +330,7 @@ class EnterpriseArchitectureModule:
 
         # Validate load balancer requirements
         if config.high_availability and not config.load_balancer_url:
-            errors.append(
-                "High availability requires load balancer URL to be specified"
-            )
+            errors.append("High availability requires load balancer URL to be specified")
 
         # Validate disaster recovery requirements
         if config.disaster_recovery and not config.backup_strategy:
@@ -368,9 +341,7 @@ class EnterpriseArchitectureModule:
     def _initialize_components(self) -> Any:
         """Initialize enterprise architecture components."""
         try:
-            self.console.print(
-                "🚀 Initializing Enterprise Architecture Components", style="bold green"
-            )
+            self.console.print("🚀 Initializing Enterprise Architecture Components", style="bold green")
 
             # Initialize deployment manager
             self.deployment_manager = DeploymentManager(self.config)
@@ -387,17 +358,13 @@ class EnterpriseArchitectureModule:
             if self.config.monitoring_enabled:
                 self.performance_monitor = PerformanceMonitor(self.config)
 
-            self.logger.info(
-                "Enterprise Architecture components initialized successfully"
-            )
+            self.logger.info("Enterprise Architecture components initialized successfully")
 
         except Exception as e:
             self.logger.error(f"Failed to initialize components: {e}")
             raise
 
-    def _display_environment_validation(
-        self, validation_results: dict[str, Any]
-    ) -> Any:
+    def _display_environment_validation(self, validation_results: dict[str, Any]) -> Any:
         """Display environment validation results following crawl_mcp.py patterns."""
         table = Table(title="Enterprise Architecture - Environment Validation")
         table.add_column("Variable", style="cyan")
@@ -434,16 +401,13 @@ class EnterpriseArchitectureModule:
         if not validation_results["overall_valid"]:
             self.console.print("\n📋 Recommendations:", style="bold yellow")
             for result in validation_results["validation_results"].values():
-                if (
-                    isinstance(result, ArchitectureValidationResult)
-                    and not result.valid
-                ):
+                if isinstance(result, ArchitectureValidationResult) and not result.valid:
                     for rec in result.recommendations:
                         self.console.print(f"  • {rec}")
 
     def deploy_architecture(self, complexity_level: str = "basic") -> dict[str, Any]:
         """Step 4: Modular Component Testing
-        Step 5: Progressive Complexity Support
+        Step 5: Progressive Complexity Support.
 
         Deploy enterprise architecture with progressive complexity.
         """
@@ -463,20 +427,14 @@ class EnterpriseArchitectureModule:
                 TimeElapsedColumn(),
                 console=self.console,
             ) as progress:
-                task = progress.add_task(
-                    f"Deploying {complexity_level} architecture...", total=100
-                )
+                task = progress.add_task(f"Deploying {complexity_level} architecture...", total=100)
 
                 # Step 1: Validate environment (10%)
-                progress.update(
-                    task, advance=10, description="Validating environment..."
-                )
+                progress.update(task, advance=10, description="Validating environment...")
                 env_status = self._validate_deployment_environment()
 
                 # Step 2: Initialize deployment (20%)
-                progress.update(
-                    task, advance=20, description="Initializing deployment..."
-                )
+                progress.update(task, advance=20, description="Initializing deployment...")
                 deployment_result = self._initialize_deployment(complexity_level)
 
                 # Step 3: Configure high availability (30%)
@@ -484,9 +442,7 @@ class EnterpriseArchitectureModule:
                     "advanced",
                     "enterprise",
                 ]:
-                    progress.update(
-                        task, advance=30, description="Configuring high availability..."
-                    )
+                    progress.update(task, advance=30, description="Configuring high availability...")
                     ha_result = self._configure_high_availability()
                 else:
                     progress.update(task, advance=30)
@@ -497,9 +453,7 @@ class EnterpriseArchitectureModule:
 
                 # Step 4: Setup disaster recovery (40%)
                 if self.config.disaster_recovery and complexity_level == "enterprise":
-                    progress.update(
-                        task, advance=40, description="Setting up disaster recovery..."
-                    )
+                    progress.update(task, advance=40, description="Setting up disaster recovery...")
                     dr_result = self._setup_disaster_recovery()
                 else:
                     progress.update(task, advance=40)
@@ -509,18 +463,14 @@ class EnterpriseArchitectureModule:
                     }
 
                 # Step 5: Performance optimization (50%)
-                progress.update(
-                    task, advance=50, description="Optimizing performance..."
-                )
+                progress.update(task, advance=50, description="Optimizing performance...")
                 perf_result = self._optimize_performance(complexity_level)
 
                 # Step 6: Final validation (100%)
                 progress.update(task, advance=50, description="Final validation...")
                 final_validation = self._validate_deployment()
 
-                progress.update(
-                    task, completed=100, description="Deployment completed!"
-                )
+                progress.update(task, completed=100, description="Deployment completed!")
 
             return {
                 "success": True,
@@ -647,9 +597,7 @@ class EnterpriseArchitectureModule:
         if "connection" in error_str or "network" in error_str:
             return f"Network connectivity issue: {error}. Check network configuration and connectivity."
         elif "permission" in error_str or "access" in error_str:
-            return (
-                f"Permission denied: {error}. Check access permissions and credentials."
-            )
+            return f"Permission denied: {error}. Check access permissions and credentials."
         elif "resource" in error_str or "memory" in error_str:
             return f"Resource constraint: {error}. Check system resources and capacity."
         elif "configuration" in error_str or "config" in error_str:
@@ -658,7 +606,7 @@ class EnterpriseArchitectureModule:
             return f"Deployment error: {error}"
 
     def cleanup_resources(self) -> Any:
-        """Step 6: Resource Management and Cleanup
+        """Step 6: Resource Management and Cleanup.
 
         Clean up allocated resources following crawl_mcp.py patterns.
         """

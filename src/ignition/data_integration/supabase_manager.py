@@ -331,15 +331,11 @@ LOGFLARE_URL=http://localhost:4000
                 version = cursor.fetchone()[0]
 
                 # Test schema existence
-                cursor.execute(
-                    "SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'ignition';"
-                )
+                cursor.execute("SELECT schema_name FROM information_schema.schemata WHERE schema_name = 'ignition';")
                 schema_exists = cursor.fetchone() is not None
 
                 # Test table count
-                cursor.execute(
-                    "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'ignition';"
-                )
+                cursor.execute("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'ignition';")
                 table_count = cursor.fetchone()[0] if schema_exists else 0
 
             return {
@@ -382,9 +378,7 @@ LOGFLARE_URL=http://localhost:4000
 
                 with psycopg2.connect(**conn_params) as conn, conn.cursor() as cursor:
                     # Get database size
-                    cursor.execute(
-                        f"SELECT pg_size_pretty(pg_database_size('{self.config.db_name}'));"
-                    )
+                    cursor.execute(f"SELECT pg_size_pretty(pg_database_size('{self.config.db_name}'));")
                     db_size = cursor.fetchone()[0]
 
                     # Get table information
@@ -515,9 +509,7 @@ LOGFLARE_URL=http://localhost:4000
                     "file_path": str(backup_file),
                     "size": stat.st_size,
                     "created_at": datetime.fromtimestamp(stat.st_mtime).isoformat(),
-                    "age_days": (
-                        datetime.now() - datetime.fromtimestamp(stat.st_mtime)
-                    ).days,
+                    "age_days": (datetime.now() - datetime.fromtimestamp(stat.st_mtime)).days,
                 }
             )
 
@@ -632,6 +624,4 @@ if __name__ == "__main__":
 
     # Generate configuration summary
     config_summary = manager.generate_configuration_summary()
-    print(
-        f"📋 Configuration ready for {len(config_summary['docker_services'])} Docker services"
-    )
+    print(f"📋 Configuration ready for {len(config_summary['docker_services'])} Docker services")

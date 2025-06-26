@@ -99,9 +99,7 @@ class ConfidenceTracker:
             storage_path: Path to store confidence data
         """
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.storage_path = (
-            Path(storage_path) if storage_path else Path("data/confidence_metrics.json")
-        )
+        self.storage_path = Path(storage_path) if storage_path else Path("data/confidence_metrics.json")
         self.confidence_metrics: dict[str, ConfidenceMetric] = {}
 
         # Step 1: Environment validation first
@@ -114,9 +112,7 @@ class ConfidenceTracker:
         self.storage_path.parent.mkdir(parents=True, exist_ok=True)
 
         if not os.access(self.storage_path.parent, os.W_OK):
-            self.logger.warning(
-                f"Storage directory not writable: {self.storage_path.parent}"
-            )
+            self.logger.warning(f"Storage directory not writable: {self.storage_path.parent}")
 
     def _load_confidence_data(self) -> None:
         """Load existing confidence data from storage."""
@@ -132,16 +128,12 @@ class ConfidenceTracker:
                         confidence_score=metric_data["confidence_score"],
                         sample_size=metric_data["sample_size"],
                         accuracy_history=metric_data.get("accuracy_history", []),
-                        last_updated=datetime.fromisoformat(
-                            metric_data["last_updated"]
-                        ),
+                        last_updated=datetime.fromisoformat(metric_data["last_updated"]),
                         trend=metric_data.get("trend", "stable"),
                     )
                     self.confidence_metrics[key] = metric
 
-                self.logger.info(
-                    f"Loaded {len(self.confidence_metrics)} confidence metrics"
-                )
+                self.logger.info(f"Loaded {len(self.confidence_metrics)} confidence metrics")
 
         except Exception as e:
             self.logger.warning(f"Failed to load confidence data: {e}")
@@ -177,9 +169,7 @@ class ConfidenceTracker:
         """
         # Step 2: Comprehensive Input Validation
         if not 0.0 <= accuracy <= 1.0:
-            raise AdaptiveLearningError(
-                f"Accuracy must be between 0.0 and 1.0, got {accuracy}"
-            )
+            raise AdaptiveLearningError(f"Accuracy must be between 0.0 and 1.0, got {accuracy}")
 
         if not domain or not topic:
             raise AdaptiveLearningError("Domain and topic cannot be empty")
@@ -199,9 +189,7 @@ class ConfidenceTracker:
             # Calculate new confidence score (weighted average)
             old_weight = metric.sample_size / (metric.sample_size + 1)
             new_weight = 1 / (metric.sample_size + 1)
-            metric.confidence_score = (old_weight * metric.confidence_score) + (
-                new_weight * accuracy
-            )
+            metric.confidence_score = (old_weight * metric.confidence_score) + (new_weight * accuracy)
 
             metric.sample_size += 1
             metric.last_updated = datetime.now()
@@ -235,9 +223,7 @@ class ConfidenceTracker:
             self.confidence_metrics[key] = metric
 
         self._save_confidence_data()
-        self.logger.debug(
-            f"Updated confidence for {domain}:{topic} to {metric.confidence_score:.3f}"
-        )
+        self.logger.debug(f"Updated confidence for {domain}:{topic} to {metric.confidence_score:.3f}")
 
     def get_confidence(self, domain: str, topic: str) -> ConfidenceMetric | None:
         """Get confidence metric for a domain/topic."""
@@ -246,46 +232,28 @@ class ConfidenceTracker:
 
     def get_domain_confidence(self, domain: str) -> dict[str, ConfidenceMetric]:
         """Get all confidence metrics for a domain."""
-        return {
-            key: metric
-            for key, metric in self.confidence_metrics.items()
-            if metric.domain == domain
-        }
+        return {key: metric for key, metric in self.confidence_metrics.items() if metric.domain == domain}
 
-    def get_low_confidence_areas(
-        self, threshold: float = 0.7
-    ) -> list[ConfidenceMetric]:
+    def get_low_confidence_areas(self, threshold: float = 0.7) -> list[ConfidenceMetric]:
         """Get areas with confidence below threshold."""
-        return [
-            metric
-            for metric in self.confidence_metrics.values()
-            if metric.confidence_score < threshold
-        ]
+        return [metric for metric in self.confidence_metrics.values() if metric.confidence_score < threshold]
 
     def get_statistics(self) -> dict[str, Any]:
         """Get confidence tracking statistics."""
         if not self.confidence_metrics:
             return {"total_metrics": 0}
 
-        scores = [
-            metric.confidence_score for metric in self.confidence_metrics.values()
-        ]
+        scores = [metric.confidence_score for metric in self.confidence_metrics.values()]
 
         return {
             "total_metrics": len(self.confidence_metrics),
             "average_confidence": sum(scores) / len(scores),
             "min_confidence": min(scores),
             "max_confidence": max(scores),
-            "domains": list(
-                {metric.domain for metric in self.confidence_metrics.values()}
-            ),
+            "domains": list({metric.domain for metric in self.confidence_metrics.values()}),
             "low_confidence_count": len(self.get_low_confidence_areas()),
-            "improving_trends": len(
-                [m for m in self.confidence_metrics.values() if m.trend == "improving"]
-            ),
-            "declining_trends": len(
-                [m for m in self.confidence_metrics.values() if m.trend == "declining"]
-            ),
+            "improving_trends": len([m for m in self.confidence_metrics.values() if m.trend == "improving"]),
+            "declining_trends": len([m for m in self.confidence_metrics.values() if m.trend == "declining"]),
         }
 
 
@@ -311,14 +279,10 @@ class AdaptiveLearningEngine:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.decision_log_manager = decision_log_manager
         self.knowledge_validators = knowledge_validators or []
-        self.storage_path = (
-            Path(storage_path) if storage_path else Path("data/learning_data")
-        )
+        self.storage_path = Path(storage_path) if storage_path else Path("data/learning_data")
 
         # Initialize components
-        self.confidence_tracker = ConfidenceTracker(
-            self.storage_path / "confidence_metrics.json"
-        )
+        self.confidence_tracker = ConfidenceTracker(self.storage_path / "confidence_metrics.json")
         self.conversations: list[ConversationData] = []
         self.knowledge_gaps: dict[str, KnowledgeGap] = {}
 
@@ -342,9 +306,7 @@ class AdaptiveLearningEngine:
         self.storage_path.mkdir(parents=True, exist_ok=True)
 
         if not os.access(self.storage_path, os.W_OK):
-            self.logger.warning(
-                f"Learning data directory not writable: {self.storage_path}"
-            )
+            self.logger.warning(f"Learning data directory not writable: {self.storage_path}")
 
     def _load_learning_data(self) -> None:
         """Load existing learning data from storage."""
@@ -387,15 +349,9 @@ class AdaptiveLearningEngine:
                         frequency=gap_data.get("frequency", 1),
                         severity=gap_data.get("severity", "medium"),
                         examples=gap_data.get("examples", []),
-                        suggested_improvements=gap_data.get(
-                            "suggested_improvements", []
-                        ),
-                        first_identified=datetime.fromisoformat(
-                            gap_data["first_identified"]
-                        ),
-                        last_encountered=datetime.fromisoformat(
-                            gap_data["last_encountered"]
-                        ),
+                        suggested_improvements=gap_data.get("suggested_improvements", []),
+                        first_identified=datetime.fromisoformat(gap_data["first_identified"]),
+                        last_encountered=datetime.fromisoformat(gap_data["last_encountered"]),
                         status=gap_data.get("status", "open"),
                     )
                     self.knowledge_gaps[gap_id] = gap
@@ -490,11 +446,7 @@ class AdaptiveLearningEngine:
                 self.learning_stats["total_feedback_received"] += 1
 
             # Update confidence scores if accuracy rating is provided
-            if (
-                conversation_data.accuracy_rating is not None
-                and conversation_data.domain
-                and conversation_data.topic
-            ):
+            if conversation_data.accuracy_rating is not None and conversation_data.domain and conversation_data.topic:
                 self.confidence_tracker.update_confidence(
                     conversation_data.domain,
                     conversation_data.topic,
@@ -502,10 +454,7 @@ class AdaptiveLearningEngine:
                 )
 
             # Identify potential knowledge gaps
-            if (
-                conversation_data.accuracy_rating is not None
-                and conversation_data.accuracy_rating < 0.7
-            ):
+            if conversation_data.accuracy_rating is not None and conversation_data.accuracy_rating < 0.7:
                 self._identify_knowledge_gap(conversation_data)
 
             # Update learning statistics
@@ -514,9 +463,7 @@ class AdaptiveLearningEngine:
             # Save data
             self._save_learning_data()
 
-            self.logger.info(
-                f"Learned from conversation {conversation_data.conversation_id}"
-            )
+            self.logger.info(f"Learned from conversation {conversation_data.conversation_id}")
 
         except Exception as e:
             # Step 3: Error handling with user-friendly messages
@@ -567,22 +514,14 @@ class AdaptiveLearningEngine:
         """Update learning statistics."""
         if self.conversations:
             # Calculate average accuracy
-            accuracy_ratings = [
-                conv.accuracy_rating
-                for conv in self.conversations
-                if conv.accuracy_rating is not None
-            ]
+            accuracy_ratings = [conv.accuracy_rating for conv in self.conversations if conv.accuracy_rating is not None]
 
             if accuracy_ratings:
-                self.learning_stats["average_accuracy"] = sum(accuracy_ratings) / len(
-                    accuracy_ratings
-                )
+                self.learning_stats["average_accuracy"] = sum(accuracy_ratings) / len(accuracy_ratings)
 
         self.learning_stats["last_learning_update"] = datetime.now().isoformat()
 
-    def update_confidence_scores(
-        self, domain: str, topic: str, accuracy: float
-    ) -> None:
+    def update_confidence_scores(self, domain: str, topic: str, accuracy: float) -> None:
         """Update confidence scores based on feedback.
 
         Args:
@@ -602,9 +541,7 @@ class AdaptiveLearningEngine:
 
         # Sort by severity and frequency
         severity_order = {"critical": 4, "high": 3, "medium": 2, "low": 1}
-        gaps.sort(
-            key=lambda x: (severity_order.get(x.severity, 0), x.frequency), reverse=True
-        )
+        gaps.sort(key=lambda x: (severity_order.get(x.severity, 0), x.frequency), reverse=True)
 
         return gaps
 
@@ -617,27 +554,18 @@ class AdaptiveLearningEngine:
         critical_gaps = [gap for gap in gaps if gap.severity == "critical"]
 
         if critical_gaps:
-            recommendations.append(
-                f"Address {len(critical_gaps)} critical knowledge gaps immediately"
-            )
+            recommendations.append(f"Address {len(critical_gaps)} critical knowledge gaps immediately")
 
         # Analyze confidence trends
         low_confidence_areas = self.confidence_tracker.get_low_confidence_areas()
         if low_confidence_areas:
-            recommendations.append(
-                f"Improve knowledge in {len(low_confidence_areas)} low-confidence areas"
-            )
+            recommendations.append(f"Improve knowledge in {len(low_confidence_areas)} low-confidence areas")
 
         # Analyze conversation patterns
         if self.learning_stats["total_conversations"] > 0:
-            feedback_rate = (
-                self.learning_stats["total_feedback_received"]
-                / self.learning_stats["total_conversations"]
-            )
+            feedback_rate = self.learning_stats["total_feedback_received"] / self.learning_stats["total_conversations"]
             if feedback_rate < 0.3:
-                recommendations.append(
-                    "Increase user feedback collection to improve learning"
-                )
+                recommendations.append("Increase user feedback collection to improve learning")
 
         return recommendations
 
@@ -675,9 +603,7 @@ class AdaptiveLearningEngine:
         if gap_id in self.knowledge_gaps:
             self.knowledge_gaps[gap_id].status = "resolved"
             if resolution_notes:
-                self.knowledge_gaps[gap_id].suggested_improvements.append(
-                    f"Resolved: {resolution_notes}"
-                )
+                self.knowledge_gaps[gap_id].suggested_improvements.append(f"Resolved: {resolution_notes}")
 
             self.learning_stats["knowledge_gaps_resolved"] += 1
             self._save_learning_data()
@@ -697,30 +623,20 @@ class AdaptiveLearningEngine:
             Dictionary with domain learning status
         """
         # Get domain conversations
-        domain_conversations = [
-            conv for conv in self.conversations if conv.domain == domain
-        ]
+        domain_conversations = [conv for conv in self.conversations if conv.domain == domain]
 
         # Get domain confidence metrics
         domain_confidence = self.confidence_tracker.get_domain_confidence(domain)
 
         # Get domain knowledge gaps
-        domain_gaps = [
-            gap for gap in self.knowledge_gaps.values() if gap.domain == domain
-        ]
+        domain_gaps = [gap for gap in self.knowledge_gaps.values() if gap.domain == domain]
 
         # Calculate domain statistics
         if domain_conversations:
             accuracy_ratings = [
-                conv.accuracy_rating
-                for conv in domain_conversations
-                if conv.accuracy_rating is not None
+                conv.accuracy_rating for conv in domain_conversations if conv.accuracy_rating is not None
             ]
-            avg_accuracy = (
-                sum(accuracy_ratings) / len(accuracy_ratings)
-                if accuracy_ratings
-                else None
-            )
+            avg_accuracy = sum(accuracy_ratings) / len(accuracy_ratings) if accuracy_ratings else None
         else:
             avg_accuracy = None
 
@@ -734,9 +650,7 @@ class AdaptiveLearningEngine:
                 "critical": len([g for g in domain_gaps if g.severity == "critical"]),
                 "open": len([g for g in domain_gaps if g.status == "open"]),
             },
-            "topics_covered": list(
-                {conv.topic for conv in domain_conversations if conv.topic}
-            ),
+            "topics_covered": list({conv.topic for conv in domain_conversations if conv.topic}),
             "learning_trend": self._calculate_domain_trend(domain_conversations),
         }
 
@@ -750,20 +664,10 @@ class AdaptiveLearningEngine:
 
         # Get recent and older accuracy ratings
         recent_conversations = conversations[-5:]
-        older_conversations = (
-            conversations[-10:-5] if len(conversations) >= 10 else conversations[:-5]
-        )
+        older_conversations = conversations[-10:-5] if len(conversations) >= 10 else conversations[:-5]
 
-        recent_accuracy = [
-            conv.accuracy_rating
-            for conv in recent_conversations
-            if conv.accuracy_rating is not None
-        ]
-        older_accuracy = [
-            conv.accuracy_rating
-            for conv in older_conversations
-            if conv.accuracy_rating is not None
-        ]
+        recent_accuracy = [conv.accuracy_rating for conv in recent_conversations if conv.accuracy_rating is not None]
+        older_accuracy = [conv.accuracy_rating for conv in older_conversations if conv.accuracy_rating is not None]
 
         if not recent_accuracy or not older_accuracy:
             return "insufficient_feedback"

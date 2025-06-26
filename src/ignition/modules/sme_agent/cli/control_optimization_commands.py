@@ -1,4 +1,4 @@
-"""CLI Commands for AI Control Supervisor - Phase 11.6
+"""CLI Commands for AI Control Supervisor - Phase 11.6.
 
 This module provides CLI commands for the AI Control Supervisor system,
 including PID optimization, MPC control, and performance monitoring.
@@ -31,7 +31,7 @@ console = Console()
 
 # Import AI Control Supervisor components
 try:
-    from ..ai_control_supervisor import (
+    from src.ignition.modules.sme_agent.ai_control_supervisor import (
         AIControlSupervisor,
         ControlMode,
         MPCConfig,
@@ -44,7 +44,7 @@ try:
         test_environment_validation,
         validate_environment,
     )
-    from ..hybrid_mpc_controller import (
+    from src.ignition.modules.sme_agent.hybrid_mpc_controller import (
         ConstraintSet,
         FOPDTModel,
         HybridMPCController,
@@ -73,9 +73,7 @@ def format_error_message(error: str, context: str = "") -> str:
     return f"Error: {error}"
 
 
-def display_validation_results(
-    results: dict[str, Any], title: str = "Validation Results"
-) -> None:
+def display_validation_results(results: dict[str, Any], title: str = "Validation Results") -> None:
     """Display validation results in a formatted table."""
     table = Table(title=title)
     table.add_column("Component", style="cyan")
@@ -90,12 +88,8 @@ def display_validation_results(
     if "components" in results:
         for component, details in results["components"].items():
             if isinstance(details, dict):
-                status = (
-                    "✅ Available" if details.get("valid", False) else "❌ Unavailable"
-                )
-                detail_str = ", ".join(
-                    [f"{k}: {v}" for k, v in details.items() if k != "valid"]
-                )
+                status = "✅ Available" if details.get("valid", False) else "❌ Unavailable"
+                detail_str = ", ".join([f"{k}: {v}" for k, v in details.items() if k != "valid"])
                 table.add_row(component.title(), status, detail_str)
 
     # Errors and warnings
@@ -110,9 +104,7 @@ def display_validation_results(
     console.print(table)
 
 
-def display_test_results(
-    results: list[dict[str, Any]], title: str = "Test Results"
-) -> None:
+def display_test_results(results: list[dict[str, Any]], title: str = "Test Results") -> None:
     """Display test results in a formatted table."""
     table = Table(title=title)
     table.add_column("Test", style="cyan")
@@ -161,14 +153,10 @@ def mpc_group() -> None:
 
 
 @control_group.command("validate-env")
-@click.option(
-    "--verbose", "-v", is_flag=True, help="Show detailed validation information"
-)
+@click.option("--verbose", "-v", is_flag=True, help="Show detailed validation information")
 def validate_control_environment(verbose: bool) -> None:
     """Validate AI Control Supervisor environment setup."""
-    console.print(
-        "[bold blue]🔍 Validating AI Control Supervisor Environment...[/bold blue]"
-    )
+    console.print("[bold blue]🔍 Validating AI Control Supervisor Environment...[/bold blue]")
 
     if not CONTROL_MODULES_AVAILABLE:
         console.print("[red]❌ Control modules not available. Check imports.[/red]")
@@ -188,9 +176,7 @@ def validate_control_environment(verbose: bool) -> None:
             console.print("[green]✅ Environment validation successful[/green]")
         else:
             console.print("[red]❌ Environment validation failed[/red]")
-            console.print(
-                "[yellow]💡 Check the errors above and configure missing components[/yellow]"
-            )
+            console.print("[yellow]💡 Check the errors above and configure missing components[/yellow]")
 
     except Exception as e:
         console.print(f"[red]❌ Validation error: {e}[/red]")
@@ -206,9 +192,7 @@ def validate_control_environment(verbose: bool) -> None:
 )
 def test_control_system(component: str) -> None:
     """Test AI Control Supervisor functionality."""
-    console.print(
-        f"[bold blue]🧪 Testing AI Control Supervisor - {component.title()}...[/bold blue]"
-    )
+    console.print(f"[bold blue]🧪 Testing AI Control Supervisor - {component.title()}...[/bold blue]")
 
     if not CONTROL_MODULES_AVAILABLE:
         console.print("[red]❌ Control modules not available. Check imports.[/red]")
@@ -243,9 +227,7 @@ def test_control_system(component: str) -> None:
                 test_results.append(model_test)
 
             # Display results
-            display_test_results(
-                test_results, f"AI Control Supervisor Tests - {component.title()}"
-            )
+            display_test_results(test_results, f"AI Control Supervisor Tests - {component.title()}")
 
             # Summary
             passed = sum(1 for result in test_results if result.get("success", False))
@@ -281,9 +263,7 @@ def control_system_status() -> None:
             "AI Control Supervisor and MPC modules loaded",
         )
     else:
-        info_table.add_row(
-            "Control Modules", "❌ Unavailable", "Import errors detected"
-        )
+        info_table.add_row("Control Modules", "❌ Unavailable", "Import errors detected")
 
     # Check environment variables
     env_vars = [
@@ -345,20 +325,12 @@ def control_system_status() -> None:
     default="ziegler_nichols_open",
     help="PID tuning method",
 )
-@click.option(
-    "--data-file", "-f", type=click.Path(exists=True), help="Process data file (CSV)"
-)
+@click.option("--data-file", "-f", type=click.Path(exists=True), help="Process data file (CSV)")
 @click.option("--setpoint", "-s", type=float, default=50.0, help="Control setpoint")
-@click.option(
-    "--output", "-o", type=click.Path(), help="Output file for PID parameters"
-)
-def tune_pid_controller(
-    method: str, data_file: str | None, setpoint: float, output: str | None
-) -> None:
+@click.option("--output", "-o", type=click.Path(), help="Output file for PID parameters")
+def tune_pid_controller(method: str, data_file: str | None, setpoint: float, output: str | None) -> None:
     """Tune PID controller using specified method."""
-    console.print(
-        f"[bold blue]🎛️ Tuning PID Controller - {method.replace('_', ' ').title()}[/bold blue]"
-    )
+    console.print(f"[bold blue]🎛️ Tuning PID Controller - {method.replace('_', ' ').title()}[/bold blue]")
 
     if not CONTROL_MODULES_AVAILABLE:
         console.print("[red]❌ Control modules not available[/red]")
@@ -371,9 +343,7 @@ def tune_pid_controller(
         tuning_method = TuningMethod(method)
 
         # Simulate tuning process
-        console.print(
-            f"[yellow]📊 Processing data from: {data_file or 'default test data'}[/yellow]"
-        )
+        console.print(f"[yellow]📊 Processing data from: {data_file or 'default test data'}[/yellow]")
         console.print(f"[yellow]🎯 Target setpoint: {setpoint}[/yellow]")
         console.print(f"[yellow]⚙️ Applying {tuning_method.value} method...[/yellow]")
 
@@ -393,16 +363,10 @@ def tune_pid_controller(
         results_table.add_column("Value", style="green")
         results_table.add_column("Description", style="yellow")
 
-        results_table.add_row(
-            "Kp (Proportional)", f"{pid_params.kp:.4f}", "Proportional gain"
-        )
+        results_table.add_row("Kp (Proportional)", f"{pid_params.kp:.4f}", "Proportional gain")
         results_table.add_row("Ki (Integral)", f"{pid_params.ki:.4f}", "Integral gain")
-        results_table.add_row(
-            "Kd (Derivative)", f"{pid_params.kd:.4f}", "Derivative gain"
-        )
-        results_table.add_row(
-            "Setpoint", f"{pid_params.setpoint:.2f}", "Control setpoint"
-        )
+        results_table.add_row("Kd (Derivative)", f"{pid_params.kd:.4f}", "Derivative gain")
+        results_table.add_row("Setpoint", f"{pid_params.setpoint:.2f}", "Control setpoint")
 
         console.print(results_table)
 
@@ -434,9 +398,7 @@ def tune_pid_controller(
     required=True,
     help="PID configuration file (JSON)",
 )
-@click.option(
-    "--test-data", "-d", type=click.Path(exists=True), help="Test data file (CSV)"
-)
+@click.option("--test-data", "-d", type=click.Path(exists=True), help="Test data file (CSV)")
 def validate_pid_configuration(config_file: str, test_data: str | None) -> None:
     """Validate PID controller configuration."""
     console.print("[bold blue]✅ Validating PID Configuration[/bold blue]")
@@ -456,22 +418,14 @@ def validate_pid_configuration(config_file: str, test_data: str | None) -> None:
         validation_table.add_column("Details", style="yellow")
 
         # Parameter validation
-        validation_table.add_row(
-            "Parameter Format", "✅ Valid", "All parameters properly formatted"
-        )
-        validation_table.add_row(
-            "Gain Values", "✅ Valid", "All gains are non-negative"
-        )
+        validation_table.add_row("Parameter Format", "✅ Valid", "All parameters properly formatted")
+        validation_table.add_row("Gain Values", "✅ Valid", "All gains are non-negative")
 
         # Stability checks (simplified)
         if pid_params.kp > 0 and pid_params.ki >= 0 and pid_params.kd >= 0:
-            validation_table.add_row(
-                "Stability", "✅ Likely Stable", "Basic stability criteria met"
-            )
+            validation_table.add_row("Stability", "✅ Likely Stable", "Basic stability criteria met")
         else:
-            validation_table.add_row(
-                "Stability", "⚠️ Check Required", "Review gain values"
-            )
+            validation_table.add_row("Stability", "⚠️ Check Required", "Review gain values")
 
         console.print(validation_table)
         console.print("[green]✅ PID configuration validation completed[/green]")
@@ -498,14 +452,10 @@ def validate_pid_configuration(config_file: str, test_data: str | None) -> None:
     default="fopdt",
     help="Model type to identify",
 )
-@click.option(
-    "--output", "-o", type=click.Path(), help="Output file for identified model"
-)
+@click.option("--output", "-o", type=click.Path(), help="Output file for identified model")
 def identify_process_model(data_file: str, model_type: str, output: str | None) -> None:
     """Identify process model from historical data."""
-    console.print(
-        f"[bold blue]🔬 Identifying Process Model - {model_type.upper()}[/bold blue]"
-    )
+    console.print(f"[bold blue]🔬 Identifying Process Model - {model_type.upper()}[/bold blue]")
 
     if not CONTROL_MODULES_AVAILABLE:
         console.print("[red]❌ Control modules not available[/red]")
@@ -520,9 +470,7 @@ def identify_process_model(data_file: str, model_type: str, output: str | None) 
 
             if model_type == "fopdt":
                 # Simulate model identification
-                identified_model = FOPDTModel(
-                    gain=2.0, time_constant=5.0, dead_time=1.5
-                )
+                identified_model = FOPDTModel(gain=2.0, time_constant=5.0, dead_time=1.5)
 
                 # Display results
                 model_table = Table(title="FOPDT Model Identification Results")
@@ -530,17 +478,13 @@ def identify_process_model(data_file: str, model_type: str, output: str | None) 
                 model_table.add_column("Value", style="green")
                 model_table.add_column("Units", style="yellow")
 
-                model_table.add_row(
-                    "Process Gain (K)", f"{identified_model.gain:.4f}", ""
-                )
+                model_table.add_row("Process Gain (K)", f"{identified_model.gain:.4f}", "")
                 model_table.add_row(
                     "Time Constant (τ)",
                     f"{identified_model.time_constant:.2f}",
                     "seconds",
                 )
-                model_table.add_row(
-                    "Dead Time (θ)", f"{identified_model.dead_time:.2f}", "seconds"
-                )
+                model_table.add_row("Dead Time (θ)", f"{identified_model.dead_time:.2f}", "seconds")
 
                 console.print(model_table)
 
@@ -558,9 +502,7 @@ def identify_process_model(data_file: str, model_type: str, output: str | None) 
 
                     console.print(f"[green]✅ Model saved to: {output}[/green]")
 
-            console.print(
-                "[green]✅ Model identification completed successfully[/green]"
-            )
+            console.print("[green]✅ Model identification completed successfully[/green]")
 
         except Exception as e:
             console.print(f"[red]❌ Model identification error: {e}[/red]")
@@ -576,16 +518,10 @@ def identify_process_model(data_file: str, model_type: str, output: str | None) 
     required=True,
     help="Process model file (JSON)",
 )
-@click.option(
-    "--prediction-horizon", "-p", type=int, default=10, help="Prediction horizon"
-)
+@click.option("--prediction-horizon", "-p", type=int, default=10, help="Prediction horizon")
 @click.option("--control-horizon", "-c", type=int, default=3, help="Control horizon")
-@click.option(
-    "--output", "-o", type=click.Path(), help="Output file for MPC configuration"
-)
-def design_mpc_controller(
-    model_file: str, prediction_horizon: int, control_horizon: int, output: str | None
-) -> None:
+@click.option("--output", "-o", type=click.Path(), help="Output file for MPC configuration")
+def design_mpc_controller(model_file: str, prediction_horizon: int, control_horizon: int, output: str | None) -> None:
     """Design MPC controller with specified parameters."""
     console.print("[bold blue]🎛️ Designing MPC Controller[/bold blue]")
 
@@ -681,9 +617,7 @@ def simulate_mpc_control(config_file: str, setpoint: float, steps: int) -> None:
             with open(config_file) as f:
                 config_data = json.load(f)
 
-            console.print(
-                f"[yellow]📊 Loading configuration from: {config_file}[/yellow]"
-            )
+            console.print(f"[yellow]📊 Loading configuration from: {config_file}[/yellow]")
             console.print(f"[yellow]🎯 Setpoint: {setpoint}[/yellow]")
 
             # Create test model for simulation
@@ -700,9 +634,7 @@ def simulate_mpc_control(config_file: str, setpoint: float, steps: int) -> None:
             # Initialize controller
             init_result = await controller.initialize()
             if not init_result["success"]:
-                console.print(
-                    f"[red]❌ Controller initialization failed: {init_result['error']}[/red]"
-                )
+                console.print(f"[red]❌ Controller initialization failed: {init_result['error']}[/red]")
                 return
 
             # Run simulation
@@ -713,9 +645,7 @@ def simulate_mpc_control(config_file: str, setpoint: float, steps: int) -> None:
 
             for step in range(steps):
                 # Get control action
-                control_result = await controller.predict_and_control(
-                    current_output, setpoint
-                )
+                control_result = await controller.predict_and_control(current_output, setpoint)
 
                 if control_result["success"]:
                     control_output = control_result["control_output"]
@@ -734,9 +664,7 @@ def simulate_mpc_control(config_file: str, setpoint: float, steps: int) -> None:
                         }
                     )
                 else:
-                    console.print(
-                        f"[red]❌ Control calculation failed at step {step}[/red]"
-                    )
+                    console.print(f"[red]❌ Control calculation failed at step {step}[/red]")
                     break
 
             # Display simulation summary

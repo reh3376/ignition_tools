@@ -181,7 +181,7 @@ def validate_vector_embedding_environment() -> dict[str, Any]:
     Returns:
         dict containing validation results and component availability.
     """
-    validation_result = {
+        validation_result: dict[str, Any] = {
         "validation_score": 0,
         "total_checks": 12,
         "components": {},
@@ -296,7 +296,7 @@ class VectorEmbeddingEnhancement:
         self.embedding_model = None
         self.faiss_index = None
         self.neo4j_driver = None
-        self.validation_result = None
+self.validation_result: dict[str, Any] = None
 
         # Storage
         self.document_store = {}  # id -> document mapping
@@ -318,7 +318,7 @@ class VectorEmbeddingEnhancement:
         Step 3: Resource management setup
         """
         # Step 1: Environment validation first
-        self.validation_result = validate_vector_embedding_environment()
+self.validation_result: dict[str, Any] = validate_vector_embedding_environment()
 
         if self.validation_result["validation_percentage"] < 60:
             raise SMEAgentValidationError(

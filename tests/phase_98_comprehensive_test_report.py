@@ -74,9 +74,7 @@ class Phase98ComprehensiveTestReporter:
     def log_test_result(self, test_name: str, passed: bool, details: str = "") -> None:
         """Log test result following crawl_mcp.py patterns."""
         status = "✅ PASSED" if passed else "❌ FAILED"
-        self.console.print(
-            f"  {status}: {test_name}", style="green" if passed else "red"
-        )
+        self.console.print(f"  {status}: {test_name}", style="green" if passed else "red")
         if details:
             self.console.print(f"    Details: {details}", style="dim")
 
@@ -98,9 +96,7 @@ class Phase98ComprehensiveTestReporter:
                 module = RealTimeAnalyticsModule(config)
 
                 # Test environment validation
-                env_valid = all(
-                    result.valid for result in module.environment_validation.values()
-                )
+                env_valid = all(result.valid for result in module.environment_validation.values())
                 test_results[f"{complexity}_environment"] = env_valid
 
                 # Test data processing
@@ -119,9 +115,7 @@ class Phase98ComprehensiveTestReporter:
 
                 # Test error handling
                 error_result = module.process_data(None)
-                test_results[f"{complexity}_error_handling"] = not error_result[
-                    "success"
-                ]
+                test_results[f"{complexity}_error_handling"] = not error_result["success"]
 
                 # Test report generation
                 report_result = module.generate_analytics_report()
@@ -183,9 +177,7 @@ class Phase98ComprehensiveTestReporter:
                 module = SecurityComplianceModule(config)
 
                 # Test environment validation
-                env_valid = all(
-                    result.valid for result in module.environment_validation.values()
-                )
+                env_valid = all(result.valid for result in module.environment_validation.values())
                 test_results[f"{security_level}_environment"] = env_valid
 
                 # Test event logging
@@ -197,21 +189,15 @@ class Phase98ComprehensiveTestReporter:
                 }
 
                 event_result = module.log_security_event(test_event)
-                test_results[f"{security_level}_event_logging"] = event_result[
-                    "success"
-                ]
+                test_results[f"{security_level}_event_logging"] = event_result["success"]
 
                 # Test compliance checking
                 compliance_result = module.run_compliance_check("general")
-                test_results[f"{security_level}_compliance"] = compliance_result[
-                    "success"
-                ]
+                test_results[f"{security_level}_compliance"] = compliance_result["success"]
 
                 # Test error handling
                 error_result = module.log_security_event(None)
-                test_results[f"{security_level}_error_handling"] = not error_result[
-                    "success"
-                ]
+                test_results[f"{security_level}_error_handling"] = not error_result["success"]
 
                 # Test report generation
                 report_result = module.generate_security_report()
@@ -268,17 +254,13 @@ class Phase98ComprehensiveTestReporter:
 
             # Test different integration levels
             for integration_level in ["basic", "standard", "advanced", "enterprise"]:
-                self.console.print(
-                    f"  🔌 Testing {integration_level} integration level"
-                )
+                self.console.print(f"  🔌 Testing {integration_level} integration level")
 
                 config = IntegrationConfig(integration_level=integration_level)
                 module = IntegrationHubModule(config)
 
                 # Test environment validation
-                env_valid = all(
-                    result.valid for result in module.environment_validation.values()
-                )
+                env_valid = all(result.valid for result in module.environment_validation.values())
                 test_results[f"{integration_level}_environment"] = env_valid
 
                 # Test endpoint registration
@@ -289,9 +271,7 @@ class Phase98ComprehensiveTestReporter:
                 }
 
                 endpoint_result = module.register_api_endpoint(test_endpoint)
-                test_results[f"{integration_level}_endpoint_registration"] = (
-                    endpoint_result["success"]
-                )
+                test_results[f"{integration_level}_endpoint_registration"] = endpoint_result["success"]
 
                 # Test webhook processing
                 test_webhook = {
@@ -301,21 +281,15 @@ class Phase98ComprehensiveTestReporter:
                 }
 
                 webhook_result = module.process_webhook(test_webhook)
-                test_results[f"{integration_level}_webhook_processing"] = (
-                    webhook_result["success"]
-                )
+                test_results[f"{integration_level}_webhook_processing"] = webhook_result["success"]
 
                 # Test error handling
                 error_result = module.register_api_endpoint(None)
-                test_results[f"{integration_level}_error_handling"] = not error_result[
-                    "success"
-                ]
+                test_results[f"{integration_level}_error_handling"] = not error_result["success"]
 
                 # Test report generation
                 report_result = module.generate_integration_report()
-                test_results[f"{integration_level}_reporting"] = report_result[
-                    "success"
-                ]
+                test_results[f"{integration_level}_reporting"] = report_result["success"]
 
                 # Cleanup
                 module.cleanup_resources()
@@ -456,9 +430,7 @@ class Phase98ComprehensiveTestReporter:
                 module = RealTimeAnalyticsModule(config)
 
                 # Higher complexity should have more components
-                component_count = sum(
-                    module.generate_analytics_report()["report"]["components"].values()
-                )
+                component_count = sum(module.generate_analytics_report()["report"]["components"].values())
                 test_results[f"analytics_{level}_components"] = component_count >= i + 1
 
                 module.cleanup_resources()
@@ -470,9 +442,7 @@ class Phase98ComprehensiveTestReporter:
                 module = SecurityComplianceModule(config)
 
                 # Higher security should have more components
-                component_count = sum(
-                    module.generate_security_report()["report"]["components"].values()
-                )
+                component_count = sum(module.generate_security_report()["report"]["components"].values())
                 test_results[f"security_{level}_components"] = component_count >= i + 1
 
                 module.cleanup_resources()
@@ -484,14 +454,8 @@ class Phase98ComprehensiveTestReporter:
                 module = IntegrationHubModule(config)
 
                 # Higher integration should have more components
-                component_count = sum(
-                    module.generate_integration_report()["report"][
-                        "components"
-                    ].values()
-                )
-                test_results[f"integration_{level}_components"] = (
-                    component_count >= i + 1
-                )
+                component_count = sum(module.generate_integration_report()["report"]["components"].values())
+                test_results[f"integration_{level}_components"] = component_count >= i + 1
 
                 module.cleanup_resources()
 
@@ -621,16 +585,12 @@ class Phase98ComprehensiveTestReporter:
 
             # Test 5: Progressive Complexity
             complexity_results = self.test_progressive_complexity()
-            self.test_results["detailed_results"][
-                "progressive_complexity"
-            ] = complexity_results
+            self.test_results["detailed_results"]["progressive_complexity"] = complexity_results
             progress.advance(task)
 
             # Test 6: Resource Management
             resource_results = self.test_resource_management()
-            self.test_results["detailed_results"][
-                "resource_management"
-            ] = resource_results
+            self.test_results["detailed_results"]["resource_management"] = resource_results
             progress.advance(task)
 
         # Calculate overall scores
@@ -726,11 +686,7 @@ class Phase98ComprehensiveTestReporter:
         category_table.add_column("Status", style="yellow")
 
         for category, score in summary["category_scores"].items():
-            status = (
-                "✅ PASSED"
-                if score >= 80
-                else "⚠️ NEEDS IMPROVEMENT" if score >= 60 else "❌ FAILED"
-            )
+            status = "✅ PASSED" if score >= 80 else "⚠️ NEEDS IMPROVEMENT" if score >= 60 else "❌ FAILED"
             category_table.add_row(category, f"{score:.1f}/100", status)
 
         self.console.print(category_table)
@@ -742,9 +698,7 @@ class Phase98ComprehensiveTestReporter:
                 style="green bold",
             )
         elif summary["overall_score"] >= 80:
-            self.console.print(
-                "✅ GOOD: Phase 9.8 implementation meets requirements!", style="green"
-            )
+            self.console.print("✅ GOOD: Phase 9.8 implementation meets requirements!", style="green")
         elif summary["overall_score"] >= 60:
             self.console.print(
                 "⚠️ ACCEPTABLE: Phase 9.8 implementation needs some improvements",
@@ -771,9 +725,7 @@ def main():
     with open(output_file, "w") as f:
         json.dump(results, f, indent=2)
 
-    console.print(
-        f"\n💾 Comprehensive test results saved to: {output_file}", style="dim"
-    )
+    console.print(f"\n💾 Comprehensive test results saved to: {output_file}", style="dim")
 
     return results
 

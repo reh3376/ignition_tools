@@ -12,9 +12,7 @@ from pathlib import Path
 from typing import Any
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -62,9 +60,7 @@ class Phase114SimpleTester:
 
                 # Log category summary
                 status = "✅ PASSED" if category_results["failed"] == 0 else "❌ FAILED"
-                logger.info(
-                    f"{status} - {category_results['passed']}/{category_results['total']} tests passed"
-                )
+                logger.info(f"{status} - {category_results['passed']}/{category_results['total']} tests passed")
 
             except Exception as e:
                 logger.error(f"❌ Category '{category_name}' failed with error: {e}")
@@ -113,10 +109,7 @@ class Phase114SimpleTester:
         # Test specialized domain expertise
         results["total"] += 1
         try:
-            file_path = (
-                self.base_path
-                / "src/ignition/modules/sme_agent/specialized_domain_expertise.py"
-            )
+            file_path = self.base_path / "src/ignition/modules/sme_agent/specialized_domain_expertise.py"
             content = file_path.read_text()
 
             required_elements = [
@@ -128,34 +121,23 @@ class Phase114SimpleTester:
                 "def get_specialized_domain_info",
             ]
 
-            missing_elements = [
-                elem for elem in required_elements if elem not in content
-            ]
+            missing_elements = [elem for elem in required_elements if elem not in content]
 
             if not missing_elements:
                 results["passed"] += 1
-                results["details"].append(
-                    "✅ Specialized Domain Expertise: All required elements found"
-                )
+                results["details"].append("✅ Specialized Domain Expertise: All required elements found")
             else:
                 results["failed"] += 1
-                results["details"].append(
-                    f"❌ Specialized Domain Expertise: Missing {missing_elements}"
-                )
+                results["details"].append(f"❌ Specialized Domain Expertise: Missing {missing_elements}")
 
         except Exception as e:
             results["failed"] += 1
-            results["details"].append(
-                f"❌ Specialized Domain Expertise: Error reading file - {e}"
-            )
+            results["details"].append(f"❌ Specialized Domain Expertise: Error reading file - {e}")
 
         # Test proactive development assistance
         results["total"] += 1
         try:
-            file_path = (
-                self.base_path
-                / "src/ignition/modules/sme_agent/proactive_development_assistance.py"
-            )
+            file_path = self.base_path / "src/ignition/modules/sme_agent/proactive_development_assistance.py"
             content = file_path.read_text()
 
             required_elements = [
@@ -168,34 +150,23 @@ class Phase114SimpleTester:
                 "def get_proactive_development_info",
             ]
 
-            missing_elements = [
-                elem for elem in required_elements if elem not in content
-            ]
+            missing_elements = [elem for elem in required_elements if elem not in content]
 
             if not missing_elements:
                 results["passed"] += 1
-                results["details"].append(
-                    "✅ Proactive Development Assistance: All required elements found"
-                )
+                results["details"].append("✅ Proactive Development Assistance: All required elements found")
             else:
                 results["failed"] += 1
-                results["details"].append(
-                    f"❌ Proactive Development Assistance: Missing {missing_elements}"
-                )
+                results["details"].append(f"❌ Proactive Development Assistance: Missing {missing_elements}")
 
         except Exception as e:
             results["failed"] += 1
-            results["details"].append(
-                f"❌ Proactive Development Assistance: Error reading file - {e}"
-            )
+            results["details"].append(f"❌ Proactive Development Assistance: Error reading file - {e}")
 
         # Test enhanced code intelligence
         results["total"] += 1
         try:
-            file_path = (
-                self.base_path
-                / "src/ignition/modules/sme_agent/enhanced_code_intelligence.py"
-            )
+            file_path = self.base_path / "src/ignition/modules/sme_agent/enhanced_code_intelligence.py"
             content = file_path.read_text()
 
             required_elements = [
@@ -208,26 +179,18 @@ class Phase114SimpleTester:
                 "def get_enhanced_code_intelligence_info",
             ]
 
-            missing_elements = [
-                elem for elem in required_elements if elem not in content
-            ]
+            missing_elements = [elem for elem in required_elements if elem not in content]
 
             if not missing_elements:
                 results["passed"] += 1
-                results["details"].append(
-                    "✅ Enhanced Code Intelligence: All required elements found"
-                )
+                results["details"].append("✅ Enhanced Code Intelligence: All required elements found")
             else:
                 results["failed"] += 1
-                results["details"].append(
-                    f"❌ Enhanced Code Intelligence: Missing {missing_elements}"
-                )
+                results["details"].append(f"❌ Enhanced Code Intelligence: Missing {missing_elements}")
 
         except Exception as e:
             results["failed"] += 1
-            results["details"].append(
-                f"❌ Enhanced Code Intelligence: Error reading file - {e}"
-            )
+            results["details"].append(f"❌ Enhanced Code Intelligence: Error reading file - {e}")
 
         return results
 
@@ -238,10 +201,7 @@ class Phase114SimpleTester:
         # Test advanced CLI commands
         results["total"] += 1
         try:
-            file_path = (
-                self.base_path
-                / "src/ignition/modules/sme_agent/cli/advanced_commands.py"
-            )
+            file_path = self.base_path / "src/ignition/modules/sme_agent/cli/advanced_commands.py"
             content = file_path.read_text()
 
             required_elements = [
@@ -253,26 +213,18 @@ class Phase114SimpleTester:
                 "code_intelligence",
             ]
 
-            missing_elements = [
-                elem for elem in required_elements if elem not in content
-            ]
+            missing_elements = [elem for elem in required_elements if elem not in content]
 
             if not missing_elements:
                 results["passed"] += 1
-                results["details"].append(
-                    "✅ Advanced CLI Commands: All required elements found"
-                )
+                results["details"].append("✅ Advanced CLI Commands: All required elements found")
             else:
                 results["failed"] += 1
-                results["details"].append(
-                    f"❌ Advanced CLI Commands: Missing {missing_elements}"
-                )
+                results["details"].append(f"❌ Advanced CLI Commands: Missing {missing_elements}")
 
         except Exception as e:
             results["failed"] += 1
-            results["details"].append(
-                f"❌ Advanced CLI Commands: Error reading file - {e}"
-            )
+            results["details"].append(f"❌ Advanced CLI Commands: Error reading file - {e}")
 
         return results
 
@@ -295,9 +247,7 @@ class Phase114SimpleTester:
 
         if found_docs >= 1:
             results["passed"] += 1
-            results["details"].append(
-                f"✅ Documentation: Found {found_docs}/{len(doc_files)} documentation files"
-            )
+            results["details"].append(f"✅ Documentation: Found {found_docs}/{len(doc_files)} documentation files")
         else:
             results["failed"] += 1
             results["details"].append("❌ Documentation: No documentation files found")
@@ -345,9 +295,7 @@ class Phase114SimpleTester:
                 file_size = file_path.stat().st_size
                 if file_size >= min_size:
                     results["passed"] += 1
-                    results["details"].append(
-                        f"✅ {filename}: Substantial implementation ({file_size:,} bytes)"
-                    )
+                    results["details"].append(f"✅ {filename}: Substantial implementation ({file_size:,} bytes)")
                 else:
                     results["failed"] += 1
                     results["details"].append(
@@ -381,23 +329,17 @@ class Phase114SimpleTester:
         logger.info("\n📋 Category Breakdown:")
         for category, results in self.test_results["test_categories"].items():
             status = "✅" if results["failed"] == 0 else "❌"
-            logger.info(
-                f"   {status} {category}: {results['passed']}/{results['total']}"
-            )
+            logger.info(f"   {status} {category}: {results['passed']}/{results['total']}")
 
         # Success message
         if failed_tests == 0:
-            logger.info(
-                "\n🎉 ALL TESTS PASSED! Phase 11.4 implementation is complete and ready."
-            )
+            logger.info("\n🎉 ALL TESTS PASSED! Phase 11.4 implementation is complete and ready.")
         elif success_rate >= 80:
             logger.info(
-                f"\n✅ MOSTLY COMPLETE! {success_rate:.1f}% success rate indicates Phase 11.4 is substantially implemented."
+                f"\n✅ MOSTLY COMPLETE! {success_rate:.1f}% success rate indicates Phase 11.4 is substantially implemented."  # noqa: E501
             )
         else:
-            logger.info(
-                f"\n⚠️  {failed_tests} test(s) failed. Phase 11.4 implementation needs attention."
-            )
+            logger.info(f"\n⚠️  {failed_tests} test(s) failed. Phase 11.4 implementation needs attention.")
 
         # Save detailed report
         report_path = self.base_path / "phase_11_4_simple_test_report.json"
@@ -421,24 +363,16 @@ async def main():
         results = await tester.run_all_tests()
 
         # Exit with appropriate code based on success rate
-        success_rate = (
-            (results["passed_tests"] / results["total_tests"] * 100)
-            if results["total_tests"] > 0
-            else 0
-        )
+        success_rate = (results["passed_tests"] / results["total_tests"] * 100) if results["total_tests"] > 0 else 0
 
         if results["failed_tests"] == 0:
             print("\n✅ All tests passed! Phase 11.4 is complete and ready.")
             sys.exit(0)
         elif success_rate >= 80:
-            print(
-                f"\n✅ Phase 11.4 is substantially complete ({success_rate:.1f}% success rate)."
-            )
+            print(f"\n✅ Phase 11.4 is substantially complete ({success_rate:.1f}% success rate).")
             sys.exit(0)
         else:
-            print(
-                f"\n❌ Phase 11.4 needs attention ({success_rate:.1f}% success rate)."
-            )
+            print(f"\n❌ Phase 11.4 needs attention ({success_rate:.1f}% success rate).")
             sys.exit(1)
 
     except Exception as e:

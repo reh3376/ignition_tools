@@ -9,7 +9,7 @@ import os
 import subprocess
 import threading
 import time
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from typing import Any
 
 import psutil
@@ -45,11 +45,7 @@ class EnhancedTerminalMonitor(TerminalMonitor):
                 "memory_sufficient",
             ]
 
-            missing_components = [
-                comp
-                for comp in required_components
-                if not env_validation.get(comp, False)
-            ]
+            missing_components = [comp for comp in required_components if not env_validation.get(comp, False)]
 
             if missing_components:
                 raise RuntimeError(f"Missing required components: {missing_components}")
@@ -60,15 +56,11 @@ class EnhancedTerminalMonitor(TerminalMonitor):
             self.monitoring_active = True
 
             # Start monitoring thread
-            self.monitor_thread = threading.Thread(
-                target=self._monitoring_loop, daemon=True, name="TerminalMonitor"
-            )
+            self.monitor_thread = threading.Thread(target=self._monitoring_loop, daemon=True, name="TerminalMonitor")
             self.monitor_thread.start()
 
             # Start cleanup thread
-            self.cleanup_thread = threading.Thread(
-                target=self._cleanup_loop, daemon=True, name="TerminalCleanup"
-            )
+            self.cleanup_thread = threading.Thread(target=self._cleanup_loop, daemon=True, name="TerminalCleanup")
             self.cleanup_thread.start()
 
             return True
@@ -77,7 +69,7 @@ class EnhancedTerminalMonitor(TerminalMonitor):
             self.monitoring_active = False
             raise RuntimeError(f"Failed to start monitoring: {e}")
 
-    def stop_monitoring(self):
+    def stop_monitoring(self) -> None:
         """Stop the monitoring system."""
         self.monitoring_active = False
 
@@ -95,10 +87,8 @@ class EnhancedTerminalMonitor(TerminalMonitor):
                     execution.process.terminate()
                     execution.process.wait(timeout=5)
                 except:
-                    try:
+                    with suppress(Exception):
                         execution.process.kill()
-                    except:
-                        pass
 
     async def execute_command(self, request: CommandRequest) -> CommandExecution:
         """Execute a command with monitoring and auto-recovery.
@@ -117,14 +107,10 @@ class EnhancedTerminalMonitor(TerminalMonitor):
             raise ValueError(f"Invalid command request: {e}")
 
         # Check concurrent command limit
-        active_commands = sum(
-            1 for exec in self.executions.values() if exec.state == CommandState.RUNNING
-        )
+        active_commands = sum(1 for exec in self.executions.values() if exec.state == CommandState.RUNNING)
 
         if active_commands >= self.config.max_concurrent_commands:
-            raise RuntimeError(
-                f"Maximum concurrent commands limit reached ({self.config.max_concurrent_commands})"
-            )
+            raise RuntimeError(f"Maximum concurrent commands limit reached ({self.config.max_concurrent_commands})")
 
         # Create execution instance
         execution_id = f"cmd_{int(time.time() * 1000)}_{len(self.executions)}"
@@ -149,7 +135,7 @@ class EnhancedTerminalMonitor(TerminalMonitor):
             self._update_statistics(execution)
             raise
 
-    async def _start_command_execution(self, execution: CommandExecution):
+    async def _start_command_execution(self, execution: CommandExecution) -> None:
         """Start command execution."""
         request = execution.request
 
@@ -157,7 +143,7 @@ class EnhancedTerminalMonitor(TerminalMonitor):
             # Prepare command
             if isinstance(request.command, str):
                 if request.args:
-                    cmd = [request.command] + request.args
+                    cmd = [request.command, *request.args]
                 else:
                     cmd = request.command if request.shell else [request.command]
             else:
@@ -189,7 +175,7 @@ class EnhancedTerminalMonitor(TerminalMonitor):
             execution.errors.append(f"Failed to start command: {e}")
             raise
 
-    async def _wait_for_completion(self, execution: CommandExecution):
+    async def _wait_for_completion(self, execution: CommandExecution) -> bool:
         """Wait for command completion with monitoring."""
         timeout = execution.request.timeout or self.config.default_timeout
         start_time = time.time()
@@ -255,7 +241,7 @@ class EnhancedTerminalMonitor(TerminalMonitor):
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             return False
 
-    async def _handle_timeout(self, execution: CommandExecution):
+    async def _handle_timeout(self, execution: CommandExecution) -> None:
         """Handle command timeout."""
         execution.state = CommandState.TIMEOUT
         execution.errors.append(
@@ -265,7 +251,7 @@ class EnhancedTerminalMonitor(TerminalMonitor):
         if self.config.enable_auto_recovery:
             await self._attempt_recovery(execution, "timeout")
 
-    async def _handle_stall(self, execution: CommandExecution):
+    async def _handle_stall(self, execution: CommandExecution) -> None:
         """Handle command stall."""
         execution.warnings.append("Command appears stalled (low CPU activity)")
         self.stats["stalled_commands"] += 1
@@ -273,7 +259,7 @@ class EnhancedTerminalMonitor(TerminalMonitor):
         if self.config.enable_auto_recovery:
             await self._attempt_recovery(execution, "stall")
 
-    async def _attempt_recovery(self, execution: CommandExecution, reason: str):
+    async def _attempt_recovery(self, execution: CommandExecution, reason: str) -> None:
         """Attempt to recover a failed/stalled command."""
         if not self.config.enable_auto_recovery:
             return
@@ -281,9 +267,7 @@ class EnhancedTerminalMonitor(TerminalMonitor):
         max_retries = execution.request.max_retries or self.config.max_retries
         if execution.retry_count >= max_retries:
             execution.state = CommandState.FAILED
-            execution.errors.append(
-                f"Maximum recovery attempts reached ({max_retries})"
-            )
+            execution.errors.append(f"Maximum recovery attempts reached ({max_retries})")
             return
 
         # Determine recovery actions
@@ -309,9 +293,7 @@ class EnhancedTerminalMonitor(TerminalMonitor):
         execution.last_recovery_time = time.time()
         execution.recovery_attempts.append(f"{reason}:{action}")
 
-    async def _handle_retry_recovery(
-        self, execution: CommandExecution, reason: str
-    ) -> bool:
+    async def _handle_retry_recovery(self, execution: CommandExecution, reason: str) -> bool:
         """Handle retry recovery action."""
         try:
             # Kill current process if running
@@ -336,9 +318,7 @@ class EnhancedTerminalMonitor(TerminalMonitor):
         except Exception:
             return False
 
-    async def _handle_kill_restart_recovery(
-        self, execution: CommandExecution, reason: str
-    ) -> bool:
+    async def _handle_kill_restart_recovery(self, execution: CommandExecution, reason: str) -> bool:
         """Handle kill and restart recovery action."""
         try:
             # Force kill process and all children
@@ -349,10 +329,8 @@ class EnhancedTerminalMonitor(TerminalMonitor):
 
                     # Kill children first
                     for child in children:
-                        try:
+                        with suppress(Exception):
                             child.kill()
-                        except:
-                            pass
 
                     # Kill parent
                     parent.kill()
@@ -369,9 +347,7 @@ class EnhancedTerminalMonitor(TerminalMonitor):
         except Exception:
             return False
 
-    async def _handle_adaptive_timeout_recovery(
-        self, execution: CommandExecution, reason: str
-    ) -> bool:
+    async def _handle_adaptive_timeout_recovery(self, execution: CommandExecution, reason: str) -> bool:
         """Handle adaptive timeout recovery action."""
         try:
             # Increase timeout by factor
@@ -388,9 +364,7 @@ class EnhancedTerminalMonitor(TerminalMonitor):
         except Exception:
             return False
 
-    async def _handle_escalation_recovery(
-        self, execution: CommandExecution, reason: str
-    ) -> bool:
+    async def _handle_escalation_recovery(self, execution: CommandExecution, reason: str) -> bool:
         """Handle escalation recovery action."""
         execution.errors.append(f"Command escalated for manual intervention: {reason}")
         execution.state = CommandState.FAILED
@@ -403,20 +377,18 @@ class EnhancedTerminalMonitor(TerminalMonitor):
 
         return False
 
-    async def _handle_skip_recovery(
-        self, execution: CommandExecution, reason: str
-    ) -> bool:
+    async def _handle_skip_recovery(self, execution: CommandExecution, reason: str) -> bool:
         """Handle skip recovery action."""
         execution.warnings.append(f"Command skipped due to {reason}")
         execution.state = CommandState.COMPLETED
         execution.return_code = -1
         return True
 
-    def _monitoring_loop(self):
+    def _monitoring_loop(self) -> Any:
         """Main monitoring loop."""
         while self.monitoring_active:
             try:
-                current_time = time.time()
+                time.time()
 
                 for execution in list(self.executions.values()):
                     if execution.state == CommandState.RUNNING and execution.process:
@@ -433,7 +405,7 @@ class EnhancedTerminalMonitor(TerminalMonitor):
                 print(f"Monitoring loop error: {e}")
                 time.sleep(self.config.check_interval)
 
-    def _cleanup_loop(self):
+    def _cleanup_loop(self) -> Any:
         """Cleanup loop for completed executions."""
         while self.monitoring_active:
             try:
@@ -464,7 +436,7 @@ class EnhancedTerminalMonitor(TerminalMonitor):
                 print(f"Cleanup loop error: {e}")
                 time.sleep(60)  # Wait longer on error
 
-    def _update_execution_metrics(self, execution: CommandExecution):
+    def _update_execution_metrics(self, execution: CommandExecution) -> Any:
         """Update execution metrics."""
         if not execution.process:
             return
@@ -485,7 +457,7 @@ class EnhancedTerminalMonitor(TerminalMonitor):
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             pass
 
-    def _update_statistics(self, execution: CommandExecution):
+    def _update_statistics(self, execution: CommandExecution) -> Any:
         """Update system statistics."""
         if execution.state == CommandState.COMPLETED:
             self.stats["successful_commands"] += 1
@@ -497,12 +469,8 @@ class EnhancedTerminalMonitor(TerminalMonitor):
         # Update average execution time
         if execution.metrics.end_time:
             duration = execution.metrics.get_duration()
-            total_time = self.stats["average_execution_time"] * (
-                self.stats["total_commands"] - 1
-            )
-            self.stats["average_execution_time"] = (total_time + duration) / self.stats[
-                "total_commands"
-            ]
+            total_time = self.stats["average_execution_time"] * (self.stats["total_commands"] - 1)
+            self.stats["average_execution_time"] = (total_time + duration) / self.stats["total_commands"]
 
     def get_statistics(self) -> dict[str, Any]:
         """Get monitoring statistics."""
@@ -511,14 +479,9 @@ class EnhancedTerminalMonitor(TerminalMonitor):
         return {
             **self.stats,
             "uptime_seconds": uptime,
-            "active_executions": len(
-                [e for e in self.executions.values() if e.state == CommandState.RUNNING]
-            ),
+            "active_executions": len([e for e in self.executions.values() if e.state == CommandState.RUNNING]),
             "total_executions": len(self.executions),
-            "success_rate": (
-                self.stats["successful_commands"] / max(1, self.stats["total_commands"])
-            )
-            * 100,
+            "success_rate": (self.stats["successful_commands"] / max(1, self.stats["total_commands"])) * 100,
             "recovery_rate": (
                 self.stats["recovered_commands"]
                 / max(1, self.stats["failed_commands"] + self.stats["timeout_commands"])
@@ -549,7 +512,7 @@ class EnhancedTerminalMonitor(TerminalMonitor):
         }
 
     @asynccontextmanager
-    async def managed_execution(self, request: CommandRequest):
+    async def managed_execution(self, request: CommandRequest) -> None:
         """Context manager for managed command execution."""
         execution = None
         try:
@@ -561,10 +524,8 @@ class EnhancedTerminalMonitor(TerminalMonitor):
                     execution.process.terminate()
                     execution.process.wait(timeout=5)
                 except:
-                    try:
+                    with suppress(Exception):
                         execution.process.kill()
-                    except:
-                        pass
 
 
 # Global enhanced monitor instance

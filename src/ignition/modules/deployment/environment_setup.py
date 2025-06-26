@@ -1,4 +1,4 @@
-"""Phase 9.7 Environment Setup System
+"""Phase 9.7 Environment Setup System.
 ==================================
 
 Following crawl_mcp.py methodology for systematic environment configuration:
@@ -56,7 +56,7 @@ class ValidationResult:
 
 
 class Phase97EnvironmentSetup:
-    """Phase 9.7 Environment Setup System
+    """Phase 9.7 Environment Setup System.
 
     Following crawl_mcp.py methodology:
     - Step 1: Environment Variable Validation First
@@ -177,11 +177,9 @@ class Phase97EnvironmentSetup:
 
     def validate_environment_variables(self) -> dict[str, ValidationResult]:
         """Step 1: Environment Variable Validation First
-        Following crawl_mcp.py methodology
+        Following crawl_mcp.py methodology.
         """
-        self.console.print(
-            "🔍 Step 1: Environment Variable Validation", style="bold blue"
-        )
+        self.console.print("🔍 Step 1: Environment Variable Validation", style="bold blue")
 
         results = {}
 
@@ -192,16 +190,12 @@ class Phase97EnvironmentSetup:
 
             # Display result with user-friendly formatting
             status = "✅" if result.valid else "❌" if req.required else "⚠️"
-            self.console.print(
-                f"  {status} {req.name}: {self._format_validation_message(result)}"
-            )
+            self.console.print(f"  {status} {req.name}: {self._format_validation_message(result)}")
 
         self.setup_results["environment_validation"] = results
         return results
 
-    def _validate_single_requirement(
-        self, req: EnvironmentRequirement, value: str | None
-    ) -> ValidationResult:
+    def _validate_single_requirement(self, req: EnvironmentRequirement, value: str | None) -> ValidationResult:
         """Validate a single environment requirement with comprehensive checks."""
         if not value:
             if req.required:
@@ -224,9 +218,7 @@ class Phase97EnvironmentSetup:
                 return ValidationResult(
                     valid=True,
                     warning="Optional variable not set",
-                    suggestions=[
-                        f"set {req.env_var} if needed: {req.setup_instructions}"
-                    ],
+                    suggestions=[f"set {req.env_var} if needed: {req.setup_instructions}"],
                 )
 
         # Validate based on type
@@ -239,9 +231,7 @@ class Phase97EnvironmentSetup:
         else:  # string
             return ValidationResult(valid=True, value=value)
 
-    def _validate_path(
-        self, path_str: str, req: EnvironmentRequirement
-    ) -> ValidationResult:
+    def _validate_path(self, path_str: str, req: EnvironmentRequirement) -> ValidationResult:
         """Validate path with user-friendly error messages."""
         try:
             path = Path(path_str).expanduser().resolve()
@@ -340,9 +330,7 @@ class Phase97EnvironmentSetup:
 
         return ValidationResult(valid=True, value=url)
 
-    def _validate_boolean(
-        self, value: str, req: EnvironmentRequirement
-    ) -> ValidationResult:
+    def _validate_boolean(self, value: str, req: EnvironmentRequirement) -> ValidationResult:
         """Validate boolean value."""
         value = value.lower().strip()
         if value in ["true", "false", "1", "0", "yes", "no"]:
@@ -366,11 +354,9 @@ class Phase97EnvironmentSetup:
 
     def check_system_requirements(self) -> dict[str, ValidationResult]:
         """Step 2: Comprehensive System Requirements Validation
-        Check Java, Gradle, and other system dependencies
+        Check Java, Gradle, and other system dependencies.
         """
-        self.console.print(
-            "\n🔍 Step 2: System Requirements Validation", style="bold blue"
-        )
+        self.console.print("\n🔍 Step 2: System Requirements Validation", style="bold blue")
 
         results = {}
 
@@ -378,25 +364,19 @@ class Phase97EnvironmentSetup:
         java_result = self._check_java_installation()
         results["java"] = java_result
         status = "✅" if java_result.valid else "❌"
-        self.console.print(
-            f"  {status} Java: {self._format_validation_message(java_result)}"
-        )
+        self.console.print(f"  {status} Java: {self._format_validation_message(java_result)}")
 
         # Check Gradle installation
         gradle_result = self._check_gradle_installation()
         results["gradle"] = gradle_result
         status = "✅" if gradle_result.valid else "❌"
-        self.console.print(
-            f"  {status} Gradle: {self._format_validation_message(gradle_result)}"
-        )
+        self.console.print(f"  {status} Gradle: {self._format_validation_message(gradle_result)}")
 
         # Check OpenSSL for certificate generation
         openssl_result = self._check_openssl_installation()
         results["openssl"] = openssl_result
         status = "✅" if openssl_result.valid else "⚠️"
-        self.console.print(
-            f"  {status} OpenSSL: {self._format_validation_message(openssl_result)}"
-        )
+        self.console.print(f"  {status} OpenSSL: {self._format_validation_message(openssl_result)}")
 
         self.setup_results["system_requirements"] = results
         return results
@@ -405,9 +385,7 @@ class Phase97EnvironmentSetup:
         """Check Java installation and version."""
         try:
             # Check if java command is available
-            result = subprocess.run(
-                ["java", "-version"], capture_output=True, text=True, timeout=10
-            )
+            result = subprocess.run(["java", "-version"], capture_output=True, text=True, timeout=10)
 
             if result.returncode != 0:
                 return ValidationResult(
@@ -422,11 +400,7 @@ class Phase97EnvironmentSetup:
 
             # Parse version from output
             version_output = result.stderr  # Java outputs version to stderr
-            if (
-                "11." in version_output
-                or "17." in version_output
-                or "21." in version_output
-            ):
+            if "11." in version_output or "17." in version_output or "21." in version_output:
                 return ValidationResult(
                     valid=True,
                     value=f"Java found: {version_output.split()[0] if version_output.split() else 'Unknown version'}",
@@ -468,9 +442,7 @@ class Phase97EnvironmentSetup:
     def _check_gradle_installation(self) -> ValidationResult:
         """Check Gradle installation and version."""
         try:
-            result = subprocess.run(
-                ["gradle", "--version"], capture_output=True, text=True, timeout=15
-            )
+            result = subprocess.run(["gradle", "--version"], capture_output=True, text=True, timeout=15)
 
             if result.returncode != 0:
                 return ValidationResult(
@@ -484,13 +456,9 @@ class Phase97EnvironmentSetup:
                 )
 
             # Parse version
-            version_line = next(
-                (line for line in result.stdout.split("\n") if "Gradle" in line), ""
-            )
+            version_line = next((line for line in result.stdout.split("\n") if "Gradle" in line), "")
             if version_line:
-                return ValidationResult(
-                    valid=True, value=f"Gradle found: {version_line.strip()}"
-                )
+                return ValidationResult(valid=True, value=f"Gradle found: {version_line.strip()}")
             else:
                 return ValidationResult(
                     valid=True,
@@ -524,14 +492,10 @@ class Phase97EnvironmentSetup:
     def _check_openssl_installation(self) -> ValidationResult:
         """Check OpenSSL for certificate generation."""
         try:
-            result = subprocess.run(
-                ["openssl", "version"], capture_output=True, text=True, timeout=10
-            )
+            result = subprocess.run(["openssl", "version"], capture_output=True, text=True, timeout=10)
 
             if result.returncode == 0:
-                return ValidationResult(
-                    valid=True, value=f"OpenSSL found: {result.stdout.strip()}"
-                )
+                return ValidationResult(valid=True, value=f"OpenSSL found: {result.stdout.strip()}")
             else:
                 return ValidationResult(
                     valid=False,
@@ -554,11 +518,9 @@ class Phase97EnvironmentSetup:
 
     def setup_development_environment(self, interactive: bool = True) -> dict[str, Any]:
         """Step 3: Progressive Environment Setup
-        set up development environment with user guidance
+        set up development environment with user guidance.
         """
-        self.console.print(
-            "\n🔧 Step 3: Development Environment Setup", style="bold blue"
-        )
+        self.console.print("\n🔧 Step 3: Development Environment Setup", style="bold blue")
 
         setup_results = {}
 
@@ -587,31 +549,25 @@ class Phase97EnvironmentSetup:
             ("DEPLOYMENT_OUTPUT_DIR", "Deployment output directory"),
         ]
 
-        for env_var, description in directories:
+        for env_var, _description in directories:
             req = next(r for r in self.requirements if r.env_var == env_var)
 
             # Get path from environment or use default
             path_str = os.getenv(env_var) or req.default_value
             if not path_str:
-                results[env_var] = ValidationResult(
-                    valid=False, error=f"No path specified for {env_var}"
-                )
+                results[env_var] = ValidationResult(valid=False, error=f"No path specified for {env_var}")
                 continue
 
             try:
                 path = Path(path_str).expanduser().resolve()
 
                 if path.exists():
-                    results[env_var] = ValidationResult(
-                        valid=True, value=str(path), warning="Directory already exists"
-                    )
+                    results[env_var] = ValidationResult(valid=True, value=str(path), warning="Directory already exists")
                 else:
                     if interactive:
                         create = Confirm.ask(f"Create directory {path}?", default=True)
                         if not create:
-                            results[env_var] = ValidationResult(
-                                valid=False, error="Directory creation declined"
-                            )
+                            results[env_var] = ValidationResult(valid=False, error="Directory creation declined")
                             continue
 
                     path.mkdir(parents=True, exist_ok=True)
@@ -648,12 +604,7 @@ class Phase97EnvironmentSetup:
         cert_path = os.getenv("SIGNING_CERT_PATH")
         key_path = os.getenv("SIGNING_KEY_PATH")
 
-        if (
-            cert_path
-            and key_path
-            and Path(cert_path).exists()
-            and Path(key_path).exists()
-        ):
+        if cert_path and key_path and Path(cert_path).exists() and Path(key_path).exists():
             results["certificates"] = ValidationResult(
                 valid=True,
                 value="Existing certificates found",
@@ -663,9 +614,7 @@ class Phase97EnvironmentSetup:
 
         # Offer to generate certificates
         if interactive:
-            generate = Confirm.ask(
-                "Generate self-signed certificates for development?", default=True
-            )
+            generate = Confirm.ask("Generate self-signed certificates for development?", default=True)
             if not generate:
                 results["certificates"] = ValidationResult(
                     valid=False,
@@ -796,15 +745,11 @@ class Phase97EnvironmentSetup:
             # Write to .env file
             if new_vars:
                 with open(env_file, "a") as f:
-                    f.write(
-                        f"\n# Phase 9.7 Environment Setup - {datetime.now().isoformat()}\n"
-                    )
+                    f.write(f"\n# Phase 9.7 Environment Setup - {datetime.now().isoformat()}\n")
                     for key, value in new_vars.items():
                         f.write(f"{key}={value}\n")
 
-                self.console.print(
-                    f"    ✅ Updated .env file with {len(new_vars)} variables"
-                )
+                self.console.print(f"    ✅ Updated .env file with {len(new_vars)} variables")
 
                 return ValidationResult(
                     valid=True,
@@ -830,7 +775,7 @@ class Phase97EnvironmentSetup:
             )
 
     def generate_setup_report(self) -> dict[str, Any]:
-        """Step 4: Generate comprehensive setup report"""
+        """Step 4: Generate comprehensive setup report."""
         self.console.print("\n📊 Step 4: Generating Setup Report", style="bold blue")
 
         # Validate current state
@@ -851,9 +796,7 @@ class Phase97EnvironmentSetup:
             "environment_results": env_results,
             "system_results": sys_results,
             "setup_results": self.setup_results,
-            "recommendations": self._generate_setup_recommendations(
-                env_results, sys_results
-            ),
+            "recommendations": self._generate_setup_recommendations(env_results, sys_results),
             "next_steps": self._generate_next_steps(env_results, sys_results),
         }
 
@@ -864,9 +807,7 @@ class Phase97EnvironmentSetup:
 
         return report
 
-    def _calculate_environment_score(
-        self, results: dict[str, ValidationResult]
-    ) -> float:
+    def _calculate_environment_score(self, results: dict[str, ValidationResult]) -> float:
         """Calculate environment setup score."""
         total_weight = 0
         achieved_weight = 0
@@ -948,18 +889,13 @@ class Phase97EnvironmentSetup:
 
         # Configuration steps
         missing_critical = [
-            var
-            for var in ["JAVA_HOME", "GRADLE_HOME"]
-            if not env_results.get(var, ValidationResult(False)).valid
+            var for var in ["JAVA_HOME", "GRADLE_HOME"] if not env_results.get(var, ValidationResult(False)).valid
         ]
         if missing_critical:
             steps.append(f"set environment variables: {', '.join(missing_critical)}")
 
         # Testing steps
-        if all(
-            sys_results.get(comp, ValidationResult(False)).valid
-            for comp in ["java", "gradle"]
-        ):
+        if all(sys_results.get(comp, ValidationResult(False)).valid for comp in ["java", "gradle"]):
             steps.append("Run Phase 9.7 validation tests")
             steps.append("Test module packaging with sample project")
 
@@ -979,11 +915,7 @@ class Phase97EnvironmentSetup:
             (
                 "✅ Ready"
                 if report["environment_score"] >= 80
-                else (
-                    "⚠️ Partial"
-                    if report["environment_score"] >= 50
-                    else "❌ Needs Setup"
-                )
+                else ("⚠️ Partial" if report["environment_score"] >= 50 else "❌ Needs Setup")
             ),
         )
         table.add_row(
@@ -1033,13 +965,13 @@ def main() -> None:
     )
 
     # Step 1: Validate current environment
-    env_results = setup.validate_environment_variables()
+    setup.validate_environment_variables()
 
     # Step 2: Check system requirements
-    sys_results = setup.check_system_requirements()
+    setup.check_system_requirements()
 
     # Step 3: Setup development environment
-    setup_results = setup.setup_development_environment(interactive=True)
+    setup.setup_development_environment(interactive=True)
 
     # Step 4: Generate final report
     report = setup.generate_setup_report()
@@ -1050,9 +982,7 @@ def main() -> None:
     with open("phase_97_environment_setup_report.json", "w") as f:
         json.dump(report, f, indent=2, default=str)
 
-    setup.console.print(
-        "\n📄 Complete setup report saved to: phase_97_environment_setup_report.json"
-    )
+    setup.console.print("\n📄 Complete setup report saved to: phase_97_environment_setup_report.json")
 
 
 if __name__ == "__main__":

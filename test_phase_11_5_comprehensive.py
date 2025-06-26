@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Comprehensive Test Suite for Phase 11.5: Industrial Dataset Curation & AI Model Preparation
+"""Comprehensive Test Suite for Phase 11.5: Industrial Dataset Curation & AI Model Preparation.
 
 Following the crawl_mcp.py methodology for structured testing:
 - Comprehensive validation and error handling
@@ -139,9 +139,7 @@ class Phase115TestSuite:
                     print(f"  ❌ Missing validation key: {key}")
                     return False
 
-            print(
-                f"  ✓ Environment validation completed with {len(validation_results)} components"
-            )
+            print(f"  ✓ Environment validation completed with {len(validation_results)} components")
             return True
         except Exception as e:
             print(f"  ❌ Environment validation failed: {e}")
@@ -161,9 +159,7 @@ class Phase115TestSuite:
                     return False
 
                 if curator.complexity_level != level:
-                    print(
-                        f"  ❌ Complexity level mismatch: {curator.complexity_level} != {level}"
-                    )
+                    print(f"  ❌ Complexity level mismatch: {curator.complexity_level} != {level}")
                     return False
 
                 # Test status method
@@ -172,9 +168,7 @@ class Phase115TestSuite:
                     print(f"  ❌ Status should be dict, got {type(status)}")
                     return False
 
-            print(
-                "  ✓ Dataset curator initialized successfully for all complexity levels"
-            )
+            print("  ✓ Dataset curator initialized successfully for all complexity levels")
             return True
         except Exception as e:
             print(f"  ❌ Dataset curator initialization failed: {e}")
@@ -219,14 +213,10 @@ class Phase115TestSuite:
 
             # Verify variables were added
             if len(curator.variables) != len(test_variables):
-                print(
-                    f"  ❌ Expected {len(test_variables)} variables, got {len(curator.variables)}"
-                )
+                print(f"  ❌ Expected {len(test_variables)} variables, got {len(curator.variables)}")
                 return False
 
-            print(
-                f"  ✓ Successfully managed {len(test_variables)} variable metadata entries"
-            )
+            print(f"  ✓ Successfully managed {len(test_variables)} variable metadata entries")
             return True
         except Exception as e:
             print(f"  ❌ Variable metadata management failed: {e}")
@@ -250,36 +240,26 @@ class Phase115TestSuite:
             )
 
             # Save to temporary file
-            with tempfile.NamedTemporaryFile(
-                mode="w", suffix=".csv", delete=False
-            ) as f:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
                 test_data.to_csv(f.name, index=False)
                 temp_file = f.name
 
             try:
                 # Test CSV ingestion
                 result = asyncio.run(
-                    ingestion_framework.ingest_csv_data(
-                        file_path=temp_file, timestamp_column="timestamp"
-                    )
+                    ingestion_framework.ingest_csv_data(file_path=temp_file, timestamp_column="timestamp")
                 )
 
                 if not result.get("success", False):
-                    print(
-                        f"  ❌ CSV ingestion failed: {result.get('error', 'Unknown error')}"
-                    )
+                    print(f"  ❌ CSV ingestion failed: {result.get('error', 'Unknown error')}")
                     return False
 
                 if result["rows_processed"] != 100:
-                    print(
-                        f"  ❌ Expected 100 rows, processed {result['rows_processed']}"
-                    )
+                    print(f"  ❌ Expected 100 rows, processed {result['rows_processed']}")
                     return False
 
                 if result["columns_processed"] != 4:  # timestamp becomes index
-                    print(
-                        f"  ❌ Expected 4 columns, processed {result['columns_processed']}"
-                    )
+                    print(f"  ❌ Expected 4 columns, processed {result['columns_processed']}")
                     return False
 
                 # Verify quality report
@@ -289,7 +269,7 @@ class Phase115TestSuite:
                     return False
 
                 print(
-                    f"  ✓ Data ingestion successful: {result['rows_processed']} rows, quality score: {quality_report['quality_score']:.1f}"
+                    f"  ✓ Data ingestion successful: {result['rows_processed']} rows, quality score: {quality_report['quality_score']:.1f}"  # noqa: E501
                 )
                 return True
 
@@ -311,9 +291,7 @@ class Phase115TestSuite:
             test_data = pd.DataFrame(
                 {
                     "reactor_temperature": 50 + 10 * pd.np.random.randn(100),
-                    "valve_output_cv": pd.np.clip(
-                        50 + 20 * pd.np.random.randn(100), 0, 100
-                    ),
+                    "valve_output_cv": pd.np.clip(50 + 20 * pd.np.random.randn(100), 0, 100),
                     "temp_setpoint": [75] * 100,  # Constant setpoint
                     "ambient_temp_dv": 20 + 5 * pd.np.random.randn(100),
                     "pump_status_state": pd.np.random.choice([0, 1], 100),
@@ -330,9 +308,7 @@ class Phase115TestSuite:
             )
 
             if not result.get("success", False):
-                print(
-                    f"  ❌ Classification failed: {result.get('error', 'Unknown error')}"
-                )
+                print(f"  ❌ Classification failed: {result.get('error', 'Unknown error')}")
                 return False
 
             if result["total_variables"] != 6:
@@ -362,7 +338,7 @@ class Phase115TestSuite:
             accuracy = correct_classifications / len(expected_classifications) * 100
 
             print(
-                f"  ✓ Variable classification completed: {result['classified_variables']}/{result['total_variables']} classified, {accuracy:.1f}% accuracy"
+                f"  ✓ Variable classification completed: {result['classified_variables']}/{result['total_variables']} classified, {accuracy:.1f}% accuracy"  # noqa: E501
             )
             return True
 
@@ -396,9 +372,7 @@ class Phase115TestSuite:
                     print(f"  ❌ Missing CLI command: {cmd}")
                     return False
 
-            print(
-                f"  ✓ All {len(expected_commands)} CLI commands are properly integrated"
-            )
+            print(f"  ✓ All {len(expected_commands)} CLI commands are properly integrated")
             return True
 
         except Exception as e:
@@ -409,9 +383,7 @@ class Phase115TestSuite:
         """Test 8: Verify data source validation functionality."""
         try:
             # Test CSV file validation
-            with tempfile.NamedTemporaryFile(
-                mode="w", suffix=".csv", delete=False
-            ) as f:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
                 f.write("timestamp,value\n2024-01-01,100\n")
                 temp_csv = f.name
 
@@ -419,9 +391,7 @@ class Phase115TestSuite:
                 # Valid CSV file
                 result = validate_data_source(temp_csv, DataSourceType.CSV_XLS)
                 if not result.get("valid", False):
-                    print(
-                        f"  ❌ Valid CSV file failed validation: {result.get('error')}"
-                    )
+                    print(f"  ❌ Valid CSV file failed validation: {result.get('error')}")
                     return False
 
                 # Invalid file path
@@ -431,13 +401,9 @@ class Phase115TestSuite:
                     return False
 
                 # OPC-UA URL validation
-                result = validate_data_source(
-                    "opc.tcp://localhost:4840", DataSourceType.OPC_UA
-                )
+                result = validate_data_source("opc.tcp://localhost:4840", DataSourceType.OPC_UA)
                 if not result.get("valid", False):
-                    print(
-                        f"  ❌ Valid OPC-UA URL failed validation: {result.get('error')}"
-                    )
+                    print(f"  ❌ Valid OPC-UA URL failed validation: {result.get('error')}")
                     return False
 
                 # Invalid OPC-UA URL
@@ -550,9 +516,7 @@ class Phase115TestSuite:
                 {
                     "timestamp": pd.date_range("2024-01-01", periods=50, freq="1min"),
                     "reactor_temp_pv": 75 + 10 * pd.np.random.randn(50),
-                    "cooling_valve_cv": pd.np.clip(
-                        50 + 20 * pd.np.random.randn(50), 0, 100
-                    ),
+                    "cooling_valve_cv": pd.np.clip(50 + 20 * pd.np.random.randn(50), 0, 100),
                     "temp_setpoint_sp": [80] * 50,
                     "ambient_temp_dv": 22 + 3 * pd.np.random.randn(50),
                     "pump_status": pd.np.random.choice([0, 1], 50),
@@ -561,24 +525,18 @@ class Phase115TestSuite:
             )
 
             # Save and ingest data
-            with tempfile.NamedTemporaryFile(
-                mode="w", suffix=".csv", delete=False
-            ) as f:
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
                 test_data.to_csv(f.name, index=False)
                 temp_file = f.name
 
             try:
                 # Step 1: Ingest data
                 ingestion_result = asyncio.run(
-                    ingestion_framework.ingest_csv_data(
-                        file_path=temp_file, timestamp_column="timestamp"
-                    )
+                    ingestion_framework.ingest_csv_data(file_path=temp_file, timestamp_column="timestamp")
                 )
 
                 if not ingestion_result.get("success"):
-                    print(
-                        f"  ❌ Integration ingestion failed: {ingestion_result.get('error')}"
-                    )
+                    print(f"  ❌ Integration ingestion failed: {ingestion_result.get('error')}")
                     return False
 
                 # Step 2: Classify variables
@@ -588,9 +546,7 @@ class Phase115TestSuite:
                 )
 
                 if not classification_result.get("success"):
-                    print(
-                        f"  ❌ Integration classification failed: {classification_result.get('error')}"
-                    )
+                    print(f"  ❌ Integration classification failed: {classification_result.get('error')}")
                     return False
 
                 # Step 3: Get summary
@@ -601,7 +557,7 @@ class Phase115TestSuite:
                     return False
 
                 print(
-                    f"  ✓ Full workflow integration successful: {classification_result['classified_variables']} variables classified"
+                    f"  ✓ Full workflow integration successful: {classification_result['classified_variables']} variables classified"  # noqa: E501
                 )
                 return True
 
@@ -630,9 +586,9 @@ class Phase115TestSuite:
             from rich.console import Console
 
             # Test basic functionality
-            df = pd.DataFrame({"test": [1, 2, 3]})
-            arr = np.array([1, 2, 3])
-            console = Console()
+            pd.DataFrame({"test": [1, 2, 3]})
+            np.array([1, 2, 3])
+            Console()
 
             print(f"  ✓ All {len(required_packages)} required dependencies validated")
             return True
@@ -694,25 +650,17 @@ class Phase115TestSuite:
 
         # Overall assessment
         if self.passed_count == self.test_count:
-            print(
-                "\n🎉 ALL TESTS PASSED! Phase 11.5 implementation is ready for production."
-            )
+            print("\n🎉 ALL TESTS PASSED! Phase 11.5 implementation is ready for production.")
         elif self.passed_count >= self.test_count * 0.8:
             print("\n⚠️ Most tests passed. Review failed tests before deployment.")
         else:
-            print(
-                "\n❌ Significant issues detected. Address failed tests before proceeding."
-            )
+            print("\n❌ Significant issues detected. Address failed tests before proceeding.")
 
         return {
             "total_tests": self.test_count,
             "passed_tests": self.passed_count,
             "failed_tests": self.failed_count,
-            "success_rate": (
-                (self.passed_count / self.test_count * 100)
-                if self.test_count > 0
-                else 0
-            ),
+            "success_rate": ((self.passed_count / self.test_count * 100) if self.test_count > 0 else 0),
             "duration_seconds": duration,
             "test_results": self.test_results,
             "timestamp": datetime.now().isoformat(),

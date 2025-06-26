@@ -1,4 +1,4 @@
-"""SME Agent Evaluation CLI Commands - Testing and Batch Management
+"""SME Agent Evaluation CLI Commands - Testing and Batch Management.
 
 Following crawl_mcp.py methodology:
 - Step 4: Modular component testing
@@ -14,7 +14,10 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
-from ..sme_agent_module import SMEAgentModule, SMEAgentValidationError
+from src.ignition.modules.sme_agent.sme_agent_module import (
+    SMEAgentModule,
+    SMEAgentValidationError,
+)
 
 console = Console()
 logger = logging.getLogger(__name__)
@@ -39,21 +42,19 @@ def handle_sme_agent_error(func: Any) -> None:
 
 @click.group(name="evaluation")
 def evaluation_commands() -> None:
-    """SME Agent Evaluation Commands - Testing and Batch Management"""
+    """SME Agent Evaluation Commands - Testing and Batch Management."""
     pass
 
 
 @evaluation_commands.command("test-all")
 @handle_sme_agent_error
 def test_all_components() -> None:
-    """Step 4: Modular Component Testing
+    """Step 4: Modular Component Testing.
 
     Run comprehensive tests on all SME Agent components.
     """
     console.print("[bold blue]🧪 SME Agent Comprehensive Testing[/bold blue]")
-    console.print(
-        "Following crawl_mcp.py methodology - Step 4: Modular Component Testing"
-    )
+    console.print("Following crawl_mcp.py methodology - Step 4: Modular Component Testing")
 
     try:
         with SMEAgentModule() as agent:
@@ -108,9 +109,7 @@ def export_evaluation_batch(batch_id: str, export_format: str) -> None:
 @evaluation_commands.command("import-evaluation")
 @click.argument("batch_id", required=True)
 @click.argument("evaluation_file", type=click.Path(exists=True), required=True)
-@click.option(
-    "--sme-id", required=True, help="ID of the human SME who performed the evaluation"
-)
+@click.option("--sme-id", required=True, help="ID of the human SME who performed the evaluation")
 @handle_sme_agent_error
 def import_human_evaluation(batch_id: str, evaluation_file: str, sme_id: str) -> None:
     """Import human evaluation results."""
@@ -118,9 +117,7 @@ def import_human_evaluation(batch_id: str, evaluation_file: str, sme_id: str) ->
 
     try:
         with SMEAgentModule() as agent:
-            import_result = agent.import_human_evaluation(
-                batch_id, evaluation_file, sme_id
-            )
+            import_result = agent.import_human_evaluation(batch_id, evaluation_file, sme_id)
             _display_import_result(import_result)
 
     except Exception as e:
@@ -149,9 +146,7 @@ def reinforcement_learning_summary() -> None:
 @handle_sme_agent_error
 def create_test_evaluation_batch(size: int) -> None:
     """Create a test evaluation batch for human review."""
-    console.print(
-        f"[bold blue]🎯 Creating Test Evaluation Batch (Size: {size})[/bold blue]"
-    )
+    console.print(f"[bold blue]🎯 Creating Test Evaluation Batch (Size: {size})[/bold blue]")
 
     try:
         with SMEAgentModule() as agent:

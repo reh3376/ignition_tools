@@ -96,7 +96,7 @@ class RefactoringWorkflow:
                     operation_id=f"split_file_{operation_counter}",
                     operation_type="split_file",
                     target_files=[str(file_path)],
-                    description=f"Split {file_path.name} ({recommendation.physical_lines} lines, complexity {recommendation.complexity_score:.1f})",
+                    description=f"Split {file_path.name} ({recommendation.physical_lines} lines, complexity {recommendation.complexity_score:.1f})",  # noqa: E501
                     risk_level=self._assess_risk_level(recommendation),
                     estimated_time=self._estimate_refactoring_time(recommendation),
                     dependencies=[],

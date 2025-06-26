@@ -45,17 +45,13 @@ def dataset() -> None:
 )
 @click.option("--description", "-d", help="Dataset description")
 @click.option("--tags", help="Comma-separated tags")
-def create(
-    name: str, dataset_type: str, description: str | None, tags: str | None
-) -> None:
+def create(name: str, dataset_type: str, description: str | None, tags: str | None) -> None:
     """Create a new dataset."""
     try:
         manager = DatasetManager()
 
         # Parse tags
-        tag_list = (
-            [tag.strip() for tag in tags.split(",") if tag.strip()] if tags else []
-        )
+        tag_list = [tag.strip() for tag in tags.split(",") if tag.strip()] if tags else []
 
         # Create dataset
         dataset = manager.create_dataset(
@@ -79,9 +75,7 @@ def create(
         console.print("\n💡 Next steps:", style="bold blue")
         console.print("   1. Add data sources: ign data dataset add-source")
         console.print("   2. Define features: ign data dataset add-feature")
-        console.print(
-            "   3. Launch UI for interactive curation: ign data dataset buildout"
-        )
+        console.print("   3. Launch UI for interactive curation: ign data dataset buildout")
 
     except Exception as e:
         console.print(f"❌ Failed to create dataset: {e}", style="red")
@@ -164,6 +158,9 @@ def list() -> None:
 def info(dataset_id: str) -> None:
     """Show detailed information about a dataset."""
     try:
+        pass  # TODO: Add try block content
+    except Exception:
+        pass  # TODO: Handle exception
         manager = DatasetManager()
         dataset = manager.get_dataset(dataset_id)
 
@@ -189,36 +186,24 @@ Size: {dataset.file_size_mb:.2f} MB
         if dataset.schema.description:
             info_text += f"Description: {dataset.schema.description}\n"
 
-        console.print(
-            Panel(
-                info_text.strip(), title="📊 Dataset Information", border_style="blue"
-            )
-        )
+        console.print(Panel(info_text.strip(), title="📊 Dataset Information", border_style="blue"))
 
         # Data sources
         if dataset.data_sources:
             console.print("\n🔗 Data Sources:", style="bold")
             for i, source in enumerate(dataset.data_sources):
                 status_icon = "🟢" if source.active else "🔴"
-                console.print(
-                    f"  {i + 1}. {status_icon} {source.source_type} ({source.source_id[:8]}...)"
-                )
+                console.print(f"  {i + 1}. {status_icon} {source.source_type} ({source.source_id[:8]}...)")
         else:
             console.print("\n🔗 Data Sources: None configured", style="yellow")
 
         # Features
         if dataset.schema.features:
-            console.print(
-                f"\n🎯 Features ({len(dataset.schema.features)}):", style="bold"
-            )
+            console.print(f"\n🎯 Features ({len(dataset.schema.features)}):", style="bold")
             for feature in dataset.schema.features:
                 target_icon = "🎯" if feature.is_target else "📊"
-                transform_text = (
-                    f" ({feature.transformation})" if feature.transformation else ""
-                )
-                console.print(
-                    f"  {target_icon} {feature.name} [{feature.data_type}]{transform_text}"
-                )
+                transform_text = f" ({feature.transformation})" if feature.transformation else ""
+                console.print(f"  {target_icon} {feature.name} [{feature.data_type}]{transform_text}")
         else:
             console.print("\n🎯 Features: None defined", style="yellow")
 
@@ -226,12 +211,8 @@ Size: {dataset.file_size_mb:.2f} MB
         if dataset.quality_report:
             quality = dataset.quality_report.overall_quality.value
             console.print(f"\n📈 Quality: {quality}", style="bold")
-            console.print(
-                f"  Completeness: {dataset.quality_report.completeness_score:.1f}%"
-            )
-            console.print(
-                f"  Consistency: {dataset.quality_report.consistency_score:.1f}%"
-            )
+            console.print(f"  Completeness: {dataset.quality_report.completeness_score:.1f}%")
+            console.print(f"  Consistency: {dataset.quality_report.consistency_score:.1f}%")
             console.print(f"  Accuracy: {dataset.quality_report.accuracy_score:.1f}%")
         else:
             console.print("\n📈 Quality: Not assessed", style="yellow")
@@ -280,9 +261,7 @@ def process(dataset_id: str) -> None:
     default="csv",
     help="Export format",
 )
-@click.option(
-    "--include-metadata", is_flag=True, default=True, help="Include metadata in export"
-)
+@click.option("--include-metadata", is_flag=True, default=True, help="Include metadata in export")
 def export(dataset_id: str, format_type: str, include_metadata: bool) -> None:
     """Export a dataset."""
     try:
@@ -299,9 +278,7 @@ def export(dataset_id: str, format_type: str, include_metadata: bool) -> None:
         )
 
         with console.status("[bold blue]Exporting..."):
-            export_path = manager.export_dataset(
-                dataset_id, format_type=format_type, include_metadata=include_metadata
-            )
+            export_path = manager.export_dataset(dataset_id, format_type=format_type, include_metadata=include_metadata)
 
         console.print("✅ Dataset exported successfully!", style="green")
         console.print(f"   Location: {export_path}")
@@ -326,9 +303,7 @@ def delete(dataset_id: str) -> None:
         dataset_name = dataset.name
 
         if manager.delete_dataset(dataset_id):
-            console.print(
-                f"✅ Dataset '{dataset_name}' deleted successfully!", style="green"
-            )
+            console.print(f"✅ Dataset '{dataset_name}' deleted successfully!", style="green")
         else:
             console.print(f"❌ Failed to delete dataset '{dataset_name}'", style="red")
 
@@ -339,9 +314,7 @@ def delete(dataset_id: str) -> None:
 @dataset.command()
 @click.option("--port", "-p", default=8501, help="Port for the UI server")
 @click.option("--host", "-h", default="localhost", help="Host for the UI server")
-@click.option(
-    "--open-browser", is_flag=True, default=True, help="Open browser automatically"
-)
+@click.option("--open-browser", is_flag=True, default=True, help="Open browser automatically")
 def buildout(port: int, host: str, open_browser: bool) -> None:
     """🚀 Launch interactive dataset buildout UI."""
     try:
@@ -426,9 +399,7 @@ def status(dataset_id: str | None) -> None:
             console.print(f"   Columns: {dataset.column_count}")
 
             if dataset.quality_report:
-                console.print(
-                    f"   Quality: {dataset.quality_report.overall_quality.value}"
-                )
+                console.print(f"   Quality: {dataset.quality_report.overall_quality.value}")
         else:
             # Show system overview
             datasets = manager.list_datasets()
@@ -467,9 +438,7 @@ def status(dataset_id: str | None) -> None:
 
                 console.print("🌐 UI Dependencies: ✅ Available")
             except ImportError:
-                console.print(
-                    "🌐 UI Dependencies: ❌ Missing (install streamlit and plotly)"
-                )
+                console.print("🌐 UI Dependencies: ❌ Missing (install streamlit and plotly)")
 
     except Exception as e:
         console.print(f"❌ Failed to get status: {e}", style="red")
@@ -532,9 +501,7 @@ def add_source(dataset_id: str, source_type: str, config: str) -> None:
             console.print("❌ Invalid JSON configuration", style="red")
             return
 
-        source_id = manager.add_data_source(
-            dataset_id, source_type=source_type, connection_config=connection_config
-        )
+        source_id = manager.add_data_source(dataset_id, source_type=source_type, connection_config=connection_config)
 
         console.print("✅ Data source added successfully!", style="green")
         console.print(f"   Source ID: {source_id}")

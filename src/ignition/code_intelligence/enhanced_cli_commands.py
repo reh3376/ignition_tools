@@ -81,9 +81,7 @@ def validate_script_path(script_path: str) -> dict[str, Any]:
 
         # Check if it's a Python file
         if not script_path.endswith(".py"):
-            validation_result["warnings"].append(
-                "File does not have .py extension - proceeding anyway"
-            )
+            validation_result["warnings"].append("File does not have .py extension - proceeding anyway")
 
         # Check if file is readable
         try:
@@ -211,9 +209,7 @@ def validate(
                 return result
 
         except Exception as e:
-            console.print(
-                f"[bold red]❌ Validation failed: {format_cli_error(e)}[/bold red]"
-            )
+            console.print(f"[bold red]❌ Validation failed: {format_cli_error(e)}[/bold red]")
             return None
 
     # Run the async validation
@@ -224,9 +220,7 @@ def validate(
 
     # Step 4: Display results
     if result.success:
-        console.print(
-            "\n[bold green]✅ Validation completed successfully![/bold green]"
-        )
+        console.print("\n[bold green]✅ Validation completed successfully![/bold green]")
 
         # Create results table
         table = Table(title="Validation Results")
@@ -242,11 +236,7 @@ def validate(
         table.add_row(
             "Import Validation",
             "✅ Valid" if result.imports_valid else "❌ Invalid",
-            (
-                f"{len(result.missing_imports)} missing"
-                if result.missing_imports
-                else "All available"
-            ),
+            (f"{len(result.missing_imports)} missing" if result.missing_imports else "All available"),
         )
         table.add_row(
             "Knowledge Graph",
@@ -256,11 +246,7 @@ def validate(
         table.add_row(
             "Hallucination Check",
             "✅ Clean" if not result.hallucination_detected else "⚠️  Issues",
-            (
-                f"{len(result.hallucination_issues)} found"
-                if result.hallucination_issues
-                else "None detected"
-            ),
+            (f"{len(result.hallucination_issues)} found" if result.hallucination_issues else "None detected"),
         )
 
         console.print(table)
@@ -274,9 +260,7 @@ def validate(
         if result.suggestions:
             console.print("\n[bold yellow]💡 Improvement Suggestions:[/bold yellow]")
             for i, suggestion in enumerate(result.suggestions, 1):
-                console.print(
-                    f"  {i}. [{suggestion['type'].upper()}] {suggestion['suggestion']}"
-                )
+                console.print(f"  {i}. [{suggestion['type'].upper()}] {suggestion['suggestion']}")
 
         # Save to output file if requested
         if output:
@@ -351,29 +335,19 @@ def check_hallucinations(
             await validator.cleanup()
             return result
         except Exception as e:
-            console.print(
-                f"[bold red]❌ Hallucination check failed: {format_cli_error(e)}[/bold red]"
-            )
+            console.print(f"[bold red]❌ Hallucination check failed: {format_cli_error(e)}[/bold red]")
             return None
 
     result = asyncio.run(run_hallucination_check())
 
     if result and result.success:
         if result.hallucination_detected:
-            console.print(
-                "[bold red]⚠️  Potential AI hallucinations detected![/bold red]"
-            )
+            console.print("[bold red]⚠️  Potential AI hallucinations detected![/bold red]")
 
             for i, issue in enumerate(result.hallucination_issues, 1):
-                console.print(
-                    f"\n{i}. [bold]Type:[/bold] {issue.get('type', 'Unknown')}"
-                )
-                console.print(
-                    f"   [bold]Description:[/bold] {issue.get('description', 'No description')}"
-                )
-                console.print(
-                    f"   [bold]Confidence:[/bold] {issue.get('confidence', 0.0):.2f}"
-                )
+                console.print(f"\n{i}. [bold]Type:[/bold] {issue.get('type', 'Unknown')}")
+                console.print(f"   [bold]Description:[/bold] {issue.get('description', 'No description')}")
+                console.print(f"   [bold]Confidence:[/bold] {issue.get('confidence', 0.0):.2f}")
                 if "line" in issue:
                     console.print(f"   [bold]Line:[/bold] {issue['line']}")
         else:
@@ -395,9 +369,7 @@ def check_hallucinations(
     default="comprehensive",
     help="Analysis type: pattern, context, structure, comprehensive",
 )
-@click.option(
-    "--model-preference", default="qwen", help="Preferred model: qwen, codellama, auto"
-)
+@click.option("--model-preference", default="qwen", help="Preferred model: qwen, codellama, auto")
 @click.option(
     "--include-suggestions/--no-suggestions",
     default=True,
@@ -446,9 +418,7 @@ def analyze_ast(
 
             return result
         except Exception as e:
-            console.print(
-                f"[bold red]❌ Analysis failed: {format_cli_error(e)}[/bold red]"
-            )
+            console.print(f"[bold red]❌ Analysis failed: {format_cli_error(e)}[/bold red]")
             return None
 
     result = asyncio.run(run_analysis())
@@ -466,13 +436,9 @@ def analyze_ast(
         structure_table.add_row("Classes", str(result.total_classes))
         structure_table.add_row("Complexity Score", f"{result.complexity_score:.1f}/10")
         if result.code_quality_score > 0:
-            structure_table.add_row(
-                "Quality Score", f"{result.code_quality_score:.1f}/10"
-            )
+            structure_table.add_row("Quality Score", f"{result.code_quality_score:.1f}/10")
         if result.maintainability_score > 0:
-            structure_table.add_row(
-                "Maintainability", f"{result.maintainability_score:.1f}/10"
-            )
+            structure_table.add_row("Maintainability", f"{result.maintainability_score:.1f}/10")
 
         console.print(structure_table)
 
@@ -481,22 +447,16 @@ def analyze_ast(
             console.print("\n[bold yellow]🔍 Pattern Detection Results:[/bold yellow]")
 
             if result.patterns_detected:
-                console.print(
-                    f"[green]✅ Patterns found: {len(result.patterns_detected)}[/green]"
-                )
+                console.print(f"[green]✅ Patterns found: {len(result.patterns_detected)}[/green]")
                 for pattern in result.patterns_detected[:5]:  # Show first 5
                     console.print(
                         f"  • {pattern.pattern_name} (line {pattern.line_number}, confidence: {pattern.confidence:.2f})"
                     )
 
             if result.antipatterns_detected:
-                console.print(
-                    f"[red]⚠️  Antipatterns found: {len(result.antipatterns_detected)}[/red]"
-                )
+                console.print(f"[red]⚠️  Antipatterns found: {len(result.antipatterns_detected)}[/red]")
                 for antipattern in result.antipatterns_detected[:5]:  # Show first 5
-                    console.print(
-                        f"  • {antipattern.pattern_name} (line {antipattern.line_number})"
-                    )
+                    console.print(f"  • {antipattern.pattern_name} (line {antipattern.line_number})")
 
         # AI insights
         if result.context_understanding:
@@ -507,22 +467,16 @@ def analyze_ast(
                 console.print(f"[bold]Purpose:[/bold] {understanding['purpose']}")
 
             if understanding.get("patterns"):
-                console.print(
-                    f"[bold]Patterns:[/bold] {', '.join(understanding['patterns'])}"
-                )
+                console.print(f"[bold]Patterns:[/bold] {', '.join(understanding['patterns'])}")
 
             if understanding.get("ignition_patterns"):
-                console.print(
-                    f"[bold]Ignition Patterns:[/bold] {', '.join(understanding['ignition_patterns'])}"
-                )
+                console.print(f"[bold]Ignition Patterns:[/bold] {', '.join(understanding['ignition_patterns'])}")
 
         # Suggestions
         if result.suggestions:
             console.print("\n[bold yellow]💡 Improvement Suggestions:[/bold yellow]")
             for i, suggestion in enumerate(result.suggestions, 1):
-                console.print(
-                    f"  {i}. [{suggestion['type'].upper()}] {suggestion['suggestion']}"
-                )
+                console.print(f"  {i}. [{suggestion['type'].upper()}] {suggestion['suggestion']}")
 
         # Processing info
         console.print(f"\n[bold]Processing Time:[/bold] {result.processing_time:.2f}s")
@@ -551,9 +505,7 @@ def analyze_ast(
     default=True,
     help="Suggest fixes for missing imports",
 )
-def validate_imports(
-    script_path: str, show_available: bool, suggest_fixes: bool
-) -> Any:
+def validate_imports(script_path: str, show_available: bool, suggest_fixes: bool) -> Any:
     """Validate imports against available modules in the environment.
 
     Examples:
@@ -588,9 +540,7 @@ def validate_imports(
             await validator.cleanup()
             return result
         except Exception as e:
-            console.print(
-                f"[bold red]❌ Import validation failed: {format_cli_error(e)}[/bold red]"
-            )
+            console.print(f"[bold red]❌ Import validation failed: {format_cli_error(e)}[/bold red]")
             return None
 
     result = asyncio.run(run_import_validation())
@@ -612,9 +562,7 @@ def validate_imports(
 
 @code.command()
 @click.argument("script_path")
-@click.option(
-    "--model-preference", default="qwen", help="Preferred model: qwen, codellama, auto"
-)
+@click.option("--model-preference", default="qwen", help="Preferred model: qwen, codellama, auto")
 @click.option(
     "--focus",
     multiple=True,
@@ -655,9 +603,7 @@ def suggest_improvements(script_path: str, model_preference: str, focus: tuple) 
 
             return result
         except Exception as e:
-            console.print(
-                f"[bold red]❌ Analysis failed: {format_cli_error(e)}[/bold red]"
-            )
+            console.print(f"[bold red]❌ Analysis failed: {format_cli_error(e)}[/bold red]")
             return None
 
     result = asyncio.run(run_suggestion_analysis())
@@ -669,29 +615,19 @@ def suggest_improvements(script_path: str, model_preference: str, focus: tuple) 
             # Filter by focus areas if specified
             filtered_suggestions = result.suggestions
             if focus:
-                filtered_suggestions = [
-                    s for s in result.suggestions if s.get("type", "").lower() in focus
-                ]
+                filtered_suggestions = [s for s in result.suggestions if s.get("type", "").lower() in focus]
 
             if filtered_suggestions:
-                console.print(
-                    "\n[bold yellow]💡 Improvement Suggestions:[/bold yellow]"
-                )
+                console.print("\n[bold yellow]💡 Improvement Suggestions:[/bold yellow]")
                 for i, suggestion in enumerate(filtered_suggestions, 1):
                     suggestion_type = suggestion.get("type", "general").upper()
-                    suggestion_text = suggestion.get(
-                        "suggestion", "No suggestion available"
-                    )
+                    suggestion_text = suggestion.get("suggestion", "No suggestion available")
                     console.print(f"\n{i}. [bold][{suggestion_type}][/bold]")
                     console.print(f"   {suggestion_text}")
             else:
-                console.print(
-                    "[green]✅ No specific improvements needed in the selected focus areas![/green]"
-                )
+                console.print("[green]✅ No specific improvements needed in the selected focus areas![/green]")
         else:
-            console.print(
-                "[green]✅ No improvements suggested - code looks good![/green]"
-            )
+            console.print("[green]✅ No improvements suggested - code looks good![/green]")
 
 
 @code.command()
@@ -711,9 +647,7 @@ def find_examples(pattern: str, source: str | None, limit: int) -> None:
     # This would integrate with the web intelligence system to search crawled data
     # For now, show placeholder implementation
     console.print("[yellow]⚠️  Example finder requires web intelligence data.[/yellow]")
-    console.print(
-        "Run [cyan]ign web update[/cyan] to crawl documentation sources first."
-    )
+    console.print("Run [cyan]ign web update[/cyan] to crawl documentation sources first.")
 
     # TODO: Integrate with web intelligence crawler results
     # - Search through crawled code examples

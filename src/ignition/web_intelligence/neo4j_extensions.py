@@ -49,15 +49,9 @@ class DocumentChunkNode(BaseModel):
     content: str = Field(..., description="Chunk content")
     chunk_index: int = Field(..., description="Index within document")
     source_url: str = Field(..., description="Source URL")
-    embedding_hash: str | None = Field(
-        default=None, description="Hash of embedding vector"
-    )
-    chunk_type: str = Field(
-        default="text", description="Type of chunk: text, code, example"
-    )
-    language: str | None = Field(
-        default=None, description="Programming language if code"
-    )
+    embedding_hash: str | None = Field(default=None, description="Hash of embedding vector")
+    chunk_type: str = Field(default="text", description="Type of chunk: text, code, example")
+    language: str | None = Field(default=None, description="Programming language if code")
 
 
 class CodeExampleNode(BaseModel):
@@ -66,13 +60,9 @@ class CodeExampleNode(BaseModel):
     code: str = Field(..., description="Code content")
     language: str = Field(..., description="Programming language")
     context: str = Field(..., description="Context or description")
-    validation_status: str = Field(
-        default="unvalidated", description="Validation status"
-    )
+    validation_status: str = Field(default="unvalidated", description="Validation status")
     complexity_score: float | None = Field(default=None, description="Complexity score")
-    ignition_specific: bool = Field(
-        default=False, description="Whether Ignition-specific"
-    )
+    ignition_specific: bool = Field(default=False, description="Whether Ignition-specific")
 
 
 class ValidationRuleNode(BaseModel):
@@ -82,9 +72,7 @@ class ValidationRuleNode(BaseModel):
     rule_content: str = Field(..., description="Rule content/description")
     confidence: float = Field(..., description="Confidence score")
     source_documentation: str = Field(..., description="Source documentation URL")
-    applies_to: list[str] = Field(
-        default_factory=list, description="What the rule applies to"
-    )
+    applies_to: list[str] = Field(default_factory=list, description="What the rule applies to")
 
 
 def validate_neo4j_environment() -> dict[str, Any]:
@@ -100,9 +88,7 @@ def validate_neo4j_environment() -> dict[str, Any]:
     try:
         if not NEO4J_AVAILABLE:
             validation_result["valid"] = False
-            validation_result["errors"].append(
-                "Neo4j driver not available. Install with: pip install neo4j"
-            )
+            validation_result["errors"].append("Neo4j driver not available. Install with: pip install neo4j")
             return validation_result
 
         validation_result["neo4j_available"] = True
@@ -177,9 +163,7 @@ class WebIntelligenceGraphManager:
             neo4j_password = os.getenv("NEO4J_PASSWORD")
 
             if neo4j_uri and neo4j_user and neo4j_password:
-                self.driver = GraphDatabase.driver(
-                    neo4j_uri, auth=(neo4j_user, neo4j_password)
-                )
+                self.driver = GraphDatabase.driver(neo4j_uri, auth=(neo4j_user, neo4j_password))
 
                 # Create schema
                 await self._create_web_intelligence_schema()
@@ -248,9 +232,7 @@ class WebIntelligenceGraphManager:
             print(f"Failed to add web source: {format_neo4j_error(e)}")
             return False
 
-    async def add_document_chunk(
-        self, document_chunk: DocumentChunkNode, source_url: str
-    ) -> str | None:
+    async def add_document_chunk(self, document_chunk: DocumentChunkNode, source_url: str) -> str | None:
         """Add a document chunk and link it to its web source."""
         try:
             with self.driver.session() as session:
@@ -285,9 +267,7 @@ class WebIntelligenceGraphManager:
             print(f"Failed to add document chunk: {format_neo4j_error(e)}")
             return None
 
-    async def add_code_example(
-        self, code_example: CodeExampleNode, chunk_id: str
-    ) -> str | None:
+    async def add_code_example(self, code_example: CodeExampleNode, chunk_id: str) -> str | None:
         """Add a code example and link it to its document chunk."""
         try:
             with self.driver.session() as session:
@@ -322,9 +302,7 @@ class WebIntelligenceGraphManager:
             print(f"Failed to add code example: {format_neo4j_error(e)}")
             return None
 
-    async def add_validation_rule(
-        self, validation_rule: ValidationRuleNode, chunk_id: str
-    ) -> str | None:
+    async def add_validation_rule(self, validation_rule: ValidationRuleNode, chunk_id: str) -> str | None:
         """Add a validation rule derived from documentation."""
         try:
             with self.driver.session() as session:
@@ -358,9 +336,7 @@ class WebIntelligenceGraphManager:
             print(f"Failed to add validation rule: {format_neo4j_error(e)}")
             return None
 
-    async def link_example_to_function(
-        self, example_id: str, function_name: str
-    ) -> bool:
+    async def link_example_to_function(self, example_id: str, function_name: str) -> bool:
         """Create relationship between code example and function."""
         try:
             with self.driver.session() as session:
@@ -371,18 +347,14 @@ class WebIntelligenceGraphManager:
                 RETURN ce, f
                 """
 
-                result = session.run(
-                    query, example_id=example_id, function_name=function_name
-                )
+                result = session.run(query, example_id=example_id, function_name=function_name)
                 return result.single() is not None
 
         except Exception as e:
             print(f"Failed to link example to function: {format_neo4j_error(e)}")
             return False
 
-    async def find_examples_for_pattern(
-        self, pattern: str, limit: int = 5
-    ) -> list[dict[str, Any]]:
+    async def find_examples_for_pattern(self, pattern: str, limit: int = 5) -> list[dict[str, Any]]:
         """Find code examples matching a pattern."""
         try:
             with self.driver.session() as session:
@@ -423,9 +395,7 @@ class WebIntelligenceGraphManager:
             print(f"Failed to find examples: {format_neo4j_error(e)}")
             return []
 
-    async def get_validation_rules_for_function(
-        self, function_name: str
-    ) -> list[dict[str, Any]]:
+    async def get_validation_rules_for_function(self, function_name: str) -> list[dict[str, Any]]:
         """Get validation rules that apply to a specific function."""
         try:
             with self.driver.session() as session:
@@ -561,7 +531,7 @@ def create_validation_rule_from_documentation(
     rule_content: str,
     confidence: float,
     source_url: str,
-    applies_to: list[str] = None,
+    applies_to: list[str] | None = None,
 ) -> ValidationRuleNode:
     """Create a ValidationRule node from documentation content."""
     return ValidationRuleNode(

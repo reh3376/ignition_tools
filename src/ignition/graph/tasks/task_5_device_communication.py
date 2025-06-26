@@ -464,7 +464,7 @@ def get_device_communication_functions() -> list[dict[str, Any]]:
                 ],
                 "returns": {
                     "type": "dict",
-                    "description": "Connection information including status, security settings, and server capabilities",
+                    "description": "Connection information including status, security settings, and server capabilities",  # noqa: E501
                 },
                 "scope": ["Gateway"],
                 "category": "Device Communication",

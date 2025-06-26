@@ -20,9 +20,7 @@ class HallucinationReporter:
     def __init__(self):
         self.report_timestamp = datetime.now(UTC)
 
-    def generate_comprehensive_report(
-        self, validation_result: ScriptValidationResult
-    ) -> dict[str, Any]:
+    def generate_comprehensive_report(self, validation_result: ScriptValidationResult) -> dict[str, Any]:
         """Generate a comprehensive report in JSON format."""
         # Categorize validations by status (knowledge graph items only)
         valid_items = []
@@ -59,10 +57,7 @@ class HallucinationReporter:
 
         # Process classes (only knowledge graph ones)
         for val in validation_result.class_validations:
-            class_name = (
-                val.class_instantiation.full_class_name
-                or val.class_instantiation.class_name
-            )
+            class_name = val.class_instantiation.full_class_name or val.class_instantiation.class_name
             if not self._is_from_knowledge_graph(class_name, validation_result):
                 continue  # Skip external classes
             item = {
@@ -101,9 +96,7 @@ class HallucinationReporter:
         for val in validation_result.method_validations:
             if not (
                 val.method_call.object_type
-                and self._is_from_knowledge_graph(
-                    val.method_call.object_type, validation_result
-                )
+                and self._is_from_knowledge_graph(val.method_call.object_type, validation_result)
             ):
                 continue  # Skip external methods
 
@@ -149,9 +142,7 @@ class HallucinationReporter:
         for val in validation_result.attribute_validations:
             if not (
                 val.attribute_access.object_type
-                and self._is_from_knowledge_graph(
-                    val.attribute_access.object_type, validation_result
-                )
+                and self._is_from_knowledge_graph(val.attribute_access.object_type, validation_result)
             ):
                 continue  # Skip external attributes
 
@@ -187,9 +178,7 @@ class HallucinationReporter:
         for val in validation_result.function_validations:
             if not (
                 val.function_call.full_name
-                and self._is_from_knowledge_graph(
-                    val.function_call.full_name, validation_result
-                )
+                and self._is_from_knowledge_graph(val.function_call.full_name, validation_result)
             ):
                 continue  # Skip external functions
             item = {
@@ -278,9 +267,7 @@ class HallucinationReporter:
             base_module = item_name.split(".")[0]
             return base_module in kg_modules
 
-        return any(
-            item_name in module or module.endswith(item_name) for module in kg_modules
-        )
+        return any(item_name in module or module.endswith(item_name) for module in kg_modules)
 
     def _serialize_validation_result(self, validation_result) -> dict[str, Any]:
         """Convert ValidationResult to JSON-serializable dictionary."""
@@ -314,9 +301,7 @@ class HallucinationReporter:
         elif status == ValidationStatus.NOT_FOUND:
             not_found_items.append(item)
 
-    def _create_library_summary(
-        self, validation_result: ScriptValidationResult
-    ) -> list[dict[str, Any]]:
+    def _create_library_summary(self, validation_result: ScriptValidationResult) -> list[dict[str, Any]]:
         """Create summary of libraries analyzed."""
         library_stats = {}
 
@@ -411,9 +396,7 @@ class HallucinationReporter:
 
         return list(library_stats.values())
 
-    def _generate_recommendations(
-        self, validation_result: ScriptValidationResult
-    ) -> list[str]:
+    def _generate_recommendations(self, validation_result: ScriptValidationResult) -> list[str]:
         """Generate recommendations based on validation results."""
         recommendations = []
 
@@ -421,15 +404,9 @@ class HallucinationReporter:
         kg_hallucinations = list(validation_result.hallucinations_detected)
 
         if kg_hallucinations:
-            method_issues = [
-                h for h in kg_hallucinations if h["type"] == "METHOD_NOT_FOUND"
-            ]
-            attr_issues = [
-                h for h in kg_hallucinations if h["type"] == "ATTRIBUTE_NOT_FOUND"
-            ]
-            param_issues = [
-                h for h in kg_hallucinations if h["type"] == "INVALID_PARAMETERS"
-            ]
+            method_issues = [h for h in kg_hallucinations if h["type"] == "METHOD_NOT_FOUND"]
+            attr_issues = [h for h in kg_hallucinations if h["type"] == "ATTRIBUTE_NOT_FOUND"]
+            param_issues = [h for h in kg_hallucinations if h["type"] == "INVALID_PARAMETERS"]
 
             if method_issues:
                 recommendations.append(
@@ -485,12 +462,8 @@ class HallucinationReporter:
         md.append("# AI Hallucination Detection Report")
         md.append("")
         md.append(f"**Script:** `{report['analysis_metadata']['script_path']}`")
-        md.append(
-            f"**Analysis Date:** {report['analysis_metadata']['analysis_timestamp']}"
-        )
-        md.append(
-            f"**Overall Confidence:** {report['validation_summary']['overall_confidence']:.2%}"
-        )
+        md.append(f"**Analysis Date:** {report['analysis_metadata']['analysis_timestamp']}")
+        md.append(f"**Overall Confidence:** {report['validation_summary']['overall_confidence']:.2%}")
         md.append("")
 
         # Summary
@@ -538,9 +511,7 @@ class HallucinationReporter:
                     md.append("**Classes Used:**")
                     for cls in lib["classes_used"]:
                         status_emoji = "✅" if cls["status"] == "VALID" else "❌"
-                        md.append(
-                            f"  - {status_emoji} `{cls['class_name']}` ({cls['confidence']:.1%})"
-                        )
+                        md.append(f"  - {status_emoji} `{cls['class_name']}` ({cls['confidence']:.1%})")
 
                 if lib["methods_called"]:
                     md.append("**Methods Called:**")
@@ -562,9 +533,7 @@ class HallucinationReporter:
                     md.append("**Functions Called:**")
                     for func in lib["functions_called"]:
                         status_emoji = "✅" if func["status"] == "VALID" else "❌"
-                        md.append(
-                            f"  - {status_emoji} `{func['function_name']}()` ({func['confidence']:.1%})"
-                        )
+                        md.append(f"  - {status_emoji} `{func['function_name']}()` ({func['confidence']:.1%})")
 
                 md.append("")
 
@@ -586,9 +555,7 @@ class HallucinationReporter:
             md.append("### ❌ Invalid Items")
             md.append("")
             for item in invalid_items:
-                md.append(
-                    f"- **{item['type']}** `{item['name']}` (Line {item['line']}) - {item['message']}"
-                )
+                md.append(f"- **{item['type']}** `{item['name']}` (Line {item['line']}) - {item['message']}")
             md.append("")
 
         # Not found items
@@ -597,9 +564,7 @@ class HallucinationReporter:
             md.append("### 🔍 Not Found Items")
             md.append("")
             for item in not_found_items:
-                md.append(
-                    f"- **{item['type']}** `{item['name']}` (Line {item['line']}) - {item['message']}"
-                )
+                md.append(f"- **{item['type']}** `{item['name']}` (Line {item['line']}) - {item['message']}")
             md.append("")
 
         # Valid items (sample)
@@ -608,9 +573,7 @@ class HallucinationReporter:
             md.append("### ✅ Valid Items (Sample)")
             md.append("")
             for item in valid_items[:10]:  # Show first 10
-                md.append(
-                    f"- **{item['type']}** `{item['name']}` (Line {item['line']}) - {item['message']}"
-                )
+                md.append(f"- **{item['type']}** `{item['name']}` (Line {item['line']}) - {item['message']}")
             if len(valid_items) > 10:
                 md.append(f"- ... and {len(valid_items) - 10} more valid items")
             md.append("")
@@ -624,9 +587,7 @@ class HallucinationReporter:
         print("=" * 80)
 
         print(f"Script: {report['analysis_metadata']['script_path']}")
-        print(
-            f"Overall Confidence: {report['validation_summary']['overall_confidence']:.1%}"
-        )
+        print(f"Overall Confidence: {report['validation_summary']['overall_confidence']:.1%}")
 
         summary = report["validation_summary"]
         print("\nValidation Results:")
@@ -637,13 +598,9 @@ class HallucinationReporter:
         print(f"  📊 Hallucination Rate: {summary['hallucination_rate']:.1%}")
 
         if report["hallucinations_detected"]:
-            print(
-                f"\n🚨 {len(report['hallucinations_detected'])} Hallucinations Detected:"
-            )
+            print(f"\n🚨 {len(report['hallucinations_detected'])} Hallucinations Detected:")
             for hall in report["hallucinations_detected"][:5]:  # Show first 5
-                print(
-                    f"  - {hall['type'].replace('_', ' ').title()} at {hall['location']}"
-                )
+                print(f"  - {hall['type'].replace('_', ' ').title()} at {hall['location']}")
                 print(f"    {hall['description']}")
 
         if report["recommendations"]:

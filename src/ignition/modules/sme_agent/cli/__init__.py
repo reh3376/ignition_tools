@@ -1,4 +1,4 @@
-"""SME Agent CLI Package - Modular Command Interface
+"""SME Agent CLI Package - Modular Command Interface.
 
 Following crawl_mcp.py methodology with modular design.
 """

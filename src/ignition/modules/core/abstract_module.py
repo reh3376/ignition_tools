@@ -90,9 +90,7 @@ class AbstractIgnitionModule(ABC):
 
         # Initialize logging
         self._logger = self._diagnostics_manager.get_logger()
-        self._logger.info(
-            f"Initializing module: {self._metadata.name} v{self._metadata.version}"
-        )
+        self._logger.info(f"Initializing module: {self._metadata.name} v{self._metadata.version}")
 
     # Properties
 
@@ -236,9 +234,7 @@ class AbstractIgnitionModule(ABC):
 
     # Lifecycle management methods
 
-    def _set_state(
-        self: Self, new_state: ModuleState, error_message: str | None = None
-    ):
+    def _set_state(self: Self, new_state: ModuleState, error_message: str | None = None):
         """Set module state.
 
         Args:

@@ -43,15 +43,11 @@ class IndentationFixer:
         try:
             # Check if target directory exists
             if not self.target_directory.exists():
-                self.console.print(
-                    f"[red]Error: Target directory {self.target_directory} does not exist[/red]"
-                )
+                self.console.print(f"[red]Error: Target directory {self.target_directory} does not exist[/red]")
                 return False
 
             # Check if mypy is available
-            result = subprocess.run(
-                ["python", "-m", "mypy", "--version"], capture_output=True, text=True
-            )
+            result = subprocess.run(["python", "-m", "mypy", "--version"], capture_output=True, text=True)
             if result.returncode != 0:
                 self.console.print("[red]Error: mypy is not available[/red]")
                 return False
@@ -80,11 +76,7 @@ class IndentationFixer:
 
             syntax_errors = []
             for line in result.stdout.split("\n"):
-                if (
-                    "syntax" in line
-                    or "unexpected indent" in line
-                    or "indentation" in line
-                ):
+                if "syntax" in line or "unexpected indent" in line or "indentation" in line:
                     # Parse mypy error format: file:line: error: message [error-code]
                     match = re.match(r"([^:]+):(\d+):\s*error:\s*(.+)", line)
                     if match:
@@ -104,9 +96,7 @@ class IndentationFixer:
             self.console.print(f"[red]Failed to get syntax errors: {e}[/red]")
             return []
 
-    def fix_variable_assignment_indentation(
-        self, file_path: str, line_num: int
-    ) -> bool:
+    def fix_variable_assignment_indentation(self, file_path: str, line_num: int) -> bool:
         """Fix variable assignment indentation issues."""
         try:
             with open(file_path, encoding="utf-8") as f:
@@ -131,9 +121,7 @@ class IndentationFixer:
                 with open(file_path, "w", encoding="utf-8") as f:
                     f.writelines(lines)
 
-                self.patterns_fixed.append(
-                    f"Variable assignment indentation: {file_path}:{line_num}"
-                )
+                self.patterns_fixed.append(f"Variable assignment indentation: {file_path}:{line_num}")
                 return True
 
             # Pattern 2: Fix general indentation issues
@@ -146,17 +134,13 @@ class IndentationFixer:
                     with open(file_path, "w", encoding="utf-8") as f:
                         f.writelines(lines)
 
-                    self.patterns_fixed.append(
-                        f"General indentation: {file_path}:{line_num}"
-                    )
+                    self.patterns_fixed.append(f"General indentation: {file_path}:{line_num}")
                     return True
 
             return False
 
         except Exception as e:
-            self.console.print(
-                f"[red]Failed to fix indentation in {file_path}:{line_num}: {e}[/red]"
-            )
+            self.console.print(f"[red]Failed to fix indentation in {file_path}:{line_num}: {e}[/red]")
             return False
 
     def get_proper_indentation(self, lines: list[str], line_index: int) -> str:
@@ -196,9 +180,7 @@ class IndentationFixer:
                     "errors_fixed": 0,
                 }
 
-            self.console.print(
-                f"[yellow]Found {len(initial_errors)} syntax errors to fix[/yellow]"
-            )
+            self.console.print(f"[yellow]Found {len(initial_errors)} syntax errors to fix[/yellow]")
 
             # Step 3: Process each error
             with Progress(
@@ -206,17 +188,13 @@ class IndentationFixer:
                 TextColumn("[progress.description]{task.description}"),
                 console=self.console,
             ) as progress:
-                task = progress.add_task(
-                    "Fixing indentation errors...", total=len(initial_errors)
-                )
+                task = progress.add_task("Fixing indentation errors...", total=len(initial_errors))
 
                 for error in initial_errors:
                     file_path = error["file"]
                     line_num = error["line"]
 
-                    progress.update(
-                        task, description=f"Fixing {Path(file_path).name}:{line_num}"
-                    )
+                    progress.update(task, description=f"Fixing {Path(file_path).name}:{line_num}")
 
                     if self.fix_variable_assignment_indentation(file_path, line_num):
                         self.errors_fixed += 1
@@ -286,12 +264,8 @@ def fix_indentation_errors(target_directory: str = "src/") -> dict[str, Any]:
         # Step 4: Display results
         if result["success"]:
             if result["errors_fixed"] > 0:
-                console.print(
-                    f"[green]✅ Fixed {result['errors_fixed']} indentation errors[/green]"
-                )
-                console.print(
-                    f"[blue]📊 Initial errors: {result['initial_errors']}[/blue]"
-                )
+                console.print(f"[green]✅ Fixed {result['errors_fixed']} indentation errors[/green]")
+                console.print(f"[blue]📊 Initial errors: {result['initial_errors']}[/blue]")
                 console.print(f"[blue]📊 Final errors: {result['final_errors']}[/blue]")
 
                 if result.get("patterns_fixed"):
@@ -301,16 +275,12 @@ def fix_indentation_errors(target_directory: str = "src/") -> dict[str, Any]:
 
                 if result.get("remaining_errors"):
                     console.print(
-                        f"\n[yellow]⚠️  {len(result['remaining_errors'])} errors remain (may require manual intervention)[/yellow]"
+                        f"\n[yellow]⚠️  {len(result['remaining_errors'])} errors remain (may require manual intervention)[/yellow]"  # noqa: E501
                     )
                     for error in result["remaining_errors"][:5]:  # Show first 5
-                        console.print(
-                            f"  • {error['file']}:{error['line']} - {error.get('message', 'Unknown error')}"
-                        )
+                        console.print(f"  • {error['file']}:{error['line']} - {error.get('message', 'Unknown error')}")
             else:
-                console.print(
-                    f"[green]✅ {result.get('message', 'No errors found')}[/green]"
-                )
+                console.print(f"[green]✅ {result.get('message', 'No errors found')}[/green]")
         else:
             console.print(f"[red]❌ {result['error']}[/red]")
 

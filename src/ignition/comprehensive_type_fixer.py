@@ -24,9 +24,7 @@ from .advanced_type_fixer import AdvancedTypeFixer
 from .type_annotation_fixer import FixResult, TypeAnnotationFixer
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -96,8 +94,6 @@ class ComprehensiveTypeFixer:
                 raise FileNotFoundError(f"Source directory {self.source_dir} not found")
 
             # Check if Python version supports modern typing
-            if sys.version_info < (3, 8):
-                raise RuntimeError("Python 3.8+ required for modern type annotations")
 
             # Check mypy availability
             import subprocess
@@ -151,9 +147,7 @@ class ComprehensiveTypeFixer:
                         total_errors += 1
 
             error_counts["TOTAL"] = total_errors
-            logger.info(
-                f"📋 Found {total_errors} total errors across {len(error_counts) - 1} types"
-            )
+            logger.info(f"📋 Found {total_errors} total errors across {len(error_counts) - 1} types")
 
             return error_counts
 
@@ -164,9 +158,7 @@ class ComprehensiveTypeFixer:
     def fix_all_comprehensively(self) -> ComprehensiveFixResult:
         """Fix all mypy errors comprehensively following crawl_mcp.py methodology."""
         logger.info("🚀 Starting comprehensive mypy error fixing")
-        logger.info(
-            "📋 Following crawl_mcp.py methodology: systematic, modular, and progressive"
-        )
+        logger.info("📋 Following crawl_mcp.py methodology: systematic, modular, and progressive")
 
         # Step 1: Get initial error state
         initial_errors = self.get_error_summary()
@@ -192,9 +184,7 @@ class ComprehensiveTypeFixer:
                 phase_results[phase_name] = phase_result
 
                 # Calculate fixes applied in this phase
-                phase_fixes = sum(
-                    result.fixes_applied for result in phase_result.values()
-                )
+                phase_fixes = sum(result.fixes_applied for result in phase_result.values())
                 total_fixes_applied += phase_fixes
 
                 logger.info(f"✅ {phase_name} completed: {phase_fixes} fixes applied")
@@ -254,8 +244,7 @@ class ComprehensiveTypeFixer:
 
         status = "✅ SUCCESS" if result.success else "❌ FAILED"
         reduction_percent = (
-            (result.total_initial_errors - result.total_final_errors)
-            / max(result.total_initial_errors, 1)
+            (result.total_initial_errors - result.total_final_errors) / max(result.total_initial_errors, 1)
         ) * 100
 
         report.extend(
@@ -275,12 +264,8 @@ class ComprehensiveTypeFixer:
         for phase_name, phase_results in result.phase_results.items():
             report.extend([f"### {phase_name}", ""])
 
-            phase_fixes = sum(
-                fix_result.fixes_applied for fix_result in phase_results.values()
-            )
-            phase_success = sum(
-                1 for fix_result in phase_results.values() if fix_result.success
-            )
+            phase_fixes = sum(fix_result.fixes_applied for fix_result in phase_results.values())
+            phase_success = sum(1 for fix_result in phase_results.values() if fix_result.success)
 
             report.extend(
                 [
@@ -307,7 +292,7 @@ class ComprehensiveTypeFixer:
                 "",
                 "To see remaining errors by type:",
                 "```bash",
-                "python -m mypy src/ --no-error-summary 2>&1 | grep 'error:' | sed 's/.*\\[\\(.*\\)\\]$/\\1/' | sort | uniq -c | sort -nr",
+                "python -m mypy src/ --no-error-summary 2>&1 | grep 'error:' | sed 's/.*\\[\\(.*\\)\\]$/\\1/' | sort | uniq -c | sort -nr",  # noqa: E501
                 "```",
                 "",
                 "## Next Steps",

@@ -22,7 +22,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from ..web_intelligence import format_neo4j_error
+from src.ignition.web_intelligence import format_neo4j_error
 
 
 class ValidationRequest(BaseModel):
@@ -30,18 +30,10 @@ class ValidationRequest(BaseModel):
 
     script_path: str = Field(..., description="Path to Python script to validate")
     check_imports: bool = Field(default=True, description="Validate import statements")
-    check_syntax: bool = Field(
-        default=True, description="Check syntax and AST structure"
-    )
-    check_knowledge_graph: bool = Field(
-        default=True, description="Validate against knowledge graph"
-    )
-    check_hallucinations: bool = Field(
-        default=True, description="Check for AI hallucinations"
-    )
-    confidence_threshold: float = Field(
-        default=0.7, ge=0.0, le=1.0, description="Confidence threshold"
-    )
+    check_syntax: bool = Field(default=True, description="Check syntax and AST structure")
+    check_knowledge_graph: bool = Field(default=True, description="Validate against knowledge graph")
+    check_hallucinations: bool = Field(default=True, description="Check for AI hallucinations")
+    confidence_threshold: float = Field(default=0.7, ge=0.0, le=1.0, description="Confidence threshold")
 
 
 class ValidationResult(BaseModel):
@@ -53,26 +45,14 @@ class ValidationResult(BaseModel):
 
     syntax_valid: bool = Field(default=False, description="Syntax validation result")
     imports_valid: bool = Field(default=False, description="Import validation result")
-    knowledge_graph_valid: bool = Field(
-        default=False, description="Knowledge graph validation result"
-    )
-    hallucination_free: bool = Field(
-        default=False, description="Hallucination detection result"
-    )
+    knowledge_graph_valid: bool = Field(default=False, description="Knowledge graph validation result")
+    hallucination_free: bool = Field(default=False, description="Hallucination detection result")
 
-    issues: list[dict[str, Any]] = Field(
-        default_factory=list, description="Detected issues"
-    )
-    suggestions: list[str] = Field(
-        default_factory=list, description="Improvement suggestions"
-    )
-    metadata: dict[str, Any] = Field(
-        default_factory=dict, description="Additional metadata"
-    )
+    issues: list[dict[str, Any]] = Field(default_factory=list, description="Detected issues")
+    suggestions: list[str] = Field(default_factory=list, description="Improvement suggestions")
+    metadata: dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
 
-    error_message: str = Field(
-        default="", description="Error message if validation failed"
-    )
+    error_message: str = Field(default="", description="Error message if validation failed")
 
 
 class EnhancedCodeValidator:
@@ -112,9 +92,7 @@ class EnhancedCodeValidator:
                     assert self.neo4j_user is not None
                     assert self.neo4j_password is not None
 
-                    self.driver = GraphDatabase.driver(
-                        self.neo4j_uri, auth=(self.neo4j_user, self.neo4j_password)
-                    )
+                    self.driver = GraphDatabase.driver(self.neo4j_uri, auth=(self.neo4j_user, self.neo4j_password))
 
                     # Test connection
                     with self.driver.session() as session:
@@ -123,9 +101,7 @@ class EnhancedCodeValidator:
                     print("✓ Neo4j connection established")
 
                 except Exception as e:
-                    print(
-                        f"Warning: Neo4j initialization failed: {format_neo4j_error(e)}"
-                    )
+                    print(f"Warning: Neo4j initialization failed: {format_neo4j_error(e)}")
                     self.driver = None
 
             self._initialized = True
@@ -259,15 +235,10 @@ class EnhancedCodeValidator:
 
             # Step 8: Aggregate results
             result.issues = issues
-            result.confidence_score = (
-                sum(confidence_scores) / len(confidence_scores)
-                if confidence_scores
-                else 0.0
-            )
+            result.confidence_score = sum(confidence_scores) / len(confidence_scores) if confidence_scores else 0.0
             result.valid = (
                 result.confidence_score >= request.confidence_threshold
-                and len([issue for issue in issues if issue.get("severity") == "error"])
-                == 0
+                and len([issue for issue in issues if issue.get("severity") == "error"]) == 0
             )
 
             # Step 9: Generate suggestions
@@ -315,10 +286,7 @@ class EnhancedCodeValidator:
                         )
 
                 # Check for complex nested structures
-                if (
-                    isinstance(node, ast.FunctionDef)
-                    and len(list(ast.walk(node))) > 100
-                ):
+                if isinstance(node, ast.FunctionDef) and len(list(ast.walk(node))) > 100:
                     issues.append(
                         {
                             "type": "complexity",
@@ -369,19 +337,18 @@ class EnhancedCodeValidator:
                                 }
                             )
 
-                elif isinstance(node, ast.ImportFrom):
-                    if node.module:
-                        try:
-                            __import__(node.module)
-                        except ImportError:
-                            issues.append(
-                                {
-                                    "type": "import_error",
-                                    "severity": "error",
-                                    "message": f"Module not found: {node.module}",
-                                    "line": getattr(node, "lineno", 0),
-                                }
-                            )
+                elif isinstance(node, ast.ImportFrom) and node.module:
+                    try:
+                        __import__(node.module)
+                    except ImportError:
+                        issues.append(
+                            {
+                                "type": "import_error",
+                                "severity": "error",
+                                "message": f"Module not found: {node.module}",
+                                "line": getattr(node, "lineno", 0),
+                            }
+                        )
 
             return {
                 "valid": len([i for i in issues if i["severity"] == "error"]) == 0,
@@ -428,9 +395,7 @@ class EnhancedCodeValidator:
             function_calls = []
             for node in ast.walk(tree):
                 if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
-                    if hasattr(node.func.value, "id") and isinstance(
-                        node.func.value, ast.Name
-                    ):
+                    if hasattr(node.func.value, "id") and isinstance(node.func.value, ast.Name):
                         function_calls.append(f"{node.func.value.id}.{node.func.attr}")
                 elif isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
                     function_calls.append(node.func.id)
@@ -561,39 +526,29 @@ class EnhancedCodeValidator:
                 ],
             }
 
-    def _generate_suggestions(
-        self, issues: list[dict[str, Any]], script_content: str
-    ) -> list[str]:
+    def _generate_suggestions(self, issues: list[dict[str, Any]], script_content: str) -> list[str]:
         """Generate improvement suggestions based on detected issues."""
         suggestions = []
 
         error_types = [issue["type"] for issue in issues]
 
         if "syntax_error" in error_types:
-            suggestions.append(
-                "Fix syntax errors before proceeding with other validations"
-            )
+            suggestions.append("Fix syntax errors before proceeding with other validations")
 
         if "import_error" in error_types:
             suggestions.append("Install missing packages or check import statements")
 
         if "complexity" in error_types:
-            suggestions.append(
-                "Consider breaking down complex functions into smaller parts"
-            )
+            suggestions.append("Consider breaking down complex functions into smaller parts")
 
         if "potential_hallucination" in error_types:
-            suggestions.append(
-                "Review AI-generated code sections for correctness and completeness"
-            )
+            suggestions.append("Review AI-generated code sections for correctness and completeness")
 
         if "knowledge_graph" in error_types:
             suggestions.append("Verify function calls against Ignition documentation")
 
         if len(script_content.split("\n")) > 1000:
-            suggestions.append(
-                "Consider splitting large scripts into modular components"
-            )
+            suggestions.append("Consider splitting large scripts into modular components")
 
         return suggestions
 

@@ -391,7 +391,7 @@ class DatasetCurationUI:
             if dataset.quality_report:
                 quality_color = self.get_quality_color(dataset.quality_report.overall_quality)
                 st.markdown(
-                    f"**Quality:** <span style='color: {quality_color}'>{dataset.quality_report.overall_quality.value}</span>",
+                    f"**Quality:** <span style='color: {quality_color}'>{dataset.quality_report.overall_quality.value}</span>",  # noqa: E501
                     unsafe_allow_html=True,
                 )
 
@@ -647,7 +647,7 @@ class DatasetCurationUI:
         with col1:
             quality_color = self.get_quality_color(report.overall_quality)
             st.markdown(
-                f"### Overall Quality: <span style='color: {quality_color}'>{report.overall_quality.value.title()}</span>",
+                f"### Overall Quality: <span style='color: {quality_color}'>{report.overall_quality.value.title()}</span>",  # noqa: E501
                 unsafe_allow_html=True,
             )
 
@@ -692,7 +692,7 @@ class DatasetCurationUI:
                 for issue in report.issues:
                     severity_color = {"low": "🟢", "medium": "🟡", "high": "🔴"}
                     st.write(
-                        f"{severity_color.get(issue['severity'], '🔵')} **{issue['type'].title()}**: {issue['description']}"
+                        f"{severity_color.get(issue['severity'], '🔵')} **{issue['type'].title()}**: {issue['description']}"  # noqa: E501
                     )
             else:
                 st.success("No issues found!")

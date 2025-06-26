@@ -1,4 +1,4 @@
-"""SME Agent Web Interface - FastAPI Implementation
+"""SME Agent Web Interface - FastAPI Implementation.
 
 Phase 11.3: SME Agent Integration & Interfaces
 Following crawl_mcp.py methodology:
@@ -59,9 +59,7 @@ async def lifespan(app: FastAPI) -> None:
             raise RuntimeError("SME Agent environment validation failed")
 
         # Initialize with basic complexity for web interface
-        init_result = sme_agent_instance.initialize_components(
-            complexity_level="standard"
-        )
+        init_result = sme_agent_instance.initialize_components(complexity_level="standard")
         if not init_result["success"]:
             logger.error("❌ SME Agent initialization failed")
             raise RuntimeError("SME Agent initialization failed")
@@ -104,14 +102,10 @@ app.add_middleware(
 class ChatRequest(BaseModel):
     """Chat request model with comprehensive validation."""
 
-    question: str = Field(
-        ..., min_length=1, max_length=10000, description="User question"
-    )
+    question: str = Field(..., min_length=1, max_length=10000, description="User question")
     context: str | None = Field(None, max_length=20000, description="Optional context")
     complexity: str = Field("standard", description="Complexity level")
-    session_id: str | None = Field(
-        None, description="Optional session ID for conversation history"
-    )
+    session_id: str | None = Field(None, description="Optional session ID for conversation history")
     stream: bool = Field(True, description="Enable streaming response")
 
     @validator("complexity")
@@ -146,9 +140,7 @@ class ChatResponse(BaseModel):
 class AnalysisRequest(BaseModel):
     """File analysis request model."""
 
-    content: str = Field(
-        ..., min_length=1, max_length=100000, description="File content to analyze"
-    )
+    content: str = Field(..., min_length=1, max_length=100000, description="File content to analyze")
     filename: str | None = Field(None, description="Optional filename")
     complexity: str = Field("standard", description="Analysis complexity level")
 
@@ -233,7 +225,7 @@ async def chat_endpoint(request: ChatRequest) -> None:
         session_id = request.session_id or str(uuid.uuid4())
 
         # Process question
-        start_time_local = time.time()
+        time.time()
         response = sme_agent_instance.ask_question(request.question, request.context)
 
         # Store in conversation session
@@ -286,12 +278,10 @@ async def chat_stream_endpoint(request: ChatRequest) -> None:
         """Generate streaming response."""
         try:
             # Send initial metadata
-            yield f"data: {json.dumps({'type': 'start', 'session_id': session_id, 'timestamp': datetime.now().isoformat()})}\n\n"
+            yield f"data: {json.dumps({'type': 'start', 'session_id': session_id, 'timestamp': datetime.now().isoformat()})}\n\n"  # noqa: E501
 
             # Process question (simulate streaming by chunking response)
-            response = sme_agent_instance.ask_question(
-                request.question, request.context
-            )
+            response = sme_agent_instance.ask_question(request.question, request.context)
 
             # Stream response in chunks
             words = response.response.split()
@@ -365,8 +355,12 @@ async def analyze_endpoint(request: AnalysisRequest) -> None:
 
     try:
         # Create analysis question
-        question = "Please analyze this file and provide insights about its structure, purpose, and potential improvements."
-        context = f"Filename: {request.filename or 'unknown'}\nContent:\n{request.content[:5000]}..."  # Limit context size
+        question = (
+            "Please analyze this file and provide insights about its structure, purpose, and potential improvements."
+        )
+        context = (
+            f"Filename: {request.filename or 'unknown'}\nContent:\n{request.content[:5000]}..."  # Limit context size
+        )
 
         # Process analysis
         response = sme_agent_instance.ask_question(question, context)

@@ -371,9 +371,7 @@ def refresh() -> None:
 
 
 @analytics_group.command()
-@click.option(
-    "--check-sync", is_flag=True, help="Check documentation synchronization status"
-)
+@click.option("--check-sync", is_flag=True, help="Check documentation synchronization status")
 @click.option("--update-api", is_flag=True, help="Update API documentation")
 @click.option("--validate-refs", is_flag=True, help="Validate cross-references")
 @click.option(
@@ -406,9 +404,7 @@ def docs(check_sync: bool, update_api: bool, validate_refs: bool, format: str) -
             results = {}
 
             if check_sync:
-                progress.update(
-                    task, description="Checking documentation sync status..."
-                )
+                progress.update(task, description="Checking documentation sync status...")
                 doc_items = doc_sync.analyze_documentation_sync_status()
                 results["sync_status"] = [asdict(item) for item in doc_items]
 
@@ -469,15 +465,9 @@ def _display_health_table(metrics) -> Any:
     main_table.add_row("Total Lines", f"{metrics.total_lines:,}", "📄")
     main_table.add_row("Total Classes", str(metrics.total_classes), "🏗️")
     main_table.add_row("Total Methods", str(metrics.total_methods), "⚙️")
-    main_table.add_row(
-        "Average Complexity", f"{metrics.average_complexity:.1f}", complexity_status
-    )
-    main_table.add_row(
-        "Technical Debt Score", f"{metrics.technical_debt_score:.2f}", debt_status
-    )
-    main_table.add_row(
-        "Large Files (>1000 lines)", str(metrics.large_files_count), "📊"
-    )
+    main_table.add_row("Average Complexity", f"{metrics.average_complexity:.1f}", complexity_status)
+    main_table.add_row("Technical Debt Score", f"{metrics.technical_debt_score:.2f}", debt_status)
+    main_table.add_row("Large Files (>1000 lines)", str(metrics.large_files_count), "📊")
     main_table.add_row("Quality Trend", metrics.quality_trend, "📈")
 
     console.print(main_table)
@@ -519,9 +509,7 @@ def _display_detailed_health_report(metrics) -> None:
     if metrics.debt_hotspots:
         console.print("🔥 **Technical Debt Hotspots**")
         for hotspot in metrics.debt_hotspots[:5]:
-            console.print(
-                f"   • {hotspot['file_path']} (Score: {hotspot['debt_score']:.2f})"
-            )
+            console.print(f"   • {hotspot['file_path']} (Score: {hotspot['debt_score']:.2f})")
         console.print()
 
     # Largest files
@@ -538,9 +526,7 @@ def _display_detailed_health_report(metrics) -> None:
         console.print("🕸️  **Highly Coupled Files**")
         for file_info in metrics.highly_coupled_files[:5]:
             total_coupling = file_info.get("total_coupling", 0)
-            console.print(
-                f"   • {file_info['file_path']}: {total_coupling} connections"
-            )
+            console.print(f"   • {file_info['file_path']}: {total_coupling} connections")
 
 
 def _display_dependency_table(nodes, edges) -> None:
@@ -578,9 +564,7 @@ def _display_dependency_table(nodes, edges) -> None:
         console.print(f"\n📈 **Summary**: {len(nodes)} nodes, {len(edges)} edges")
         avg_complexity = sum(n.complexity for n in nodes) / len(nodes)
         console.print(f"   • Average complexity: {avg_complexity:.1f}")
-        console.print(
-            f"   • High-risk files: {len([n for n in nodes if n.risk_level in ['critical', 'high']])}"
-        )
+        console.print(f"   • High-risk files: {len([n for n in nodes if n.risk_level in ['critical', 'high']])}")
 
 
 def _display_mermaid_graph(nodes, edges) -> None:
@@ -601,9 +585,7 @@ def _display_mermaid_graph(nodes, edges) -> None:
         console.print(f'    {node_id}["{Path(node.file_path).name}"] {risk_class}')
 
     # Add edges
-    displayed_nodes = {
-        Path(n.file_path).stem.replace("-", "_").replace(".", "_") for n in nodes[:20]
-    }
+    displayed_nodes = {Path(n.file_path).stem.replace("-", "_").replace(".", "_") for n in nodes[:20]}
     for edge in edges:
         source_id = Path(edge.source).stem.replace("-", "_").replace(".", "_")
         target_id = Path(edge.target).stem.replace("-", "_").replace(".", "_")
@@ -638,9 +620,7 @@ def _display_debt_table(metrics, severity_filter) -> None:
         hotspots_table.add_column("Primary Issues", style="yellow")
 
         for hotspot in metrics.debt_hotspots:
-            if severity_filter == "all" or "critical" in str(
-                hotspot.get("debt_score", 0)
-            ):
+            if severity_filter == "all" or "critical" in str(hotspot.get("debt_score", 0)):
                 issues = ", ".join(hotspot.get("primary_issues", []))
                 hotspots_table.add_row(
                     Path(hotspot["file_path"]).name,
@@ -678,9 +658,7 @@ def _display_debt_tree(metrics) -> None:
     if metrics.debt_hotspots:
         hotspots_branch = tree.add("🔥 Critical Hotspots")
         for hotspot in metrics.debt_hotspots[:5]:
-            file_branch = hotspots_branch.add(
-                f"{Path(hotspot['file_path']).name} (Score: {hotspot['debt_score']:.2f})"
-            )
+            file_branch = hotspots_branch.add(f"{Path(hotspot['file_path']).name} (Score: {hotspot['debt_score']:.2f})")
             for issue in hotspot.get("primary_issues", []):
                 file_branch.add(f"❌ {issue}")
 
@@ -688,9 +666,7 @@ def _display_debt_tree(metrics) -> None:
     if metrics.refactoring_candidates:
         candidates_branch = tree.add("🔧 Refactoring Candidates")
         for candidate in metrics.refactoring_candidates[:5]:
-            candidates_branch.add(
-                f"{Path(candidate['file_path']).name} (Score: {candidate['debt_score']:.2f})"
-            )
+            candidates_branch.add(f"{Path(candidate['file_path']).name} (Score: {candidate['debt_score']:.2f})")
 
     console.print(tree)
 
@@ -746,14 +722,8 @@ def _display_optimization_insights(insights) -> None:
         bottlenecks_table.add_column("Impact", style="red")
 
         for bottleneck in insights["bottlenecks"]:
-            impact_color = (
-                "[red]High[/red]"
-                if bottleneck["impact"] == "high"
-                else "[yellow]Medium[/yellow]"
-            )
-            bottlenecks_table.add_row(
-                Path(bottleneck["file_path"]).name, bottleneck["reason"], impact_color
-            )
+            impact_color = "[red]High[/red]" if bottleneck["impact"] == "high" else "[yellow]Medium[/yellow]"
+            bottlenecks_table.add_row(Path(bottleneck["file_path"]).name, bottleneck["reason"], impact_color)
 
         console.print(bottlenecks_table)
 
@@ -825,9 +795,7 @@ def _display_documentation_status(results) -> None:
         issues_table.add_column("Issue", style="red", width=30)
 
         for issue in results["validation_issues"][:10]:
-            issues_table.add_row(
-                Path(issue["doc_file"]).name, issue["reference"], issue["issue"]
-            )
+            issues_table.add_row(Path(issue["doc_file"]).name, issue["reference"], issue["issue"])
 
         console.print(issues_table)
 

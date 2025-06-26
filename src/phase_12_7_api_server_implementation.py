@@ -59,7 +59,7 @@ def validate_api_environment() -> dict[str, Any]:
     """Validate environment setup before starting API server.
     Following crawl_mcp.py methodology: Environment validation first.
     """
-    validation_results = {"valid": True, "checks": {}, "errors": [], "warnings": []}
+    validation_results: dict[str, Any] = {"valid": True, "checks": {}, "errors": [], "warnings": []}
 
     # Check Python version
     python_version = sys.version_info
@@ -67,9 +67,7 @@ def validate_api_environment() -> dict[str, Any]:
         validation_results["checks"]["python_version"] = "✅ PASS"
     else:
         validation_results["checks"]["python_version"] = "❌ FAIL"
-        validation_results["errors"].append(
-            f"Python 3.8+ required, found {python_version}"
-        )
+        validation_results["errors"].append(f"Python 3.8+ required, found {python_version}")
         validation_results["valid"] = False
 
     # Check required environment variables
@@ -120,9 +118,7 @@ def validate_api_environment() -> dict[str, Any]:
         validation_results["checks"]["project_structure"] = "✅ PASS"
     else:
         validation_results["checks"]["project_structure"] = "⚠️ PARTIAL"
-        validation_results["warnings"].extend(
-            [f"Missing directory: {d}" for d in missing_dirs]
-        )
+        validation_results["warnings"].extend([f"Missing directory: {d}" for d in missing_dirs])
 
     return validation_results
 
@@ -165,13 +161,9 @@ class HealthCheckResponse(BaseModel):
 class CLICommandRequest(BaseModel):
     """CLI command execution request model."""
 
-    command: str = Field(
-        ..., min_length=1, max_length=1000, description="CLI command to execute"
-    )
+    command: str = Field(..., min_length=1, max_length=1000, description="CLI command to execute")
     args: list[str] | None = Field(default=[], description="Command arguments")
-    timeout: int | None = Field(
-        default=30, ge=1, le=300, description="Command timeout in seconds"
-    )
+    timeout: int | None = Field(default=30, ge=1, le=300, description="Command timeout in seconds")
 
 
 class CLICommandResponse(BaseModel):
@@ -190,9 +182,7 @@ class SystemStatusResponse(BaseModel):
     api_server: str = Field(..., description="API server status")
     cli_system: str = Field(..., description="CLI system status")
     database: str = Field(..., description="Database connectivity status")
-    environment_validation: dict[str, str] = Field(
-        ..., description="Environment validation results"
-    )
+    environment_validation: dict[str, str] = Field(..., description="Environment validation results")
     metrics: dict[str, Any] = Field(..., description="System metrics")
 
 
@@ -231,7 +221,7 @@ class APIErrorHandler:
         )
 
     @staticmethod
-    def handle_general_error(error: Exception, request_id: str = None) -> JSONResponse:
+    def handle_general_error(error: Exception, request_id: str | None = None) -> JSONResponse:
         """Handle general API errors with user-friendly messages."""
         global error_count
         error_count += 1
@@ -258,8 +248,8 @@ class APIErrorHandler:
 class APIServerTester:
     """Comprehensive API server testing following crawl_mcp.py methodology."""
 
-    def __init__(self):
-        self.test_results = {
+    def __init__(self) -> None:
+        self.test_results: Any = {
             "environment_validation": {},
             "server_initialization": {},
             "endpoint_functionality": {},
@@ -298,9 +288,7 @@ class APIServerTester:
 
         success_rate = (passed_tests / total_tests * 100) if total_tests > 0 else 0
 
-        print(
-            f"✅ Testing completed: {passed_tests}/{total_tests} tests passed ({success_rate:.1f}%)"
-        )
+        print(f"✅ Testing completed: {passed_tests}/{total_tests} tests passed ({success_rate:.1f}%)")
 
         return {
             "overall_success": success_rate >= 80,
@@ -311,7 +299,7 @@ class APIServerTester:
             "timestamp": datetime.now().isoformat(),
         }
 
-    async def _test_environment_validation(self):
+    async def _test_environment_validation(self) -> None:
         """Test environment validation."""
         try:
             validation_result = validate_api_environment()
@@ -327,11 +315,11 @@ class APIServerTester:
                 "error": str(e),
             }
 
-    async def _test_server_initialization(self):
+    async def _test_server_initialization(self) -> None:
         """Test server initialization components."""
         # Test FastAPI app creation
         try:
-            test_app = FastAPI(title="Test API")
+            FastAPI(title="Test API")
             self.test_results["server_initialization"]["fastapi_creation"] = {
                 "status": "PASS",
                 "details": "FastAPI app created successfully",
@@ -354,7 +342,7 @@ class APIServerTester:
                 "details": "CLI modules not fully available",
             }
 
-    async def _test_endpoint_functionality(self):
+    async def _test_endpoint_functionality(self) -> None:
         """Test endpoint functionality."""
         # Test health check endpoint logic
         try:
@@ -395,16 +383,14 @@ class APIServerTester:
                 "error": str(e),
             }
 
-    async def _test_error_handling(self):
+    async def _test_error_handling(self) -> None:
         """Test error handling mechanisms."""
         # Test validation error handling
         try:
             error_handler = APIErrorHandler()
             # Create a simple validation error for testing
             test_exception = ValueError("Test validation error")
-            response = error_handler.handle_general_error(
-                test_exception, "test-validation"
-            )
+            response = error_handler.handle_general_error(test_exception, "test-validation")
 
             self.test_results["error_handling"]["validation_errors"] = {
                 "status": "PASS",
@@ -432,7 +418,7 @@ class APIServerTester:
                 "error": str(e),
             }
 
-    async def _test_performance_metrics(self):
+    async def _test_performance_metrics(self) -> None:
         """Test performance metrics collection."""
         try:
             global request_count, error_count
@@ -442,9 +428,7 @@ class APIServerTester:
             metrics = {
                 "total_requests": request_count,
                 "total_errors": error_count,
-                "error_rate": (
-                    (error_count / request_count * 100) if request_count > 0 else 0
-                ),
+                "error_rate": ((error_count / request_count * 100) if request_count > 0 else 0),
                 "uptime_seconds": time.time() - (server_start_time or time.time()),
             }
 
@@ -465,7 +449,7 @@ class APIServerTester:
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> None:
     """Application lifespan management with proper resource handling.
     Following crawl_mcp.py resource management patterns.
     """
@@ -526,7 +510,7 @@ app.add_middleware(
 
 
 @app.get("/health", response_model=HealthCheckResponse)
-async def health_check():
+async def health_check() -> Any:
     """Health check endpoint.
     Basic level: Simple health status.
     """
@@ -553,7 +537,7 @@ async def health_check():
 
 
 @app.get("/status", response_model=SystemStatusResponse)
-async def system_status():
+async def system_status() -> Any:
     """System status endpoint.
     Standard level: Comprehensive system status.
     """
@@ -570,9 +554,7 @@ async def system_status():
             "uptime_seconds": uptime,
             "total_requests": request_count,
             "total_errors": error_count,
-            "error_rate": (
-                (error_count / request_count * 100) if request_count > 0 else 0
-            ),
+            "error_rate": ((error_count / request_count * 100) if request_count > 0 else 0),
             "memory_usage": "Not implemented",  # Could add psutil for real metrics
             "cpu_usage": "Not implemented",
         }
@@ -581,9 +563,7 @@ async def system_status():
             api_server="healthy",
             cli_system="available" if CLI_AVAILABLE else "partial",
             database=(
-                "configured"
-                if env_validation["checks"].get("environment_variables") == "✅ PASS"
-                else "not_configured"
+                "configured" if env_validation["checks"].get("environment_variables") == "✅ PASS" else "not_configured"
             ),
             environment_validation=env_validation["checks"],
             metrics=metrics,
@@ -593,7 +573,7 @@ async def system_status():
 
 
 @app.post("/cli/execute", response_model=CLICommandResponse)
-async def execute_cli_command(request: CLICommandRequest):
+async def execute_cli_command(request: CLICommandRequest) -> Any:
     """Execute CLI command endpoint.
     Advanced level: CLI integration with validation and timeout.
     """
@@ -648,7 +628,7 @@ async def execute_cli_command(request: CLICommandRequest):
 
 
 @app.get("/test/comprehensive")
-async def run_comprehensive_tests():
+async def run_comprehensive_tests() -> Any:
     """Comprehensive testing endpoint.
     Enterprise level: Full system testing and validation.
     """
@@ -669,12 +649,10 @@ async def run_comprehensive_tests():
 # ============================================================================
 
 
-async def main():
+async def main() -> bool:
     """Main execution function following crawl_mcp.py methodology."""
     print("🚀 Phase 12.7: API Server Implementation")
-    print(
-        "Following crawl_mcp.py methodology: Environment validation → Testing → Deployment"
-    )
+    print("Following crawl_mcp.py methodology: Environment validation → Testing → Deployment")
 
     # Step 1: Environment validation first
     print("\n🔍 Step 1: Environment Validation")
@@ -696,9 +674,7 @@ async def main():
     if test_results["overall_success"]:
         print("✅ Testing completed successfully")
     else:
-        print(
-            f"⚠️ Testing completed with issues: {test_results['success_rate']:.1f}% success rate"
-        )
+        print(f"⚠️ Testing completed with issues: {test_results['success_rate']:.1f}% success rate")
 
     # Step 3: Server configuration
     print("\n⚙️ Step 3: Server Configuration")

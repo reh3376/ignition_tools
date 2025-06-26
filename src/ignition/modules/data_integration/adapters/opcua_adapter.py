@@ -24,9 +24,7 @@ class OPCUAAdapter(BaseDataAdapter):
         """Connect to OPC-UA server."""
         try:
             # Extract connection parameters
-            url = self.config.connection_params.get(
-                "url"
-            ) or self.config.connection_params.get("endpoint_url")
+            url = self.config.connection_params.get("url") or self.config.connection_params.get("endpoint_url")
             if not url:
                 self.logger.error("OPC-UA URL is required")
                 return False
@@ -41,9 +39,7 @@ class OPCUAAdapter(BaseDataAdapter):
             if "password" in self.config.connection_params:
                 connect_kwargs["password"] = self.config.connection_params["password"]
             if "certificate" in self.config.connection_params:
-                connect_kwargs["certificate"] = self.config.connection_params[
-                    "certificate"
-                ]
+                connect_kwargs["certificate"] = self.config.connection_params["certificate"]
 
             success = await self._client.connect(**connect_kwargs)
             if success:
@@ -85,9 +81,7 @@ class OPCUAAdapter(BaseDataAdapter):
             self.logger.error(f"OPC-UA connection test error: {e}")
             return False
 
-    async def read_data(
-        self, query: dict[str, Any] | None = None
-    ) -> list[dict[str, Any]]:
+    async def read_data(self, query: dict[str, Any] | None = None) -> list[dict[str, Any]]:
         """Read data from OPC-UA server."""
         if not self._client or not self._connected:
             self.logger.error("OPC-UA client not connected")
@@ -172,9 +166,7 @@ class OPCUAAdapter(BaseDataAdapter):
                 if "node_id" in record and "value" in record:
                     node_values[record["node_id"]] = record["value"]
                 else:
-                    self.logger.warning(
-                        "Invalid write data format - missing node_id or value"
-                    )
+                    self.logger.warning("Invalid write data format - missing node_id or value")
 
             if node_values:
                 # Use write_values method
@@ -194,9 +186,7 @@ class OPCUAAdapter(BaseDataAdapter):
             self.logger.error(f"OPC-UA write error: {e}")
             return False
 
-    async def stream_data(
-        self, callback: callable, query: dict[str, Any] | None = None
-    ) -> None:
+    async def stream_data(self, callback: callable, query: dict[str, Any] | None = None) -> None:
         """Stream data from OPC-UA server using subscriptions."""
         if not self._client or not self._connected:
             self.logger.error("OPC-UA client not connected")
@@ -231,13 +221,9 @@ class OPCUAAdapter(BaseDataAdapter):
 
             # Create subscription
             interval = query.get("interval", 1000.0) if query else 1000.0
-            subscription_id = await self._client.subscribe_nodes(
-                node_ids, data_change_callback, interval
-            )
+            subscription_id = await self._client.subscribe_nodes(node_ids, data_change_callback, interval)
 
-            self.logger.info(
-                f"Created OPC-UA subscription {subscription_id} for {len(node_ids)} nodes"
-            )
+            self.logger.info(f"Created OPC-UA subscription {subscription_id} for {len(node_ids)} nodes")
 
             # Keep streaming until disconnected
             while self._connected:

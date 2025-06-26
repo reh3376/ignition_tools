@@ -117,9 +117,7 @@ class BaseDomainManager(ABC):
 
         self.logger.info(f"Initialized {domain_name} domain manager")
 
-    def validate_input(
-        self: Self, query: str, context: dict[str, Any] | None = None
-    ) -> bool:
+    def validate_input(self: Self, query: str, context: dict[str, Any] | None = None) -> bool:
         """Step 2: Comprehensive Input Validation.
 
         Args:
@@ -179,9 +177,7 @@ class BaseDomainManager(ABC):
         pass
 
     @abstractmethod
-    def query_knowledge(
-        self, query: str, context: dict[str, Any] | None = None
-    ) -> DomainQueryResult:
+    def query_knowledge(self, query: str, context: dict[str, Any] | None = None) -> DomainQueryResult:
         """Query domain knowledge.
 
         Args:
@@ -200,9 +196,7 @@ class BaseDomainManager(ABC):
     def update_statistics(self: Self) -> bool:
         """Update domain statistics."""
         total_items = len(self.knowledge_items)
-        avg_confidence = sum(
-            item.confidence for item in self.knowledge_items.values()
-        ) / max(total_items, 1)
+        avg_confidence = sum(item.confidence for item in self.knowledge_items.values()) / max(total_items, 1)
 
         self.statistics.update(
             {
@@ -238,9 +232,7 @@ class BaseDomainManager(ABC):
             with open(stats_file, "w", encoding="utf-8") as f:
                 json.dump(self.statistics, f, indent=2, ensure_ascii=False, default=str)
 
-            self.logger.info(
-                f"Saved {len(self.knowledge_items)} knowledge items for {self.domain_name}"
-            )
+            self.logger.info(f"Saved {len(self.knowledge_items)} knowledge items for {self.domain_name}")
             return True
 
         except Exception as e:
@@ -263,9 +255,7 @@ class BaseDomainManager(ABC):
 
                 # Load knowledge items
                 for item_id, item_data in knowledge_data.get("items", {}).items():
-                    item_data["last_updated"] = datetime.fromisoformat(
-                        item_data["last_updated"]
-                    )
+                    item_data["last_updated"] = datetime.fromisoformat(item_data["last_updated"])
                     self.knowledge_items[item_id] = DomainKnowledgeItem(**item_data)
 
                 self.categories = knowledge_data.get("categories", {})
@@ -274,13 +264,9 @@ class BaseDomainManager(ABC):
                 with open(stats_file, encoding="utf-8") as f:
                     self.statistics = json.load(f)
                     if "last_updated" in self.statistics:
-                        self.statistics["last_updated"] = datetime.fromisoformat(
-                            self.statistics["last_updated"]
-                        )
+                        self.statistics["last_updated"] = datetime.fromisoformat(self.statistics["last_updated"])
 
-            self.logger.info(
-                f"Loaded {len(self.knowledge_items)} knowledge items for {self.domain_name}"
-            )
+            self.logger.info(f"Loaded {len(self.knowledge_items)} knowledge items for {self.domain_name}")
             return True
 
         except Exception as e:
@@ -495,29 +481,17 @@ def valueChanged(tag, tagPath, previousValue, currentValue, initialChange, misse
 
         # Update categories
         self.categories = {
-            "startup": [
-                item.id
-                for item in self.knowledge_items.values()
-                if item.category == "startup"
-            ],
-            "tag_events": [
-                item.id
-                for item in self.knowledge_items.values()
-                if item.category == "tag_events"
-            ],
+            "startup": [item.id for item in self.knowledge_items.values() if item.category == "startup"],
+            "tag_events": [item.id for item in self.knowledge_items.values() if item.category == "tag_events"],
             "shutdown": [],
             "timers": [],
         }
 
         # Save the initial knowledge base
         self.save_knowledge_base()
-        self.logger.info(
-            f"Created initial knowledge base with {len(self.knowledge_items)} items"
-        )
+        self.logger.info(f"Created initial knowledge base with {len(self.knowledge_items)} items")
 
-    def query_knowledge(
-        self, query: str, context: dict[str, Any] | None = None
-    ) -> DomainQueryResult:
+    def query_knowledge(self, query: str, context: dict[str, Any] | None = None) -> DomainQueryResult:
         """Query gateway scripting knowledge.
 
         Args:
@@ -556,11 +530,7 @@ def valueChanged(tag, tagPath, previousValue, currentValue, initialChange, misse
             results.sort(key=lambda x: x.confidence, reverse=True)
 
             # Calculate overall confidence
-            confidence = (
-                sum(item.confidence for item in results) / max(len(results), 1)
-                if results
-                else 0.0
-            )
+            confidence = sum(item.confidence for item in results) / max(len(results), 1) if results else 0.0
 
             # Generate suggestions and related topics
             suggestions = self._generate_suggestions(results)
@@ -589,14 +559,10 @@ def valueChanged(tag, tagPath, previousValue, currentValue, initialChange, misse
                 results=[],
                 confidence=0.0,
                 processing_time=time.time() - start_time,
-                suggestions=[
-                    "An error occurred while processing your query. Please try again."
-                ],
+                suggestions=["An error occurred while processing your query. Please try again."],
             )
 
-    def _calculate_relevance_score(
-        self, query: str, item: DomainKnowledgeItem
-    ) -> float:
+    def _calculate_relevance_score(self, query: str, item: DomainKnowledgeItem) -> float:
         """Calculate relevance score between query and knowledge item."""
         score = 0.0
 
@@ -626,9 +592,7 @@ def valueChanged(tag, tagPath, previousValue, currentValue, initialChange, misse
 
         return min(score, 1.0)  # Cap at 1.0
 
-    def _generate_suggestions(
-        self: Self, results: list[DomainKnowledgeItem]
-    ) -> list[str]:
+    def _generate_suggestions(self: Self, results: list[DomainKnowledgeItem]) -> list[str]:
         """Generate suggestions based on query and results."""
         suggestions = []
 
@@ -645,9 +609,7 @@ def valueChanged(tag, tagPath, previousValue, currentValue, initialChange, misse
             categories = {item.category for item in results}
             for category in self.script_patterns:
                 if category not in categories:
-                    suggestions.append(
-                        f"You might also be interested in {category} scripts"
-                    )
+                    suggestions.append(f"You might also be interested in {category} scripts")
 
         return suggestions[:3]  # Limit to 3 suggestions
 
@@ -684,11 +646,7 @@ def valueChanged(tag, tagPath, previousValue, currentValue, initialChange, misse
             return None
 
         # Find relevant knowledge items for this script type
-        relevant_items = [
-            item
-            for item in self.knowledge_items.values()
-            if item.category == script_type
-        ]
+        relevant_items = [item for item in self.knowledge_items.values() if item.category == script_type]
 
         if not relevant_items:
             return None
@@ -716,19 +674,19 @@ def valueChanged(tag, tagPath, previousValue, currentValue, initialChange, misse
         if not script_content or not isinstance(script_content, str):
             return {"success": False, "error": "Invalid script content provided"}
 
-        analysis = {
-            "success": True,
-            "score": 0.0,
-            "issues": [],
-            "recommendations": [],
-            "best_practices_followed": [],
-            "metrics": {
-                "lines_of_code": len(script_content.split("\n")),
-                "has_error_handling": False,
-                "has_logging": False,
-                "has_comments": False,
-            },
-        }
+            analysis: dict[str, Any] = {
+                "success": True,
+                "score": 0.0,
+                "issues": [],
+                "recommendations": [],
+                "best_practices_followed": [],
+                "metrics": {
+                    "lines_of_code": len(script_content.split("\n")),
+                    "has_error_handling": False,
+                    "has_logging": False,
+                    "has_comments": False,
+                },
+            }
 
         script_lower = script_content.lower()
 
@@ -739,23 +697,16 @@ def valueChanged(tag, tagPath, previousValue, currentValue, initialChange, misse
             analysis["score"] += 0.3
         else:
             analysis["issues"].append("Missing error handling (try/except blocks)")
-            analysis["recommendations"].append(
-                "Add try/except blocks for robust error handling"
-            )
+            analysis["recommendations"].append("Add try/except blocks for robust error handling")
 
         # Check for logging
-        if any(
-            keyword in script_lower
-            for keyword in ["logger", "log", "system.util.getlogger"]
-        ):
+        if any(keyword in script_lower for keyword in ["logger", "log", "system.util.getlogger"]):
             analysis["metrics"]["has_logging"] = True
             analysis["best_practices_followed"].append("Includes logging")
             analysis["score"] += 0.3
         else:
             analysis["issues"].append("Missing logging statements")
-            analysis["recommendations"].append(
-                "Add logging for debugging and monitoring"
-            )
+            analysis["recommendations"].append("Add logging for debugging and monitoring")
 
         # Check for comments
         if "#" in script_content:
@@ -806,9 +757,7 @@ class SystemFunctionsDomainManager(BaseDomainManager):
         try:
             # Load from Neo4j if available
             has_neo4j = (
-                self.neo4j_client
-                and hasattr(self.neo4j_client, "is_connected")
-                and self.neo4j_client.is_connected()
+                self.neo4j_client and hasattr(self.neo4j_client, "is_connected") and self.neo4j_client.is_connected()
             )
 
             if has_neo4j:
@@ -840,9 +789,7 @@ class SystemFunctionsDomainManager(BaseDomainManager):
             results = self.neo4j_client.execute_query(query)
 
             for record in results:
-                function_id = (
-                    f"{record.get('module', 'system')}.{record.get('name', 'unknown')}"
-                )
+                function_id = f"{record.get('module', 'system')}.{record.get('name', 'unknown')}"
 
                 # Create knowledge item for this function
                 item = DomainKnowledgeItem(
@@ -857,16 +804,12 @@ class SystemFunctionsDomainManager(BaseDomainManager):
                         "usage_examples": [],
                     },
                     confidence=0.8,
-                    tags=self._generate_function_tags(
-                        record.get("name", ""), record.get("module", "")
-                    ),
+                    tags=self._generate_function_tags(record.get("name", ""), record.get("module", "")),
                 )
 
                 self.knowledge_items[function_id] = item
 
-            self.logger.info(
-                f"Loaded {len(self.knowledge_items)} system functions from Neo4j"
-            )
+            self.logger.info(f"Loaded {len(self.knowledge_items)} system functions from Neo4j")
 
         except Exception as e:
             self.logger.error(f"Failed to load from Neo4j: {e}")
@@ -945,9 +888,7 @@ class SystemFunctionsDomainManager(BaseDomainManager):
 
         # Save the initial knowledge base
         self.save_knowledge_base()
-        self.logger.info(
-            f"Created initial system functions knowledge base with {len(self.knowledge_items)} items"
-        )
+        self.logger.info(f"Created initial system functions knowledge base with {len(self.knowledge_items)} items")
 
     def _categorize_function(self: Self, function_name: str) -> str:
         """Categorize function based on name."""
@@ -968,9 +909,7 @@ class SystemFunctionsDomainManager(BaseDomainManager):
         else:
             return "utility"
 
-    def _generate_function_tags(
-        self: Self, function_name: str, module: str
-    ) -> list[str]:
+    def _generate_function_tags(self: Self, function_name: str, module: str) -> list[str]:
         """Generate tags for a function."""
         tags = []
 
@@ -993,9 +932,7 @@ class SystemFunctionsDomainManager(BaseDomainManager):
 
         return list(set(tags))  # Remove duplicates
 
-    def query_knowledge(
-        self, query: str, context: dict[str, Any] | None = None
-    ) -> DomainQueryResult:
+    def query_knowledge(self, query: str, context: dict[str, Any] | None = None) -> DomainQueryResult:
         """Query system functions knowledge.
 
         Args:
@@ -1015,9 +952,7 @@ class SystemFunctionsDomainManager(BaseDomainManager):
                 results=[],
                 confidence=0.0,
                 processing_time=time.time() - start_time,
-                suggestions=[
-                    "Please provide a valid query about Ignition system functions"
-                ],
+                suggestions=["Please provide a valid query about Ignition system functions"],
             )
 
         try:
@@ -1039,11 +974,7 @@ class SystemFunctionsDomainManager(BaseDomainManager):
             )
 
             # Calculate overall confidence
-            confidence = (
-                sum(item.confidence for item in results) / max(len(results), 1)
-                if results
-                else 0.0
-            )
+            confidence = sum(item.confidence for item in results) / max(len(results), 1) if results else 0.0
 
             # Generate suggestions and related topics
             suggestions = self._generate_function_suggestions(results)
@@ -1072,14 +1003,10 @@ class SystemFunctionsDomainManager(BaseDomainManager):
                 results=[],
                 confidence=0.0,
                 processing_time=time.time() - start_time,
-                suggestions=[
-                    "An error occurred while searching system functions. Please try again."
-                ],
+                suggestions=["An error occurred while searching system functions. Please try again."],
             )
 
-    def _calculate_function_relevance(
-        self, query: str, item: DomainKnowledgeItem
-    ) -> float:
+    def _calculate_function_relevance(self, query: str, item: DomainKnowledgeItem) -> float:
         """Calculate relevance score for system function."""
         score = 0.0
 
@@ -1113,9 +1040,7 @@ class SystemFunctionsDomainManager(BaseDomainManager):
 
         return min(score, 1.0)
 
-    def _generate_function_suggestions(
-        self, results: list[DomainKnowledgeItem]
-    ) -> list[str]:
+    def _generate_function_suggestions(self, results: list[DomainKnowledgeItem]) -> list[str]:
         """Generate suggestions for system function queries."""
         suggestions = []
 
@@ -1178,8 +1103,7 @@ class SystemFunctionsDomainManager(BaseDomainManager):
             matches = [
                 item
                 for item in self.knowledge_items.values()
-                if function_name.lower() in item.name.lower()
-                or function_name.lower() in item.id.lower()
+                if function_name.lower() in item.name.lower() or function_name.lower() in item.id.lower()
             ]
             if not matches:
                 return None

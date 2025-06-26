@@ -1,4 +1,4 @@
-"""IGN Scripts Web Intelligence & Validation System - Phase 11.8
+"""IGN Scripts Web Intelligence & Validation System - Phase 11.8.
 
 This module provides advanced web crawling, knowledge graph validation, and AI-powered
 code analysis capabilities using best-in-class open source models instead of proprietary APIs.
@@ -24,46 +24,26 @@ from pydantic import BaseModel, Field
 class WebIntelligenceConfig(BaseModel):
     """Configuration for Web Intelligence system following crawl_mcp.py patterns."""
 
-    web_intelligence_enabled: bool = Field(
-        default=False, description="Enable web intelligence features"
-    )
-    use_local_models: bool = Field(
-        default=True, description="Force local models, no external APIs"
-    )
-    ollama_host: str = Field(
-        default="http://localhost:11434", description="Local Ollama server"
-    )
-    hf_cache_dir: str = Field(
-        default="/tmp/hf_cache", description="Hugging Face model cache"
-    )
+    web_intelligence_enabled: bool = Field(default=False, description="Enable web intelligence features")
+    use_local_models: bool = Field(default=True, description="Force local models, no external APIs")
+    ollama_host: str = Field(default="http://localhost:11434", description="Local Ollama server")
+    hf_cache_dir: str = Field(default="/tmp/hf_cache", description="Hugging Face model cache")
 
     # Model Selection Configuration (following Phase 11.8 spec)
-    embedding_model: str = Field(
-        default="sentence-transformers/all-MiniLM-L6-v2", description="Embedding model"
-    )
-    code_analysis_model: str = Field(
-        default="codellama:13b-instruct", description="Code analysis model"
-    )
-    documentation_model: str = Field(
-        default="mistral:7b-instruct", description="Documentation model"
-    )
-    validation_model: str = Field(
-        default="llama3.1:8b-instruct", description="Validation model"
-    )
+    embedding_model: str = Field(default="sentence-transformers/all-MiniLM-L6-v2", description="Embedding model")
+    code_analysis_model: str = Field(default="codellama:13b-instruct", description="Code analysis model")
+    documentation_model: str = Field(default="mistral:7b-instruct", description="Documentation model")
+    validation_model: str = Field(default="llama3.1:8b-instruct", description="Validation model")
     coder_model: str = Field(default="qwen2.5-coder:7b", description="Coder model")
 
     # Crawling Configuration
-    crawl_update_interval: str = Field(
-        default="daily", description="Crawl update interval"
-    )
+    crawl_update_interval: str = Field(default="daily", description="Crawl update interval")
     documentation_sources: str = Field(
         default="ignition_docs,community_forums,github_ignition",
         description="Documentation sources",
     )
     max_concurrent_crawls: int = Field(default=5, description="Max concurrent crawls")
-    chunk_size: int = Field(
-        default=1000, description="Optimized for local model context windows"
-    )
+    chunk_size: int = Field(default=1000, description="Optimized for local model context windows")
 
 
 def validate_environment() -> bool:
@@ -75,9 +55,7 @@ def validate_environment() -> bool:
     validation_results = []
 
     # 1. Check web intelligence settings
-    web_intelligence_enabled = (
-        os.getenv("WEB_INTELLIGENCE_ENABLED", "false").lower() == "true"
-    )
+    web_intelligence_enabled = os.getenv("WEB_INTELLIGENCE_ENABLED", "false").lower() == "true"
     validation_results.append(("Web Intelligence Enabled", web_intelligence_enabled))
 
     if not web_intelligence_enabled:
@@ -131,9 +109,7 @@ def validate_environment() -> bool:
 
 def validate_neo4j_connection() -> bool:
     """Check if Neo4j environment variables are configured (from crawl_mcp.py)."""
-    return all(
-        [os.getenv("NEO4J_URI"), os.getenv("NEO4J_USER"), os.getenv("NEO4J_PASSWORD")]
-    )
+    return all([os.getenv("NEO4J_URI"), os.getenv("NEO4J_USER"), os.getenv("NEO4J_PASSWORD")])
 
 
 def format_neo4j_error(error: Exception) -> str:

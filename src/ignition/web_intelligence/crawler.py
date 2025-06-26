@@ -25,19 +25,11 @@ class CrawlRequest(BaseModel):
     """Input validation model for crawl requests (crawl_mcp.py methodology)."""
 
     url: HttpUrl = Field(..., description="URL to crawl")
-    crawl_type: str = Field(
-        default="auto", description="Crawl type: auto, single, sitemap, recursive"
-    )
+    crawl_type: str = Field(default="auto", description="Crawl type: auto, single, sitemap, recursive")
     max_depth: int = Field(default=3, ge=1, le=10, description="Maximum crawling depth")
-    max_concurrent: int = Field(
-        default=5, ge=1, le=20, description="Maximum concurrent requests"
-    )
-    chunk_size: int = Field(
-        default=1000, ge=100, le=10000, description="Content chunk size"
-    )
-    include_code_blocks: bool = Field(
-        default=True, description="Preserve code blocks in content"
-    )
+    max_concurrent: int = Field(default=5, ge=1, le=20, description="Maximum concurrent requests")
+    chunk_size: int = Field(default=1000, ge=100, le=10000, description="Content chunk size")
+    include_code_blocks: bool = Field(default=True, description="Preserve code blocks in content")
 
     @validator("crawl_type")
     def validate_crawl_type(cls, v) -> Any:
@@ -70,13 +62,9 @@ class CrawlResult(BaseModel):
     content: str = Field(default="", description="Extracted content")
     markdown: str = Field(default="", description="Markdown content")
     links: list[str] = Field(default_factory=list, description="Found links")
-    code_blocks: list[dict[str, Any]] = Field(
-        default_factory=list, description="Extracted code blocks"
-    )
+    code_blocks: list[dict[str, Any]] = Field(default_factory=list, description="Extracted code blocks")
     chunks: list[str] = Field(default_factory=list, description="Content chunks")
-    metadata: dict[str, Any] = Field(
-        default_factory=dict, description="Additional metadata"
-    )
+    metadata: dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
     success: bool = Field(default=False, description="Crawl success status")
     error: str = Field(default="", description="Error message if failed")
 
@@ -118,24 +106,20 @@ class WebCrawler:
             if validate_neo4j_connection():
                 try:
                     # Import knowledge graph components if available
-                    from ..code_intelligence.enhanced_validator import (
-                        EnhancedCodeValidator,  # type: ignore
+                    from src.ignition.code_intelligence.enhanced_validator import (
+                        EnhancedCodeValidator,
                     )
 
                     neo4j_uri = os.getenv("NEO4J_URI")
                     neo4j_user = os.getenv("NEO4J_USER")
                     neo4j_password = os.getenv("NEO4J_PASSWORD")
 
-                    self.knowledge_validator = EnhancedCodeValidator(
-                        neo4j_uri, neo4j_user, neo4j_password
-                    )
+                    self.knowledge_validator = EnhancedCodeValidator(neo4j_uri, neo4j_user, neo4j_password)
                     await self.knowledge_validator.initialize()
                     print("✓ Knowledge graph validator initialized")
 
                 except Exception as e:
-                    print(
-                        f"Warning: Knowledge validator initialization failed: {format_neo4j_error(e)}"
-                    )
+                    print(f"Warning: Knowledge validator initialization failed: {format_neo4j_error(e)}")
                     self.knowledge_validator = None
 
             self._initialized = True
@@ -177,9 +161,7 @@ class WebCrawler:
                 return await self._crawl_single(request)
 
         except Exception as e:
-            return CrawlResult(
-                url=str(request.url), success=False, error=f"Crawl failed: {e!s}"
-            )
+            return CrawlResult(url=str(request.url), success=False, error=f"Crawl failed: {e!s}")
 
     def _detect_crawl_type(self, url: str) -> str:
         """Detect appropriate crawl type from URL (crawl_mcp.py patterns)."""
@@ -250,8 +232,7 @@ class WebCrawler:
                 return CrawlResult(
                     url=str(request.url),
                     success=False,
-                    error=getattr(result, "error_message", None)
-                    or "Unknown crawl error",
+                    error=getattr(result, "error_message", None) or "Unknown crawl error",
                 )
 
         except Exception as e:
@@ -301,18 +282,14 @@ class WebCrawler:
 
         return code_blocks
 
-    def _create_intelligent_chunks(
-        self, content: str, chunk_size: int, preserve_code: bool = True
-    ) -> list[str]:
+    def _create_intelligent_chunks(self, content: str, chunk_size: int, preserve_code: bool = True) -> list[str]:
         """Create intelligent content chunks preserving code blocks."""
         if not content:
             return []
 
         if not preserve_code:
             # Simple chunking without code preservation
-            return [
-                content[i : i + chunk_size] for i in range(0, len(content), chunk_size)
-            ]
+            return [content[i : i + chunk_size] for i in range(0, len(content), chunk_size)]
 
         # Intelligent chunking preserving code blocks
         chunks = []
@@ -333,11 +310,7 @@ class WebCrawler:
                 current_chunk = line
 
             # Check if we should create a new chunk
-            if (
-                len(current_chunk) >= chunk_size
-                and not in_code_block
-                and not line.strip().startswith("```")
-            ):
+            if len(current_chunk) >= chunk_size and not in_code_block and not line.strip().startswith("```"):
                 chunks.append(current_chunk)
                 current_chunk = ""
 

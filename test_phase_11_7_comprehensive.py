@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Comprehensive Phase 11.7 Implementation Test
-Production Deployment & PLC Integration
+Production Deployment & PLC Integration.
 
 Following crawl_mcp.py methodology:
 - Step 1: Environment validation first
@@ -51,9 +51,7 @@ class Phase117ComprehensiveTest:
         self.total_tests = 0
         self.passed_tests = 0
 
-    def log_result(
-        self, category: str, test_name: str, passed: bool, details: str = ""
-    ):
+    def log_result(self, category: str, test_name: str, passed: bool, details: str = ""):
         """Log test result following crawl_mcp.py error handling."""
         self.total_tests += 1
         if passed:
@@ -71,7 +69,7 @@ class Phase117ComprehensiveTest:
         print(f"{status_icon} {test_name}: {details}")
 
     def test_environment_validation(self):
-        """Test 1: Environment Validation - crawl_mcp.py Step 1"""
+        """Test 1: Environment Validation - crawl_mcp.py Step 1."""
         print("\n🔍 Testing Environment Validation...")
 
         # Test Python version
@@ -101,7 +99,7 @@ class Phase117ComprehensiveTest:
             )
 
     def test_module_imports(self):
-        """Test 2: Module Imports and Dependencies - crawl_mcp.py Step 2"""
+        """Test 2: Module Imports and Dependencies - crawl_mcp.py Step 2."""
         print("\n📦 Testing Module Imports...")
 
         # Test core module imports
@@ -139,7 +137,7 @@ class Phase117ComprehensiveTest:
                 )
 
     def test_production_deployment_core(self):
-        """Test 3: Production Deployment Core Functionality"""
+        """Test 3: Production Deployment Core Functionality."""
         print("\n🏭 Testing Production Deployment Core...")
 
         try:
@@ -157,13 +155,9 @@ class Phase117ComprehensiveTest:
                 ports={8000: 8000},
             )
 
-            test_plc_config = PLCConfig(
-                name="test-plc", server_url="opc.tcp://localhost:4840"
-            )
+            test_plc_config = PLCConfig(name="test-plc", server_url="opc.tcp://localhost:4840")
 
-            test_config = ProductionConfig(
-                docker_config=test_docker_config, plc_configs=[test_plc_config]
-            )
+            test_config = ProductionConfig(docker_config=test_docker_config, plc_configs=[test_plc_config])
 
             # Test configuration validation
             try:
@@ -183,7 +177,7 @@ class Phase117ComprehensiveTest:
 
             # Test manager initialization
             try:
-                manager = ProductionDeploymentManager(config=test_config)
+                ProductionDeploymentManager(config=test_config)
                 self.log_result(
                     "production_deployment",
                     "Manager Initialization",
@@ -207,19 +201,15 @@ class Phase117ComprehensiveTest:
             )
 
     def test_docker_integration(self):
-        """Test 4: Docker Integration"""
+        """Test 4: Docker Integration."""
         print("\n🐳 Testing Docker Integration...")
 
         # Test Docker availability
         try:
-            result = subprocess.run(
-                ["docker", "--version"], capture_output=True, text=True
-            )
+            result = subprocess.run(["docker", "--version"], capture_output=True, text=True)
             docker_available = result.returncode == 0
             version = result.stdout.strip() if docker_available else "Not available"
-            self.log_result(
-                "docker_integration", "Docker Command", docker_available, version
-            )
+            self.log_result("docker_integration", "Docker Command", docker_available, version)
         except FileNotFoundError:
             self.log_result(
                 "docker_integration",
@@ -268,7 +258,7 @@ class Phase117ComprehensiveTest:
             )
 
     def test_plc_communication(self):
-        """Test 5: PLC Communication"""
+        """Test 5: PLC Communication."""
         print("\n🔌 Testing PLC Communication...")
 
         # Test OPC-UA client availability
@@ -293,9 +283,7 @@ class Phase117ComprehensiveTest:
         try:
             from src.ignition.modules.sme_agent.production_deployment import PLCConfig
 
-            plc_config = PLCConfig(
-                name="test-plc", server_url="opc.tcp://localhost:4840"
-            )
+            PLCConfig(name="test-plc", server_url="opc.tcp://localhost:4840")
             self.log_result(
                 "plc_communication",
                 "PLC Configuration Model",
@@ -311,7 +299,7 @@ class Phase117ComprehensiveTest:
             )
 
     def test_cli_commands(self):
-        """Test 6: CLI Commands Integration"""
+        """Test 6: CLI Commands Integration."""
         print("\n💻 Testing CLI Commands...")
 
         # Test CLI command imports
@@ -327,9 +315,7 @@ class Phase117ComprehensiveTest:
                 "deployment_group imported successfully",
             )
         except ImportError as e:
-            self.log_result(
-                "cli_commands", "Deployment Group Import", False, f"Import error: {e!s}"
-            )
+            self.log_result("cli_commands", "Deployment Group Import", False, f"Import error: {e!s}")
 
         # Test CLI integration
         try:
@@ -347,12 +333,10 @@ class Phase117ComprehensiveTest:
                 "Help command working" if success else "CLI error",
             )
         except Exception as e:
-            self.log_result(
-                "cli_commands", "Deployment CLI Help", False, f"CLI test error: {e!s}"
-            )
+            self.log_result("cli_commands", "Deployment CLI Help", False, f"CLI test error: {e!s}")
 
     def test_file_structure(self):
-        """Test 7: File Structure Validation"""
+        """Test 7: File Structure Validation."""
         print("\n📁 Testing File Structure...")
 
         # Test required files exist
@@ -375,7 +359,7 @@ class Phase117ComprehensiveTest:
             )
 
     def test_documentation(self):
-        """Test 8: Documentation Verification"""
+        """Test 8: Documentation Verification."""
         print("\n📚 Testing Documentation...")
 
         # Check for Phase 11.7 documentation
@@ -407,7 +391,7 @@ class Phase117ComprehensiveTest:
                 )
 
     def test_configuration_management(self):
-        """Test 9: Configuration Management"""
+        """Test 9: Configuration Management."""
         print("\n⚙️ Testing Configuration Management...")
 
         # Test configuration manager
@@ -418,11 +402,9 @@ class Phase117ComprehensiveTest:
                 ProductionDeploymentManager,
             )
 
-            docker_config = DockerConfig(
-                image_name="ign-scripts", container_name="test-container"
-            )
+            docker_config = DockerConfig(image_name="ign-scripts", container_name="test-container")
             config = ProductionConfig(docker_config=docker_config)
-            manager = ProductionDeploymentManager(config=config)
+            ProductionDeploymentManager(config=config)
 
             self.log_result(
                 "configuration",
@@ -431,12 +413,10 @@ class Phase117ComprehensiveTest:
                 "Configuration manager created",
             )
         except Exception as e:
-            self.log_result(
-                "configuration", "Configuration Manager", False, f"Manager error: {e!s}"
-            )
+            self.log_result("configuration", "Configuration Manager", False, f"Manager error: {e!s}")
 
     def test_integration_examples(self):
-        """Test 10: Integration Examples"""
+        """Test 10: Integration Examples."""
         print("\n🔗 Testing Integration Examples...")
 
         # Test basic integration setup
@@ -449,19 +429,13 @@ class Phase117ComprehensiveTest:
             )
 
             # Create test configuration
-            docker_config = DockerConfig(
-                image_name="ign-scripts", container_name="test-integration"
-            )
+            docker_config = DockerConfig(image_name="ign-scripts", container_name="test-integration")
 
-            plc_config = PLCConfig(
-                name="test-integration-plc", server_url="opc.tcp://localhost:4840"
-            )
+            plc_config = PLCConfig(name="test-integration-plc", server_url="opc.tcp://localhost:4840")
 
-            test_config = ProductionConfig(
-                docker_config=docker_config, plc_configs=[plc_config]
-            )
+            test_config = ProductionConfig(docker_config=docker_config, plc_configs=[plc_config])
 
-            manager = ProductionDeploymentManager(config=test_config)
+            ProductionDeploymentManager(config=test_config)
             self.log_result(
                 "integration_examples",
                 "Integration Setup",
@@ -500,9 +474,7 @@ class Phase117ComprehensiveTest:
         print("📊 TEST SUMMARY")
         print("=" * 50)
 
-        success_rate = (
-            (self.passed_tests / self.total_tests * 100) if self.total_tests > 0 else 0
-        )
+        success_rate = (self.passed_tests / self.total_tests * 100) if self.total_tests > 0 else 0
         print(f"Total Tests: {self.total_tests}")
         print(f"Passed: {self.passed_tests}")
         print(f"Failed: {self.total_tests - self.passed_tests}")

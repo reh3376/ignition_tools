@@ -34,9 +34,7 @@ class RecoveryConfig(BaseModel):
     source_repo_path: str = Field(..., description="Path to source repository")
     frontend_repo_url: str = Field(..., description="URL of target frontend repository")
     recovery_commit: str = Field(..., description="Commit hash to recover from")
-    temp_dir: str = Field(
-        default="/tmp", description="Temporary directory for operations"
-    )
+    temp_dir: str = Field(default="/tmp", description="Temporary directory for operations")
     dry_run: bool = Field(False, description="Whether to run in dry-run mode")
 
 
@@ -77,14 +75,10 @@ class FrontendRecoveryManager:
     def _validate_configuration(self) -> None:
         """Validate configuration following crawl_mcp.py patterns."""
         if not self.source_path.exists():
-            raise ValueError(
-                f"Source repository path does not exist: {self.source_path}"
-            )
+            raise ValueError(f"Source repository path does not exist: {self.source_path}")
 
         if not self.source_path.is_dir():
-            raise ValueError(
-                f"Source repository path is not a directory: {self.source_path}"
-            )
+            raise ValueError(f"Source repository path is not a directory: {self.source_path}")
 
     def validate_environment(self) -> dict[str, Any]:
         """
@@ -103,9 +97,7 @@ class FrontendRecoveryManager:
         try:
             # Git availability
             try:
-                result = subprocess.run(
-                    ["git", "--version"], capture_output=True, text=True
-                )
+                result = subprocess.run(["git", "--version"], capture_output=True, text=True)
                 validation_result["git_available"] = result.returncode == 0
             except FileNotFoundError:
                 self.errors.append("Git not available in PATH")
@@ -120,9 +112,7 @@ class FrontendRecoveryManager:
                     repo.commit(self.config.recovery_commit)
                     validation_result["recovery_commit_exists"] = True
                 except:
-                    self.errors.append(
-                        f"Recovery commit {self.config.recovery_commit} not found"
-                    )
+                    self.errors.append(f"Recovery commit {self.config.recovery_commit} not found")
 
             except InvalidGitRepositoryError:
                 self.errors.append("Source path is not a valid Git repository")
@@ -186,7 +176,7 @@ class FrontendRecoveryManager:
             print(f"Created temporary directory: {self.temp_frontend_path}")
 
             # Get list of frontend files from git history
-            repo = git.Repo(self.source_path)
+            git.Repo(self.source_path)
 
             # Get all frontend files from the recovery commit
             result = subprocess.run(
@@ -225,9 +215,7 @@ class FrontendRecoveryManager:
 
                     if result.returncode == 0:
                         # Create directory structure
-                        target_path = self.temp_frontend_path / file_path.replace(
-                            "frontend/", ""
-                        )
+                        target_path = self.temp_frontend_path / file_path.replace("frontend/", "")
                         target_path.parent.mkdir(parents=True, exist_ok=True)
 
                         # Write file content
@@ -235,16 +223,12 @@ class FrontendRecoveryManager:
                         extraction_result["files_extracted"] += 1
                         print(f"Extracted: {file_path}")
                     else:
-                        self.warnings.append(
-                            f"Failed to extract {file_path}: {result.stderr.decode()}"
-                        )
+                        self.warnings.append(f"Failed to extract {file_path}: {result.stderr.decode()}")
 
                 except Exception as e:
                     self.warnings.append(f"Error extracting {file_path}: {e!s}")
 
-            extraction_result["extraction_successful"] = (
-                extraction_result["files_extracted"] > 0
-            )
+            extraction_result["extraction_successful"] = extraction_result["files_extracted"] > 0
 
         except Exception as e:
             self.errors.append(f"Frontend extraction failed: {e!s}")
@@ -284,9 +268,7 @@ class FrontendRecoveryManager:
             )
 
             if result.returncode != 0:
-                self.errors.append(
-                    f"Failed to clone frontend repository: {result.stderr}"
-                )
+                self.errors.append(f"Failed to clone frontend repository: {result.stderr}")
                 return setup_result
 
             setup_result["repo_cloned"] = True
@@ -313,9 +295,7 @@ class FrontendRecoveryManager:
                 return setup_result
 
             # Check if there are changes to commit
-            result = subprocess.run(
-                ["git", "status", "--porcelain"], capture_output=True, text=True
-            )
+            result = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True)
             if result.stdout.strip():
                 # Commit the changes
                 commit_message = f"feat: Initial frontend files migration from IGN_scripts\n\n✅ Frontend Migration Complete:\n- {setup_result['files_copied']} files migrated from backend repository\n- Clean separation with independent development capability\n- Ready for UI development following UIroadmap.md\n\n🎯 Source: IGN_scripts commit {self.config.recovery_commit}\n📊 Files: {setup_result['files_copied']} TypeScript/React components"
@@ -334,9 +314,7 @@ class FrontendRecoveryManager:
                 setup_result["ready_for_push"] = True
                 print("Successfully committed frontend files")
             else:
-                self.warnings.append(
-                    "No changes to commit - repository may already be up to date"
-                )
+                self.warnings.append("No changes to commit - repository may already be up to date")
                 setup_result["git_configured"] = True
 
         except Exception as e:
@@ -400,7 +378,7 @@ class FrontendRecoveryManager:
         try:
             # Step 1: Environment Validation
             print("\n📋 Step 1: Environment Validation")
-            env_result = self.validate_environment()
+            self.validate_environment()
             if self.errors:
                 return RecoveryResult(
                     success=False,
@@ -438,9 +416,7 @@ class FrontendRecoveryManager:
                     errors=self.errors,
                     warnings=self.warnings,
                 )
-            print(
-                f"✅ Repository setup completed with {setup_result['files_copied']} files"
-            )
+            print(f"✅ Repository setup completed with {setup_result['files_copied']} files")
 
             # Step 4: Push to Remote
             print("\n🚀 Step 4: Push to Remote")
@@ -454,9 +430,7 @@ class FrontendRecoveryManager:
                     errors=self.errors,
                     warnings=self.warnings,
                 )
-            print(
-                f"✅ Successfully pushed {push_result['files_pushed']} files to remote"
-            )
+            print(f"✅ Successfully pushed {push_result['files_pushed']} files to remote")
 
             return RecoveryResult(
                 success=True,
@@ -473,7 +447,7 @@ class FrontendRecoveryManager:
                 message=f"Recovery failed: {e!s}",
                 files_recovered=0,
                 files_pushed=0,
-                errors=self.errors + [str(e)],
+                errors=[*self.errors, str(e)],
                 warnings=self.warnings,
             )
 
@@ -482,9 +456,7 @@ class FrontendRecoveryManager:
             if self.temp_frontend_path and self.temp_frontend_path.exists():
                 try:
                     shutil.rmtree(self.temp_frontend_path)
-                    print(
-                        f"🧹 Cleaned up temporary directory: {self.temp_frontend_path}"
-                    )
+                    print(f"🧹 Cleaned up temporary directory: {self.temp_frontend_path}")
                 except:
                     pass
 

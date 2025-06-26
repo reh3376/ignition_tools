@@ -1,4 +1,4 @@
-"""Phase 11.7: Production Deployment & PLC Integration Module
+"""Phase 11.7: Production Deployment & PLC Integration Module.
 
 Following crawl_mcp.py methodology:
 - Step 1: Environment validation first
@@ -13,7 +13,7 @@ import asyncio
 import logging
 import os
 from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
@@ -71,14 +71,10 @@ class DockerConfig(BaseModel):
     tag: str = Field(default="latest", description="Docker image tag")
     container_name: str = Field(..., description="Container name")
     ports: dict[int, int] = Field(default_factory=dict, description="Port mappings")
-    environment: dict[str, str] = Field(
-        default_factory=dict, description="Environment variables"
-    )
+    environment: dict[str, str] = Field(default_factory=dict, description="Environment variables")
     volumes: dict[str, str] = Field(default_factory=dict, description="Volume mappings")
     network_mode: str = Field(default="bridge", description="Docker network mode")
-    restart_policy: str = Field(
-        default="unless-stopped", description="Container restart policy"
-    )
+    restart_policy: str = Field(default="unless-stopped", description="Container restart policy")
     memory_limit: str = Field(default="2g", description="Memory limit")
     cpu_limit: float = Field(default=2.0, ge=0.1, le=32.0, description="CPU limit")
 
@@ -87,14 +83,7 @@ class DockerConfig(BaseModel):
     def validate_image_name(cls, v: str) -> str:
         if not v or len(v.strip()) == 0:
             raise ValueError("Image name cannot be empty")
-        if (
-            not v.replace("-", "")
-            .replace("_", "")
-            .replace("/", "")
-            .replace(":", "")
-            .replace(".", "")
-            .isalnum()
-        ):
+        if not v.replace("-", "").replace("_", "").replace("/", "").replace(":", "").replace(".", "").isalnum():
             raise ValueError("Invalid Docker image name format")
         return v.strip()
 
@@ -116,12 +105,8 @@ class PLCConfig(BaseModel):
     password: str | None = Field(None, description="Authentication password")
     security_policy: str = Field(default="None", description="Security policy")
     timeout: float = Field(default=30.0, gt=0, le=300, description="Connection timeout")
-    polling_interval: float = Field(
-        default=1.0, gt=0.1, le=60.0, description="Data polling interval"
-    )
-    tag_list: list[str] = Field(
-        default_factory=list, description="OPC-UA tags to monitor"
-    )
+    polling_interval: float = Field(default=1.0, gt=0.1, le=60.0, description="Data polling interval")
+    tag_list: list[str] = Field(default_factory=list, description="OPC-UA tags to monitor")
 
     @field_validator("server_url")
     @classmethod
@@ -141,18 +126,12 @@ class PLCConfig(BaseModel):
 class ProductionConfig(BaseModel):
     """Production deployment configuration."""
 
-    deployment_mode: DeploymentMode = Field(
-        default=DeploymentMode.PRODUCTION, description="Deployment mode"
-    )
+    deployment_mode: DeploymentMode = Field(default=DeploymentMode.PRODUCTION, description="Deployment mode")
     docker_config: DockerConfig = Field(..., description="Docker configuration")
-    plc_configs: list[PLCConfig] = Field(
-        default_factory=list, description="PLC configurations"
-    )
+    plc_configs: list[PLCConfig] = Field(default_factory=list, description="PLC configurations")
     monitoring_enabled: bool = Field(default=True, description="Enable monitoring")
     auto_restart: bool = Field(default=True, description="Enable auto-restart")
-    health_check_interval: float = Field(
-        default=30.0, gt=0, description="Health check interval"
-    )
+    health_check_interval: float = Field(default=30.0, gt=0, description="Health check interval")
     log_level: str = Field(default="INFO", description="Logging level")
     backup_enabled: bool = Field(default=True, description="Enable automated backups")
 
@@ -199,7 +178,7 @@ def validate_production_environment() -> dict[str, Any]:
     """Validate production deployment environment."""
     logger.info("🔍 Validating production deployment environment...")
 
-    validation_results = {"valid": True, "errors": [], "warnings": [], "components": {}}
+    validation_results: dict[str, Any] = {"valid": True, "errors": [], "warnings": [], "components": {}}
 
     try:
         # Validate Docker environment
@@ -346,9 +325,7 @@ def validate_network_connectivity() -> dict[str, Any]:
         client.ping()
         connectivity_checks.append({"service": "Docker Daemon", "status": "connected"})
     except Exception as e:
-        connectivity_checks.append(
-            {"service": "Docker Daemon", "status": "failed", "error": str(e)}
-        )
+        connectivity_checks.append({"service": "Docker Daemon", "status": "failed", "error": str(e)})
 
     # Check OPC-UA server connectivity if configured
     opcua_url = os.getenv("OPCUA_SERVER_URL")
@@ -356,37 +333,23 @@ def validate_network_connectivity() -> dict[str, Any]:
         try:
             # Basic URL validation
             if opcua_url.startswith("opc.tcp://"):
-                connectivity_checks.append(
-                    {"service": f"OPC-UA ({opcua_url})", "status": "configured"}
-                )
+                connectivity_checks.append({"service": f"OPC-UA ({opcua_url})", "status": "configured"})
             else:
-                connectivity_checks.append(
-                    {"service": f"OPC-UA ({opcua_url})", "status": "invalid_url"}
-                )
+                connectivity_checks.append({"service": f"OPC-UA ({opcua_url})", "status": "invalid_url"})
         except Exception as e:
-            connectivity_checks.append(
-                {"service": "OPC-UA", "status": "failed", "error": str(e)}
-            )
+            connectivity_checks.append({"service": "OPC-UA", "status": "failed", "error": str(e)})
 
     # Check Neo4j connectivity if configured
     neo4j_uri = os.getenv("NEO4J_URI")
     if neo4j_uri:
-        connectivity_checks.append(
-            {"service": f"Neo4j ({neo4j_uri})", "status": "configured"}
-        )
+        connectivity_checks.append({"service": f"Neo4j ({neo4j_uri})", "status": "configured"})
 
-    failed_checks = [
-        check
-        for check in connectivity_checks
-        if check["status"] in ["failed", "invalid_url"]
-    ]
+    failed_checks = [check for check in connectivity_checks if check["status"] in ["failed", "invalid_url"]]
 
     return {
         "valid": len(failed_checks) == 0,
         "checks": connectivity_checks,
-        "warnings": [
-            f"Connectivity issue: {check['service']}" for check in failed_checks
-        ],
+        "warnings": [f"Connectivity issue: {check['service']}" for check in failed_checks],
     }
 
 
@@ -398,13 +361,9 @@ def format_deployment_error(error: Exception, context: str = "") -> str:
     error_str = str(error).lower()
 
     if "docker" in error_str and "connection" in error_str:
-        return (
-            f"Docker connection error in {context}: Check if Docker daemon is running"
-        )
+        return f"Docker connection error in {context}: Check if Docker daemon is running"
     elif "permission" in error_str or "denied" in error_str:
-        return (
-            f"Permission error in {context}: Check Docker permissions or run with sudo"
-        )
+        return f"Permission error in {context}: Check Docker permissions or run with sudo"
     elif "not found" in error_str or "no such" in error_str:
         return f"Resource not found in {context}: Check image/container names"
     elif "port" in error_str and "bind" in error_str:
@@ -428,9 +387,7 @@ class ProductionDeploymentManager:
 
     config: ProductionConfig
     _docker_client: docker.DockerClient | None = field(default=None, init=False)
-    _plc_connections: dict[str, PLCConnectionInfo] = field(
-        default_factory=dict, init=False
-    )
+    _plc_connections: dict[str, PLCConnectionInfo] = field(default_factory=dict, init=False)
     _deployment_info: DeploymentInfo | None = field(default=None, init=False)
     _monitoring_task: asyncio.Task | None = field(default=None, init=False)
     _is_initialized: bool = field(default=False, init=False)
@@ -464,9 +421,7 @@ class ProductionDeploymentManager:
             if self.config.monitoring_enabled:
                 monitoring_result = await self._start_monitoring()
                 if not monitoring_result["success"]:
-                    logger.warning(
-                        f"Monitoring initialization failed: {monitoring_result['error']}"
-                    )
+                    logger.warning(f"Monitoring initialization failed: {monitoring_result['error']}")
 
             self._is_initialized = True
             logger.info("✅ Production Deployment Manager initialized successfully")
@@ -526,22 +481,15 @@ class ProductionDeploymentManager:
                 self._plc_connections[plc_config.name] = connection_info
 
             connected_count = sum(
-                1
-                for conn in self._plc_connections.values()
-                if conn.status == PLCConnectionStatus.CONNECTED
+                1 for conn in self._plc_connections.values() if conn.status == PLCConnectionStatus.CONNECTED
             )
 
-            logger.info(
-                f"✅ PLC connections initialized: {connected_count}/{len(self.config.plc_configs)} connected"
-            )
+            logger.info(f"✅ PLC connections initialized: {connected_count}/{len(self.config.plc_configs)} connected")
 
             return {
                 "success": True,
                 "message": f"PLC connections initialized: {connected_count}/{len(self.config.plc_configs)} connected",
-                "connections": {
-                    name: conn.status.value
-                    for name, conn in self._plc_connections.items()
-                },
+                "connections": {name: conn.status.value for name, conn in self._plc_connections.items()},
             }
 
         except Exception as e:
@@ -619,9 +567,7 @@ class ProductionDeploymentManager:
             return
 
         try:
-            container = self._docker_client.containers.get(
-                self._deployment_info.container_name
-            )
+            container = self._docker_client.containers.get(self._deployment_info.container_name)
 
             # Update status
             if container.status == "running":
@@ -645,24 +591,18 @@ class ProductionDeploymentManager:
                 cpu_stats = stats.get("cpu_stats", {})
                 precpu_stats = stats.get("precpu_stats", {})
                 if cpu_stats and precpu_stats:
-                    cpu_delta = cpu_stats.get("cpu_usage", {}).get(
-                        "total_usage", 0
-                    ) - precpu_stats.get("cpu_usage", {}).get("total_usage", 0)
-                    system_delta = cpu_stats.get(
-                        "system_cpu_usage", 0
-                    ) - precpu_stats.get("system_cpu_usage", 0)
+                    cpu_delta = cpu_stats.get("cpu_usage", {}).get("total_usage", 0) - precpu_stats.get(
+                        "cpu_usage", {}
+                    ).get("total_usage", 0)
+                    system_delta = cpu_stats.get("system_cpu_usage", 0) - precpu_stats.get("system_cpu_usage", 0)
                     if system_delta > 0:
                         cpu_percent = (cpu_delta / system_delta) * 100
                         self._deployment_info.cpu_usage = f"{cpu_percent:.1f}%"
 
             # Update uptime
-            created_time = datetime.fromisoformat(
-                container.attrs["Created"].replace("Z", "+00:00")
-            )
+            created_time = datetime.fromisoformat(container.attrs["Created"].replace("Z", "+00:00"))
             uptime = datetime.now() - created_time.replace(tzinfo=None)
-            self._deployment_info.uptime = str(uptime).split(".")[
-                0
-            ]  # Remove microseconds
+            self._deployment_info.uptime = str(uptime).split(".")[0]  # Remove microseconds
 
         except Exception as e:
             logger.error(f"Error updating deployment status: {e}")
@@ -671,9 +611,7 @@ class ProductionDeploymentManager:
         """Monitor PLC connection health."""
         for name, connection_info in self._plc_connections.items():
             try:
-                plc_config = next(
-                    (cfg for cfg in self.config.plc_configs if cfg.name == name), None
-                )
+                plc_config = next((cfg for cfg in self.config.plc_configs if cfg.name == name), None)
                 if not plc_config:
                     continue
 
@@ -688,9 +626,7 @@ class ProductionDeploymentManager:
                     connection_info.error_message = None
                 else:
                     if connection_info.status == PLCConnectionStatus.CONNECTED:
-                        logger.warning(
-                            f"PLC {name} disconnected: {test_result['error']}"
-                        )
+                        logger.warning(f"PLC {name} disconnected: {test_result['error']}")
                     connection_info.status = PLCConnectionStatus.ERROR
                     connection_info.error_message = test_result["error"]
 
@@ -732,9 +668,7 @@ class ProductionDeploymentManager:
         try:
             initialization_result = await self.initialize()
             if not initialization_result["success"]:
-                raise RuntimeError(
-                    f"Initialization failed: {initialization_result['error']}"
-                )
+                raise RuntimeError(f"Initialization failed: {initialization_result['error']}")
 
             yield self
 
@@ -748,10 +682,8 @@ class ProductionDeploymentManager:
         # Stop monitoring
         if self._monitoring_task and not self._monitoring_task.done():
             self._monitoring_task.cancel()
-            try:
+            with suppress(asyncio.CancelledError):
                 await self._monitoring_task
-            except asyncio.CancelledError:
-                pass
             logger.info("✅ Monitoring stopped")
 
         # Close Docker client
@@ -780,9 +712,7 @@ class ProductionDeploymentManager:
 
             # Check if container already exists
             try:
-                existing_container = self._docker_client.containers.get(
-                    docker_config.container_name
-                )
+                existing_container = self._docker_client.containers.get(docker_config.container_name)
                 if existing_container.status == "running":
                     return {
                         "success": False,
@@ -791,9 +721,7 @@ class ProductionDeploymentManager:
                 else:
                     # Remove stopped container
                     existing_container.remove()
-                    logger.info(
-                        f"Removed existing container: {docker_config.container_name}"
-                    )
+                    logger.info(f"Removed existing container: {docker_config.container_name}")
             except docker.errors.NotFound:
                 pass  # Container doesn't exist, which is fine
 
@@ -801,9 +729,7 @@ class ProductionDeploymentManager:
             try:
                 image_name = f"{docker_config.image_name}:{docker_config.tag}"
                 logger.info(f"Pulling image: {image_name}")
-                self._docker_client.images.pull(
-                    docker_config.image_name, tag=docker_config.tag
-                )
+                self._docker_client.images.pull(docker_config.image_name, tag=docker_config.tag)
             except Exception as e:
                 logger.warning(f"Could not pull image: {e}")
 
@@ -812,16 +738,14 @@ class ProductionDeploymentManager:
 
             # Convert port mappings to Docker API format
             port_bindings = {
-                f"{container_port}/tcp": host_port
-                for host_port, container_port in docker_config.ports.items()
+                f"{container_port}/tcp": host_port for host_port, container_port in docker_config.ports.items()
             }
 
             # Convert volumes to Docker API format (if any)
             volume_bindings = None
             if docker_config.volumes:
                 volume_bindings = [
-                    f"{host_path}:{container_path}"
-                    for host_path, container_path in docker_config.volumes.items()
+                    f"{host_path}:{container_path}" for host_path, container_path in docker_config.volumes.items()
                 ]
 
             container = self._docker_client.containers.run(
@@ -846,9 +770,7 @@ class ProductionDeploymentManager:
                 ports=docker_config.ports,
             )
 
-            logger.info(
-                f"✅ Container deployed successfully: {docker_config.container_name}"
-            )
+            logger.info(f"✅ Container deployed successfully: {docker_config.container_name}")
 
             return {
                 "success": True,
@@ -869,9 +791,7 @@ class ProductionDeploymentManager:
             return {"success": False, "error": "No active deployment"}
 
         try:
-            container = self._docker_client.containers.get(
-                self._deployment_info.container_name
-            )
+            container = self._docker_client.containers.get(self._deployment_info.container_name)
             container.stop(timeout=30)
 
             self._deployment_info.status = DeploymentStatus.STOPPED
@@ -893,16 +813,12 @@ class ProductionDeploymentManager:
             return {"success": False, "error": "No active deployment"}
 
         try:
-            container = self._docker_client.containers.get(
-                self._deployment_info.container_name
-            )
+            container = self._docker_client.containers.get(self._deployment_info.container_name)
             container.restart(timeout=30)
 
             self._deployment_info.status = DeploymentStatus.RUNNING
 
-            logger.info(
-                f"✅ Container restarted: {self._deployment_info.container_name}"
-            )
+            logger.info(f"✅ Container restarted: {self._deployment_info.container_name}")
 
             return {
                 "success": True,
@@ -921,9 +837,7 @@ class ProductionDeploymentManager:
         plc_status = {
             name: {
                 "status": conn.status.value,
-                "last_connected": (
-                    conn.last_connected.isoformat() if conn.last_connected else None
-                ),
+                "last_connected": (conn.last_connected.isoformat() if conn.last_connected else None),
                 "error": conn.error_message,
                 "tag_count": conn.tag_count,
                 "data_quality": conn.data_quality,
@@ -957,9 +871,7 @@ class ProductionDeploymentManager:
             return
 
         # Container status table
-        container_table = Table(
-            title="🐳 Container Status", show_header=True, header_style="bold blue"
-        )
+        container_table = Table(title="🐳 Container Status", show_header=True, header_style="bold blue")
         container_table.add_column("Property", style="cyan")
         container_table.add_column("Value", style="white")
 
@@ -977,9 +889,7 @@ class ProductionDeploymentManager:
 
         # PLC connections table
         if status["plc_connections"]:
-            plc_table = Table(
-                title="🏭 PLC Connections", show_header=True, header_style="bold green"
-            )
+            plc_table = Table(title="🏭 PLC Connections", show_header=True, header_style="bold green")
             plc_table.add_column("Name", style="cyan")
             plc_table.add_column("Status", style="white")
             plc_table.add_column("Last Connected", style="white")
@@ -989,9 +899,7 @@ class ProductionDeploymentManager:
 
             for name, conn in status["plc_connections"].items():
                 status_color = "green" if conn["status"] == "connected" else "red"
-                quality_str = (
-                    f"{conn['data_quality']:.1%}" if conn["data_quality"] > 0 else "N/A"
-                )
+                quality_str = f"{conn['data_quality']:.1%}" if conn["data_quality"] > 0 else "N/A"
 
                 plc_table.add_row(
                     name,
@@ -1041,9 +949,7 @@ async def test_production_deployment() -> dict[str, Any]:
         )
 
         # Test deployment manager
-        async with ProductionDeploymentManager(
-            test_config
-        ).managed_deployment() as manager:
+        async with ProductionDeploymentManager(test_config).managed_deployment() as manager:
             # Test deployment
             deploy_result = await manager.deploy_container()
             if not deploy_result["success"]:
@@ -1124,16 +1030,12 @@ async def create_production_deployment_manager(
 if __name__ == "__main__":
 
     async def main() -> None:
-        console.print(
-            "[bold blue]🏭 Phase 11.7: Production Deployment & PLC Integration[/bold blue]"
-        )
+        console.print("[bold blue]🏭 Phase 11.7: Production Deployment & PLC Integration[/bold blue]")
         console.print("Testing production deployment functionality...\n")
 
         # Test environment validation
         env_result = validate_production_environment()
-        console.print(
-            f"Environment Validation: {'✅ Valid' if env_result['valid'] else '❌ Invalid'}"
-        )
+        console.print(f"Environment Validation: {'✅ Valid' if env_result['valid'] else '❌ Invalid'}")
 
         if env_result["errors"]:
             for error in env_result["errors"]:
@@ -1145,9 +1047,7 @@ if __name__ == "__main__":
 
         # Test deployment functionality
         test_result = await test_production_deployment()
-        console.print(
-            f"\nDeployment Test: {'✅ Passed' if test_result['success'] else '❌ Failed'}"
-        )
+        console.print(f"\nDeployment Test: {'✅ Passed' if test_result['success'] else '❌ Failed'}")
 
         if not test_result["success"]:
             console.print(f"  [red]Error:[/red] {test_result['error']}")

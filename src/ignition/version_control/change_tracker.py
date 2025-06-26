@@ -117,9 +117,7 @@ class ChangeTracker:
     def get_recent_changes(self, limit: int = 50) -> list[ChangeRecord]:
         """Get recent changes across all files."""
         try:
-            recent_changes = sorted(
-                self._change_history, key=lambda x: x.timestamp, reverse=True
-            )
+            recent_changes = sorted(self._change_history, key=lambda x: x.timestamp, reverse=True)
             return recent_changes[:limit]
         except Exception as e:
             logger.error(f"Failed to get recent changes: {e}")
@@ -198,9 +196,7 @@ class ChangeTracker:
             resource_type = self._determine_resource_type(file_path)
 
             # Calculate risk level
-            risk_level = self._calculate_risk_level(
-                file_path, change_type, resource_type
-            )
+            risk_level = self._calculate_risk_level(file_path, change_type, resource_type)
 
             # Create change record
             change = ChangeRecord(
@@ -260,9 +256,7 @@ class ChangeTracker:
             logger.error(f"Failed to determine resource type: {e}")
             return ResourceType.UNKNOWN
 
-    def _calculate_risk_level(
-        self, file_path: str, change_type: ChangeType, resource_type: ResourceType
-    ) -> str:
+    def _calculate_risk_level(self, file_path: str, change_type: ChangeType, resource_type: ResourceType) -> str:
         """Calculate risk level for a change."""
         try:
             risk_score = 0.0

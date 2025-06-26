@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Phase 11.3 Implementation Test Script
+"""Phase 11.3 Implementation Test Script.
 
 This script tests the multi-interface deployment implementation
 following the crawl_mcp.py methodology.
@@ -64,9 +64,7 @@ def test_sme_agent_basic():
         if validation_result.get("valid"):
             print("✅ SME Agent environment validation passed")
         else:
-            print(
-                f"⚠️ SME Agent environment validation issues: {validation_result.get('errors', [])}"
-            )
+            print(f"⚠️ SME Agent environment validation issues: {validation_result.get('errors', [])}")
 
         # Test status check
         status = agent.get_status()

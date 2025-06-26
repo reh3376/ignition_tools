@@ -64,8 +64,8 @@ def test_gateway_scripting_domain_manager():
         assert hasattr(manager, "statistics")
 
         # Test input validation
-        assert manager.validate_input("test query") == True
-        assert manager.validate_input("") == False
+        assert manager.validate_input("test query")
+        assert not manager.validate_input("")
 
         print("✅ GatewayScriptingDomainManager tests passed")
         return True
@@ -87,8 +87,8 @@ def test_system_functions_domain_manager():
         assert hasattr(manager, "statistics")
 
         # Test input validation
-        assert manager.validate_input("test query") == True
-        assert manager.validate_input("") == False
+        assert manager.validate_input("test query")
+        assert not manager.validate_input("")
 
         print("✅ SystemFunctionsDomainManager tests passed")
         return True

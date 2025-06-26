@@ -92,25 +92,19 @@ class Phase125MasterTestRunner:
         print("-" * 50)
         try:
             comprehensive_tester = Phase125ComprehensiveTester()
-            comprehensive_results = (
-                await comprehensive_tester.run_comprehensive_test_suite()
-            )
+            comprehensive_results = await comprehensive_tester.run_comprehensive_test_suite()
 
             self.results.comprehensive_test_results = comprehensive_results
-            self.results.environment_validation = comprehensive_results.get(
-                "test_results", {}
-            ).get("environment_validation", False)
-            self.results.api_functionality = comprehensive_results.get(
-                "test_results", {}
-            ).get("api_functionality", False)
+            self.results.environment_validation = comprehensive_results.get("test_results", {}).get(
+                "environment_validation", False
+            )
+            self.results.api_functionality = comprehensive_results.get("test_results", {}).get(
+                "api_functionality", False
+            )
 
             print("✅ Comprehensive testing completed")
-            print(
-                f"   Environment Validation: {'✅' if self.results.environment_validation else '❌'}"
-            )
-            print(
-                f"   API Functionality: {'✅' if self.results.api_functionality else '❌'}"
-            )
+            print(f"   Environment Validation: {'✅' if self.results.environment_validation else '❌'}")
+            print(f"   API Functionality: {'✅' if self.results.api_functionality else '❌'}")
 
         except Exception as e:
             print(f"❌ Comprehensive testing failed: {e}")
@@ -123,35 +117,25 @@ class Phase125MasterTestRunner:
         print("-" * 50)
         try:
             performance_tester = Phase125PerformanceTester()
-            performance_results = (
-                await performance_tester.run_comprehensive_performance_tests()
-            )
+            performance_results = await performance_tester.run_comprehensive_performance_tests()
 
             self.results.performance_test_results = performance_results
-            self.results.performance_benchmarking = performance_results.get(
-                "overall_success", False
-            )
+            self.results.performance_benchmarking = performance_results.get("overall_success", False)
 
             print("✅ Performance benchmarking completed")
-            print(
-                f"   Performance Requirements: {'✅' if self.results.performance_benchmarking else '❌'}"
-            )
+            print(f"   Performance Requirements: {'✅' if self.results.performance_benchmarking else '❌'}")
 
             # Check for performance issues
             if not self.results.performance_benchmarking:
                 summary = performance_results.get("summary", {})
                 if summary.get("max_error_rate_percent", 0) > 5:
-                    self.results.blocking_issues.append(
-                        "High error rate detected in performance tests"
-                    )
+                    self.results.blocking_issues.append("High error rate detected in performance tests")
                 if summary.get("avg_response_time_ms", 0) > 500:
                     self.results.blocking_issues.append("Slow response times detected")
 
         except Exception as e:
             print(f"❌ Performance benchmarking failed: {e}")
-            self.results.blocking_issues.append(
-                f"Performance benchmarking failure: {e}"
-            )
+            self.results.blocking_issues.append(f"Performance benchmarking failure: {e}")
 
         print()
 
@@ -160,27 +144,19 @@ class Phase125MasterTestRunner:
         print("-" * 50)
         try:
             integration_tester = Phase125IntegrationTester()
-            integration_results = (
-                await integration_tester.run_comprehensive_integration_tests()
-            )
+            integration_results = await integration_tester.run_comprehensive_integration_tests()
 
             self.results.integration_test_results = integration_results
-            self.results.integration_testing = integration_results.get(
-                "overall_success", False
-            )
+            self.results.integration_testing = integration_results.get("overall_success", False)
 
             print("✅ Integration testing completed")
-            print(
-                f"   CLI-API Integration: {'✅' if self.results.integration_testing else '❌'}"
-            )
+            print(f"   CLI-API Integration: {'✅' if self.results.integration_testing else '❌'}")
 
             # Check for integration issues
             if not self.results.integration_testing:
                 mapping_rate = integration_results.get("mapping_consistency_rate", 0)
                 if mapping_rate < 70:
-                    self.results.blocking_issues.append(
-                        "CLI-API mapping consistency below 70%"
-                    )
+                    self.results.blocking_issues.append("CLI-API mapping consistency below 70%")
 
         except Exception as e:
             print(f"❌ Integration testing failed: {e}")
@@ -201,9 +177,7 @@ class Phase125MasterTestRunner:
         ]
 
         self.results.categories_passed = sum(category_results)
-        self.results.overall_success_rate = (
-            self.results.categories_passed / self.results.categories_total
-        ) * 100
+        self.results.overall_success_rate = (self.results.categories_passed / self.results.categories_total) * 100
 
         # Determine completion status
         if self.results.overall_success_rate >= 90:
@@ -237,27 +211,19 @@ class Phase125MasterTestRunner:
 
         # Critical issues first
         if self.results.blocking_issues:
-            recommendations.append(
-                "🚨 CRITICAL: Address blocking issues before production deployment"
-            )
+            recommendations.append("🚨 CRITICAL: Address blocking issues before production deployment")
 
         # Environment issues
         if not self.results.environment_validation:
-            recommendations.append(
-                "🔧 Fix environment setup - required for all other functionality"
-            )
+            recommendations.append("🔧 Fix environment setup - required for all other functionality")
 
         # API issues
         if not self.results.api_functionality:
-            recommendations.append(
-                "⚙️ Resolve API functionality issues - critical for Phase 12 completion"
-            )
+            recommendations.append("⚙️ Resolve API functionality issues - critical for Phase 12 completion")
 
         # Performance issues
         if not self.results.performance_benchmarking:
-            recommendations.append(
-                "🚀 Optimize performance - required for production deployment"
-            )
+            recommendations.append("🚀 Optimize performance - required for production deployment")
 
         # Integration issues
         if not self.results.integration_testing:
@@ -265,13 +231,9 @@ class Phase125MasterTestRunner:
 
         # Success recommendations
         if self.results.production_ready:
-            recommendations.append(
-                "🎉 Excellent! Phase 12.5 completed successfully - ready for Phase 12.6"
-            )
+            recommendations.append("🎉 Excellent! Phase 12.5 completed successfully - ready for Phase 12.6")
         elif self.results.overall_success_rate >= 75:
-            recommendations.append(
-                "✅ Good progress! Address remaining issues for production readiness"
-            )
+            recommendations.append("✅ Good progress! Address remaining issues for production readiness")
 
         # Specific category recommendations
         comprehensive_results = self.results.comprehensive_test_results
@@ -288,26 +250,16 @@ class Phase125MasterTestRunner:
 
         # Test categories
         print("📊 TEST CATEGORY RESULTS:")
-        print(
-            f"   Environment Validation:    {'✅ PASS' if self.results.environment_validation else '❌ FAIL'}"
-        )
-        print(
-            f"   API Functionality:         {'✅ PASS' if self.results.api_functionality else '❌ FAIL'}"
-        )
-        print(
-            f"   Performance Benchmarking:  {'✅ PASS' if self.results.performance_benchmarking else '❌ FAIL'}"
-        )
-        print(
-            f"   Integration Testing:       {'✅ PASS' if self.results.integration_testing else '❌ FAIL'}"
-        )
+        print(f"   Environment Validation:    {'✅ PASS' if self.results.environment_validation else '❌ FAIL'}")
+        print(f"   API Functionality:         {'✅ PASS' if self.results.api_functionality else '❌ FAIL'}")
+        print(f"   Performance Benchmarking:  {'✅ PASS' if self.results.performance_benchmarking else '❌ FAIL'}")
+        print(f"   Integration Testing:       {'✅ PASS' if self.results.integration_testing else '❌ FAIL'}")
         print()
 
         # Overall metrics
         print("📈 OVERALL METRICS:")
         print(f"   Success Rate: {self.results.overall_success_rate:.1f}%")
-        print(
-            f"   Categories Passed: {self.results.categories_passed}/{self.results.categories_total}"
-        )
+        print(f"   Categories Passed: {self.results.categories_passed}/{self.results.categories_total}")
         print(f"   Execution Time: {self.results.total_execution_time:.1f} seconds")
         print(f"   Completion Status: {self.results.completion_status}")
         print()

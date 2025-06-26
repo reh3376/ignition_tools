@@ -53,9 +53,7 @@ def web_crawl_command(url: str, **kwargs) -> dict[str, Any]:
     Returns:
         dict: Crawl results and status
     """
-    console.print(
-        "\n[bold blue]IGN Scripts Web Intelligence - Crawl Documentation[/bold blue]"
-    )
+    console.print("\n[bold blue]IGN Scripts Web Intelligence - Crawl Documentation[/bold blue]")
 
     # Step 1: Environment validation first (crawl_mcp.py methodology)
     console.print("\n[yellow]Validating environment...[/yellow]")
@@ -160,9 +158,7 @@ def web_search_command(query: str, **kwargs) -> dict[str, Any]:
     Returns:
         dict: Search results
     """
-    console.print(
-        "\n[bold blue]IGN Scripts Web Intelligence - Semantic Search[/bold blue]"
-    )
+    console.print("\n[bold blue]IGN Scripts Web Intelligence - Semantic Search[/bold blue]")
 
     # Environment validation first
     if not validate_environment():
@@ -194,9 +190,7 @@ def web_update_command(**kwargs) -> dict[str, Any]:
     Returns:
         dict: Update results
     """
-    console.print(
-        "\n[bold blue]IGN Scripts Web Intelligence - Update Knowledge Base[/bold blue]"
-    )
+    console.print("\n[bold blue]IGN Scripts Web Intelligence - Update Knowledge Base[/bold blue]")
 
     # Environment validation
     if not validate_environment():
@@ -231,15 +225,11 @@ def web_sources_command(**kwargs) -> dict[str, Any]:
     Returns:
         dict: Source management results
     """
-    console.print(
-        "\n[bold blue]IGN Scripts Web Intelligence - Manage Sources[/bold blue]"
-    )
+    console.print("\n[bold blue]IGN Scripts Web Intelligence - Manage Sources[/bold blue]")
 
     # Get current sources
     sources = os.getenv("DOCUMENTATION_SOURCES", "").strip()
-    source_list = (
-        [s.strip() for s in sources.split(",") if s.strip()] if sources else []
-    )
+    source_list = [s.strip() for s in sources.split(",") if s.strip()] if sources else []
 
     # Display sources table
     table = Table(title="Configured Documentation Sources")
@@ -259,9 +249,7 @@ def web_sources_command(**kwargs) -> dict[str, Any]:
 
     # Display configuration help
     console.print("\n[blue]Configuration:[/blue]")
-    console.print(
-        "Set DOCUMENTATION_SOURCES environment variable with comma-separated URLs:"
-    )
+    console.print("Set DOCUMENTATION_SOURCES environment variable with comma-separated URLs:")
     console.print(
         "Example: DOCUMENTATION_SOURCES=https://docs.ignitiongateway.com,https://forum.inductiveautomation.com"
     )
@@ -278,11 +266,9 @@ def web_status_command(**kwargs) -> dict[str, Any]:
     Returns:
         dict: System status
     """
-    console.print(
-        "\n[bold blue]IGN Scripts Web Intelligence - System Status[/bold blue]"
-    )
+    console.print("\n[bold blue]IGN Scripts Web Intelligence - System Status[/bold blue]")
 
-    status_data = {
+    status_data: dict[str, Any] = {
         "success": True,
         "environment": {},
         "models": {},
@@ -408,14 +394,12 @@ def validate_script(args) -> dict[str, Any]:
         script_path = str(args.script_path).strip()
 
         # Step 2: Environment validation before proceeding
-        console.print(
-            "🔍 [bold blue]IGN Enhanced Code Validator - Phase 11.8[/bold blue]"
-        )
+        console.print("🔍 [bold blue]IGN Enhanced Code Validator - Phase 11.8[/bold blue]")
         console.print()
 
         # Import enhanced validator
         try:
-            from ..code_intelligence.enhanced_validator import (
+            from src.ignition.code_intelligence.enhanced_validator import (
                 EnhancedCodeValidator,
                 ValidationRequest,
                 validate_script_path,
@@ -436,9 +420,7 @@ def validate_script(args) -> dict[str, Any]:
         neo4j_user = os.getenv("NEO4J_USER")
         neo4j_password = os.getenv("NEO4J_PASSWORD")
 
-        validator = EnhancedCodeValidator(
-            neo4j_uri=neo4j_uri, neo4j_user=neo4j_user, neo4j_password=neo4j_password
-        )
+        validator = EnhancedCodeValidator(neo4j_uri=neo4j_uri, neo4j_user=neo4j_user, neo4j_password=neo4j_password)
 
         async def run_validation() -> Any:
             """Run validation with proper async handling."""
@@ -527,7 +509,7 @@ def analyze_hallucinations(args) -> dict[str, Any]:
 
         # Step 2: Import enhanced validator
         try:
-            from ..code_intelligence.enhanced_validator import (
+            from src.ignition.code_intelligence.enhanced_validator import (
                 EnhancedCodeValidator,
                 ValidationRequest,
                 validate_script_path,
@@ -567,9 +549,7 @@ def analyze_hallucinations(args) -> dict[str, Any]:
                 )
 
                 # Step 7: Run hallucination detection
-                console.print(
-                    f"🔍 Analyzing potential AI hallucinations in: [bold]{script_path}[/bold]"
-                )
+                console.print(f"🔍 Analyzing potential AI hallucinations in: [bold]{script_path}[/bold]")
                 console.print()
 
                 with Progress(
@@ -577,9 +557,7 @@ def analyze_hallucinations(args) -> dict[str, Any]:
                     TextColumn("[progress.description]{task.description}"),
                     console=console,
                 ) as progress:
-                    task = progress.add_task(
-                        "Detecting AI hallucinations...", total=None
-                    )
+                    task = progress.add_task("Detecting AI hallucinations...", total=None)
                     result = await validator.validate_script(request)
                     progress.update(task, completed=True)
 
@@ -644,7 +622,7 @@ def validate_batch(args) -> dict[str, Any]:
 
         # Step 3: Find Python scripts in directory
         python_files = []
-        for root, dirs, files in os.walk(directory_path):
+        for root, _dirs, files in os.walk(directory_path):
             for file in files:
                 if file.endswith(".py"):
                     python_files.append(os.path.join(root, file))
@@ -660,7 +638,7 @@ def validate_batch(args) -> dict[str, Any]:
 
         # Step 4: Import enhanced validator
         try:
-            from ..code_intelligence.enhanced_validator import (
+            from src.ignition.code_intelligence.enhanced_validator import (
                 EnhancedCodeValidator,
                 ValidationRequest,
                 validate_script_path,
@@ -676,9 +654,7 @@ def validate_batch(args) -> dict[str, Any]:
         neo4j_user = os.getenv("NEO4J_USER")
         neo4j_password = os.getenv("NEO4J_PASSWORD")
 
-        validator = EnhancedCodeValidator(
-            neo4j_uri=neo4j_uri, neo4j_user=neo4j_user, neo4j_password=neo4j_password
-        )
+        validator = EnhancedCodeValidator(neo4j_uri=neo4j_uri, neo4j_user=neo4j_user, neo4j_password=neo4j_password)
 
         async def run_batch_validation() -> Any:
             """Run batch validation with progress tracking."""
@@ -700,9 +676,7 @@ def validate_batch(args) -> dict[str, Any]:
                     TimeRemainingColumn(),
                     console=console,
                 ) as progress:
-                    task = progress.add_task(
-                        "Validating Python files...", total=len(python_files)
-                    )
+                    task = progress.add_task("Validating Python files...", total=len(python_files))
 
                     for file_path in python_files:
                         # Step 8: Validate each file
@@ -712,12 +686,8 @@ def validate_batch(args) -> dict[str, Any]:
                                 check_imports=getattr(args, "check_imports", True),
                                 check_syntax=getattr(args, "check_syntax", True),
                                 check_knowledge_graph=getattr(args, "check_kg", True),
-                                check_hallucinations=getattr(
-                                    args, "check_hallucinations", True
-                                ),
-                                confidence_threshold=getattr(
-                                    args, "confidence_threshold", 0.7
-                                ),
+                                check_hallucinations=getattr(args, "check_hallucinations", True),
+                                confidence_threshold=getattr(args, "confidence_threshold", 0.7),
                             )
 
                             result = await validator.validate_script(request)
@@ -753,9 +723,7 @@ def validate_batch(args) -> dict[str, Any]:
                     "success": True,
                     "batch_results": batch_results,
                     "total_files": len(python_files),
-                    "valid_files": len(
-                        [r for r in batch_results if r.get("valid", False)]
-                    ),
+                    "valid_files": len([r for r in batch_results if r.get("valid", False)]),
                     "message": f"Batch validation completed for {len(python_files)} files",
                 }
 
@@ -805,15 +773,11 @@ def display_validation_results(result: Any, console: Console) -> None:
     # Display overall status
     overall_status = "✅ VALID" if result.valid else "❌ INVALID"
     confidence_color = (
-        "green"
-        if result.confidence_score >= 0.8
-        else "yellow" if result.confidence_score >= 0.6 else "red"
+        "green" if result.confidence_score >= 0.8 else "yellow" if result.confidence_score >= 0.6 else "red"
     )
 
     console.print(f"Overall Status: [bold]{overall_status}[/bold]")
-    console.print(
-        f"Confidence Score: [{confidence_color}]{result.confidence_score:.2f}[/{confidence_color}]"
-    )
+    console.print(f"Confidence Score: [{confidence_color}]{result.confidence_score:.2f}[/{confidence_color}]")
     console.print()
 
     # Display issues if any
@@ -821,12 +785,10 @@ def display_validation_results(result: Any, console: Console) -> None:
         console.print("[bold red]Issues Found:[/bold red]")
         for issue in result.issues:
             severity_color = (
-                "red"
-                if issue["severity"] == "error"
-                else "yellow" if issue["severity"] == "warning" else "blue"
+                "red" if issue["severity"] == "error" else "yellow" if issue["severity"] == "warning" else "blue"
             )
             console.print(
-                f"  [{severity_color}]{issue['severity'].upper()}[/{severity_color}] Line {issue['line']}: {issue['message']}"
+                f"  [{severity_color}]{issue['severity'].upper()}[/{severity_color}] Line {issue['line']}: {issue['message']}"  # noqa: E501
             )
         console.print()
 
@@ -840,30 +802,22 @@ def display_validation_results(result: Any, console: Console) -> None:
 
 def display_hallucination_results(result: Any, console: Console) -> None:
     """Display focused hallucination analysis results."""
-    hallucination_issues = [
-        issue for issue in result.issues if issue["type"] == "potential_hallucination"
-    ]
+    hallucination_issues = [issue for issue in result.issues if issue["type"] == "potential_hallucination"]
 
     if not hallucination_issues:
         console.print("✅ [bold green]No AI hallucinations detected[/bold green]")
         console.print(f"Confidence: {result.confidence_score:.2f}")
     else:
-        console.print(
-            "⚠️ [bold yellow]Potential AI hallucinations detected:[/bold yellow]"
-        )
+        console.print("⚠️ [bold yellow]Potential AI hallucinations detected:[/bold yellow]")
         for issue in hallucination_issues:
             console.print(f"  Line {issue['line']}: {issue['message']}")
         console.print(f"Confidence: {result.confidence_score:.2f}")
 
 
-def display_batch_results(
-    batch_results: list[dict[str, Any]], console: Console
-) -> None:
+def display_batch_results(batch_results: list[dict[str, Any]], console: Console) -> None:
     """Display batch validation results summary."""
     # Create batch results table
-    table = Table(
-        title="Batch Validation Summary", show_header=True, header_style="bold magenta"
-    )
+    table = Table(title="Batch Validation Summary", show_header=True, header_style="bold magenta")
     table.add_column("File", style="cyan")
     table.add_column("Status", justify="center")
     table.add_column("Confidence", justify="center")
@@ -895,9 +849,7 @@ def display_batch_results(
     console.print(f"Total Files: [bold]{total_files}[/bold]")
     console.print(f"Valid Files: [bold green]{valid_files}[/bold green]")
     console.print(f"Invalid Files: [bold red]{invalid_files}[/bold red]")
-    console.print(
-        f"Success Rate: [bold]{(valid_files / total_files) * 100:.1f}%[/bold]"
-    )
+    console.print(f"Success Rate: [bold]{(valid_files / total_files) * 100:.1f}%[/bold]")
 
 
 def save_validation_results(result: Any, output_path: str) -> None:

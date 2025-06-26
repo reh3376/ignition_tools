@@ -326,7 +326,7 @@ class AIAssistantEnhancement:
                     {
                         "type": "complexity_reduction",
                         "priority": "medium",
-                        "description": f"High complexity ({file_info['complexity']:.1f}) indicates need for simplification",
+                        "description": f"High complexity ({file_info['complexity']:.1f}) indicates need for simplification",  # noqa: E501
                         "effort": "high",
                         "impact": "maintainability",
                     }
@@ -352,7 +352,7 @@ class AIAssistantEnhancement:
                         {
                             "type": "method_simplification",
                             "priority": "low",
-                            "description": f"Method '{method['name']}' has high complexity ({method['complexity']:.1f})",
+                            "description": f"Method '{method['name']}' has high complexity ({method['complexity']:.1f})",  # noqa: E501
                             "effort": "low",
                             "impact": "readability",
                             "method_name": method["name"],

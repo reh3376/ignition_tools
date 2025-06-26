@@ -164,13 +164,11 @@ class Neo4jEnvironmentFixer:
         print(f"📊 Found {len(inconsistent_files)} files with inconsistent variables")
         return inconsistent_files
 
-    def step_5_update_python_files(
-        self, inconsistent_files: list[tuple[Path, list[str]]]
-    ) -> None:
+    def step_5_update_python_files(self, inconsistent_files: list[tuple[Path, list[str]]]) -> None:
         """Step 5: Update Python files to support both variable names."""
         print("🔧 Step 5: Updating Python files for consistency...")
 
-        for py_file, issues in inconsistent_files:
+        for py_file, _issues in inconsistent_files:
             try:
                 with open(py_file, encoding="utf-8") as f:
                     content = f.read()

@@ -28,9 +28,7 @@ class DataChangeHandler:
         self.callback = callback
         self.node_map = {}  # Maps handle to node_id
 
-    def datachange_notification(
-        self, node: Node, val: Any, data: DataChangeNotif
-    ) -> None:
+    def datachange_notification(self, node: Node, val: Any, data: DataChangeNotif) -> None:
         """Handle data change notification.
 
         Args:
@@ -103,9 +101,7 @@ class SubscriptionManager:
 
             self.active_subscriptions[subscription_id] = subscription
 
-            logger.info(
-                "Created subscription %s for %d nodes", subscription_id, len(node_ids)
-            )
+            logger.info("Created subscription %s for %d nodes", subscription_id, len(node_ids))
             return subscription_id
 
         except Exception as e:
@@ -139,9 +135,7 @@ class SubscriptionManager:
             logger.error("Error removing subscription %s: %s", subscription_id, e)
             return False
 
-    async def get_subscription_info(
-        self, subscription_id: str
-    ) -> dict[str, Any] | None:
+    async def get_subscription_info(self, subscription_id: str) -> dict[str, Any] | None:
         """Get information about a specific subscription.
 
         Args:
@@ -184,9 +178,7 @@ class SubscriptionManager:
 
         return subscriptions
 
-    async def modify_subscription_interval(
-        self, subscription_id: str, new_interval: float
-    ) -> bool:
+    async def modify_subscription_interval(self, subscription_id: str, new_interval: float) -> bool:
         """Modify the publishing interval of a subscription.
 
         Args:
@@ -211,18 +203,14 @@ class SubscriptionManager:
                 )
                 return True
             else:
-                logger.warning(
-                    "Subscription %s not found for modification", subscription_id
-                )
+                logger.warning("Subscription %s not found for modification", subscription_id)
                 return False
 
         except Exception as e:
             logger.error("Error modifying subscription %s: %s", subscription_id, e)
             return False
 
-    async def add_nodes_to_subscription(
-        self, subscription_id: str, node_ids: list[str]
-    ) -> bool:
+    async def add_nodes_to_subscription(self, subscription_id: str, node_ids: list[str]) -> bool:
         """Add additional nodes to an existing subscription.
 
         Args:
@@ -245,20 +233,14 @@ class SubscriptionManager:
                 sub_info["node_ids"].extend(node_ids)
                 sub_info["monitored_items"] += len(monitored_items)
 
-                logger.info(
-                    "Added %d nodes to subscription %s", len(node_ids), subscription_id
-                )
+                logger.info("Added %d nodes to subscription %s", len(node_ids), subscription_id)
                 return True
             else:
-                logger.warning(
-                    "Subscription %s not found for adding nodes", subscription_id
-                )
+                logger.warning("Subscription %s not found for adding nodes", subscription_id)
                 return False
 
         except Exception as e:
-            logger.error(
-                "Error adding nodes to subscription %s: %s", subscription_id, e
-            )
+            logger.error("Error adding nodes to subscription %s: %s", subscription_id, e)
             return False
 
     async def create_event_subscription(
@@ -286,17 +268,9 @@ class SubscriptionManager:
                         event_data = {
                             "event_type": str(event.EventType),
                             "source_node": str(event.SourceNode),
-                            "message": (
-                                str(event.Message.Text)
-                                if hasattr(event, "Message")
-                                else ""
-                            ),
-                            "severity": (
-                                event.Severity if hasattr(event, "Severity") else 0
-                            ),
-                            "time": (
-                                event.Time if hasattr(event, "Time") else datetime.now()
-                            ),
+                            "message": (str(event.Message.Text) if hasattr(event, "Message") else ""),
+                            "severity": (event.Severity if hasattr(event, "Severity") else 0),
+                            "time": (event.Time if hasattr(event, "Time") else datetime.now()),
                         }
                         self.callback(event_data)
                     except Exception as e:
@@ -335,10 +309,7 @@ class SubscriptionManager:
             Status information
         """
         active_count = len(self.active_subscriptions)
-        total_nodes = sum(
-            sub_info.get("monitored_items", 0)
-            for sub_info in self.subscriptions.values()
-        )
+        total_nodes = sum(sub_info.get("monitored_items", 0) for sub_info in self.subscriptions.values())
 
         return {
             "active_subscriptions": active_count,
@@ -355,9 +326,7 @@ class SubscriptionManager:
             try:
                 await self.remove_subscription(subscription_id)
             except Exception as e:
-                logger.error(
-                    "Error cleaning up subscription %s: %s", subscription_id, e
-                )
+                logger.error("Error cleaning up subscription %s: %s", subscription_id, e)
 
         self.subscriptions.clear()
         self.active_subscriptions.clear()

@@ -1,4 +1,4 @@
-"""IGN Scripts FastAPI Application
+"""IGN Scripts FastAPI Application.
 
 This API provides REST endpoints for the IGN Scripts CLI functionality,
 enabling frontend applications to interact with the system.
@@ -67,12 +67,8 @@ def validate_auth_environment() -> dict[str, Any]:
     validation_results = {
         "jwt_secret_key": bool(os.getenv("JWT_SECRET_KEY")),
         "jwt_algorithm": bool(os.getenv("JWT_ALGORITHM", "HS256")),
-        "jwt_access_token_expire_minutes": bool(
-            os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "30")
-        ),
-        "jwt_refresh_token_expire_days": bool(
-            os.getenv("JWT_REFRESH_TOKEN_EXPIRE_DAYS", "7")
-        ),
+        "jwt_access_token_expire_minutes": bool(os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "30")),
+        "jwt_refresh_token_expire_days": bool(os.getenv("JWT_REFRESH_TOKEN_EXPIRE_DAYS", "7")),
         "api_key_header": bool(os.getenv("API_KEY_HEADER", "X-API-Key")),
         "rate_limit_enabled": os.getenv("RATE_LIMIT_ENABLED", "true").lower() == "true",
         "cors_origins": bool(os.getenv("CORS_ORIGINS")),
@@ -82,7 +78,7 @@ def validate_auth_environment() -> dict[str, Any]:
 
 
 def format_error_message(error: str) -> str:
-    """Format error messages for user-friendly responses (crawl_mcp.py principle)"""
+    """Format error messages for user-friendly responses (crawl_mcp.py principle)."""
     error_lower = error.lower()
 
     # Common CLI error patterns
@@ -108,23 +104,19 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # JWT configuration
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-this")
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
-JWT_ACCESS_TOKEN_EXPIRE_MINUTES = int(
-    os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "30")
-)
+JWT_ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 JWT_REFRESH_TOKEN_EXPIRE_DAYS = int(os.getenv("JWT_REFRESH_TOKEN_EXPIRE_DAYS", "7"))
 
 # Security configurations
 security = HTTPBearer()
-api_key_header = APIKeyHeader(
-    name=os.getenv("API_KEY_HEADER", "X-API-Key"), auto_error=False
-)
+api_key_header = APIKeyHeader(name=os.getenv("API_KEY_HEADER", "X-API-Key"), auto_error=False)
 
 # Rate limiting
 limiter = Limiter(key_func=get_remote_address)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verify a password against its hash"""
+    """Verify a password against its hash."""
     try:
         return pwd_context.verify(plain_password, hashed_password)
     except Exception as e:
@@ -133,7 +125,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 def get_password_hash(password: str) -> str:
-    """Hash a password"""
+    """Hash a password."""
     try:
         return pwd_context.hash(password)
     except Exception as e:
@@ -145,15 +137,13 @@ def get_password_hash(password: str) -> str:
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
-    """Create JWT access token"""
+    """Create JWT access token."""
     try:
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.utcnow() + expires_delta
         else:
-            expire = datetime.utcnow() + timedelta(
-                minutes=JWT_ACCESS_TOKEN_EXPIRE_MINUTES
-            )
+            expire = datetime.utcnow() + timedelta(minutes=JWT_ACCESS_TOKEN_EXPIRE_MINUTES)
 
         to_encode.update({"exp": expire, "type": "access"})
         encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
@@ -167,7 +157,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
 
 
 def create_refresh_token(data: dict) -> str:
-    """Create JWT refresh token"""
+    """Create JWT refresh token."""
     try:
         to_encode = data.copy()
         expire = datetime.utcnow() + timedelta(days=JWT_REFRESH_TOKEN_EXPIRE_DAYS)
@@ -183,7 +173,7 @@ def create_refresh_token(data: dict) -> str:
 
 
 def verify_token(token: str, token_type: str = "access") -> dict[str, Any]:
-    """Verify and decode JWT token"""
+    """Verify and decode JWT token."""
     try:
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
 
@@ -197,30 +187,22 @@ def verify_token(token: str, token_type: str = "access") -> dict[str, Any]:
         # Check expiration
         exp = payload.get("exp")
         if exp is None or datetime.utcnow() > datetime.fromtimestamp(exp):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired"
-            )
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired")
 
         return payload
     except ExpiredSignatureError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token has expired")
     except InvalidTokenError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
     except Exception as e:
         logger.error(f"Token verification error: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Token verification failed"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token verification failed")
 
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
 ) -> dict[str, Any]:
-    """Get current user from JWT token"""
+    """Get current user from JWT token."""
     try:
         if not credentials:
             raise HTTPException(
@@ -232,9 +214,7 @@ async def get_current_user(
         user_id = payload.get("sub")
 
         if user_id is None:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload"
-            )
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")
 
         # In a real implementation, this would fetch from database
         # For now, return mock user data
@@ -248,26 +228,24 @@ async def get_current_user(
         raise
     except Exception as e:
         logger.error(f"Get current user error: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication failed"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication failed")
 
 
 async def get_current_active_user(
     current_user: dict = Depends(get_current_user),
 ) -> dict[str, Any]:
-    """Get current active user"""
+    """Get current active user."""
     if not current_user.get("is_active", True):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user")
     return current_user
 
 
-def require_permission(permission: str):
-    """Decorator to require specific permission"""
+def require_permission(permission: str) -> Any:
+    """Decorator to require specific permission."""
 
-    def permission_checker(current_user: dict = Depends(get_current_active_user)):
+    def permission_checker(
+        current_user: dict = Depends(get_current_active_user),
+    ) -> Any:
         user_permissions = current_user.get("permissions", [])
         user_role = current_user.get("role", "user")
 
@@ -289,35 +267,29 @@ def require_permission(permission: str):
 async def verify_api_key(
     api_key: str | None = Depends(api_key_header),
 ) -> dict[str, Any]:
-    """Verify API key"""
+    """Verify API key."""
     if not api_key:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="API key required"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="API key required")
 
     # In a real implementation, this would check against database
     # For now, check against environment variable
     valid_api_keys = os.getenv("VALID_API_KEYS", "").split(",")
 
     if api_key not in valid_api_keys:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API key"
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid API key")
 
     return {"api_key": api_key, "permissions": ["read", "write"]}
 
 
 def validate_auth_configuration() -> dict[str, Any]:
-    """Validate authentication configuration following crawl_mcp.py methodology"""
+    """Validate authentication configuration following crawl_mcp.py methodology."""
     validation_results = {
         "jwt_secret_configured": bool(os.getenv("JWT_SECRET_KEY"))
         and os.getenv("JWT_SECRET_KEY") != "your-secret-key-change-this",
-        "jwt_algorithm_valid": os.getenv("JWT_ALGORITHM", "HS256")
-        in ["HS256", "HS384", "HS512", "RS256"],
+        "jwt_algorithm_valid": os.getenv("JWT_ALGORITHM", "HS256") in ["HS256", "HS384", "HS512", "RS256"],
         "token_expiry_configured": bool(os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES")),
         "password_hashing_available": True,  # bcrypt is imported
-        "rate_limiting_configured": os.getenv("RATE_LIMIT_ENABLED", "true").lower()
-        == "true",
+        "rate_limiting_configured": os.getenv("RATE_LIMIT_ENABLED", "true").lower() == "true",
     }
 
     errors = []
@@ -329,14 +301,10 @@ def validate_auth_configuration() -> dict[str, Any]:
 
     if not validation_results["jwt_algorithm_valid"]:
         errors.append("Invalid JWT algorithm specified")
-        recommendations.append(
-            "Use a supported JWT algorithm (HS256, HS384, HS512, RS256)"
-        )
+        recommendations.append("Use a supported JWT algorithm (HS256, HS384, HS512, RS256)")
 
     if not validation_results["token_expiry_configured"]:
-        recommendations.append(
-            "Configure JWT_ACCESS_TOKEN_EXPIRE_MINUTES for custom token expiry"
-        )
+        recommendations.append("Configure JWT_ACCESS_TOKEN_EXPIRE_MINUTES for custom token expiry")
 
     return {
         "valid": len(errors) == 0,
@@ -348,7 +316,7 @@ def validate_auth_configuration() -> dict[str, Any]:
 
 # Pydantic Models with comprehensive validation
 class CLIResponse(BaseModel):
-    """Standard response format for CLI operations"""
+    """Standard response format for CLI operations."""
 
     success: bool
     message: str
@@ -359,7 +327,7 @@ class CLIResponse(BaseModel):
 
 
 class EnvironmentValidationResponse(BaseModel):
-    """Response model for environment validation"""
+    """Response model for environment validation."""
 
     status: str = Field(..., description="Environment status: ready/invalid")
     components: dict[str, bool] = Field(default_factory=dict)
@@ -368,7 +336,7 @@ class EnvironmentValidationResponse(BaseModel):
 
 
 class SMEValidationResponse(BaseModel):
-    """Response model for SME Agent validation"""
+    """Response model for SME Agent validation."""
 
     status: str = Field(..., description="Validation status: valid/invalid")
     components: list[dict[str, Any]] = Field(default_factory=list)
@@ -377,7 +345,7 @@ class SMEValidationResponse(BaseModel):
 
 
 class RefactoringDetectionResponse(BaseModel):
-    """Response model for refactoring detection"""
+    """Response model for refactoring detection."""
 
     large_files: list[dict[str, Any]] = Field(default_factory=list)
     recommendations: list[str] = Field(default_factory=list)
@@ -385,7 +353,7 @@ class RefactoringDetectionResponse(BaseModel):
 
 
 class ScriptGenerationRequest(BaseModel):
-    """Request model for script generation"""
+    """Request model for script generation."""
 
     template_type: str = Field(..., description="Type of script template")
     parameters: dict[str, Any] = Field(..., description="Template parameters")
@@ -393,7 +361,7 @@ class ScriptGenerationRequest(BaseModel):
 
     @field_validator("template_type")
     @classmethod
-    def validate_template_type(cls, v):
+    def validate_template_type(cls, v) -> Any:
         allowed_types = ["opcua_client", "tag_historian", "alarm_handler", "custom"]
         if v not in allowed_types:
             raise ValueError(f"Template type must be one of: {allowed_types}")
@@ -401,7 +369,7 @@ class ScriptGenerationRequest(BaseModel):
 
 
 class TemplateListResponse(BaseModel):
-    """Response model for template listing"""
+    """Response model for template listing."""
 
     templates: list[dict[str, Any]] = Field(default_factory=list)
     total_count: int = 0
@@ -409,7 +377,7 @@ class TemplateListResponse(BaseModel):
 
 
 class ModuleCreateRequest(BaseModel):
-    """Request model for module creation"""
+    """Request model for module creation."""
 
     name: str = Field(..., description="Module name")
     description: str = Field(..., description="Module description")
@@ -417,16 +385,14 @@ class ModuleCreateRequest(BaseModel):
 
     @field_validator("name")
     @classmethod
-    def validate_name(cls, v):
+    def validate_name(cls, v) -> Any:
         if not v.replace("_", "").replace("-", "").isalnum():
-            raise ValueError(
-                "Module name must contain only alphanumeric characters, hyphens, and underscores"
-            )
+            raise ValueError("Module name must contain only alphanumeric characters, hyphens, and underscores")
         return v
 
 
 class SetupConfigurationRequest(BaseModel):
-    """Request model for setup configuration"""
+    """Request model for setup configuration."""
 
     ignition_version: str = Field(..., description="Ignition version")
     gateway_url: str = Field(..., description="Ignition Gateway URL")
@@ -436,28 +402,24 @@ class SetupConfigurationRequest(BaseModel):
 
 # Authentication Pydantic Models (Phase 12.4)
 class UserCreate(BaseModel):
-    """Request model for user creation"""
+    """Request model for user creation."""
 
     username: str = Field(..., min_length=3, max_length=50, description="Username")
     email: str = Field(..., description="Email address")
-    password: str = Field(
-        ..., min_length=8, description="Password (minimum 8 characters)"
-    )
+    password: str = Field(..., min_length=8, description="Password (minimum 8 characters)")
     full_name: str = Field(..., max_length=100, description="Full name")
     role: str = Field(default="user", description="User role")
 
     @field_validator("username")
     @classmethod
-    def validate_username(cls, v):
+    def validate_username(cls, v) -> Any:
         if not v.replace("_", "").replace("-", "").isalnum():
-            raise ValueError(
-                "Username must contain only alphanumeric characters, hyphens, and underscores"
-            )
+            raise ValueError("Username must contain only alphanumeric characters, hyphens, and underscores")
         return v.lower()
 
     @field_validator("email")
     @classmethod
-    def validate_email(cls, v):
+    def validate_email(cls, v) -> Any:
         import re
 
         email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
@@ -467,7 +429,7 @@ class UserCreate(BaseModel):
 
     @field_validator("role")
     @classmethod
-    def validate_role(cls, v):
+    def validate_role(cls, v) -> Any:
         allowed_roles = ["admin", "user", "viewer", "operator"]
         if v not in allowed_roles:
             raise ValueError(f"Role must be one of: {allowed_roles}")
@@ -475,19 +437,19 @@ class UserCreate(BaseModel):
 
 
 class UserLogin(BaseModel):
-    """Request model for user login"""
+    """Request model for user login."""
 
     username: str = Field(..., description="Username or email")
     password: str = Field(..., description="Password")
 
     @field_validator("username")
     @classmethod
-    def validate_username(cls, v):
+    def validate_username(cls, v) -> Any:
         return v.strip().lower()
 
 
 class Token(BaseModel):
-    """Response model for authentication tokens"""
+    """Response model for authentication tokens."""
 
     access_token: str = Field(..., description="JWT access token")
     refresh_token: str = Field(..., description="JWT refresh token")
@@ -496,13 +458,13 @@ class Token(BaseModel):
 
 
 class TokenRefresh(BaseModel):
-    """Request model for token refresh"""
+    """Request model for token refresh."""
 
     refresh_token: str = Field(..., description="Refresh token")
 
 
 class User(BaseModel):
-    """User model for responses"""
+    """User model for responses."""
 
     id: int = Field(..., description="User ID")
     username: str = Field(..., description="Username")
@@ -515,7 +477,7 @@ class User(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    """Request model for user updates"""
+    """Request model for user updates."""
 
     email: str | None = Field(None, description="Email address")
     full_name: str | None = Field(None, max_length=100, description="Full name")
@@ -524,7 +486,7 @@ class UserUpdate(BaseModel):
 
     @field_validator("email")
     @classmethod
-    def validate_email(cls, v):
+    def validate_email(cls, v) -> Any:
         if v is None:
             return v
         import re
@@ -536,7 +498,7 @@ class UserUpdate(BaseModel):
 
     @field_validator("role")
     @classmethod
-    def validate_role(cls, v):
+    def validate_role(cls, v) -> Any:
         if v is None:
             return v
         allowed_roles = ["admin", "user", "viewer", "operator"]
@@ -546,39 +508,31 @@ class UserUpdate(BaseModel):
 
 
 class PasswordChange(BaseModel):
-    """Request model for password changes"""
+    """Request model for password changes."""
 
     current_password: str = Field(..., description="Current password")
-    new_password: str = Field(
-        ..., min_length=8, description="New password (minimum 8 characters)"
-    )
+    new_password: str = Field(..., min_length=8, description="New password (minimum 8 characters)")
     confirm_password: str = Field(..., description="Confirm new password")
 
     @field_validator("confirm_password")
     @classmethod
-    def validate_passwords_match(cls, v, values):
+    def validate_passwords_match(cls, v, values) -> Any:
         if "new_password" in values.data and v != values.data["new_password"]:
             raise ValueError("Passwords do not match")
         return v
 
 
 class APIKeyCreate(BaseModel):
-    """Request model for API key creation"""
+    """Request model for API key creation."""
 
     name: str = Field(..., max_length=100, description="API key name")
-    description: str | None = Field(
-        None, max_length=500, description="API key description"
-    )
-    expires_in_days: int | None = Field(
-        30, ge=1, le=365, description="Expiration in days"
-    )
-    permissions: list[str] = Field(
-        default_factory=list, description="API key permissions"
-    )
+    description: str | None = Field(None, max_length=500, description="API key description")
+    expires_in_days: int | None = Field(30, ge=1, le=365, description="Expiration in days")
+    permissions: list[str] = Field(default_factory=list, description="API key permissions")
 
     @field_validator("permissions")
     @classmethod
-    def validate_permissions(cls, v):
+    def validate_permissions(cls, v) -> Any:
         allowed_permissions = [
             "read",
             "write",
@@ -589,14 +543,12 @@ class APIKeyCreate(BaseModel):
         ]
         for permission in v:
             if permission not in allowed_permissions:
-                raise ValueError(
-                    f"Invalid permission: {permission}. Allowed: {allowed_permissions}"
-                )
+                raise ValueError(f"Invalid permission: {permission}. Allowed: {allowed_permissions}")
         return v
 
 
 class APIKey(BaseModel):
-    """Response model for API keys"""
+    """Response model for API keys."""
 
     id: int = Field(..., description="API key ID")
     name: str = Field(..., description="API key name")
@@ -610,7 +562,7 @@ class APIKey(BaseModel):
 
 
 class AuthValidationResponse(BaseModel):
-    """Response model for authentication validation"""
+    """Response model for authentication validation."""
 
     status: str = Field(..., description="Authentication status: valid/invalid")
     components: dict[str, bool] = Field(default_factory=dict)
@@ -634,9 +586,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SlowAPIMiddleware)
 
 # CORS configuration with security considerations
-cors_origins = os.getenv(
-    "CORS_ORIGINS", "http://localhost:3000,http://localhost:8080"
-).split(",")
+cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:8080").split(",")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
@@ -648,7 +598,7 @@ app.add_middleware(
 
 # Utility Functions with comprehensive error handling
 async def run_cli_command(command: list[str]) -> CLIResponse:
-    """Execute a CLI command and return structured response with comprehensive error handling"""
+    """Execute a CLI command and return structured response with comprehensive error handling."""
     import time
 
     start_time = time.time()
@@ -666,9 +616,7 @@ async def run_cli_command(command: list[str]) -> CLIResponse:
             capture_output=True,
             text=True,
             timeout=60,  # 60 second timeout for longer operations
-            cwd=os.path.dirname(
-                os.path.dirname(os.path.abspath(__file__))
-            ),  # Project root
+            cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),  # Project root
         )
 
         execution_time = time.time() - start_time
@@ -717,8 +665,8 @@ async def run_cli_command(command: list[str]) -> CLIResponse:
 
 # Environment Validation Endpoint (crawl_mcp.py methodology)
 @app.get("/api/v1/environment/validate", response_model=EnvironmentValidationResponse)
-async def validate_api_environment():
-    """Validate complete environment setup following crawl_mcp.py methodology"""
+async def validate_api_environment() -> Any:
+    """Validate complete environment setup following crawl_mcp.py methodology."""
     try:
         validation_results = validate_environment()
 
@@ -739,9 +687,7 @@ async def validate_api_environment():
             status=status,
             components=validation_results,
             errors=errors,
-            recommendations=(
-                recommendations if errors else ["Environment is properly configured"]
-            ),
+            recommendations=(recommendations if errors else ["Environment is properly configured"]),
         )
 
     except Exception as e:
@@ -755,8 +701,8 @@ async def validate_api_environment():
 
 # Health Check Endpoint
 @app.get("/health", response_model=dict[str, str])
-async def health_check():
-    """Health check endpoint with environment validation"""
+async def health_check() -> Any:
+    """Health check endpoint with environment validation."""
     env_status = validate_environment()
     return {
         "status": "healthy",
@@ -768,8 +714,8 @@ async def health_check():
 
 # === SME AGENT ENDPOINTS ===
 @app.post("/api/v1/sme/validate-env", response_model=SMEValidationResponse)
-async def validate_sme_environment():
-    """Validate SME Agent environment setup"""
+async def validate_sme_environment() -> Any:
+    """Validate SME Agent environment setup."""
     command = ["python", "-m", "src.main", "module", "sme", "core", "validate-env"]
     result = await run_cli_command(command)
 
@@ -794,25 +740,21 @@ async def validate_sme_environment():
 
 
 @app.get("/api/v1/sme/status", response_model=CLIResponse)
-async def get_sme_status():
-    """Get SME Agent component status"""
+async def get_sme_status() -> Any:
+    """Get SME Agent component status."""
     command = ["python", "-m", "src.main", "module", "sme", "status"]
     return await run_cli_command(command)
 
 
 @app.post("/api/v1/sme/ask")
-async def ask_sme_question(
-    question: str = Body(..., description="Question to ask SME Agent")
-):
-    """Ask SME Agent a question"""
+async def ask_sme_question(question: str = Body(..., description="Question to ask SME Agent")):
+    """Ask SME Agent a question."""
     command = ["python", "-m", "src.main", "module", "sme", "ask", f'"{question}"']
     result = await run_cli_command(command)
 
     return {
         "question": question,
-        "answer": (
-            result.data.get("stdout", "") if result.success else "Unable to get answer"
-        ),
+        "answer": (result.data.get("stdout", "") if result.success else "Unable to get answer"),
         "success": result.success,
         "execution_time": result.execution_time,
         "timestamp": datetime.now().isoformat(),
@@ -821,8 +763,8 @@ async def ask_sme_question(
 
 # === SCRIPT GENERATION ENDPOINTS ===
 @app.post("/api/v1/scripts/generate")
-async def generate_script(request: ScriptGenerationRequest):
-    """Generate a script from template with comprehensive validation"""
+async def generate_script(request: ScriptGenerationRequest) -> Any:
+    """Generate a script from template with comprehensive validation."""
     try:
         # Build command with validation
         command = [
@@ -858,10 +800,8 @@ async def generate_script(request: ScriptGenerationRequest):
 
 
 @app.post("/api/v1/scripts/validate")
-async def validate_script(
-    script_content: str = Body(..., description="Script content to validate")
-):
-    """Validate a Jython script for Ignition compatibility"""
+async def validate_script(script_content: str = Body(..., description="Script content to validate")):
+    """Validate a Jython script for Ignition compatibility."""
     command = [
         "python",
         "-m",
@@ -875,9 +815,7 @@ async def validate_script(
 
     return {
         "valid": result.success,
-        "validation_results": (
-            result.data.get("stdout", "") if result.success else result.message
-        ),
+        "validation_results": (result.data.get("stdout", "") if result.success else result.message),
         "errors": [] if result.success else [result.message],
         "warnings": [],
         "execution_time": result.execution_time,
@@ -887,8 +825,8 @@ async def validate_script(
 
 # === TEMPLATE MANAGEMENT ENDPOINTS ===
 @app.get("/api/v1/templates/list", response_model=TemplateListResponse)
-async def list_script_templates():
-    """List available script templates with comprehensive details"""
+async def list_script_templates() -> Any:
+    """List available script templates with comprehensive details."""
     command = ["python", "-m", "src.main", "template", "list"]
     result = await run_cli_command(command)
 
@@ -996,15 +934,15 @@ async def list_script_templates():
         return TemplateListResponse(
             templates=templates,
             total_count=len(templates),
-            categories=list(set(t["category"] for t in templates)),
+            categories=list({t["category"] for t in templates}),
         )
     else:
         raise HTTPException(status_code=500, detail=result.message)
 
 
 @app.get("/api/v1/templates/{template_id}")
-async def get_template_details(template_id: str = Path(..., description="Template ID")):
-    """Get detailed information about a specific template"""
+async def get_template_details(template_id: str = Path(..., description="Template ID")) -> Any:
+    """Get detailed information about a specific template."""
     command = ["python", "-m", "src.main", "module", "template-info", template_id]
     result = await run_cli_command(command)
 
@@ -1016,15 +954,13 @@ async def get_template_details(template_id: str = Path(..., description="Templat
             "timestamp": datetime.now().isoformat(),
         }
     else:
-        raise HTTPException(
-            status_code=404, detail=f"Template '{template_id}' not found"
-        )
+        raise HTTPException(status_code=404, detail=f"Template '{template_id}' not found")
 
 
 # === REFACTORING ENDPOINTS ===
 @app.get("/api/v1/refactor/detect", response_model=RefactoringDetectionResponse)
-async def detect_refactoring_opportunities():
-    """Detect files that need refactoring"""
+async def detect_refactoring_opportunities() -> Any:
+    """Detect files that need refactoring."""
     command = ["python", "-m", "src.main", "refactor", "detect"]
     result = await run_cli_command(command)
 
@@ -1045,23 +981,21 @@ async def detect_refactoring_opportunities():
 
 
 @app.get("/api/v1/refactor/statistics", response_model=CLIResponse)
-async def get_refactoring_statistics():
-    """Get comprehensive refactoring statistics"""
+async def get_refactoring_statistics() -> Any:
+    """Get comprehensive refactoring statistics."""
     command = ["python", "-m", "src.main", "refactor", "statistics"]
     return await run_cli_command(command)
 
 
 @app.post("/api/v1/refactor/analyze/{file_path:path}")
-async def analyze_file(file_path: str):
-    """Analyze a specific file for refactoring opportunities"""
+async def analyze_file(file_path: str) -> Any:
+    """Analyze a specific file for refactoring opportunities."""
     command = ["python", "-m", "src.main", "refactor", "analyze", file_path]
     result = await run_cli_command(command)
 
     return {
         "file_path": file_path,
-        "analysis": (
-            result.data.get("stdout", "") if result.success else "Analysis failed"
-        ),
+        "analysis": (result.data.get("stdout", "") if result.success else "Analysis failed"),
         "success": result.success,
         "recommendations": (
             [
@@ -1078,8 +1012,8 @@ async def analyze_file(file_path: str):
 
 
 @app.post("/api/v1/refactor/split/{file_path:path}")
-async def split_large_file(file_path: str):
-    """Split a large file into smaller modules"""
+async def split_large_file(file_path: str) -> Any:
+    """Split a large file into smaller modules."""
     command = ["python", "-m", "src.main", "refactor", "split", file_path]
     result = await run_cli_command(command)
 
@@ -1093,11 +1027,9 @@ async def split_large_file(file_path: str):
 
 
 @app.post("/api/v1/refactor/workflow")
-async def execute_refactoring_workflow(
-    file_paths: list[str] = Body(..., description="List of files to refactor")
-):
-    """Execute comprehensive refactoring workflow"""
-    command = ["python", "-m", "src.main", "refactor", "workflow"] + file_paths
+async def execute_refactoring_workflow(file_paths: list[str] = Body(..., description="List of files to refactor")):
+    """Execute comprehensive refactoring workflow."""
+    command = ["python", "-m", "src.main", "refactor", "workflow", *file_paths]
     result = await run_cli_command(command)
 
     return {
@@ -1111,8 +1043,8 @@ async def execute_refactoring_workflow(
 
 # === MODULE MANAGEMENT ENDPOINTS ===
 @app.get("/api/v1/modules/list")
-async def list_available_modules():
-    """List all available IGN Scripts modules"""
+async def list_available_modules() -> Any:
+    """List all available IGN Scripts modules."""
     command = ["python", "-m", "src.main", "module", "list"]
     result = await run_cli_command(command)
 
@@ -1161,8 +1093,8 @@ async def list_available_modules():
 
 
 @app.get("/api/v1/modules/{module_name}/status")
-async def get_module_status(module_name: str):
-    """Get status of a specific module"""
+async def get_module_status(module_name: str) -> Any:
+    """Get status of a specific module."""
     command = ["python", "-m", "src.main", "module", module_name, "status"]
     result = await run_cli_command(command)
 
@@ -1176,8 +1108,8 @@ async def get_module_status(module_name: str):
 
 
 @app.post("/api/v1/modules/create")
-async def create_module(request: ModuleCreateRequest):
-    """Create a new Ignition module project"""
+async def create_module(request: ModuleCreateRequest) -> Any:
+    """Create a new Ignition module project."""
     command = [
         "python",
         "-m",
@@ -1205,8 +1137,8 @@ async def create_module(request: ModuleCreateRequest):
 
 
 @app.post("/api/v1/modules/{module_name}/build")
-async def build_module(module_name: str):
-    """Build a module project"""
+async def build_module(module_name: str) -> Any:
+    """Build a module project."""
     command = ["python", "-m", "src.main", "module", "build", module_name]
     result = await run_cli_command(command)
 
@@ -1220,8 +1152,8 @@ async def build_module(module_name: str):
 
 
 @app.post("/api/v1/modules/{module_name}/package")
-async def package_module(module_name: str):
-    """Package a module for distribution"""
+async def package_module(module_name: str) -> Any:
+    """Package a module for distribution."""
     command = ["python", "-m", "src.main", "module", "package", module_name]
     result = await run_cli_command(command)
 
@@ -1236,8 +1168,8 @@ async def package_module(module_name: str):
 
 # === SETUP AND CONFIGURATION ENDPOINTS ===
 @app.post("/api/v1/setup/configure")
-async def configure_setup(request: SetupConfigurationRequest):
-    """Configure IGN Scripts setup interactively"""
+async def configure_setup(request: SetupConfigurationRequest) -> Any:
+    """Configure IGN Scripts setup interactively."""
     command = [
         "python",
         "-m",
@@ -1270,8 +1202,8 @@ async def configure_setup(request: SetupConfigurationRequest):
 
 
 @app.get("/api/v1/setup/status")
-async def get_setup_status():
-    """Get current setup status"""
+async def get_setup_status() -> Any:
+    """Get current setup status."""
     command = ["python", "-m", "src.main", "module", "status"]
     result = await run_cli_command(command)
 
@@ -1285,18 +1217,14 @@ async def get_setup_status():
 
 # === ADVANCED FEATURES ENDPOINTS ===
 @app.get("/api/v1/advanced/features")
-async def list_advanced_features():
-    """List available advanced features (Phase 9.8)"""
+async def list_advanced_features() -> Any:
+    """List available advanced features (Phase 9.8)."""
     command = ["python", "-m", "src.main", "advanced", "--help"]
     result = await run_cli_command(command)
 
     return {
         "features_available": result.success,
-        "feature_list": (
-            result.data.get("stdout", "")
-            if result.success
-            else "Features not available"
-        ),
+        "feature_list": (result.data.get("stdout", "") if result.success else "Features not available"),
         "phase": "9.8",
         "timestamp": datetime.now().isoformat(),
     }
@@ -1304,24 +1232,22 @@ async def list_advanced_features():
 
 # === DEPLOYMENT ENDPOINTS ===
 @app.get("/api/v1/deploy/status")
-async def get_deployment_status():
-    """Get deployment status"""
+async def get_deployment_status() -> Any:
+    """Get deployment status."""
     command = ["python", "-m", "src.main", "deploy", "status"]
     result = await run_cli_command(command)
 
     return {
         "deployment_ready": result.success,
-        "status_details": (
-            result.data.get("stdout", "") if result.success else result.message
-        ),
+        "status_details": (result.data.get("stdout", "") if result.success else result.message),
         "timestamp": datetime.now().isoformat(),
     }
 
 
 # === SYSTEM INFORMATION ENDPOINTS ===
 @app.get("/api/v1/system/info")
-async def get_system_info():
-    """Get comprehensive system information"""
+async def get_system_info() -> Any:
+    """Get comprehensive system information."""
     return {
         "version": "12.1",
         "phase": "Phase 12.1: API Layer Development",
@@ -1341,17 +1267,15 @@ async def get_system_info():
 
 
 class KnowledgeGraphQueryRequest(BaseModel):
-    """Request model for knowledge graph queries"""
+    """Request model for knowledge graph queries."""
 
     query: str = Field(..., description="Cypher query to execute")
-    parameters: dict[str, Any] = Field(
-        default_factory=dict, description="Query parameters"
-    )
+    parameters: dict[str, Any] = Field(default_factory=dict, description="Query parameters")
     limit: int = Field(default=20, ge=1, le=100, description="Result limit (1-100)")
 
     @field_validator("query")
     @classmethod
-    def validate_query(cls, v):
+    def validate_query(cls, v) -> Any:
         if not v or not v.strip():
             raise ValueError("Query cannot be empty")
         # Basic safety check - prevent destructive operations
@@ -1359,14 +1283,12 @@ class KnowledgeGraphQueryRequest(BaseModel):
         query_upper = v.upper()
         for keyword in dangerous_keywords:
             if keyword in query_upper:
-                raise ValueError(
-                    f"Destructive operation '{keyword}' not allowed in read-only API"
-                )
+                raise ValueError(f"Destructive operation '{keyword}' not allowed in read-only API")
         return v.strip()
 
 
 class KnowledgeGraphResponse(BaseModel):
-    """Response model for knowledge graph operations"""
+    """Response model for knowledge graph operations."""
 
     success: bool
     data: list[dict[str, Any]] = Field(default_factory=list)
@@ -1377,7 +1299,7 @@ class KnowledgeGraphResponse(BaseModel):
 
 
 class ContextSharingRequest(BaseModel):
-    """Request model for context sharing operations"""
+    """Request model for context sharing operations."""
 
     repository: str = Field(..., description="Repository name")
     context_type: str = Field(..., description="Type of context to share")
@@ -1385,7 +1307,7 @@ class ContextSharingRequest(BaseModel):
 
     @field_validator("context_type")
     @classmethod
-    def validate_context_type(cls, v):
+    def validate_context_type(cls, v) -> Any:
         allowed_types = [
             "classes",
             "methods",
@@ -1400,7 +1322,7 @@ class ContextSharingRequest(BaseModel):
 
 
 async def validate_neo4j_connection() -> dict[str, Any]:
-    """Validate Neo4j connection with comprehensive error handling"""
+    """Validate Neo4j connection with comprehensive error handling."""
     try:
         from neo4j import GraphDatabase
 
@@ -1431,10 +1353,8 @@ async def validate_neo4j_connection() -> dict[str, Any]:
         driver = GraphDatabase.driver(neo4j_uri, auth=(neo4j_user, neo4j_password))
 
         with driver.session() as session:
-            result = session.run(
-                "RETURN 'Connection successful' as status, datetime() as timestamp"
-            )
-            record = result.single()
+            result = session.run("RETURN 'Connection successful' as status, datetime() as timestamp")
+            record: dict[str, Any] = result.single()
 
             # Get basic statistics
             stats_result = session.run(
@@ -1444,7 +1364,7 @@ async def validate_neo4j_connection() -> dict[str, Any]:
                        count(distinct labels(n)) as node_types
             """
             )
-            stats = stats_result.single()
+            stats: dict[str, Any] = stats_result.single()
 
         driver.close()
 
@@ -1461,13 +1381,9 @@ async def validate_neo4j_connection() -> dict[str, Any]:
     except Exception as e:
         error_msg = str(e).lower()
         if "authentication" in error_msg:
-            user_error = (
-                "Neo4j authentication failed. Check NEO4J_USER and NEO4J_PASSWORD."
-            )
+            user_error = "Neo4j authentication failed. Check NEO4J_USER and NEO4J_PASSWORD."
         elif "connection" in error_msg or "refused" in error_msg:
-            user_error = (
-                "Cannot connect to Neo4j. Check NEO4J_URI and ensure Neo4j is running."
-            )
+            user_error = "Cannot connect to Neo4j. Check NEO4J_URI and ensure Neo4j is running."
         else:
             user_error = f"Neo4j connection error: {e!s}"
 
@@ -1477,7 +1393,7 @@ async def validate_neo4j_connection() -> dict[str, Any]:
 async def execute_knowledge_query(
     query: str, parameters: dict[str, Any] | None = None, limit: int = 20
 ) -> dict[str, Any]:
-    """Execute a knowledge graph query with comprehensive error handling"""
+    """Execute a knowledge graph query with comprehensive error handling."""
     import time
 
     start_time = time.time()
@@ -1544,8 +1460,8 @@ async def execute_knowledge_query(
 
 
 @app.get("/api/v1/knowledge/status", response_model=KnowledgeGraphResponse)
-async def get_knowledge_graph_status():
-    """Get Neo4j knowledge graph connection status and statistics"""
+async def get_knowledge_graph_status() -> Any:
+    """Get Neo4j knowledge graph connection status and statistics."""
     connection_info = await validate_neo4j_connection()
 
     return KnowledgeGraphResponse(
@@ -1560,11 +1476,9 @@ async def get_knowledge_graph_status():
 
 
 @app.post("/api/v1/knowledge/query", response_model=KnowledgeGraphResponse)
-async def execute_cypher_query(request: KnowledgeGraphQueryRequest):
-    """Execute a read-only Cypher query on the knowledge graph"""
-    result = await execute_knowledge_query(
-        query=request.query, parameters=request.parameters, limit=request.limit
-    )
+async def execute_cypher_query(request: KnowledgeGraphQueryRequest) -> Any:
+    """Execute a read-only Cypher query on the knowledge graph."""
+    result = await execute_knowledge_query(query=request.query, parameters=request.parameters, limit=request.limit)
 
     return KnowledgeGraphResponse(
         success=result["success"],
@@ -1576,8 +1490,8 @@ async def execute_cypher_query(request: KnowledgeGraphQueryRequest):
 
 
 @app.get("/api/v1/knowledge/repositories")
-async def list_repositories():
-    """List all repositories in the knowledge graph"""
+async def list_repositories() -> Any:
+    """List all repositories in the knowledge graph."""
     query = "MATCH (r:Repository) RETURN r.name as name ORDER BY r.name"
     result = await execute_knowledge_query(query)
 
@@ -1594,8 +1508,8 @@ async def list_repositories():
 
 
 @app.get("/api/v1/knowledge/repositories/{repo_name}/overview")
-async def get_repository_overview(repo_name: str):
-    """Get comprehensive overview of a repository from the knowledge graph"""
+async def get_repository_overview(repo_name: str) -> Any:
+    """Get comprehensive overview of a repository from the knowledge graph."""
     query = """
     MATCH (r:Repository {name: $repo_name})
     OPTIONAL MATCH (r)-[:CONTAINS]->(f:File)
@@ -1629,14 +1543,12 @@ async def get_repository_overview(repo_name: str):
             "timestamp": datetime.now().isoformat(),
         }
     else:
-        raise HTTPException(
-            status_code=404, detail=f"Repository '{repo_name}' not found"
-        )
+        raise HTTPException(status_code=404, detail=f"Repository '{repo_name}' not found")
 
 
 @app.post("/api/v1/knowledge/context")
-async def get_repository_context(request: ContextSharingRequest):
-    """Get specific context information for AI agent development"""
+async def get_repository_context(request: ContextSharingRequest) -> Any:
+    """Get specific context information for AI agent development."""
     # Build query based on context type
     if request.context_type == "classes":
         query = """
@@ -1665,13 +1577,9 @@ async def get_repository_context(request: ContextSharingRequest):
         ORDER BY f.path
         """
     else:
-        raise HTTPException(
-            status_code=400, detail=f"Unsupported context type: {request.context_type}"
-        )
+        raise HTTPException(status_code=400, detail=f"Unsupported context type: {request.context_type}")
 
-    result = await execute_knowledge_query(
-        query, {"repo_name": request.repository}, limit=100
-    )
+    result = await execute_knowledge_query(query, {"repo_name": request.repository}, limit=100)
 
     if result["success"]:
         return {
@@ -1691,8 +1599,8 @@ async def get_repository_context(request: ContextSharingRequest):
 
 
 @app.get("/api/v1/knowledge/cli-mapping")
-async def get_cli_api_mapping():
-    """Get mapping between CLI commands and API endpoints for AI agent context"""
+async def get_cli_api_mapping() -> Any:
+    """Get mapping between CLI commands and API endpoints for AI agent context."""
     # This provides AI agents with understanding of how CLI maps to API
     mapping = {
         "sme_agent": {
@@ -1798,8 +1706,8 @@ async def get_cli_api_mapping():
 
 
 @app.get("/api/v1/knowledge/agent-context")
-async def get_agent_context():
-    """Get comprehensive context for AI agents"""
+async def get_agent_context() -> Any:
+    """Get comprehensive context for AI agents."""
     try:
         connection_valid = await validate_neo4j_connection()
         if not connection_valid["success"]:
@@ -1876,8 +1784,8 @@ async def get_agent_context():
 
 @app.get("/api/v1/auth/validate", response_model=AuthValidationResponse)
 @limiter.limit("10/minute")
-async def validate_auth_endpoint(request: Request):
-    """Validate authentication environment setup following crawl_mcp.py methodology"""
+async def validate_auth_endpoint(request: Request) -> Any:
+    """Validate authentication environment setup following crawl_mcp.py methodology."""
     try:
         # Step 1: Environment validation first
         auth_env = validate_auth_environment()
@@ -1887,8 +1795,7 @@ async def validate_auth_endpoint(request: Request):
         all_valid = auth_env["auth_enabled"] and config_validation["valid"]
 
         security_features = {
-            "jwt_authentication": auth_env["jwt_secret_key"]
-            and auth_env["jwt_algorithm"],
+            "jwt_authentication": auth_env["jwt_secret_key"] and auth_env["jwt_algorithm"],
             "password_hashing": True,  # bcrypt available
             "rate_limiting": auth_env["rate_limit_enabled"],
             "cors_configured": auth_env["cors_origins"],
@@ -1908,28 +1815,24 @@ async def validate_auth_endpoint(request: Request):
             status="invalid",
             components={},
             errors=[f"Validation failed: {e!s}"],
-            recommendations=[
-                "Check authentication configuration and environment variables"
-            ],
+            recommendations=["Check authentication configuration and environment variables"],
             security_features={},
         )
 
 
 @app.post("/api/v1/auth/register", response_model=User)
 @limiter.limit("5/minute")
-async def register_user(user_data: UserCreate, request: Request):
-    """Register a new user following crawl_mcp.py methodology"""
+async def register_user(user_data: UserCreate, request: Request) -> Any:
+    """Register a new user following crawl_mcp.py methodology."""
     try:
         # Step 1: Environment validation
         auth_env = validate_auth_environment()
         if not auth_env["auth_enabled"]:
-            raise HTTPException(
-                status_code=503, detail="Authentication system is disabled"
-            )
+            raise HTTPException(status_code=503, detail="Authentication system is disabled")
 
         # Step 2: Input validation (handled by Pydantic)
         # Step 3: Password hashing
-        hashed_password = get_password_hash(user_data.password)
+        get_password_hash(user_data.password)
 
         # Step 4: Mock user creation (in real implementation, save to database)
         mock_user = User(
@@ -1955,15 +1858,13 @@ async def register_user(user_data: UserCreate, request: Request):
 
 @app.post("/api/v1/auth/login", response_model=Token)
 @limiter.limit("10/minute")
-async def login_user(login_data: UserLogin, request: Request):
-    """Authenticate user and return JWT tokens following crawl_mcp.py methodology"""
+async def login_user(login_data: UserLogin, request: Request) -> Any:
+    """Authenticate user and return JWT tokens following crawl_mcp.py methodology."""
     try:
         # Step 1: Environment validation
         auth_env = validate_auth_environment()
         if not auth_env["auth_enabled"]:
-            raise HTTPException(
-                status_code=503, detail="Authentication system is disabled"
-            )
+            raise HTTPException(status_code=503, detail="Authentication system is disabled")
 
         # Step 2: Input validation (handled by Pydantic)
         # Step 3: Mock user authentication (in real implementation, check database)
@@ -1998,8 +1899,8 @@ async def login_user(login_data: UserLogin, request: Request):
 
 @app.post("/api/v1/auth/refresh", response_model=Token)
 @limiter.limit("5/minute")
-async def refresh_token_endpoint(token_data: TokenRefresh, request: Request):
-    """Refresh JWT access token following crawl_mcp.py methodology"""
+async def refresh_token_endpoint(token_data: TokenRefresh, request: Request) -> Any:
+    """Refresh JWT access token following crawl_mcp.py methodology."""
     try:
         # Step 1: Validate refresh token
         payload = verify_token(token_data.refresh_token, "refresh")
@@ -2029,8 +1930,10 @@ async def refresh_token_endpoint(token_data: TokenRefresh, request: Request):
 
 
 @app.get("/api/v1/auth/me", response_model=User)
-async def get_current_user_info(current_user: dict = Depends(get_current_active_user)):
-    """Get current user information following crawl_mcp.py methodology"""
+async def get_current_user_info(
+    current_user: dict = Depends(get_current_active_user),
+) -> Any:
+    """Get current user information following crawl_mcp.py methodology."""
     try:
         # Return mock user data (in real implementation, fetch from database)
         return User(
@@ -2045,16 +1948,12 @@ async def get_current_user_info(current_user: dict = Depends(get_current_active_
         )
     except Exception as e:
         logger.error(f"Get user info error: {e}")
-        raise HTTPException(
-            status_code=500, detail="Failed to retrieve user information"
-        )
+        raise HTTPException(status_code=500, detail="Failed to retrieve user information")
 
 
 @app.put("/api/v1/auth/me", response_model=User)
-async def update_current_user(
-    user_update: UserUpdate, current_user: dict = Depends(get_current_active_user)
-):
-    """Update current user information following crawl_mcp.py methodology"""
+async def update_current_user(user_update: UserUpdate, current_user: dict = Depends(get_current_active_user)):
+    """Update current user information following crawl_mcp.py methodology."""
     try:
         # Step 1: Validate permissions (users can update their own info)
         # Step 2: Apply updates (mock implementation)
@@ -2064,9 +1963,7 @@ async def update_current_user(
             email=user_update.email or f"{current_user['username']}@example.com",
             full_name=user_update.full_name or f"User {current_user['username']}",
             role=user_update.role or current_user["role"],
-            is_active=(
-                user_update.is_active if user_update.is_active is not None else True
-            ),
+            is_active=(user_update.is_active if user_update.is_active is not None else True),
             created_at=datetime.utcnow(),
             last_login=datetime.utcnow(),
         )
@@ -2080,16 +1977,14 @@ async def update_current_user(
 
 
 @app.post("/api/v1/auth/change-password")
-async def change_password(
-    password_data: PasswordChange, current_user: dict = Depends(get_current_active_user)
-):
-    """Change user password following crawl_mcp.py methodology"""
+async def change_password(password_data: PasswordChange, current_user: dict = Depends(get_current_active_user)):
+    """Change user password following crawl_mcp.py methodology."""
     try:
         # Step 1: Validate current password (mock implementation)
         # In real implementation, verify against stored hash
 
         # Step 2: Hash new password
-        new_password_hash = get_password_hash(password_data.new_password)
+        get_password_hash(password_data.new_password)
 
         # Step 3: Update password (mock implementation)
         logger.info(f"Password changed for user: {current_user['username']}")
@@ -2106,7 +2001,7 @@ async def create_api_key(
     api_key_data: APIKeyCreate,
     current_user: dict = Depends(require_permission("admin")),
 ):
-    """Create API key following crawl_mcp.py methodology"""
+    """Create API key following crawl_mcp.py methodology."""
     try:
         # Step 1: Generate API key
         import secrets
@@ -2116,9 +2011,7 @@ async def create_api_key(
         # Step 2: Calculate expiration
         expires_at = None
         if api_key_data.expires_in_days:
-            expires_at = datetime.utcnow() + timedelta(
-                days=api_key_data.expires_in_days
-            )
+            expires_at = datetime.utcnow() + timedelta(days=api_key_data.expires_in_days)
 
         # Step 3: Create API key record (mock implementation)
         mock_api_key = APIKey(
@@ -2133,9 +2026,7 @@ async def create_api_key(
             is_active=True,
         )
 
-        logger.info(
-            f"API key created: {api_key_data.name} by {current_user['username']}"
-        )
+        logger.info(f"API key created: {api_key_data.name} by {current_user['username']}")
         return mock_api_key
 
     except Exception as e:
@@ -2144,8 +2035,10 @@ async def create_api_key(
 
 
 @app.get("/api/v1/auth/api-keys", response_model=list[APIKey])
-async def list_api_keys(current_user: dict = Depends(require_permission("admin"))):
-    """List API keys following crawl_mcp.py methodology"""
+async def list_api_keys(
+    current_user: dict = Depends(require_permission("admin")),
+) -> Any:
+    """List API keys following crawl_mcp.py methodology."""
     try:
         # Mock implementation - return sample API keys
         mock_keys = [
@@ -2170,10 +2063,8 @@ async def list_api_keys(current_user: dict = Depends(require_permission("admin")
 
 
 @app.delete("/api/v1/auth/api-keys/{key_id}")
-async def delete_api_key(
-    key_id: int, current_user: dict = Depends(require_permission("admin"))
-):
-    """Delete API key following crawl_mcp.py methodology"""
+async def delete_api_key(key_id: int, current_user: dict = Depends(require_permission("admin"))):
+    """Delete API key following crawl_mcp.py methodology."""
     try:
         # Mock implementation
         logger.info(f"API key {key_id} deleted by {current_user['username']}")
@@ -2189,7 +2080,7 @@ async def delete_api_key(
 async def admin_only_endpoint(
     current_user: dict = Depends(require_permission("admin")),
 ):
-    """Admin-only endpoint demonstrating role-based access control"""
+    """Admin-only endpoint demonstrating role-based access control."""
     return {
         "message": "This is an admin-only endpoint",
         "user": current_user["username"],
@@ -2201,7 +2092,7 @@ async def admin_only_endpoint(
 async def protected_knowledge_graph(
     current_user: dict = Depends(require_permission("knowledge_graph")),
 ):
-    """Protected knowledge graph endpoint"""
+    """Protected knowledge graph endpoint."""
     return {
         "message": "Access granted to knowledge graph features",
         "user": current_user["username"],
@@ -2211,10 +2102,10 @@ async def protected_knowledge_graph(
 
 # Background Tasks
 @app.post("/api/v1/tasks/backup")
-async def trigger_backup(background_tasks: BackgroundTasks):
-    """Trigger a background backup task"""
+async def trigger_backup(background_tasks: BackgroundTasks) -> Any:
+    """Trigger a background backup task."""
 
-    async def run_backup():
+    async def run_backup() -> None:
         command = ["python", "-m", "src.main", "backup", "create"]
         await run_cli_command(command)
 
@@ -2228,8 +2119,8 @@ async def trigger_backup(background_tasks: BackgroundTasks):
 
 # === ERROR HANDLERS ===
 @app.exception_handler(HTTPException)
-async def http_exception_handler(request, exc):
-    """Custom HTTP exception handler with user-friendly messages"""
+async def http_exception_handler(request, exc) -> Any:
+    """Custom HTTP exception handler with user-friendly messages."""
     return JSONResponse(
         status_code=exc.status_code,
         content={
@@ -2242,8 +2133,8 @@ async def http_exception_handler(request, exc):
 
 
 @app.exception_handler(Exception)
-async def general_exception_handler(request, exc):
-    """General exception handler for unexpected errors"""
+async def general_exception_handler(request, exc) -> Any:
+    """General exception handler for unexpected errors."""
     logger.error(f"Unexpected error: {exc!s}")
     return JSONResponse(
         status_code=500,

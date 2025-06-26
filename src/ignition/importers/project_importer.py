@@ -65,9 +65,7 @@ class IgnitionProjectImporter:
             ImportResult with information about the import operation
         """
         start_time = datetime.now()
-        logger.info(
-            f"Starting project import from {import_path} with mode {mode.value}"
-        )
+        logger.info(f"Starting project import from {import_path} with mode {mode.value}")
 
         try:
             # Validate file exists

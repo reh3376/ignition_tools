@@ -40,9 +40,7 @@ class PackagingConfig:
 
     # Core packaging settings
     output_directory: Path = field(default_factory=lambda: Path("dist"))
-    temp_directory: Path = field(
-        default_factory=lambda: Path(tempfile.gettempdir()) / "ignition-packaging"
-    )
+    temp_directory: Path = field(default_factory=lambda: Path(tempfile.gettempdir()) / "ignition-packaging")
 
     # Module metadata
     module_name: str = ""
@@ -63,15 +61,9 @@ class PackagingConfig:
     validate_compatibility: bool = True
 
     # Environment variables with fallbacks
-    signing_cert_path: str = field(
-        default_factory=lambda: os.getenv("MODULE_SIGNING_CERT_PATH", "")
-    )
-    signing_key_path: str = field(
-        default_factory=lambda: os.getenv("MODULE_SIGNING_KEY_PATH", "")
-    )
-    repository_url: str = field(
-        default_factory=lambda: os.getenv("MODULE_REPOSITORY_URL", "")
-    )
+    signing_cert_path: str = field(default_factory=lambda: os.getenv("MODULE_SIGNING_CERT_PATH", ""))
+    signing_key_path: str = field(default_factory=lambda: os.getenv("MODULE_SIGNING_KEY_PATH", ""))
+    repository_url: str = field(default_factory=lambda: os.getenv("MODULE_REPOSITORY_URL", ""))
 
     def __post_init__(self) -> None:
         """Validate configuration after initialization."""
@@ -138,20 +130,10 @@ class ModulePackager:
         validation_results = {
             "java_available": self._check_java(),
             "gradle_available": self._check_gradle(),
-            "signing_cert_exists": bool(
-                self.config.signing_cert_path
-                and Path(self.config.signing_cert_path).exists()
-            ),
-            "signing_key_exists": bool(
-                self.config.signing_key_path
-                and Path(self.config.signing_key_path).exists()
-            ),
-            "output_directory_writable": self._check_directory_writable(
-                self.config.output_directory
-            ),
-            "temp_directory_writable": self._check_directory_writable(
-                self.config.temp_directory
-            ),
+            "signing_cert_exists": bool(self.config.signing_cert_path and Path(self.config.signing_cert_path).exists()),
+            "signing_key_exists": bool(self.config.signing_key_path and Path(self.config.signing_key_path).exists()),
+            "output_directory_writable": self._check_directory_writable(self.config.output_directory),
+            "temp_directory_writable": self._check_directory_writable(self.config.temp_directory),
         }
         return validation_results
 
@@ -180,9 +162,7 @@ class ModulePackager:
         env_validation = self.validate_environment()
         missing_requirements = [k for k, v in env_validation.items() if not v]
         if missing_requirements:
-            result.warnings.extend(
-                [f"Missing requirement: {req}" for req in missing_requirements]
-            )
+            result.warnings.extend([f"Missing requirement: {req}" for req in missing_requirements])
 
         try:
             with Progress(
@@ -211,9 +191,7 @@ class ModulePackager:
 
                 # Step 2: Create package metadata
                 metadata_task = progress.add_task("Creating metadata...", total=100)
-                metadata = self._create_package_metadata(
-                    project_path, result.module_file
-                )
+                metadata = self._create_package_metadata(project_path, result.module_file)
                 result.metadata_file = self._save_metadata(metadata)
                 progress.update(metadata_task, advance=50)
 
@@ -245,9 +223,7 @@ class ModulePackager:
                     "environment": env_validation,
                 }
 
-                self.console.print(
-                    f"✅ Successfully packaged module: {result.package_file}"
-                )
+                self.console.print(f"✅ Successfully packaged module: {result.package_file}")
 
         except Exception as e:
             result.errors.append(f"Packaging error: {e!s}")
@@ -255,9 +231,7 @@ class ModulePackager:
 
         return result
 
-    def package_multiple_modules(
-        self, project_paths: list[Path]
-    ) -> list[PackagingResult]:
+    def package_multiple_modules(self, project_paths: list[Path]) -> list[PackagingResult]:
         """Package multiple modules in batch.
 
         Args:
@@ -287,9 +261,7 @@ class ModulePackager:
     def _check_java(self) -> bool:
         """Check if Java is available."""
         try:
-            result = subprocess.run(
-                ["java", "-version"], capture_output=True, timeout=10
-            )
+            result = subprocess.run(["java", "-version"], capture_output=True, timeout=10)
             return result.returncode == 0
         except (subprocess.TimeoutExpired, FileNotFoundError):
             return False
@@ -297,9 +269,7 @@ class ModulePackager:
     def _check_gradle(self) -> bool:
         """Check if Gradle is available."""
         try:
-            result = subprocess.run(
-                ["gradle", "--version"], capture_output=True, timeout=10
-            )
+            result = subprocess.run(["gradle", "--version"], capture_output=True, timeout=10)
             return result.returncode == 0
         except (subprocess.TimeoutExpired, FileNotFoundError):
             return False
@@ -368,9 +338,7 @@ class ModulePackager:
                 "errors": [f"Build error: {e!s}"],
             }
 
-    def _create_package_metadata(
-        self, project_path: Path, module_file: Path
-    ) -> dict[str, Any]:
+    def _create_package_metadata(self, project_path: Path, module_file: Path) -> dict[str, Any]:
         """Create package metadata."""
         metadata = {
             "package_info": {
@@ -400,10 +368,7 @@ class ModulePackager:
 
     def _save_metadata(self, metadata: dict[str, Any]) -> Path:
         """Save package metadata to file."""
-        metadata_file = (
-            self.config.output_directory
-            / f"{metadata['package_info']['name']}-metadata.json"
-        )
+        metadata_file = self.config.output_directory / f"{metadata['package_info']['name']}-metadata.json"
 
         with open(metadata_file, "w", encoding="utf-8") as f:
             json.dump(metadata, f, indent=2, ensure_ascii=False)

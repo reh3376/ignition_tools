@@ -227,14 +227,10 @@ echo "✅ Post-commit analysis started"
                     "file_size",
                     "debt_score",
                 ]:
-                    print(
-                        f"❌ {result.gate_name} check failed for {file_path}: {result.message}"
-                    )
+                    print(f"❌ {result.gate_name} check failed for {file_path}: {result.message}")
                     all_passed = False
                 elif not result.passed:
-                    print(
-                        f"⚠️  {result.gate_name} warning for {file_path}: {result.message}"
-                    )
+                    print(f"⚠️  {result.gate_name} warning for {file_path}: {result.message}")
 
         return all_passed
 
@@ -283,9 +279,7 @@ echo "✅ Post-commit analysis started"
                         threshold=self.config.file_size_threshold,
                         message=f"File has {lines} lines (threshold: {self.config.file_size_threshold})",
                         details={"lines": lines},
-                        recommendations=(
-                            ["Consider refactoring large files"] if not passed else []
-                        ),
+                        recommendations=(["Consider refactoring large files"] if not passed else []),
                     )
                 )
 
@@ -301,9 +295,7 @@ echo "✅ Post-commit analysis started"
                         threshold=self.config.complexity_threshold,
                         message=f"Complexity score: {complexity:.1f} (threshold: {self.config.complexity_threshold})",
                         details={"complexity": complexity},
-                        recommendations=(
-                            ["Reduce cyclomatic complexity"] if not passed else []
-                        ),
+                        recommendations=(["Reduce cyclomatic complexity"] if not passed else []),
                     )
                 )
 
@@ -324,9 +316,7 @@ echo "✅ Post-commit analysis started"
                         threshold=self.config.debt_threshold,
                         message=f"Technical debt score: {debt_score:.2f} (threshold: {self.config.debt_threshold})",
                         details={"debt_score": debt_score},
-                        recommendations=(
-                            ["Address technical debt issues"] if not passed else []
-                        ),
+                        recommendations=(["Address technical debt issues"] if not passed else []),
                     )
                 )
 
@@ -341,9 +331,7 @@ echo "✅ Post-commit analysis started"
                     threshold=20.0,
                     message=f"Maintainability index: {maintainability:.1f}",
                     details={"maintainability": maintainability},
-                    recommendations=(
-                        ["Improve code maintainability"] if not passed else []
-                    ),
+                    recommendations=(["Improve code maintainability"] if not passed else []),
                 )
             )
 
@@ -362,9 +350,7 @@ echo "✅ Post-commit analysis started"
 
         return results
 
-    def generate_code_review_insights(
-        self, changed_files: list[str]
-    ) -> list[CodeReviewInsight]:
+    def generate_code_review_insights(self, changed_files: list[str]) -> list[CodeReviewInsight]:
         """Generate insights for code review assistance."""
         if not self.config.enable_review_assistance:
             return []
@@ -386,21 +372,16 @@ echo "✅ Post-commit analysis started"
                 related_files = impact_analysis.affected_files[:5]  # Top 5
 
                 # Generate suggestions
-                suggestions = self._generate_review_suggestions(
-                    file_path, impact_analysis
-                )
+                suggestions = self._generate_review_suggestions(file_path, impact_analysis)
 
                 # Generate test recommendations
-                test_recommendations = self._generate_test_recommendations(
-                    file_path, impact_analysis
-                )
+                test_recommendations = self._generate_test_recommendations(file_path, impact_analysis)
 
                 insight = CodeReviewInsight(
                     file_path=file_path,
                     change_type=change_type,
                     risk_level=risk_level,
-                    impact_score=len(impact_analysis.affected_files)
-                    / 10.0,  # Normalized impact
+                    impact_score=len(impact_analysis.affected_files) / 10.0,  # Normalized impact
                     complexity_change=0.0,  # Would need before/after analysis
                     debt_impact=0.0,  # Would need before/after analysis
                     suggestions=suggestions,
@@ -450,9 +431,7 @@ echo "✅ Post-commit analysis started"
         """Calculate risk level based on impact analysis."""
         return impact_analysis.risk_level
 
-    def _generate_review_suggestions(
-        self, file_path: str, impact_analysis: ChangeImpactAnalysis
-    ) -> list[str]:
+    def _generate_review_suggestions(self, file_path: str, impact_analysis: ChangeImpactAnalysis) -> list[str]:
         """Generate code review suggestions."""
         suggestions = []
 
@@ -462,9 +441,7 @@ echo "✅ Post-commit analysis started"
 
         # Breaking changes suggestions
         if impact_analysis.breaking_changes:
-            suggestions.append(
-                "Potential breaking changes detected - review API compatibility"
-            )
+            suggestions.append("Potential breaking changes detected - review API compatibility")
 
         # Test coverage suggestions
         if impact_analysis.test_coverage_gaps:
@@ -481,9 +458,7 @@ echo "✅ Post-commit analysis started"
 
         return suggestions
 
-    def _generate_test_recommendations(
-        self, file_path: str, impact_analysis: ChangeImpactAnalysis
-    ) -> list[str]:
+    def _generate_test_recommendations(self, file_path: str, impact_analysis: ChangeImpactAnalysis) -> list[str]:
         """Generate test recommendations."""
         recommendations = []
 
@@ -493,9 +468,7 @@ echo "✅ Post-commit analysis started"
 
         # Dependency-based recommendations
         if impact_analysis.affected_files:
-            recommendations.append(
-                f"Test interactions with {len(impact_analysis.affected_files)} dependent files"
-            )
+            recommendations.append(f"Test interactions with {len(impact_analysis.affected_files)} dependent files")
 
         # Breaking changes recommendations
         if impact_analysis.breaking_changes:
@@ -505,7 +478,7 @@ echo "✅ Post-commit analysis started"
 
     def create_workflow_report(self, changed_files: list[str]) -> dict[str, Any]:
         """Create a comprehensive workflow report."""
-        report = {
+        report: dict[str, Any] = {
             "timestamp": datetime.now().isoformat(),
             "files_analyzed": len(changed_files),
             "quality_gates": {},
@@ -555,19 +528,13 @@ echo "✅ Post-commit analysis started"
 
         # Global recommendations
         if insights:
-            high_risk_files = [
-                i for i in insights if i.risk_level in ["high", "critical"]
-            ]
+            high_risk_files = [i for i in insights if i.risk_level in ["high", "critical"]]
             if high_risk_files:
-                report["recommendations"].append(
-                    f"Review {len(high_risk_files)} high-risk files carefully"
-                )
+                report["recommendations"].append(f"Review {len(high_risk_files)} high-risk files carefully")
 
             avg_impact = sum(i.impact_score for i in insights) / len(insights)
             if avg_impact > 0.5:
-                report["recommendations"].append(
-                    "Consider staging deployment due to high impact"
-                )
+                report["recommendations"].append("Consider staging deployment due to high impact")
 
         return report
 

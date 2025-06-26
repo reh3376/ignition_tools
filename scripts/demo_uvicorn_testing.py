@@ -64,9 +64,7 @@ class UvicornAPIDemo:
                 )
 
             print("Starting server in background...")
-            self.server_process = subprocess.Popen(
-                cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
-            )
+            self.server_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
             # Wait for server to start
             print("Waiting for server to initialize...")
@@ -114,12 +112,8 @@ class UvicornAPIDemo:
                     print(f"   URL: {self.server_url}{endpoint}")
                     if endpoint == "/openapi.json":
                         data = response.json()
-                        print(
-                            f"   API Title: {data.get('info', {}).get('title', 'N/A')}"
-                        )
-                        print(
-                            f"   API Version: {data.get('info', {}).get('version', 'N/A')}"
-                        )
+                        print(f"   API Title: {data.get('info', {}).get('title', 'N/A')}")
+                        print(f"   API Version: {data.get('info', {}).get('version', 'N/A')}")
                         print(f"   Endpoints: {len(data.get('paths', {}))}")
                 else:
                     print(f"❌ Failed: HTTP {response.status_code}")
@@ -176,9 +170,7 @@ class UvicornAPIDemo:
         }
 
         try:
-            response = requests.post(
-                f"{self.server_url}/chat", json=payload, timeout=30
-            )
+            response = requests.post(f"{self.server_url}/chat", json=payload, timeout=30)
             print(f"Status Code: {response.status_code}")
             if response.status_code == 200:
                 data = response.json()
@@ -217,9 +209,7 @@ class UvicornAPIDemo:
         for test_case in test_cases:
             self.print_step(f"Testing {test_case['name']}")
             try:
-                response = requests.post(
-                    f"{self.server_url}/chat", json=test_case["payload"], timeout=10
-                )
+                response = requests.post(f"{self.server_url}/chat", json=test_case["payload"], timeout=10)
                 expected_status = test_case["expected"]
                 actual_status = response.status_code
 
@@ -231,9 +221,7 @@ class UvicornAPIDemo:
                 if actual_status == 422:
                     try:
                         error_data = response.json()
-                        print(
-                            f"   Validation error: {error_data.get('detail', 'Unknown')}"
-                        )
+                        print(f"   Validation error: {error_data.get('detail', 'Unknown')}")
                     except (ValueError, requests.exceptions.JSONDecodeError):
                         print(f"   Raw error: {response.text[:100]}")
 

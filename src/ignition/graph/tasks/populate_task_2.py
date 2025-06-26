@@ -143,9 +143,7 @@ def populate_database_system_functions() -> bool:
                 CREATE (f)-[:AVAILABLE_IN]->(s)
                 """
 
-                db_manager.execute_query(
-                    create_scope_query, {"func_name": func["name"], "scope_name": scope}
-                )
+                db_manager.execute_query(create_scope_query, {"func_name": func["name"], "scope_name": scope})
 
             # Create common pattern relationships
             for pattern in func["common_patterns"]:
@@ -207,9 +205,7 @@ def populate_database_system_functions() -> bool:
         result = db_manager.execute_query(verify_query)
         function_count = result[0]["function_count"]
 
-        logger.info(
-            f"Successfully populated {function_count} database system functions"
-        )
+        logger.info(f"Successfully populated {function_count} database system functions")
 
         # Get relationship counts
         rel_query = """

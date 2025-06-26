@@ -31,15 +31,9 @@ class RepositoryConfig:
     """Configuration for repository management operations."""
 
     # Repository settings
-    repository_url: str = field(
-        default_factory=lambda: os.getenv("MODULE_REPOSITORY_URL", "")
-    )
-    api_token: str = field(
-        default_factory=lambda: os.getenv("REPOSITORY_API_TOKEN", "")
-    )
-    repository_name: str = field(
-        default_factory=lambda: os.getenv("REPOSITORY_NAME", "ignition-modules")
-    )
+    repository_url: str = field(default_factory=lambda: os.getenv("MODULE_REPOSITORY_URL", ""))
+    api_token: str = field(default_factory=lambda: os.getenv("REPOSITORY_API_TOKEN", ""))
+    repository_name: str = field(default_factory=lambda: os.getenv("REPOSITORY_NAME", "ignition-modules"))
 
     # Upload settings
     upload_timeout: int = 300  # 5 minutes
@@ -132,9 +126,7 @@ class RepositoryManager:
 
         # Configure session with authentication
         if self.config.api_token:
-            self.session.headers.update(
-                {"Authorization": f"Bearer {self.config.api_token}"}
-            )
+            self.session.headers.update({"Authorization": f"Bearer {self.config.api_token}"})
         elif self.config.username and self.config.password:
             self.session.auth = (self.config.username, self.config.password)
 
@@ -142,15 +134,9 @@ class RepositoryManager:
         """Validate repository environment following crawl_mcp.py patterns."""
         validation_results = {
             "repository_url_valid": False,
-            "authentication_configured": bool(
-                self.config.api_token or (self.config.username and self.config.password)
-            ),
-            "download_directory_writable": self._check_directory_writable(
-                self.config.download_directory
-            ),
-            "cache_directory_writable": self._check_directory_writable(
-                self.config.cache_directory
-            ),
+            "authentication_configured": bool(self.config.api_token or (self.config.username and self.config.password)),
+            "download_directory_writable": self._check_directory_writable(self.config.download_directory),
+            "cache_directory_writable": self._check_directory_writable(self.config.cache_directory),
             "repository_accessible": False,
         }
 
@@ -161,15 +147,11 @@ class RepositoryManager:
 
             # Test repository accessibility
             if url_validation["valid"]:
-                validation_results["repository_accessible"] = (
-                    self._test_repository_connection()
-                )
+                validation_results["repository_accessible"] = self._test_repository_connection()
 
         return validation_results
 
-    def upload_module(
-        self, package_path: Path, metadata: dict[str, Any] | None = None
-    ) -> RepositoryResult:
+    def upload_module(self, package_path: Path, metadata: dict[str, Any] | None = None) -> RepositoryResult:
         """Upload a module package to the repository."""
         result = RepositoryResult(success=False)
 
@@ -180,37 +162,25 @@ class RepositoryManager:
 
         # Validate environment
         validation_results = self.validate_environment()
-        missing_requirements = [
-            req for req, valid in validation_results.items() if not valid
-        ]
+        missing_requirements = [req for req, valid in validation_results.items() if not valid]
 
         if missing_requirements:
-            result.warnings.extend(
-                [f"Environment issue: {req}" for req in missing_requirements]
-            )
+            result.warnings.extend([f"Environment issue: {req}" for req in missing_requirements])
 
             # Check for critical missing requirements
             critical_missing = [
-                req
-                for req in missing_requirements
-                if req in ["repository_url_valid", "authentication_configured"]
+                req for req in missing_requirements if req in ["repository_url_valid", "authentication_configured"]
             ]
             if critical_missing:
-                result.errors.extend(
-                    [f"Critical requirement missing: {req}" for req in critical_missing]
-                )
+                result.errors.extend([f"Critical requirement missing: {req}" for req in critical_missing])
                 return result
 
         try:
-            with console.status(
-                f"[bold green]Uploading {package_path.name}...", spinner="dots"
-            ):
+            with console.status(f"[bold green]Uploading {package_path.name}...", spinner="dots"):
                 # Prepare upload data
                 upload_data = {
                     "name": package_path.stem,
-                    "version": (
-                        metadata.get("version", "1.0.0") if metadata else "1.0.0"
-                    ),
+                    "version": (metadata.get("version", "1.0.0") if metadata else "1.0.0"),
                     "description": metadata.get("description", "") if metadata else "",
                     "author": metadata.get("author", "") if metadata else "",
                     "tags": metadata.get("tags", []) if metadata else [],
@@ -223,9 +193,7 @@ class RepositoryManager:
                     return result
 
                 # Upload file
-                upload_url = urljoin(
-                    self.config.repository_url, "api/v1/modules/upload"
-                )
+                upload_url = urljoin(self.config.repository_url, "api/v1/modules/upload")
 
                 with open(package_path, "rb") as f:
                     files = {"file": (package_path.name, f, "application/octet-stream")}
@@ -250,14 +218,10 @@ class RepositoryManager:
                         "response_status": response.status_code,
                     }
 
-                    self.console.print(
-                        f"✅ Successfully uploaded module: {package_path.name}"
-                    )
+                    self.console.print(f"✅ Successfully uploaded module: {package_path.name}")
 
                 else:
-                    result.errors.append(
-                        f"Upload failed with status {response.status_code}: {response.text}"
-                    )
+                    result.errors.append(f"Upload failed with status {response.status_code}: {response.text}")
 
         except requests.exceptions.RequestException as e:
             result.errors.append(f"Upload request error: {e!s}")
@@ -266,9 +230,7 @@ class RepositoryManager:
 
         return result
 
-    def download_module(
-        self, module_name: str, version: str | None = None
-    ) -> RepositoryResult:
+    def download_module(self, module_name: str, version: str | None = None) -> RepositoryResult:
         """Download a module from the repository.
 
         Args:
@@ -306,9 +268,7 @@ class RepositoryManager:
                     result.errors.append("No download URL available for module")
                     return result
 
-                response = self.session.get(
-                    download_url, stream=True, timeout=self.config.upload_timeout
-                )
+                response = self.session.get(download_url, stream=True, timeout=self.config.upload_timeout)
 
                 if response.status_code == 200:
                     # Determine filename
@@ -325,9 +285,7 @@ class RepositoryManager:
 
                     # Download with progress
                     with open(file_path, "wb") as f:
-                        for chunk in response.iter_content(
-                            chunk_size=self.config.chunk_size
-                        ):
+                        for chunk in response.iter_content(chunk_size=self.config.chunk_size):
                             if chunk:
                                 f.write(chunk)
 
@@ -341,14 +299,10 @@ class RepositoryManager:
                         "response_status": response.status_code,
                     }
 
-                    self.console.print(
-                        f"✅ Successfully downloaded module: {file_path}"
-                    )
+                    self.console.print(f"✅ Successfully downloaded module: {file_path}")
 
                 else:
-                    result.errors.append(
-                        f"Download failed with status {response.status_code}: {response.text}"
-                    )
+                    result.errors.append(f"Download failed with status {response.status_code}: {response.text}")
 
         except requests.exceptions.RequestException as e:
             result.errors.append(f"Download request error: {e!s}")
@@ -357,9 +311,7 @@ class RepositoryManager:
 
         return result
 
-    def get_module_info(
-        self, module_name: str, version: str | None = None
-    ) -> RepositoryResult:
+    def get_module_info(self, module_name: str, version: str | None = None) -> RepositoryResult:
         """Get information about a module from the repository.
 
         Args:
@@ -373,9 +325,7 @@ class RepositoryManager:
 
         try:
             # Build API URL
-            api_url = urljoin(
-                self.config.repository_url, f"api/v1/modules/{module_name}"
-            )
+            api_url = urljoin(self.config.repository_url, f"api/v1/modules/{module_name}")
             if version:
                 api_url += f"/{version}"
 
@@ -395,9 +345,7 @@ class RepositoryManager:
             elif response.status_code == 404:
                 result.errors.append(f"Module not found: {module_name}")
             else:
-                result.errors.append(
-                    f"API request failed with status {response.status_code}: {response.text}"
-                )
+                result.errors.append(f"API request failed with status {response.status_code}: {response.text}")
 
         except requests.exceptions.RequestException as e:
             result.errors.append(f"API request error: {e!s}")
@@ -438,9 +386,7 @@ class RepositoryManager:
                 }
 
             else:
-                result.errors.append(
-                    f"list request failed with status {response.status_code}: {response.text}"
-                )
+                result.errors.append(f"list request failed with status {response.status_code}: {response.text}")
 
         except requests.exceptions.RequestException as e:
             result.errors.append(f"list request error: {e!s}")
@@ -449,9 +395,7 @@ class RepositoryManager:
 
         return result
 
-    def delete_module(
-        self, module_name: str, version: str | None = None
-    ) -> RepositoryResult:
+    def delete_module(self, module_name: str, version: str | None = None) -> RepositoryResult:
         """Delete a module from the repository.
 
         Args:
@@ -465,9 +409,7 @@ class RepositoryManager:
 
         try:
             # Build API URL
-            api_url = urljoin(
-                self.config.repository_url, f"api/v1/modules/{module_name}"
-            )
+            api_url = urljoin(self.config.repository_url, f"api/v1/modules/{module_name}")
             if version:
                 api_url += f"/{version}"
 
@@ -485,9 +427,7 @@ class RepositoryManager:
             elif response.status_code == 404:
                 result.errors.append(f"Module not found: {module_name}")
             else:
-                result.errors.append(
-                    f"Delete request failed with status {response.status_code}: {response.text}"
-                )
+                result.errors.append(f"Delete request failed with status {response.status_code}: {response.text}")
 
         except requests.exceptions.RequestException as e:
             result.errors.append(f"Delete request error: {e!s}")

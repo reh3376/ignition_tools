@@ -1,4 +1,4 @@
-"""Phase 10.3: Advanced Analytics Platform Module
+"""Phase 10.3: Advanced Analytics Platform Module.
 
 This module implements real-time analytics, machine learning, predictive maintenance,
 business intelligence, and IoT edge computing integration following crawl_mcp.py methodology.
@@ -104,13 +104,11 @@ class AdvancedAnalyticsPlatformModule:
             self._initialize_components()
 
     def _validate_environment_variables(self) -> dict[str, Any]:
-        """Step 1: Environment Variable Validation First
+        """Step 1: Environment Variable Validation First.
 
         Validate analytics platform environment variables following crawl_mcp.py patterns.
         """
-        self.console.print(
-            "🔍 Advanced Analytics Platform: Environment Validation", style="bold blue"
-        )
+        self.console.print("🔍 Advanced Analytics Platform: Environment Validation", style="bold blue")
 
         required_vars = {
             "ANALYTICS_DATABASE_URL": {
@@ -191,7 +189,7 @@ class AdvancedAnalyticsPlatformModule:
     def _validate_single_environment_variable(
         self, var_name: str, var_config: dict[str, Any]
     ) -> AnalyticsValidationResult:
-        """Step 2: Comprehensive Input Validation
+        """Step 2: Comprehensive Input Validation.
 
         Validate a single environment variable with comprehensive checks.
         """
@@ -251,26 +249,19 @@ class AdvancedAnalyticsPlatformModule:
             details={"value": value},
         )
 
-    def _validate_format(
-        self, value: str, format_type: str, var_name: str
-    ) -> AnalyticsValidationResult:
+    def _validate_format(self, value: str, format_type: str, var_name: str) -> AnalyticsValidationResult:
         """Validate specific format types."""
-        if format_type == "url":
-            if not (
-                value.startswith("http://")
-                or value.startswith("https://")
-                or "://" in value
-            ):
-                return AnalyticsValidationResult(
-                    valid=False,
-                    component=var_name,
-                    message=f"Invalid URL format for {var_name}: {value}",
-                    error=f"Invalid URL format: {value}",
-                    recommendations=[
-                        "URL should start with http://, https://, or contain ://",
-                        f"Current value: {value}",
-                    ],
-                )
+        if format_type == "url" and not (value.startswith("http://") or value.startswith("https://") or "://" in value):
+            return AnalyticsValidationResult(
+                valid=False,
+                component=var_name,
+                message=f"Invalid URL format for {var_name}: {value}",
+                error=f"Invalid URL format: {value}",
+                recommendations=[
+                    "URL should start with http://, https://, or contain ://",
+                    f"Current value: {value}",
+                ],
+            )
 
         return AnalyticsValidationResult(
             valid=True,
@@ -279,7 +270,7 @@ class AdvancedAnalyticsPlatformModule:
         )
 
     def _load_and_validate_config(self) -> AnalyticsConfig:
-        """Step 2: Comprehensive Input Validation
+        """Step 2: Comprehensive Input Validation.
 
         Load and validate analytics configuration.
         """
@@ -289,28 +280,16 @@ class AdvancedAnalyticsPlatformModule:
             real_time_streaming_url=os.getenv("REAL_TIME_STREAMING_URL"),
             business_intelligence_url=os.getenv("BUSINESS_INTELLIGENCE_URL"),
             iot_edge_gateway_url=os.getenv("IOT_EDGE_GATEWAY_URL"),
-            real_time_processing_enabled=os.getenv(
-                "REAL_TIME_PROCESSING_ENABLED", "true"
-            ).lower()
-            == "true",
-            machine_learning_enabled=os.getenv(
-                "MACHINE_LEARNING_ENABLED", "true"
-            ).lower()
-            == "true",
-            predictive_maintenance_enabled=os.getenv(
-                "PREDICTIVE_MAINTENANCE_ENABLED", "false"
-            ).lower()
-            == "true",
-            edge_computing_enabled=os.getenv("EDGE_COMPUTING_ENABLED", "false").lower()
-            == "true",
+            real_time_processing_enabled=os.getenv("REAL_TIME_PROCESSING_ENABLED", "true").lower() == "true",
+            machine_learning_enabled=os.getenv("MACHINE_LEARNING_ENABLED", "true").lower() == "true",
+            predictive_maintenance_enabled=os.getenv("PREDICTIVE_MAINTENANCE_ENABLED", "false").lower() == "true",
+            edge_computing_enabled=os.getenv("EDGE_COMPUTING_ENABLED", "false").lower() == "true",
         )
 
         # Validate configuration consistency
         validation_errors = self._validate_config_consistency(config)
         if validation_errors:
-            self.logger.warning(
-                f"Configuration validation warnings: {validation_errors}"
-            )
+            self.logger.warning(f"Configuration validation warnings: {validation_errors}")
 
         return config
 
@@ -319,13 +298,8 @@ class AdvancedAnalyticsPlatformModule:
         errors = []
 
         # Validate feature dependencies
-        if (
-            config.predictive_maintenance_enabled
-            and not config.machine_learning_enabled
-        ):
-            errors.append(
-                "Predictive maintenance requires machine learning to be enabled"
-            )
+        if config.predictive_maintenance_enabled and not config.machine_learning_enabled:
+            errors.append("Predictive maintenance requires machine learning to be enabled")
 
         if config.edge_computing_enabled and not config.iot_edge_gateway_url:
             errors.append("Edge computing requires IoT edge gateway URL")
@@ -333,9 +307,7 @@ class AdvancedAnalyticsPlatformModule:
         # Validate URL consistency
         if config.analytics_database_url and config.business_intelligence_url:
             if config.analytics_database_url == config.business_intelligence_url:
-                errors.append(
-                    "Analytics database and BI dashboard should have different URLs"
-                )
+                errors.append("Analytics database and BI dashboard should have different URLs")
 
         return errors
 
@@ -347,17 +319,13 @@ class AdvancedAnalyticsPlatformModule:
             self.bi_dashboard = BIDashboard(self.config)
             self.iot_gateway = IoTGateway(self.config)
 
-            self.logger.info(
-                "Advanced Analytics Platform components initialized successfully"
-            )
+            self.logger.info("Advanced Analytics Platform components initialized successfully")
 
         except Exception as e:
             self.logger.error(f"Failed to initialize analytics components: {e}")
             raise
 
-    def _display_environment_validation(
-        self, validation_results: dict[str, Any]
-    ) -> Any:
+    def _display_environment_validation(self, validation_results: dict[str, Any]) -> Any:
         """Display environment validation results in a formatted table."""
         table = Table(title="Advanced Analytics Platform - Environment Validation")
         table.add_column("Variable", style="cyan")
@@ -392,9 +360,7 @@ class AdvancedAnalyticsPlatformModule:
         """Public method to get environment validation results."""
         return self.env_validation
 
-    def deploy_analytics_platform(
-        self, complexity_level: str = "basic"
-    ) -> dict[str, Any]:
+    def deploy_analytics_platform(self, complexity_level: str = "basic") -> dict[str, Any]:
         """Step 4: Deploy analytics platform with progressive complexity.
 
         Following crawl_mcp.py methodology for deployment.
@@ -549,7 +515,7 @@ class AdvancedAnalyticsPlatformModule:
             return {"success": False, "message": f"Unknown deployment step: {step}"}
 
     def _format_deployment_error(self, error: Exception) -> str:
-        """Step 3: Error Handling and User-Friendly Messages
+        """Step 3: Error Handling and User-Friendly Messages.
 
         Format deployment errors for user-friendly display.
         """
@@ -562,14 +528,12 @@ class AdvancedAnalyticsPlatformModule:
         }
 
         error_type = type(error).__name__
-        user_friendly_message = error_mappings.get(
-            error_type, f"Deployment error: {error!s}"
-        )
+        user_friendly_message = error_mappings.get(error_type, f"Deployment error: {error!s}")
 
         return user_friendly_message
 
     def cleanup_resources(self) -> Any:
-        """Step 6: Resource Management and Cleanup
+        """Step 6: Resource Management and Cleanup.
 
         Clean up allocated resources.
         """

@@ -19,9 +19,7 @@ from pathlib import Path
 from typing import Any
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -76,9 +74,7 @@ class Phase114ComprehensiveTester:
 
                 # Log category summary
                 status = "✅ PASSED" if category_results["failed"] == 0 else "❌ FAILED"
-                logger.info(
-                    f"{status} - {category_results['passed']}/{category_results['total']} tests passed"
-                )
+                logger.info(f"{status} - {category_results['passed']}/{category_results['total']} tests passed")
 
             except Exception as e:
                 logger.error(f"❌ Category '{category_name}' failed with error: {e}")
@@ -135,9 +131,7 @@ class Phase114ComprehensiveTester:
                     assert hasattr(module, "validate_proactive_development_environment")
                 elif "enhanced_code_intelligence" in test_name:
                     assert hasattr(module, "EnhancedCodeIntelligence")
-                    assert hasattr(
-                        module, "validate_enhanced_code_intelligence_environment"
-                    )
+                    assert hasattr(module, "validate_enhanced_code_intelligence_environment")
                 elif "advanced_cli_commands" in test_name:
                     assert hasattr(module, "get_advanced_commands")
 
@@ -238,16 +232,12 @@ class Phase114ComprehensiveTester:
                 results["details"].append("✅ Troubleshooting functionality works")
             except Exception as e:
                 results["failed"] += 1
-                results["details"].append(
-                    f"❌ Troubleshooting functionality failed: {e}"
-                )
+                results["details"].append(f"❌ Troubleshooting functionality failed: {e}")
 
         except ImportError as e:
             results["total"] += 1
             results["failed"] += 1
-            results["details"].append(
-                f"❌ Failed to import specialized domain expertise: {e}"
-            )
+            results["details"].append(f"❌ Failed to import specialized domain expertise: {e}")
 
         return results
 
@@ -342,9 +332,7 @@ class Phase114ComprehensiveTester:
         except ImportError as e:
             results["total"] += 1
             results["failed"] += 1
-            results["details"].append(
-                f"❌ Failed to import proactive development assistance: {e}"
-            )
+            results["details"].append(f"❌ Failed to import proactive development assistance: {e}")
 
         return results
 
@@ -362,9 +350,7 @@ class Phase114ComprehensiveTester:
             # Test 1: Environment validation
             results["total"] += 1
             try:
-                validation_result = (
-                    await validate_enhanced_code_intelligence_environment()
-                )
+                validation_result = await validate_enhanced_code_intelligence_environment()
                 assert isinstance(validation_result, dict)
                 assert "valid" in validation_result
                 results["passed"] += 1
@@ -485,9 +471,7 @@ def simple_function():
         except ImportError as e:
             results["total"] += 1
             results["failed"] += 1
-            results["details"].append(
-                f"❌ Failed to import enhanced code intelligence: {e}"
-            )
+            results["details"].append(f"❌ Failed to import enhanced code intelligence: {e}")
 
         return results
 
@@ -523,9 +507,7 @@ def simple_function():
                 command_names = list(commands.commands.keys())
                 expected_groups = ["domain", "assist", "code", "status"]
 
-                found_groups = [
-                    name for name in expected_groups if name in command_names
-                ]
+                found_groups = [name for name in expected_groups if name in command_names]
                 assert len(found_groups) >= 3  # At least 3 groups should be present
 
                 results["passed"] += 1
@@ -544,9 +526,7 @@ def simple_function():
                     domain_group = commands.commands["domain"]
                     domain_commands = list(domain_group.commands.keys())
                     expected_domain = ["validate-env", "info", "query", "troubleshoot"]
-                    found_domain = [
-                        cmd for cmd in expected_domain if cmd in domain_commands
-                    ]
+                    found_domain = [cmd for cmd in expected_domain if cmd in domain_commands]
                     assert len(found_domain) >= 2
 
                 results["passed"] += 1
@@ -603,9 +583,7 @@ def simple_function():
                     results["details"].append("✅ Phase 11.4 documented in roadmap")
                 else:
                     results["failed"] += 1
-                    results["details"].append(
-                        "❌ Phase 11.4 not properly documented in roadmap"
-                    )
+                    results["details"].append("❌ Phase 11.4 not properly documented in roadmap")
             else:
                 results["failed"] += 1
                 results["details"].append("❌ Roadmap file not found")
@@ -632,14 +610,10 @@ def simple_function():
 
             if docstring_count >= 2:
                 results["passed"] += 1
-                results["details"].append(
-                    f"✅ Docstrings found in {docstring_count} modules"
-                )
+                results["details"].append(f"✅ Docstrings found in {docstring_count} modules")
             else:
                 results["failed"] += 1
-                results["details"].append(
-                    f"❌ Insufficient docstrings found ({docstring_count})"
-                )
+                results["details"].append(f"❌ Insufficient docstrings found ({docstring_count})")
         except Exception as e:
             results["failed"] += 1
             results["details"].append(f"❌ Docstring check failed: {e}")
@@ -675,8 +649,7 @@ def simple_function():
             intelligence_init = await intelligence.initialize()
 
             assert all(
-                result.get("status") == "success"
-                for result in [expertise_init, assistance_init, intelligence_init]
+                result.get("status") == "success" for result in [expertise_init, assistance_init, intelligence_init]
             )
 
             results["passed"] += 1
@@ -744,20 +717,14 @@ def simple_function():
             if requirements_path.exists():
                 content = requirements_path.read_text()
                 required_in_file = ["click", "asyncio"]  # Basic requirements
-                found_requirements = [
-                    req for req in required_in_file if req in content.lower()
-                ]
+                found_requirements = [req for req in required_in_file if req in content.lower()]
 
                 if len(found_requirements) >= 1:
                     results["passed"] += 1
-                    results["details"].append(
-                        "✅ Requirements.txt contains needed packages"
-                    )
+                    results["details"].append("✅ Requirements.txt contains needed packages")
                 else:
                     results["failed"] += 1
-                    results["details"].append(
-                        "❌ Requirements.txt missing needed packages"
-                    )
+                    results["details"].append("❌ Requirements.txt missing needed packages")
             else:
                 results["failed"] += 1
                 results["details"].append("❌ Requirements.txt not found")
@@ -804,11 +771,10 @@ def simple_function():
 
             # Check for common environment variables (they don't need to be set)
             env_vars = ["NEO4J_URI", "NEO4J_USER", "NEO4J_PASSWORD"]
-            env_support = True
 
             for var in env_vars:
                 # Just test that os.getenv works
-                value = os.getenv(var)
+                os.getenv(var)
                 # Value can be None, we're just testing the mechanism
 
             results["passed"] += 1
@@ -841,15 +807,11 @@ def simple_function():
         logger.info("\n📋 Category Breakdown:")
         for category, results in self.test_results["test_categories"].items():
             status = "✅" if results["failed"] == 0 else "❌"
-            logger.info(
-                f"   {status} {category}: {results['passed']}/{results['total']}"
-            )
+            logger.info(f"   {status} {category}: {results['passed']}/{results['total']}")
 
         # Detailed results for failed tests
         failed_categories = [
-            (cat, res)
-            for cat, res in self.test_results["test_categories"].items()
-            if res["failed"] > 0
+            (cat, res) for cat, res in self.test_results["test_categories"].items() if res["failed"] > 0
         ]
 
         if failed_categories:
@@ -862,13 +824,9 @@ def simple_function():
 
         # Success message
         if failed_tests == 0:
-            logger.info(
-                "\n🎉 ALL TESTS PASSED! Phase 11.4 implementation is complete and functional."
-            )
+            logger.info("\n🎉 ALL TESTS PASSED! Phase 11.4 implementation is complete and functional.")
         else:
-            logger.info(
-                f"\n⚠️  {failed_tests} test(s) failed. Please review and fix the issues above."
-            )
+            logger.info(f"\n⚠️  {failed_tests} test(s) failed. Please review and fix the issues above.")
 
         # Save detailed report
         report_path = self.base_path / "phase_11_4_test_report.json"
@@ -896,9 +854,7 @@ async def main():
             print("\n✅ All tests passed! Phase 11.4 is ready for deployment.")
             sys.exit(0)
         else:
-            print(
-                f"\n❌ {results['failed_tests']} test(s) failed. Please review the issues."
-            )
+            print(f"\n❌ {results['failed_tests']} test(s) failed. Please review the issues.")
             sys.exit(1)
 
     except Exception as e:

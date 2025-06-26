@@ -166,13 +166,13 @@ class DockerConfig(BaseModel):
     restart_policy: str = Field(default="unless-stopped", description="Restart policy")
 
     @validator("image_name")
-    def validate_image_name(cls, v):
+    def validate_image_name(cls, v) -> Any:
         if not v or not isinstance(v, str):
             raise ValueError("Image name must be a non-empty string")
         return v
 
     @validator("restart_policy")
-    def validate_restart_policy(cls, v):
+    def validate_restart_policy(cls, v) -> Any:
         valid_policies = ["no", "always", "unless-stopped", "on-failure"]
         if v not in valid_policies:
             raise ValueError(f"Restart policy must be one of: {valid_policies}")
@@ -207,7 +207,7 @@ class DeploymentConfig(BaseModel):
     )
 
     @validator("environment")
-    def validate_environment(cls, v):
+    def validate_environment(cls, v) -> Any:
         valid_environments = ["development", "staging", "production"]
         if v not in valid_environments:
             raise ValueError(f"Environment must be one of: {valid_environments}")
@@ -445,7 +445,7 @@ class DeploymentManager:
                 container = self._docker_client.containers.get(container_name)
                 container.reload()
 
-                health_results = {
+                health_results: Any = {
                     "container_running": container.status == "running",
                     "health_check_passed": False,
                     "response_time": None,
@@ -539,7 +539,7 @@ class DeploymentManager:
 class Phase126ComprehensiveTester:
     """Comprehensive testing suite for Phase 12.6 deployment infrastructure."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.test_results = []
 
     async def run_comprehensive_tests(self) -> dict[str, Any]:
@@ -692,7 +692,7 @@ class Phase126ComprehensiveTester:
             )
 
             # Validate configuration
-            config_valid = (
+config_valid: list[Any] | str =  (
                 isinstance(health_config.endpoint, str) and health_config.interval > 0
             )
 
@@ -932,7 +932,7 @@ async def run_phase_12_6_implementation() -> dict[str, Any]:
 
 
 @asynccontextmanager
-async def deployment_context(config: DeploymentConfig):
+async def deployment_context(config: DeploymentConfig) -> None:
     """Async context manager for deployment operations."""
     manager = DeploymentManager(config)
     try:
@@ -947,7 +947,7 @@ async def deployment_context(config: DeploymentConfig):
 
 
 # Main execution function
-async def main():
+async def main() -> Any:
     """Main execution function for Phase 12.6."""
     results = await run_phase_12_6_implementation()
 

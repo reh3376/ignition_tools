@@ -45,7 +45,7 @@ class PatternAnalyzer:
         Returns:
             Dictionary containing analysis results for all pattern types
         """
-        results = {
+        results: dict[str, Any] = {
             "analysis_timestamp": datetime.now().isoformat(),
             "days_analyzed": days_back,
             "patterns": {},
@@ -70,14 +70,10 @@ class PatternAnalyzer:
         # Store patterns in database
         self._store_patterns(results)
 
-        logger.info(
-            f"Pattern analysis completed: {len(results['patterns'])} pattern types analyzed"
-        )
+        logger.info(f"Pattern analysis completed: {len(results['patterns'])} pattern types analyzed")
         return results
 
-    def analyze_function_co_occurrence(
-        self, days_back: int = 30
-    ) -> list[dict[str, Any]]:
+    def analyze_function_co_occurrence(self, days_back: int = 30) -> list[dict[str, Any]]:
         """Analyze which functions are commonly used together in sessions.
 
         Args:
@@ -130,15 +126,10 @@ class PatternAnalyzer:
             confidence_2_to_1 = count / function_counts[func2]
 
             # Calculate lift (how much more likely they are together vs. independently)
-            expected_together = (function_counts[func1] / total_sessions) * (
-                function_counts[func2] / total_sessions
-            )
+            expected_together = (function_counts[func1] / total_sessions) * (function_counts[func2] / total_sessions)
             lift = support / expected_together if expected_together > 0 else 0
 
-            if (
-                confidence_1_to_2 >= self.min_confidence
-                or confidence_2_to_1 >= self.min_confidence
-            ):
+            if confidence_1_to_2 >= self.min_confidence or confidence_2_to_1 >= self.min_confidence:
                 patterns.append(
                     {
                         "pattern_id": str(uuid.uuid4()),
@@ -197,9 +188,7 @@ class PatternAnalyzer:
             avg_time = record["avg_execution_time"] or 0
 
             # Analyze parameter patterns
-            parameter_patterns = self._analyze_template_parameters(
-                record["all_parameters"]
-            )
+            parameter_patterns = self._analyze_template_parameters(record["all_parameters"])
 
             patterns.append(
                 {
@@ -247,9 +236,7 @@ class PatternAnalyzer:
             if key and record["parameters"]:
                 try:
                     params = json.loads(record["parameters"])
-                    param_groups[key].append(
-                        {"parameters": params, "success": record["success"]}
-                    )
+                    param_groups[key].append({"parameters": params, "success": record["success"]})
                 except json.JSONDecodeError:
                     continue
 
@@ -274,9 +261,7 @@ class PatternAnalyzer:
 
             # Generate patterns for common parameter keys
             for key, count in key_counter.items():
-                if (
-                    count < len(param_list) * 0.3
-                ):  # Must appear in at least 30% of usages
+                if count < len(param_list) * 0.3:  # Must appear in at least 30% of usages
                     continue
 
                 frequency = count / len(param_list)
@@ -464,9 +449,7 @@ class PatternAnalyzer:
                             "support": support,
                             "pattern_data": json.dumps(pattern),
                             "created_date": datetime.now().isoformat(),
-                            "usage_count": pattern.get(
-                                "usage_count", pattern.get("frequency", 1)
-                            ),
+                            "usage_count": pattern.get("usage_count", pattern.get("frequency", 1)),
                             "relevance_score": relevance_score,
                         },
                     )
@@ -475,9 +458,7 @@ class PatternAnalyzer:
                     self._create_pattern_relationships(pattern)
 
                 except Exception as e:
-                    logger.error(
-                        f"Failed to store pattern {pattern.get('pattern_id', 'unknown')}: {e}"
-                    )
+                    logger.error(f"Failed to store pattern {pattern.get('pattern_id', 'unknown')}: {e}")
 
     def _calculate_pattern_confidence(self, pattern: dict[str, Any]) -> float:
         """Calculate overall confidence score for a pattern.
@@ -518,9 +499,7 @@ class PatternAnalyzer:
                     MATCH (p:PatternAnalysis {id: $pattern_id}), (f:Function {name: $function_name})
                     MERGE (p)-[:INVOLVES]->(f)
                     """
-                    self.client.execute_write_query(
-                        rel_query, {"pattern_id": pattern_id, "function_name": func}
-                    )
+                    self.client.execute_write_query(rel_query, {"pattern_id": pattern_id, "function_name": func})
 
             elif pattern_type == "template_usage":
                 # Link to template
@@ -539,9 +518,7 @@ class PatternAnalyzer:
         except Exception as e:
             logger.debug(f"Could not create pattern relationship: {e}")
 
-    def get_patterns_by_type(
-        self, pattern_type: str, limit: int = 10
-    ) -> list[dict[str, Any]]:
+    def get_patterns_by_type(self, pattern_type: str, limit: int = 10) -> list[dict[str, Any]]:
         """Retrieve patterns by type, ordered by relevance.
 
         Args:
@@ -558,9 +535,7 @@ class PatternAnalyzer:
         LIMIT $limit
         """
 
-        result = self.client.execute_query(
-            query, {"pattern_type": pattern_type, "limit": limit}
-        )
+        result = self.client.execute_query(query, {"pattern_type": pattern_type, "limit": limit})
 
         patterns = []
         for record in result:
@@ -574,9 +549,7 @@ class PatternAnalyzer:
 
         return patterns
 
-    def get_recommendations_for_function(
-        self, function_name: str, limit: int = 5
-    ) -> list[dict[str, Any]]:
+    def get_recommendations_for_function(self, function_name: str, limit: int = 5) -> list[dict[str, Any]]:
         """Get function recommendations based on co-occurrence patterns.
 
         Args:

@@ -1,4 +1,4 @@
-"""SME Agent Streamlit Interface - Interactive Web UI
+"""SME Agent Streamlit Interface - Interactive Web UI.
 
 Phase 11.3: SME Agent Integration & Interfaces
 Following crawl_mcp.py methodology:
@@ -160,9 +160,7 @@ def display_header() -> Any:
     st.markdown("**Phase 11.3: Multi-Interface Deployment**")
 
     # Navigation tabs
-    tab1, tab2, tab3, tab4 = st.tabs(
-        ["💬 Chat", "📄 File Analysis", "📊 Status", "⚙️ Settings"]
-    )
+    tab1, tab2, tab3, tab4 = st.tabs(["💬 Chat", "📄 File Analysis", "📊 Status", "⚙️ Settings"])
 
     return tab1, tab2, tab3, tab4
 
@@ -182,9 +180,7 @@ def display_sidebar() -> None:
         complexity = st.selectbox(
             "Select complexity level:",
             ["basic", "standard", "advanced", "enterprise"],
-            index=["basic", "standard", "advanced", "enterprise"].index(
-                st.session_state.complexity_level
-            ),
+            index=["basic", "standard", "advanced", "enterprise"].index(st.session_state.complexity_level),
             help="Higher complexity levels provide more detailed responses",
         )
 
@@ -230,7 +226,7 @@ def display_conversation_history() -> None:
 
     st.subheader("💬 Conversation History")
 
-    for i, message in enumerate(st.session_state.conversation_history):
+    for _i, message in enumerate(st.session_state.conversation_history):
         # User message
         with st.container():
             st.markdown(
@@ -311,10 +307,8 @@ def chat_interface() -> None:
             # Process question
             with st.spinner("🤔 SME Agent is thinking..."):
                 try:
-                    start_time = time.time()
-                    response = agent.ask_question(
-                        question.strip(), context.strip() if context else None
-                    )
+                    time.time()
+                    response = agent.ask_question(question.strip(), context.strip() if context else None)
 
                     # Add to conversation history
                     conversation_entry = {
@@ -359,9 +353,7 @@ def file_analysis_interface() -> None:
         return
 
     # File upload or text input
-    analysis_method = st.radio(
-        "Choose analysis method:", ["Upload File", "Paste Content"], horizontal=True
-    )
+    analysis_method = st.radio("Choose analysis method:", ["Upload File", "Paste Content"], horizontal=True)
 
     if analysis_method == "Upload File":
         uploaded_file = st.file_uploader(
@@ -405,7 +397,7 @@ def file_analysis_interface() -> None:
             with st.spinner("🔍 Analyzing content..."):
                 try:
                     # Create analysis question
-                    question = "Please analyze this file and provide insights about its structure, purpose, and potential improvements."
+                    question = "Please analyze this file and provide insights about its structure, purpose, and potential improvements."  # noqa: E501
                     context = f"Filename: {filename or 'unknown'}\nContent:\n{content[:5000]}..."  # Limit context size
 
                     # Process analysis
@@ -481,12 +473,8 @@ def status_interface() -> None:
                 st.subheader("⚙️ Configuration")
                 config = status["config"]
                 st.text(f"Model: {config['model_name']}")
-                st.text(
-                    f"Knowledge Graph: {'Enabled' if config['use_knowledge_graph'] else 'Disabled'}"
-                )
-                st.text(
-                    f"Vector Embeddings: {'Enabled' if config['use_vector_embeddings'] else 'Disabled'}"
-                )
+                st.text(f"Knowledge Graph: {'Enabled' if config['use_knowledge_graph'] else 'Disabled'}")
+                st.text(f"Vector Embeddings: {'Enabled' if config['use_vector_embeddings'] else 'Disabled'}")
 
             except Exception as e:
                 st.error(f"❌ Failed to get status: {e}")
@@ -499,9 +487,7 @@ def status_interface() -> None:
     with col2:
         st.subheader("💾 Session Information")
         st.text(f"Session ID: {st.session_state.session_id}")
-        st.text(
-            f"Conversation Length: {len(st.session_state.conversation_history)} messages"
-        )
+        st.text(f"Conversation Length: {len(st.session_state.conversation_history)} messages")
         st.text(f"Complexity Level: {st.session_state.complexity_level}")
 
         if agent_info and agent_info.get("success"):
@@ -521,12 +507,8 @@ def status_interface() -> None:
         # Performance metrics
         if st.session_state.conversation_history:
             st.subheader("📈 Performance Metrics")
-            processing_times = [
-                msg["processing_time"] for msg in st.session_state.conversation_history
-            ]
-            confidences = [
-                msg["confidence"] for msg in st.session_state.conversation_history
-            ]
+            processing_times = [msg["processing_time"] for msg in st.session_state.conversation_history]
+            confidences = [msg["confidence"] for msg in st.session_state.conversation_history]
 
             st.metric(
                 "Avg Processing Time",

@@ -68,7 +68,7 @@ def validate_environment() -> None:
     try:
         # Create temporary SME Agent instance for validation
         with SMEAgentModule() as agent:
-            validation_result = agent.validate_environment()
+        validation_result: dict[str, Any] = agent.validate_environment()
 
             # Display validation results
             if validation_result["valid"]:
@@ -125,7 +125,7 @@ def initialize_components(complexity: str) -> None:
 
     try:
         with SMEAgentModule() as agent:
-            result = agent.initialize_components(complexity_level=complexity)
+        result: dict[str, Any] = agent.initialize_components(complexity_level=complexity)
             _display_initialization_results(result)
 
     except Exception as e:
@@ -156,7 +156,7 @@ def ask_question(question: str, context: str | None, complexity: str) -> None:
     try:
         with SMEAgentModule() as agent:
             # Initialize with specified complexity
-            init_result = agent.initialize_components(complexity_level=complexity)
+init_result: dict[str, Any] = agent.initialize_components(complexity_level=complexity)
             if not init_result["success"]:
                 console.print("[red]❌ Failed to initialize SME Agent[/red]")
                 return
@@ -188,12 +188,12 @@ def analyze_file(file_path: str, complexity: str) -> None:
         file_content = Path(file_path).read_text()
 
         # Create analysis question
-        question = "Please analyze this file and provide insights about its structure, purpose, and potential improvements."
+        question = "Please analyze this file and provide insights about its structure, purpose, and potential improvements."  # noqa: E501
         context = f"File: {file_path}\nContent:\n{file_content[:2000]}..."  # Limit context size
 
         with SMEAgentModule() as agent:
             # Initialize with specified complexity
-            init_result = agent.initialize_components(complexity_level=complexity)
+init_result: dict[str, Any] = agent.initialize_components(complexity_level=complexity)
             if not init_result["success"]:
                 console.print("[red]❌ Failed to initialize SME Agent[/red]")
                 return
@@ -229,7 +229,7 @@ def test_all_components() -> None:
         try:
             with SMEAgentModule() as agent:
                 # Test initialization
-                init_result = agent.initialize_components(complexity_level=complexity)
+init_result: dict[str, Any] = agent.initialize_components(complexity_level=complexity)
 
                 if init_result["success"]:
                     console.print(
@@ -271,7 +271,7 @@ def list_evaluation_batches() -> None:
     try:
         with SMEAgentModule() as agent:
             # Initialize basic components
-            init_result = agent.initialize_components(complexity_level="basic")
+init_result: dict[str, Any] = agent.initialize_components(complexity_level="basic")
             if not init_result["success"]:
                 console.print("[red]❌ Failed to initialize SME Agent[/red]")
                 return
@@ -329,7 +329,7 @@ def export_evaluation_batch(batch_id: str, export_format: str) -> None:
     try:
         with SMEAgentModule() as agent:
             # Initialize basic components
-            init_result = agent.initialize_components(complexity_level="basic")
+init_result: dict[str, Any] = agent.initialize_components(complexity_level="basic")
             if not init_result["success"]:
                 console.print("[red]❌ Failed to initialize SME Agent[/red]")
                 return
@@ -513,7 +513,7 @@ def reinforcement_learning_summary() -> None:
                         "red" if opportunity["priority"] == "high" else "yellow"
                     )
                     console.print(
-                        f"{i}. [{priority_color}]{opportunity['improvement']}[/{priority_color}] (frequency: {opportunity['frequency']})"
+                        f"{i}. [{priority_color}]{opportunity['improvement']}[/{priority_color}] (frequency: {opportunity['frequency']})"  # noqa: E501
                     )
 
     except Exception as e:
@@ -849,7 +849,7 @@ def llm_status() -> None:
         console.print(
             Panel(
                 f"[{summary_color}]{summary_icon} {summary_text}[/{summary_color}]\n\n"
-                f"📊 Components Available: {sum(validation['components_available'].values())}/{len(validation['components_available'])}\n"
+                f"📊 Components Available: {sum(validation['components_available'].values())}/{len(validation['components_available'])}\n"  # noqa: E501
                 f"⚠️  Warnings: {len(validation['warnings'])}\n"
                 f"❌ Errors: {len(validation['errors'])}\n\n"
                 + (
@@ -1397,7 +1397,7 @@ def infrastructure_status() -> None:
         )
 
         summary_panel = Panel(
-            f"Overall Infrastructure Health: {overall_percentage:.1f}% ({total_score}/{total_checks} components available)",
+            f"Overall Infrastructure Health: {overall_percentage:.1f}% ({total_score}/{total_checks} components available)",  # noqa: E501
             title="Infrastructure Summary",
             border_style=(
                 "blue"

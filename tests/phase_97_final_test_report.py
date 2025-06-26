@@ -157,24 +157,18 @@ class Phase97FinalTestReport:
             "DEPLOYMENT_WEBHOOK_URL": os.getenv("DEPLOYMENT_WEBHOOK_URL"),
         }
 
-        configured_vars = {
-            k: v for k, v in env_vars.items() if v is not None and v.strip()
-        }
+        configured_vars = {k: v for k, v in env_vars.items() if v is not None and v.strip()}
         missing_vars = {k: v for k, v in env_vars.items() if v is None or not v.strip()}
 
         results = {
             "total_variables": len(env_vars),
             "configured_variables": len(configured_vars),
             "missing_variables": len(missing_vars),
-            "configuration_percentage": round(
-                (len(configured_vars) / len(env_vars)) * 100, 2
-            ),
+            "configuration_percentage": round((len(configured_vars) / len(env_vars)) * 100, 2),
             "configured": list(configured_vars.keys()),
             "missing": list(missing_vars.keys()),
             "critical_missing": [
-                var
-                for var in missing_vars
-                if var in ["GRADLE_HOME", "JAVA_HOME", "MODULE_REPOSITORY_URL"]
+                var for var in missing_vars if var in ["GRADLE_HOME", "JAVA_HOME", "MODULE_REPOSITORY_URL"]
             ],
             "status": "⚠️  PARTIAL" if missing_vars else "✅ COMPLETE",
         }
@@ -219,9 +213,7 @@ class Phase97FinalTestReport:
         integration_score = 90  # Integration tests pass
         environment_score = 30  # Many variables missing
 
-        overall_score = (
-            component_score + cli_score + integration_score + environment_score
-        ) / 4
+        overall_score = (component_score + cli_score + integration_score + environment_score) / 4
 
         assessment = {
             "overall_score": round(overall_score, 2),
@@ -277,8 +269,8 @@ class Phase97FinalTestReport:
             "methodology_compliance": "✅ FOLLOWS CRAWL_MCP.PY METHODOLOGY",
             "overall_score": final_assessment["overall_score"],
             "production_readiness": final_assessment["production_readiness"],
-            "key_finding": "Phase 9.7 is functionally complete with comprehensive deployment capabilities. Requires environment configuration for production use.",
-            "recommendation": "Proceed with environment setup and production configuration. All core functionality is working correctly.",
+            "key_finding": "Phase 9.7 is functionally complete with comprehensive deployment capabilities. Requires environment configuration for production use.",  # noqa: E501
+            "recommendation": "Proceed with environment setup and production configuration. All core functionality is working correctly.",  # noqa: E501
         }
 
         return self.report_data

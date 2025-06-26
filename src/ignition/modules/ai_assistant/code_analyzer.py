@@ -83,9 +83,7 @@ class AnalysisResult:
     method_calls: list[MethodCall] = field(default_factory=list)
     attribute_accesses: list[AttributeAccess] = field(default_factory=list)
     function_calls: list[FunctionCall] = field(default_factory=list)
-    variable_types: dict[str, str] = field(
-        default_factory=dict
-    )  # variable_name -> class_type
+    variable_types: dict[str, str] = field(default_factory=dict)  # variable_name -> class_type
     errors: list[str] = field(default_factory=list)
 
 
@@ -95,9 +93,7 @@ class CodeAnalyzer:
     def __init__(self) -> Any:
         self.import_map: dict[str, str] = {}  # alias -> actual_module_name
         self.variable_types: dict[str, str] = {}  # variable_name -> class_type
-        self.context_manager_vars: dict[str, tuple[int, int, str]] = (
-            {}
-        )  # var_name -> (start_line, end_line, type)
+        self.context_manager_vars: dict[str, tuple[int, int, str]] = {}  # var_name -> (start_line, end_line, type)
         self.processed_calls: set[int] = set()
         self.method_call_attributes: set[int] = set()
 
@@ -140,9 +136,7 @@ class CodeAnalyzer:
             result.errors.append(error_msg)
             return result
 
-    def analyze_code_string(
-        self, code: str, file_path: str = "<string>"
-    ) -> AnalysisResult:
+    def analyze_code_string(self, code: str, file_path: str = "<string>") -> AnalysisResult:
         """Analyze Python code from a string instead of file."""
         try:
             tree = ast.parse(code)
@@ -259,9 +253,7 @@ class CodeAnalyzer:
             else:
                 self._handle_with(node, result)
 
-    def _extract_class_instantiation(
-        self, node: ast.Assign, result: AnalysisResult
-    ) -> Any:
+    def _extract_class_instantiation(self, node: ast.Assign, result: AnalysisResult) -> Any:
         """Extract class instantiation from assignment."""
         if not isinstance(node.value, ast.Call):
             return
@@ -362,9 +354,7 @@ class CodeAnalyzer:
         )
         result.function_calls.append(function_call)
 
-    def _extract_attribute_access(
-        self, node: ast.Attribute, result: AnalysisResult
-    ) -> Any:
+    def _extract_attribute_access(self, node: ast.Attribute, result: AnalysisResult) -> Any:
         """Extract attribute access information."""
         line_num = getattr(node, "lineno", 0)
 
@@ -385,16 +375,12 @@ class CodeAnalyzer:
         """Infer object types for method calls and attribute accesses."""
         # set object types for method calls
         for method_call in result.method_calls:
-            obj_type = self._get_context_aware_type(
-                method_call.object_name, method_call.line_number
-            )
+            obj_type = self._get_context_aware_type(method_call.object_name, method_call.line_number)
             method_call.object_type = obj_type
 
         # set object types for attribute accesses
         for attr_access in result.attribute_accesses:
-            obj_type = self._get_context_aware_type(
-                attr_access.object_name, attr_access.line_number
-            )
+            obj_type = self._get_context_aware_type(attr_access.object_name, attr_access.line_number)
             attr_access.object_type = obj_type
 
     def _get_context_aware_type(self, var_name: str, line_number: int) -> str | None:
@@ -442,9 +428,7 @@ class CodeAnalyzer:
         else:
             return f"<{type(node).__name__}>"
 
-    def _is_likely_class_instantiation(
-        self, func_name: str, full_name: str | None
-    ) -> bool:
+    def _is_likely_class_instantiation(self, func_name: str, full_name: str | None) -> bool:
         """Determine if a function call is likely a class instantiation."""
         # Heuristics for class instantiation detection
         if func_name[0].isupper():  # Class names typically start with uppercase
@@ -471,9 +455,7 @@ class CodeAnalyzer:
 
         return False
 
-    def _track_method_result_assignment(
-        self, call_node: ast.Call, var_name: str
-    ) -> Any:
+    def _track_method_result_assignment(self, call_node: ast.Call, var_name: str) -> Any:
         """Track variable assignments from method calls for type inference."""
         # This could be enhanced to infer return types from method calls
         pass

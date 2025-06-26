@@ -30,9 +30,7 @@ def test_knowledge_domains():
         print(f"  ✅ Knowledge Areas: {len(gateway_manager.get_knowledge_areas())}")
 
         # Test a simple query
-        query = DomainQuery(
-            query_text="startup script", domain="gateway_scripting", max_results=5
-        )
+        query = DomainQuery(query_text="startup script", domain="gateway_scripting", max_results=5)
 
         response = gateway_manager.query_knowledge(query)
         print(f"  ✅ Query returned {len(response.results)} results")
@@ -45,9 +43,7 @@ def test_knowledge_domains():
         print(f"  ✅ Knowledge Areas: {len(system_manager.get_knowledge_areas())}")
 
         # Test system function query
-        query = DomainQuery(
-            query_text="tag read", domain="system_functions", max_results=3
-        )
+        query = DomainQuery(query_text="tag read", domain="system_functions", max_results=3)
 
         response = system_manager.query_knowledge(query)
         print(f"  ✅ Query returned {len(response.results)} results")
@@ -80,14 +76,10 @@ def test_adaptive_learning():
         confidence_tracker = ConfidenceTracker()
 
         # Test confidence updates
-        confidence_tracker.update_confidence(
-            "gateway_scripting", "startup_scripts", 0.85
-        )
+        confidence_tracker.update_confidence("gateway_scripting", "startup_scripts", 0.85)
         confidence_tracker.update_confidence("system_functions", "tag_operations", 0.92)
 
-        metric = confidence_tracker.get_confidence(
-            "gateway_scripting", "startup_scripts"
-        )
+        metric = confidence_tracker.get_confidence("gateway_scripting", "startup_scripts")
         print(f"  ✅ Confidence metric: {metric.confidence_score:.2f}")
 
         stats = confidence_tracker.get_statistics()
@@ -174,9 +166,7 @@ def test_context_aware_response():
 
         # Generate response (this will be limited without full integration)
         try:
-            response = response_generator.generate_response(
-                "How do I optimize my gateway scripts?", response_context
-            )
+            response = response_generator.generate_response("How do I optimize my gateway scripts?", response_context)
             print(f"  ✅ Generated response: {len(response.response)} chars")
             print(f"  ✅ Response confidence: {response.confidence:.2f}")
             print(f"  ✅ Recommendations: {len(response.recommendations)}")

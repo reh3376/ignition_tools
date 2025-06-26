@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Demo Script for Phase 12.8: Deployment Package Creation & How-to Guides
+"""Demo Script for Phase 12.8: Deployment Package Creation & How-to Guides.
 
 This demo showcases the Phase 12.8 implementation following crawl_mcp.py methodology:
 - Step 1: Environment validation first
@@ -79,11 +79,7 @@ async def demo_environment_validation():
     results_table.add_row(
         "Tools Available",
         f"✅ {len(env_result['tools_available'])} found",
-        (
-            ", ".join(env_result["tools_available"])
-            if env_result["tools_available"]
-            else "None"
-        ),
+        (", ".join(env_result["tools_available"]) if env_result["tools_available"] else "None"),
     )
 
     if env_result["errors"]:
@@ -134,9 +130,7 @@ async def demo_input_validation():
         install_path="/opt/ign-scripts",
         user_account="ign-scripts",
     )
-    console.print(
-        f"Standalone Config: {standalone_config.service_name} -> {standalone_config.install_path}"
-    )
+    console.print(f"Standalone Config: {standalone_config.service_name} -> {standalone_config.install_path}")
 
     # Package request
     request = PackageCreationRequest(
@@ -145,9 +139,7 @@ async def demo_input_validation():
         version="1.0.0",
         docker_config=docker_config,
     )
-    console.print(
-        f"Package Request: {request.package_type.value} for {request.deployment_target.value}"
-    )
+    console.print(f"Package Request: {request.package_type.value} for {request.deployment_target.value}")
 
     # Demo invalid configurations
     console.print("\n[bold red]❌ Invalid Configuration Examples:[/bold red]")
@@ -183,7 +175,7 @@ async def demo_package_creation():
     console.print(
         Panel(
             "[bold blue]Demo 3: Package Creation[/bold blue]\n"
-            "Following crawl_mcp.py Steps 3-6: Error handling, modular testing, progressive complexity, resource management",
+            "Following crawl_mcp.py Steps 3-6: Error handling, modular testing, progressive complexity, resource management",  # noqa: E501
             title="📦 Package Creation",
             border_style="blue",
         )
@@ -199,9 +191,7 @@ async def demo_package_creation():
             TextColumn("[progress.description]{task.description}"),
             console=console,
         ) as progress:
-            task = progress.add_task(
-                "Creating Docker deployment package...", total=None
-            )
+            task = progress.add_task("Creating Docker deployment package...", total=None)
 
             docker_result = await create_docker_package(
                 image_name="ign-scripts-demo",
@@ -215,13 +205,9 @@ async def demo_package_creation():
         if docker_result.success:
             console.print(f"✅ Docker package created: {docker_result.package_path}")
             console.print(f"📊 Package size: {docker_result.package_size} bytes")
-            results.append(
-                {"type": "docker", "success": True, "path": docker_result.package_path}
-            )
+            results.append({"type": "docker", "success": True, "path": docker_result.package_path})
         else:
-            console.print(
-                f"❌ Docker package creation failed: {docker_result.error_message}"
-            )
+            console.print(f"❌ Docker package creation failed: {docker_result.error_message}")
             results.append(
                 {
                     "type": "docker",
@@ -242,9 +228,7 @@ async def demo_package_creation():
             TextColumn("[progress.description]{task.description}"),
             console=console,
         ) as progress:
-            task = progress.add_task(
-                "Creating standalone deployment package...", total=None
-            )
+            task = progress.add_task("Creating standalone deployment package...", total=None)
 
             standalone_result = await create_standalone_package(
                 version="1.0.0",
@@ -255,9 +239,7 @@ async def demo_package_creation():
             progress.update(task, completed=True)
 
         if standalone_result.success:
-            console.print(
-                f"✅ Standalone package created: {standalone_result.package_path}"
-            )
+            console.print(f"✅ Standalone package created: {standalone_result.package_path}")
             console.print(f"📊 Package size: {standalone_result.package_size} bytes")
             results.append(
                 {
@@ -267,9 +249,7 @@ async def demo_package_creation():
                 }
             )
         else:
-            console.print(
-                f"❌ Standalone package creation failed: {standalone_result.error_message}"
-            )
+            console.print(f"❌ Standalone package creation failed: {standalone_result.error_message}")
             results.append(
                 {
                     "type": "standalone",
@@ -301,9 +281,7 @@ async def demo_how_to_guides_generation():
         TextColumn("[progress.description]{task.description}"),
         console=console,
     ) as progress:
-        task = progress.add_task(
-            "Generating comprehensive how-to guides...", total=None
-        )
+        task = progress.add_task("Generating comprehensive how-to guides...", total=None)
 
         guides_result = await generate_comprehensive_guides()
 
@@ -347,9 +325,7 @@ async def demo_full_implementation():
         TextColumn("[progress.description]{task.description}"),
         console=console,
     ) as progress:
-        task = progress.add_task(
-            "Running complete Phase 12.8 implementation...", total=None
-        )
+        task = progress.add_task("Running complete Phase 12.8 implementation...", total=None)
 
         implementation_result = await run_phase_12_8_implementation()
 
@@ -372,14 +348,8 @@ async def demo_full_implementation():
 
     results_table.add_row(
         "Environment Validation",
-        (
-            "✅ Passed"
-            if implementation_result["steps"]
-            .get("environment_validation", {})
-            .get("valid")
-            else "❌ Failed"
-        ),
-        f"Tools available: {len(implementation_result['steps'].get('environment_validation', {}).get('tools_available', []))}",
+        ("✅ Passed" if implementation_result["steps"].get("environment_validation", {}).get("valid") else "❌ Failed"),
+        f"Tools available: {len(implementation_result['steps'].get('environment_validation', {}).get('tools_available', []))}",  # noqa: E501
     )
 
     results_table.add_row(
@@ -473,10 +443,10 @@ async def main():
                 f"[bold green]✅ Demo Completed Successfully![/bold green]\n\n"
                 f"🔍 Environment Validation: {'✅ Passed' if env_result['valid'] else '❌ Failed'}\n"
                 f"✅ Input Validation: ✅ Demonstrated\n"
-                f"📦 Package Creation: {len([p for p in package_result if p['success']])}/{len(package_result)} successful\n"
+                f"📦 Package Creation: {len([p for p in package_result if p['success']])}/{len(package_result)} successful\n"  # noqa: E501
                 f"📚 Guides Generation: {'✅ Success' if guides_result['success'] else '❌ Failed'}\n"
                 f"🚀 Full Implementation: {'✅ Success' if implementation_result['success'] else '❌ Failed'}\n"
-                f"⏱️ Total Demo Time: {(datetime.fromisoformat(demo_results['end_time']) - datetime.fromisoformat(demo_results['start_time'])).total_seconds():.2f}s",
+                f"⏱️ Total Demo Time: {(datetime.fromisoformat(demo_results['end_time']) - datetime.fromisoformat(demo_results['start_time'])).total_seconds():.2f}s",  # noqa: E501
                 title="🎉 Demo Summary",
                 border_style="green",
             )

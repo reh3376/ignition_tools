@@ -121,15 +121,11 @@ class KnowledgeGraphValidator:
         self.class_cache: dict[str, dict[str, Any]] = {}
         self.method_cache: dict[str, list[dict[str, Any]]] = {}
         self.repo_cache: dict[str, str] = {}  # module_name -> repo_name
-        self.knowledge_graph_modules: set[str] = (
-            set()
-        )  # Track modules in knowledge graph
+        self.knowledge_graph_modules: set[str] = set()  # Track modules in knowledge graph
 
     async def initialize(self):
         """Initialize Neo4j connection."""
-        self.driver = AsyncGraphDatabase.driver(
-            self.neo4j_uri, auth=(self.neo4j_user, self.neo4j_password)
-        )
+        self.driver = AsyncGraphDatabase.driver(self.neo4j_uri, auth=(self.neo4j_user, self.neo4j_password))
         logger.info("Knowledge graph validator initialized")
 
     async def close(self):
@@ -137,38 +133,24 @@ class KnowledgeGraphValidator:
         if self.driver:
             await self.driver.close()
 
-    async def validate_script(
-        self, analysis_result: AnalysisResult
-    ) -> ScriptValidationResult:
+    async def validate_script(self, analysis_result: AnalysisResult) -> ScriptValidationResult:
         """Validate entire script analysis against knowledge graph."""
-        result = ScriptValidationResult(
-            script_path=analysis_result.file_path, analysis_result=analysis_result
-        )
+        result = ScriptValidationResult(script_path=analysis_result.file_path, analysis_result=analysis_result)
 
         # Validate imports first (builds context for other validations)
-        result.import_validations = await self._validate_imports(
-            analysis_result.imports
-        )
+        result.import_validations = await self._validate_imports(analysis_result.imports)
 
         # Validate class instantiations
-        result.class_validations = await self._validate_class_instantiations(
-            analysis_result.class_instantiations
-        )
+        result.class_validations = await self._validate_class_instantiations(analysis_result.class_instantiations)
 
         # Validate method calls
-        result.method_validations = await self._validate_method_calls(
-            analysis_result.method_calls
-        )
+        result.method_validations = await self._validate_method_calls(analysis_result.method_calls)
 
         # Validate attribute accesses
-        result.attribute_validations = await self._validate_attribute_accesses(
-            analysis_result.attribute_accesses
-        )
+        result.attribute_validations = await self._validate_attribute_accesses(analysis_result.attribute_accesses)
 
         # Validate function calls
-        result.function_validations = await self._validate_function_calls(
-            analysis_result.function_calls
-        )
+        result.function_validations = await self._validate_function_calls(analysis_result.function_calls)
 
         # Calculate overall confidence and detect hallucinations
         result.overall_confidence = self._calculate_overall_confidence(result)
@@ -176,9 +158,7 @@ class KnowledgeGraphValidator:
 
         return result
 
-    async def _validate_imports(
-        self, imports: list[ImportInfo]
-    ) -> list[ImportValidation]:
+    async def _validate_imports(self, imports: list[ImportInfo]) -> list[ImportValidation]:
         """Validate all imports against knowledge graph."""
         validations = []
 
@@ -188,14 +168,10 @@ class KnowledgeGraphValidator:
 
         return validations
 
-    async def _validate_single_import(
-        self, import_info: ImportInfo
-    ) -> ImportValidation:
+    async def _validate_single_import(self, import_info: ImportInfo) -> ImportValidation:
         """Validate a single import."""
         # Determine module to search for
-        search_module = (
-            import_info.module if import_info.is_from_import else import_info.name
-        )
+        search_module = import_info.module if import_info.is_from_import else import_info.name
 
         # Check cache first
         if search_module in self.module_cache:
@@ -241,9 +217,7 @@ class KnowledgeGraphValidator:
 
             return ImportValidation(import_info=import_info, validation=validation)
 
-    async def _validate_class_instantiations(
-        self, instantiations: list[ClassInstantiation]
-    ) -> list[ClassValidation]:
+    async def _validate_class_instantiations(self, instantiations: list[ClassInstantiation]) -> list[ClassValidation]:
         """Validate class instantiations."""
         validations = []
 
@@ -253,9 +227,7 @@ class KnowledgeGraphValidator:
 
         return validations
 
-    async def _validate_single_class_instantiation(
-        self, instantiation: ClassInstantiation
-    ) -> ClassValidation:
+    async def _validate_single_class_instantiation(self, instantiation: ClassInstantiation) -> ClassValidation:
         """Validate a single class instantiation."""
         class_name = instantiation.full_class_name or instantiation.class_name
 
@@ -266,9 +238,7 @@ class KnowledgeGraphValidator:
                 confidence=0.8,
                 message=f"Skipping validation: '{class_name}' is not from knowledge graph",
             )
-            return ClassValidation(
-                class_instantiation=instantiation, validation=validation
-            )
+            return ClassValidation(class_instantiation=instantiation, validation=validation)
 
         # Find class in knowledge graph
         class_info = await self._find_class(class_name)
@@ -279,9 +249,7 @@ class KnowledgeGraphValidator:
                 confidence=0.2,
                 message=f"Class '{class_name}' not found in knowledge graph",
             )
-            return ClassValidation(
-                class_instantiation=instantiation, validation=validation
-            )
+            return ClassValidation(class_instantiation=instantiation, validation=validation)
 
         # Check constructor parameters (look for __init__ method)
         init_method = await self._find_method(class_name, "__init__")
@@ -320,9 +288,7 @@ class KnowledgeGraphValidator:
             parameter_validation=param_validation,
         )
 
-    async def _validate_method_calls(
-        self, method_calls: list[MethodCall]
-    ) -> list[MethodValidation]:
+    async def _validate_method_calls(self, method_calls: list[MethodCall]) -> list[MethodValidation]:
         """Validate method calls."""
         validations = []
 
@@ -332,9 +298,7 @@ class KnowledgeGraphValidator:
 
         return validations
 
-    async def _validate_single_method_call(
-        self, method_call: MethodCall
-    ) -> MethodValidation:
+    async def _validate_single_method_call(self, method_call: MethodCall) -> MethodValidation:
         """Validate a single method call."""
         class_type = method_call.object_type
 
@@ -360,9 +324,7 @@ class KnowledgeGraphValidator:
 
         if not method_info:
             # Check for similar method names
-            similar_methods = await self._find_similar_methods(
-                class_type, method_call.method_name
-            )
+            similar_methods = await self._find_similar_methods(class_type, method_call.method_name)
 
             validation = ValidationResult(
                 status=ValidationStatus.NOT_FOUND,
@@ -415,9 +377,7 @@ class KnowledgeGraphValidator:
 
         return validations
 
-    async def _validate_single_attribute_access(
-        self, attr_access: AttributeAccess
-    ) -> AttributeValidation:
+    async def _validate_single_attribute_access(self, attr_access: AttributeAccess) -> AttributeValidation:
         """Validate a single attribute access."""
         class_type = attr_access.object_type
 
@@ -427,9 +387,7 @@ class KnowledgeGraphValidator:
                 confidence=0.3,
                 message=f"Cannot determine object type for '{attr_access.object_name}'",
             )
-            return AttributeValidation(
-                attribute_access=attr_access, validation=validation
-            )
+            return AttributeValidation(attribute_access=attr_access, validation=validation)
 
         # Skip validation for classes not from knowledge graph
         if not self._is_from_knowledge_graph(class_type):
@@ -438,18 +396,14 @@ class KnowledgeGraphValidator:
                 confidence=0.8,
                 message=f"Skipping validation: '{class_type}' is not from knowledge graph",
             )
-            return AttributeValidation(
-                attribute_access=attr_access, validation=validation
-            )
+            return AttributeValidation(attribute_access=attr_access, validation=validation)
 
         # Find attribute in knowledge graph
         attr_info = await self._find_attribute(class_type, attr_access.attribute_name)
 
         if not attr_info:
             # If not found as attribute, check if it's a method (for decorators like @agent.tool)
-            method_info = await self._find_method(
-                class_type, attr_access.attribute_name
-            )
+            method_info = await self._find_method(class_type, attr_access.attribute_name)
 
             if method_info:
                 validation = ValidationResult(
@@ -468,9 +422,7 @@ class KnowledgeGraphValidator:
                 confidence=0.2,
                 message=f"'{attr_access.attribute_name}' not found on class '{class_type}'",
             )
-            return AttributeValidation(
-                attribute_access=attr_access, validation=validation
-            )
+            return AttributeValidation(attribute_access=attr_access, validation=validation)
 
         validation = ValidationResult(
             status=ValidationStatus.VALID,
@@ -484,9 +436,7 @@ class KnowledgeGraphValidator:
             expected_type=attr_info.get("type"),
         )
 
-    async def _validate_function_calls(
-        self, function_calls: list[FunctionCall]
-    ) -> list[FunctionValidation]:
+    async def _validate_function_calls(self, function_calls: list[FunctionCall]) -> list[FunctionValidation]:
         """Validate function calls."""
         validations = []
 
@@ -496,16 +446,12 @@ class KnowledgeGraphValidator:
 
         return validations
 
-    async def _validate_single_function_call(
-        self, func_call: FunctionCall
-    ) -> FunctionValidation:
+    async def _validate_single_function_call(self, func_call: FunctionCall) -> FunctionValidation:
         """Validate a single function call."""
         func_name = func_call.full_name or func_call.function_name
 
         # Skip validation for functions not from knowledge graph
-        if func_call.full_name and not self._is_from_knowledge_graph(
-            func_call.full_name
-        ):
+        if func_call.full_name and not self._is_from_knowledge_graph(func_call.full_name):
             validation = ValidationResult(
                 status=ValidationStatus.UNCERTAIN,
                 confidence=0.8,
@@ -637,10 +583,7 @@ class KnowledgeGraphValidator:
 
         # Validate keyword arguments
         all_valid_kwarg_names = set(
-            required_positional
-            + optional_positional
-            + keyword_only_required
-            + keyword_only_optional
+            required_positional + optional_positional + keyword_only_required + keyword_only_optional
         )
         invalid_kwargs = provided_keyword_names - all_valid_kwarg_names
 
@@ -712,9 +655,7 @@ class KnowledgeGraphValidator:
                 repos_from_names.append(record["repo_name"])
 
             # Combine results, prioritizing module-based matches
-            all_repos = repos_from_modules + [
-                r for r in repos_from_names if r not in repos_from_modules
-            ]
+            all_repos = repos_from_modules + [r for r in repos_from_names if r not in repos_from_modules]
 
             if not all_repos:
                 return []
@@ -734,9 +675,7 @@ class KnowledgeGraphValidator:
 
             return files
 
-    async def _get_module_contents(
-        self, module_name: str
-    ) -> tuple[list[str], list[str]]:
+    async def _get_module_contents(self, module_name: str) -> tuple[list[str], list[str]]:
         """Get classes and functions available in a repository matching the module name."""
         if not self.driver:
             return [], []
@@ -897,9 +836,7 @@ class KnowledgeGraphValidator:
                     LIMIT 1
                     """
 
-                    result = await session.run(
-                        repo_query, repo_name=repo_name, class_name=class_part
-                    )
+                    result = await session.run(repo_query, repo_name=repo_name, class_name=class_part)
                     record = await result.single()
 
                     if record:
@@ -910,9 +847,7 @@ class KnowledgeGraphValidator:
 
             return None
 
-    async def _find_method(
-        self, class_name: str, method_name: str
-    ) -> dict[str, Any] | None:
+    async def _find_method(self, class_name: str, method_name: str) -> dict[str, Any] | None:
         """Find method information for a class."""
         cache_key = f"{class_name}.{method_name}"
         if cache_key in self.method_cache:
@@ -933,9 +868,7 @@ class KnowledgeGraphValidator:
             LIMIT 1
             """
 
-            result = await session.run(
-                query, class_name=class_name, method_name=method_name
-            )
+            result = await session.run(query, class_name=class_name, method_name=method_name)
             record = await result.single()
 
             if record:
@@ -980,9 +913,7 @@ class KnowledgeGraphValidator:
 
                     if record:
                         # Use detailed params if available, fall back to simple params
-                        params_to_use = (
-                            record["params_detailed"] or record["params_list"] or []
-                        )
+                        params_to_use = record["params_detailed"] or record["params_list"] or []
 
                         method_info = {
                             "name": record["name"],
@@ -996,9 +927,7 @@ class KnowledgeGraphValidator:
             self.method_cache[cache_key] = []
             return None
 
-    async def _find_attribute(
-        self, class_name: str, attr_name: str
-    ) -> dict[str, Any] | None:
+    async def _find_attribute(self, class_name: str, attr_name: str) -> dict[str, Any] | None:
         """Find attribute information for a class."""
         if not self.driver:
             return None
@@ -1013,9 +942,7 @@ class KnowledgeGraphValidator:
             LIMIT 1
             """
 
-            result = await session.run(
-                query, class_name=class_name, attr_name=attr_name
-            )
+            result = await session.run(query, class_name=class_name, attr_name=attr_name)
             record = await result.single()
 
             if record:
@@ -1100,16 +1027,12 @@ class KnowledgeGraphValidator:
                     LIMIT 1
                     """
 
-                    result = await session.run(
-                        repo_query, repo_name=repo_name, func_name=func_part
-                    )
+                    result = await session.run(repo_query, repo_name=repo_name, func_name=func_part)
                     record = await result.single()
 
                     if record:
                         # Use detailed params if available, fall back to simple params
-                        params_to_use = (
-                            record["params_detailed"] or record["params_list"] or []
-                        )
+                        params_to_use = record["params_detailed"] or record["params_list"] or []
 
                         return {
                             "name": record["name"],
@@ -1120,9 +1043,7 @@ class KnowledgeGraphValidator:
 
             return None
 
-    async def _find_pydantic_ai_result_method(
-        self, method_name: str
-    ) -> dict[str, Any] | None:
+    async def _find_pydantic_ai_result_method(self, method_name: str) -> dict[str, Any] | None:
         """Find method information for pydantic_ai result objects."""
         if not self.driver:
             return None
@@ -1139,9 +1060,7 @@ class KnowledgeGraphValidator:
             LIMIT 1
             """
 
-            result = await session.run(
-                query, repo_name="pydantic_ai", method_name=method_name
-            )
+            result = await session.run(query, repo_name="pydantic_ai", method_name=method_name)
             record = await result.single()
 
             if record:
@@ -1180,9 +1099,7 @@ class KnowledgeGraphValidator:
 
             return suggestions
 
-    async def _find_similar_methods(
-        self, class_name: str, method_name: str
-    ) -> list[str]:
+    async def _find_similar_methods(self, class_name: str, method_name: str) -> list[str]:
         """Find similar method names for suggestions."""
         if not self.driver:
             return []
@@ -1197,9 +1114,7 @@ class KnowledgeGraphValidator:
             LIMIT 5
             """
 
-            result = await session.run(
-                query, class_name=class_name, partial_name=method_name[:3]
-            )
+            result = await session.run(query, class_name=class_name, partial_name=method_name[:3])
             suggestions = []
             async for record in result:
                 suggestions.append(record["name"])
@@ -1243,32 +1158,23 @@ class KnowledgeGraphValidator:
 
         # Only count validations from knowledge graph classes
         for val in result.class_validations:
-            class_name = (
-                val.class_instantiation.full_class_name
-                or val.class_instantiation.class_name
-            )
+            class_name = val.class_instantiation.full_class_name or val.class_instantiation.class_name
             if self._is_from_knowledge_graph(class_name):
                 kg_validations.append(val.validation.confidence)
 
         # Only count validations from knowledge graph methods
         for val in result.method_validations:
-            if val.method_call.object_type and self._is_from_knowledge_graph(
-                val.method_call.object_type
-            ):
+            if val.method_call.object_type and self._is_from_knowledge_graph(val.method_call.object_type):
                 kg_validations.append(val.validation.confidence)
 
         # Only count validations from knowledge graph attributes
         for val in result.attribute_validations:
-            if val.attribute_access.object_type and self._is_from_knowledge_graph(
-                val.attribute_access.object_type
-            ):
+            if val.attribute_access.object_type and self._is_from_knowledge_graph(val.attribute_access.object_type):
                 kg_validations.append(val.validation.confidence)
 
         # Only count validations from knowledge graph functions
         for val in result.function_validations:
-            if val.function_call.full_name and self._is_from_knowledge_graph(
-                val.function_call.full_name
-            ):
+            if val.function_call.full_name and self._is_from_knowledge_graph(val.function_call.full_name):
                 kg_validations.append(val.validation.confidence)
 
         if not kg_validations:
@@ -1291,9 +1197,7 @@ class KnowledgeGraphValidator:
         # Don't use substring matching to avoid "pydantic" matching "pydantic_ai"
         return class_type in self.knowledge_graph_modules
 
-    def _detect_hallucinations(
-        self, result: ScriptValidationResult
-    ) -> list[dict[str, Any]]:
+    def _detect_hallucinations(self, result: ScriptValidationResult) -> list[dict[str, Any]]:
         """Detect and categorize hallucinations."""
         hallucinations = []
         reported_items = set()  # Track reported items to avoid duplicates
@@ -1318,11 +1222,7 @@ class KnowledgeGraphValidator:
                             "type": "METHOD_NOT_FOUND",
                             "location": f"line {val.method_call.line_number}",
                             "description": f"Method '{val.method_call.method_name}' not found on class '{val.method_call.object_type}'",
-                            "suggestion": (
-                                val.validation.suggestions[0]
-                                if val.validation.suggestions
-                                else None
-                            ),
+                            "suggestion": (val.validation.suggestions[0] if val.validation.suggestions else None),
                         }
                     )
 

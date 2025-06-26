@@ -1,4 +1,4 @@
-"""Data Ingestion Framework for Industrial Dataset Curation
+"""Data Ingestion Framework for Industrial Dataset Curation.
 
 Following the crawl_mcp.py methodology for structured development:
 - Comprehensive validation and error handling
@@ -55,9 +55,7 @@ class DataIngestionFramework:
         self.active_connections: dict[str, Any] = {}
         self.ingestion_stats: dict[str, Any] = {}
 
-    async def ingest_csv_data(
-        self, file_path: str, timestamp_column: str = "timestamp", **kwargs
-    ) -> dict[str, Any]:
+    async def ingest_csv_data(self, file_path: str, timestamp_column: str = "timestamp", **kwargs) -> dict[str, Any]:
         """Ingest CSV/XLS data with comprehensive validation.
 
         Args:
@@ -134,9 +132,7 @@ class DataIngestionFramework:
                 "rows_processed": len(df),
                 "columns_processed": len(df.columns),
                 "quality_report": quality_report,
-                "timestamp_range": self.ingestion_stats[dataset_name][
-                    "timestamp_range"
-                ],
+                "timestamp_range": self.ingestion_stats[dataset_name]["timestamp_range"],
             }
 
         except Exception as e:
@@ -255,14 +251,10 @@ class DataIngestionFramework:
                     IQR = Q3 - Q1
                     lower_bound = Q1 - 1.5 * IQR
                     upper_bound = Q3 + 1.5 * IQR
-                    outliers = df[(df[col] < lower_bound) | (df[col] > upper_bound)][
-                        col
-                    ]
+                    outliers = df[(df[col] < lower_bound) | (df[col] > upper_bound)][col]
                     outlier_summary[col] = {
                         "outlier_count": len(outliers),
-                        "outlier_percentage": round(
-                            (len(outliers) / total_rows * 100), 2
-                        ),
+                        "outlier_percentage": round((len(outliers) / total_rows * 100), 2),
                     }
 
             # Time series validation if index is datetime
@@ -278,9 +270,7 @@ class DataIngestionFramework:
                     "time_gaps": self._detect_time_gaps(df.index),
                 }
 
-            quality_score = self._calculate_quality_score(
-                missing_percentage, outlier_summary, total_rows
-            )
+            quality_score = self._calculate_quality_score(missing_percentage, outlier_summary, total_rows)
 
             return {
                 "total_rows": total_rows,
@@ -375,9 +365,7 @@ class DataIngestionFramework:
 
             # Penalize for outliers
             if outlier_summary:
-                avg_outliers = np.mean(
-                    [stats["outlier_percentage"] for stats in outlier_summary.values()]
-                )
+                avg_outliers = np.mean([stats["outlier_percentage"] for stats in outlier_summary.values()])
                 score -= min(float(avg_outliers), 30)  # Max 30 point penalty
 
             # Penalize for insufficient data

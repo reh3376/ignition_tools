@@ -132,9 +132,7 @@ class Phase10ComprehensiveTestReporter:
                 TimeElapsedColumn(),
                 console=self.console,
             ) as progress:
-                main_task = progress.add_task(
-                    "Running comprehensive tests...", total=100
-                )
+                main_task = progress.add_task("Running comprehensive tests...", total=100)
 
                 # Test Category 1: Enterprise Architecture Module (20%)
                 progress.update(
@@ -142,9 +140,7 @@ class Phase10ComprehensiveTestReporter:
                     advance=20,
                     description="Testing Enterprise Architecture Module...",
                 )
-                self.test_results["enterprise_architecture"] = (
-                    self._test_enterprise_architecture_module()
-                )
+                self.test_results["enterprise_architecture"] = self._test_enterprise_architecture_module()
 
                 # Test Category 2: Cloud Integration Module (20%)
                 progress.update(
@@ -152,9 +148,7 @@ class Phase10ComprehensiveTestReporter:
                     advance=20,
                     description="Testing Cloud Integration Module...",
                 )
-                self.test_results["cloud_integration"] = (
-                    self._test_cloud_integration_module()
-                )
+                self.test_results["cloud_integration"] = self._test_cloud_integration_module()
 
                 # Test Category 3: Advanced Analytics Platform Module (20%)
                 progress.update(
@@ -162,14 +156,10 @@ class Phase10ComprehensiveTestReporter:
                     advance=20,
                     description="Testing Advanced Analytics Platform Module...",
                 )
-                self.test_results["advanced_analytics"] = (
-                    self._test_advanced_analytics_module()
-                )
+                self.test_results["advanced_analytics"] = self._test_advanced_analytics_module()
 
                 # Test Category 4: CLI Integration (15%)
-                progress.update(
-                    main_task, advance=15, description="Testing CLI Integration..."
-                )
+                progress.update(main_task, advance=15, description="Testing CLI Integration...")
                 self.test_results["cli_integration"] = self._test_cli_integration()
 
                 # Test Category 5: Progressive Complexity (15%)
@@ -178,21 +168,13 @@ class Phase10ComprehensiveTestReporter:
                     advance=15,
                     description="Testing Progressive Complexity...",
                 )
-                self.test_results["progressive_complexity"] = (
-                    self._test_progressive_complexity()
-                )
+                self.test_results["progressive_complexity"] = self._test_progressive_complexity()
 
                 # Test Category 6: Resource Management (10%)
-                progress.update(
-                    main_task, advance=10, description="Testing Resource Management..."
-                )
-                self.test_results["resource_management"] = (
-                    self._test_resource_management()
-                )
+                progress.update(main_task, advance=10, description="Testing Resource Management...")
+                self.test_results["resource_management"] = self._test_resource_management()
 
-                progress.update(
-                    main_task, completed=100, description="All tests completed!"
-                )
+                progress.update(main_task, completed=100, description="All tests completed!")
 
             # Calculate final metrics
             self._calculate_final_metrics()
@@ -207,9 +189,7 @@ class Phase10ComprehensiveTestReporter:
 
         except Exception as e:
             self.logger.error(f"Comprehensive testing failed: {e}")
-            self.console.print(
-                f"❌ Comprehensive testing failed: {e!s}", style="bold red"
-            )
+            self.console.print(f"❌ Comprehensive testing failed: {e!s}", style="bold red")
             return {"success": False, "error": str(e)}
 
         finally:
@@ -231,41 +211,25 @@ class Phase10ComprehensiveTestReporter:
 
         try:
             # Test 1.1: Environment Variable Validation
-            test_results["tests"][
-                "environment_validation"
-            ] = self._test_architecture_environment_validation()
+            test_results["tests"]["environment_validation"] = self._test_architecture_environment_validation()
 
             # Test 1.2: Configuration Loading
-            test_results["tests"][
-                "configuration_loading"
-            ] = self._test_architecture_configuration_loading()
+            test_results["tests"]["configuration_loading"] = self._test_architecture_configuration_loading()
 
             # Test 1.3: Component Initialization
-            test_results["tests"][
-                "component_initialization"
-            ] = self._test_architecture_component_initialization()
+            test_results["tests"]["component_initialization"] = self._test_architecture_component_initialization()
 
             # Test 1.4: Deployment Functionality
-            test_results["tests"][
-                "deployment_functionality"
-            ] = self._test_architecture_deployment_functionality()
+            test_results["tests"]["deployment_functionality"] = self._test_architecture_deployment_functionality()
 
             # Test 1.5: Error Handling
-            test_results["tests"][
-                "error_handling"
-            ] = self._test_architecture_error_handling()
+            test_results["tests"]["error_handling"] = self._test_architecture_error_handling()
 
             # Calculate overall score
-            passed_tests = sum(
-                1
-                for test in test_results["tests"].values()
-                if test["status"] == "passed"
-            )
+            passed_tests = sum(1 for test in test_results["tests"].values() if test["status"] == "passed")
             total_tests = len(test_results["tests"])
             test_results["overall_score"] = (passed_tests / total_tests) * 100
-            test_results["status"] = (
-                "passed" if passed_tests == total_tests else "partial"
-            )
+            test_results["status"] = "passed" if passed_tests == total_tests else "partial"
 
         except Exception as e:
             test_results["status"] = "failed"
@@ -328,9 +292,7 @@ class Phase10ComprehensiveTestReporter:
             config = architecture_module.config
 
             # Validate configuration structure
-            if hasattr(config, "deployment_mode") and hasattr(
-                config, "high_availability"
-            ):
+            if hasattr(config, "deployment_mode") and hasattr(config, "high_availability"):
                 return {
                     "status": "passed",
                     "score": 100,
@@ -396,7 +358,7 @@ class Phase10ComprehensiveTestReporter:
                 return {
                     "status": "passed",
                     "score": 100,
-                    "details": f"Deployment successful with complexity: {deployment_result.get('complexity_level', 'unknown')}",
+                    "details": f"Deployment successful with complexity: {deployment_result.get('complexity_level', 'unknown')}",  # noqa: E501
                 }
             else:
                 return {
@@ -454,34 +416,22 @@ class Phase10ComprehensiveTestReporter:
 
         try:
             # Test 2.1: Environment Variable Validation
-            test_results["tests"][
-                "environment_validation"
-            ] = self._test_cloud_environment_validation()
+            test_results["tests"]["environment_validation"] = self._test_cloud_environment_validation()
 
             # Test 2.2: Configuration Loading
-            test_results["tests"][
-                "configuration_loading"
-            ] = self._test_cloud_configuration_loading()
+            test_results["tests"]["configuration_loading"] = self._test_cloud_configuration_loading()
 
             # Test 2.3: Deployment Functionality
-            test_results["tests"][
-                "deployment_functionality"
-            ] = self._test_cloud_deployment_functionality()
+            test_results["tests"]["deployment_functionality"] = self._test_cloud_deployment_functionality()
 
             # Test 2.4: Error Handling
             test_results["tests"]["error_handling"] = self._test_cloud_error_handling()
 
             # Calculate overall score
-            passed_tests = sum(
-                1
-                for test in test_results["tests"].values()
-                if test["status"] == "passed"
-            )
+            passed_tests = sum(1 for test in test_results["tests"].values() if test["status"] == "passed")
             total_tests = len(test_results["tests"])
             test_results["overall_score"] = (passed_tests / total_tests) * 100
-            test_results["status"] = (
-                "passed" if passed_tests == total_tests else "partial"
-            )
+            test_results["status"] = "passed" if passed_tests == total_tests else "partial"
 
         except Exception as e:
             test_results["status"] = "failed"
@@ -498,10 +448,7 @@ class Phase10ComprehensiveTestReporter:
             validation_results = cloud_module.validate_environment()
 
             # Validate results structure
-            if (
-                "overall_valid" in validation_results
-                and "validation_score" in validation_results
-            ):
+            if "overall_valid" in validation_results and "validation_score" in validation_results:
                 return {
                     "status": "passed",
                     "score": validation_results["validation_score"],
@@ -552,7 +499,7 @@ class Phase10ComprehensiveTestReporter:
                 return {
                     "status": "passed",
                     "score": 100,
-                    "details": f"Cloud deployment successful with complexity: {deployment_result.get('complexity_level', 'unknown')}",
+                    "details": f"Cloud deployment successful with complexity: {deployment_result.get('complexity_level', 'unknown')}",  # noqa: E501
                 }
             else:
                 return {
@@ -569,9 +516,7 @@ class Phase10ComprehensiveTestReporter:
         try:
             # Test cloud error handling
             cloud_module = CloudIntegrationModule()
-            error_result = cloud_module.deploy_cloud_infrastructure(
-                "invalid_complexity"
-            )
+            error_result = cloud_module.deploy_cloud_infrastructure("invalid_complexity")
 
             # Validate error handling
             if not error_result.get("success", True) and "error" in error_result:
@@ -605,36 +550,22 @@ class Phase10ComprehensiveTestReporter:
 
         try:
             # Test 3.1: Environment Variable Validation
-            test_results["tests"][
-                "environment_validation"
-            ] = self._test_analytics_environment_validation()
+            test_results["tests"]["environment_validation"] = self._test_analytics_environment_validation()
 
             # Test 3.2: Configuration Loading
-            test_results["tests"][
-                "configuration_loading"
-            ] = self._test_analytics_configuration_loading()
+            test_results["tests"]["configuration_loading"] = self._test_analytics_configuration_loading()
 
             # Test 3.3: Deployment Functionality
-            test_results["tests"][
-                "deployment_functionality"
-            ] = self._test_analytics_deployment_functionality()
+            test_results["tests"]["deployment_functionality"] = self._test_analytics_deployment_functionality()
 
             # Test 3.4: Error Handling
-            test_results["tests"][
-                "error_handling"
-            ] = self._test_analytics_error_handling()
+            test_results["tests"]["error_handling"] = self._test_analytics_error_handling()
 
             # Calculate overall score
-            passed_tests = sum(
-                1
-                for test in test_results["tests"].values()
-                if test["status"] == "passed"
-            )
+            passed_tests = sum(1 for test in test_results["tests"].values() if test["status"] == "passed")
             total_tests = len(test_results["tests"])
             test_results["overall_score"] = (passed_tests / total_tests) * 100
-            test_results["status"] = (
-                "passed" if passed_tests == total_tests else "partial"
-            )
+            test_results["status"] = "passed" if passed_tests == total_tests else "partial"
 
         except Exception as e:
             test_results["status"] = "failed"
@@ -651,10 +582,7 @@ class Phase10ComprehensiveTestReporter:
             validation_results = analytics_module.validate_environment()
 
             # Validate results structure
-            if (
-                "overall_valid" in validation_results
-                and "validation_score" in validation_results
-            ):
+            if "overall_valid" in validation_results and "validation_score" in validation_results:
                 return {
                     "status": "passed",
                     "score": validation_results["validation_score"],
@@ -705,7 +633,7 @@ class Phase10ComprehensiveTestReporter:
                 return {
                     "status": "passed",
                     "score": 100,
-                    "details": f"Analytics deployment successful with complexity: {deployment_result.get('complexity_level', 'unknown')}",
+                    "details": f"Analytics deployment successful with complexity: {deployment_result.get('complexity_level', 'unknown')}",  # noqa: E501
                 }
             else:
                 return {
@@ -721,7 +649,7 @@ class Phase10ComprehensiveTestReporter:
         """Test analytics platform error handling."""
         try:
             # Test analytics error handling
-            analytics_module = AdvancedAnalyticsPlatformModule()
+            AdvancedAnalyticsPlatformModule()
 
             # Basic error handling test
             return {
@@ -757,16 +685,10 @@ class Phase10ComprehensiveTestReporter:
             test_results["tests"]["command_execution"] = self._test_command_execution()
 
             # Calculate overall score
-            passed_tests = sum(
-                1
-                for test in test_results["tests"].values()
-                if test["status"] == "passed"
-            )
+            passed_tests = sum(1 for test in test_results["tests"].values() if test["status"] == "passed")
             total_tests = len(test_results["tests"])
             test_results["overall_score"] = (passed_tests / total_tests) * 100
-            test_results["status"] = (
-                "passed" if passed_tests == total_tests else "partial"
-            )
+            test_results["status"] = "passed" if passed_tests == total_tests else "partial"
 
         except Exception as e:
             test_results["status"] = "failed"
@@ -849,21 +771,13 @@ class Phase10ComprehensiveTestReporter:
         try:
             # Test complexity levels
             for level in self.complexity_levels:
-                test_results["tests"][f"complexity_{level}"] = (
-                    self._test_complexity_level(level)
-                )
+                test_results["tests"][f"complexity_{level}"] = self._test_complexity_level(level)
 
             # Calculate overall score
-            passed_tests = sum(
-                1
-                for test in test_results["tests"].values()
-                if test["status"] == "passed"
-            )
+            passed_tests = sum(1 for test in test_results["tests"].values() if test["status"] == "passed")
             total_tests = len(test_results["tests"])
             test_results["overall_score"] = (passed_tests / total_tests) * 100
-            test_results["status"] = (
-                "passed" if passed_tests == total_tests else "partial"
-            )
+            test_results["status"] = "passed" if passed_tests == total_tests else "partial"
 
         except Exception as e:
             test_results["status"] = "failed"
@@ -917,9 +831,7 @@ class Phase10ComprehensiveTestReporter:
 
         try:
             # Test 6.1: Resource Allocation
-            test_results["tests"][
-                "resource_allocation"
-            ] = self._test_resource_allocation()
+            test_results["tests"]["resource_allocation"] = self._test_resource_allocation()
 
             # Test 6.2: Resource Cleanup
             test_results["tests"]["resource_cleanup"] = self._test_resource_cleanup()
@@ -928,16 +840,10 @@ class Phase10ComprehensiveTestReporter:
             test_results["tests"]["memory_management"] = self._test_memory_management()
 
             # Calculate overall score
-            passed_tests = sum(
-                1
-                for test in test_results["tests"].values()
-                if test["status"] == "passed"
-            )
+            passed_tests = sum(1 for test in test_results["tests"].values() if test["status"] == "passed")
             total_tests = len(test_results["tests"])
             test_results["overall_score"] = (passed_tests / total_tests) * 100
-            test_results["status"] = (
-                "passed" if passed_tests == total_tests else "partial"
-            )
+            test_results["status"] = "passed" if passed_tests == total_tests else "partial"
 
         except Exception as e:
             test_results["status"] = "failed"
@@ -964,7 +870,7 @@ class Phase10ComprehensiveTestReporter:
                 return {
                     "status": "passed",
                     "score": 100,
-                    "details": f"Resource allocation tracking available: {len(architecture_module.resources_allocated)} resources",
+                    "details": f"Resource allocation tracking available: {len(architecture_module.resources_allocated)} resources",  # noqa: E501
                 }
             else:
                 return {
@@ -1044,17 +950,13 @@ class Phase10ComprehensiveTestReporter:
                 "passed_tests": passed_tests,
                 "failed_tests": failed_tests,
                 "skipped_tests": skipped_tests,
-                "test_duration": (
-                    datetime.now() - self.test_start_time
-                ).total_seconds(),
+                "test_duration": (datetime.now() - self.test_start_time).total_seconds(),
             }
         )
 
     def _display_comprehensive_results(self: Self):
         """Display comprehensive test results."""
-        self.console.print(
-            "\\n📊 Phase 10: Comprehensive Test Results", style="bold blue"
-        )
+        self.console.print("\\n📊 Phase 10: Comprehensive Test Results", style="bold blue")
 
         # Create results table
         results_table = Table(title="Enterprise Integration & Deployment Test Results")
@@ -1065,21 +967,13 @@ class Phase10ComprehensiveTestReporter:
         results_table.add_column("Details", style="dim")
 
         for category, results in self.test_results.items():
-            status_icon = (
-                "✅"
-                if results["status"] == "passed"
-                else "⚠️" if results["status"] == "partial" else "❌"
-            )
+            status_icon = "✅" if results["status"] == "passed" else "⚠️" if results["status"] == "partial" else "❌"
             status_text = f"{status_icon} {results['status'].upper()}"
             score_text = f"{results['overall_score']:.1f}%"
 
             if "tests" in results:
                 test_count = len(results["tests"])
-                passed_count = sum(
-                    1
-                    for test in results["tests"].values()
-                    if test["status"] == "passed"
-                )
+                passed_count = sum(1 for test in results["tests"].values() if test["status"] == "passed")
                 tests_text = f"{passed_count}/{test_count}"
             else:
                 tests_text = "N/A"
@@ -1100,19 +994,13 @@ class Phase10ComprehensiveTestReporter:
 
         # Calculate overall score
         category_scores = [
-            results["overall_score"]
-            for results in self.test_results.values()
-            if "overall_score" in results
+            results["overall_score"] for results in self.test_results.values() if "overall_score" in results
         ]
-        overall_score = (
-            sum(category_scores) / len(category_scores) if category_scores else 0
-        )
+        overall_score = sum(category_scores) / len(category_scores) if category_scores else 0
 
         # Add overall status
         overall_status = (
-            "✅ EXCELLENT"
-            if overall_score >= 90
-            else "✅ GOOD" if overall_score >= 80 else "⚠️ NEEDS IMPROVEMENT"
+            "✅ EXCELLENT" if overall_score >= 90 else "✅ GOOD" if overall_score >= 80 else "⚠️ NEEDS IMPROVEMENT"
         )
         results_table.add_row(
             "Overall Status",
@@ -1144,33 +1032,25 @@ class Phase10ComprehensiveTestReporter:
         self.console.print("\\n📈 Test Summary:", style="bold blue")
         self.console.print(f"  • Total Tests: {self.test_metrics['total_tests']}")
         self.console.print(
-            f"  • Passed: {self.test_metrics['passed_tests']} ({(self.test_metrics['passed_tests'] / self.test_metrics['total_tests'] * 100):.1f}%)"
+            f"  • Passed: {self.test_metrics['passed_tests']} ({(self.test_metrics['passed_tests'] / self.test_metrics['total_tests'] * 100):.1f}%)"  # noqa: E501
         )
         self.console.print(f"  • Failed: {self.test_metrics['failed_tests']}")
         self.console.print(f"  • Skipped: {self.test_metrics['skipped_tests']}")
-        self.console.print(
-            f"  • Duration: {self.test_metrics['test_duration']:.2f} seconds"
-        )
+        self.console.print(f"  • Duration: {self.test_metrics['test_duration']:.2f} seconds")
 
     def _generate_detailed_report(self: Self) -> dict[str, Any]:
         """Generate detailed test report."""
         category_scores = [
-            results["overall_score"]
-            for results in self.test_results.values()
-            if "overall_score" in results
+            results["overall_score"] for results in self.test_results.values() if "overall_score" in results
         ]
-        overall_score = (
-            sum(category_scores) / len(category_scores) if category_scores else 0
-        )
+        overall_score = sum(category_scores) / len(category_scores) if category_scores else 0
 
         return {
             "phase": "10.0 - Enterprise Integration & Deployment",
             "test_summary": {
                 "overall_score": overall_score,
                 "status": (
-                    "EXCELLENT"
-                    if overall_score >= 90
-                    else "GOOD" if overall_score >= 80 else "NEEDS_IMPROVEMENT"
+                    "EXCELLENT" if overall_score >= 90 else "GOOD" if overall_score >= 80 else "NEEDS_IMPROVEMENT"
                 ),
                 "total_tests": self.test_metrics["total_tests"],
                 "passed_tests": self.test_metrics["passed_tests"],
@@ -1191,13 +1071,9 @@ class Phase10ComprehensiveTestReporter:
 
         for category, results in self.test_results.items():
             if results["status"] == "failed":
-                recommendations.append(
-                    f"Fix issues in {category.replace('_', ' ').title()}"
-                )
+                recommendations.append(f"Fix issues in {category.replace('_', ' ').title()}")
             elif results["status"] == "partial":
-                recommendations.append(
-                    f"Improve {category.replace('_', ' ').title()} implementation"
-                )
+                recommendations.append(f"Improve {category.replace('_', ' ').title()} implementation")
 
         if not recommendations:
             recommendations.append(
@@ -1213,9 +1089,7 @@ class Phase10ComprehensiveTestReporter:
         Clean up test resources following crawl_mcp.py patterns.
         """
         try:
-            self.console.print(
-                "🧹 Cleaning up Phase 10 test resources...", style="bold yellow"
-            )
+            self.console.print("🧹 Cleaning up Phase 10 test resources...", style="bold yellow")
 
             # Execute cleanup tasks
             for task in self.cleanup_tasks:

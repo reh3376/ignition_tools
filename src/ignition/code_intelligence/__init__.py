@@ -37,9 +37,7 @@ try:
     # Package metadata
     __version__ = "8.1.0"
     __author__ = "IGN Scripts Team"
-    __description__ = (
-        "Comprehensive Code Intelligence System with automated refactoring"
-    )
+    __description__ = "Comprehensive Code Intelligence System with automated refactoring"
 
     # Quick access function for new agents
     def quick_start() -> Any:

@@ -33,16 +33,10 @@ from src.core.terminal_monitor import (
 class TestEnvironment(BaseModel):
     """Test environment configuration."""
 
-    test_timeout: int = Field(
-        default=30, ge=1, le=300, description="Test timeout in seconds"
-    )
-    temp_dir: str | None = Field(
-        default=None, description="Temporary directory for tests"
-    )
+    test_timeout: int = Field(default=30, ge=1, le=300, description="Test timeout in seconds")
+    temp_dir: str | None = Field(default=None, description="Temporary directory for tests")
     cleanup_after_tests: bool = Field(default=True, description="Clean up after tests")
-    parallel_test_limit: int = Field(
-        default=3, ge=1, le=10, description="Maximum parallel tests"
-    )
+    parallel_test_limit: int = Field(default=3, ge=1, le=10, description="Maximum parallel tests")
 
 
 class TerminalMonitorTestSuite:
@@ -113,12 +107,8 @@ class TerminalMonitorTestSuite:
 
             # Test basic terminal commands
             try:
-                result = subprocess.run(
-                    ["echo", "test"], capture_output=True, text=True, timeout=5
-                )
-                validation_results["terminal_commands_available"] = (
-                    result.returncode == 0
-                )
+                result = subprocess.run(["echo", "test"], capture_output=True, text=True, timeout=5)
+                validation_results["terminal_commands_available"] = result.returncode == 0
             except Exception:
                 pass
 
@@ -158,16 +148,10 @@ class TerminalMonitorTestSuite:
                 "terminal_commands_available",
             ]
 
-            missing_components = [
-                comp
-                for comp in required_components
-                if not env_validation.get(comp, False)
-            ]
+            missing_components = [comp for comp in required_components if not env_validation.get(comp, False)]
 
             if missing_components:
-                raise RuntimeError(
-                    f"Missing required test components: {missing_components}"
-                )
+                raise RuntimeError(f"Missing required test components: {missing_components}")
 
             # Initialize monitor with test configuration
             test_config = MonitoringConfig(
@@ -197,11 +181,7 @@ class TerminalMonitorTestSuite:
                 self.monitor.stop_monitoring()
 
             # Clean up temp directory
-            if (
-                self.temp_dir
-                and self.temp_dir.exists()
-                and self.test_env.cleanup_after_tests
-            ):
+            if self.temp_dir and self.temp_dir.exists() and self.test_env.cleanup_after_tests:
                 import shutil
 
                 shutil.rmtree(self.temp_dir, ignore_errors=True)
@@ -290,9 +270,7 @@ class TerminalMonitorTestSuite:
                 test_result["status"] = "passed"
             else:
                 test_result["status"] = "failed"
-                test_result["errors"].append(
-                    f"Expected timeout, got state: {execution.state}"
-                )
+                test_result["errors"].append(f"Expected timeout, got state: {execution.state}")
 
         except Exception as e:
             test_result["status"] = "failed"
@@ -333,9 +311,7 @@ class TerminalMonitorTestSuite:
                 test_result["status"] = "passed"
             else:
                 test_result["status"] = "failed"
-                test_result["errors"].append(
-                    f"Expected failure, got state: {execution.state}"
-                )
+                test_result["errors"].append(f"Expected failure, got state: {execution.state}")
 
         except Exception as e:
             test_result["status"] = "failed"
@@ -361,9 +337,7 @@ class TerminalMonitorTestSuite:
 
         try:
             # Create multiple concurrent commands
-            commands = [
-                CommandRequest(command=["echo", f"Command {i}"]) for i in range(3)
-            ]
+            commands = [CommandRequest(command=["echo", f"Command {i}"]) for i in range(3)]
 
             # Execute concurrently
             tasks = [self.monitor.execute_command(cmd) for cmd in commands]
@@ -371,12 +345,8 @@ class TerminalMonitorTestSuite:
 
             test_result["details"]["concurrent_test"] = {
                 "total_commands": len(executions),
-                "successful_commands": sum(
-                    1 for e in executions if e.state == CommandState.COMPLETED
-                ),
-                "failed_commands": sum(
-                    1 for e in executions if e.state == CommandState.FAILED
-                ),
+                "successful_commands": sum(1 for e in executions if e.state == CommandState.COMPLETED),
+                "failed_commands": sum(1 for e in executions if e.state == CommandState.FAILED),
                 "executions": [
                     {
                         "state": e.state.value,
@@ -393,9 +363,7 @@ class TerminalMonitorTestSuite:
                 test_result["status"] = "passed"
             else:
                 test_result["status"] = "failed"
-                test_result["errors"].append(
-                    "Not all concurrent commands completed successfully"
-                )
+                test_result["errors"].append("Not all concurrent commands completed successfully")
 
         except Exception as e:
             test_result["status"] = "failed"
@@ -459,21 +427,14 @@ else:
                 }
 
                 # Validate recovery worked
-                if (
-                    execution.state in [CommandState.COMPLETED, CommandState.RECOVERED]
-                    and execution.retry_count > 0
-                ):
+                if execution.state in [CommandState.COMPLETED, CommandState.RECOVERED] and execution.retry_count > 0:
                     test_result["status"] = "passed"
                 else:
                     test_result["status"] = "failed"
-                    test_result["errors"].append(
-                        "Recovery mechanism did not work as expected"
-                    )
+                    test_result["errors"].append("Recovery mechanism did not work as expected")
             else:
                 test_result["status"] = "skipped"
-                test_result["errors"].append(
-                    "No temp directory available for recovery test"
-                )
+                test_result["errors"].append("No temp directory available for recovery test")
 
         except Exception as e:
             test_result["status"] = "failed"
@@ -520,8 +481,7 @@ else:
             test_result["details"]["statistics_test"] = {
                 "initial_stats": initial_stats,
                 "final_stats": final_stats,
-                "commands_executed": final_stats["total_commands"]
-                - initial_stats["total_commands"],
+                "commands_executed": final_stats["total_commands"] - initial_stats["total_commands"],
                 "success_rate": final_stats["success_rate"],
             }
 
@@ -614,9 +574,7 @@ else:
                     test_results["summary"]["skipped_tests"] += 1
                     print(f"⏭️  {test_name}: SKIPPED")
 
-                test_results["summary"]["total_duration"] += test_result.get(
-                    "duration", 0.0
-                )
+                test_results["summary"]["total_duration"] += test_result.get("duration", 0.0)
 
             except Exception as e:
                 error_result = {
@@ -635,14 +593,9 @@ else:
 
         # Final summary
         test_results["end_time"] = time.time()
-        test_results["total_execution_time"] = (
-            test_results["end_time"] - test_results["start_time"]
-        )
+        test_results["total_execution_time"] = test_results["end_time"] - test_results["start_time"]
 
-        success_rate = (
-            test_results["summary"]["passed_tests"]
-            / test_results["summary"]["total_tests"]
-        ) * 100
+        success_rate = (test_results["summary"]["passed_tests"] / test_results["summary"]["total_tests"]) * 100
 
         print("\n📊 Test Suite Complete:")
         print(f"   Total Tests: {test_results['summary']['total_tests']}")

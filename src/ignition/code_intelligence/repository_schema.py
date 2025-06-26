@@ -278,15 +278,15 @@ class RepositorySchema:
             # Module constraints
             "CREATE CONSTRAINT module_path IF NOT EXISTS FOR (m:Module) REQUIRE (m.path, m.repository) IS UNIQUE",
             # Function constraints
-            "CREATE CONSTRAINT function_unique IF NOT EXISTS FOR (f:Function) REQUIRE (f.name, f.module, f.repository, f.start_line) IS UNIQUE",
+            "CREATE CONSTRAINT function_unique IF NOT EXISTS FOR (f:Function) REQUIRE (f.name, f.module, f.repository, f.start_line) IS UNIQUE",  # noqa: E501
             # Class constraints
-            "CREATE CONSTRAINT class_unique IF NOT EXISTS FOR (c:Class) REQUIRE (c.name, c.module, c.repository, c.start_line) IS UNIQUE",
+            "CREATE CONSTRAINT class_unique IF NOT EXISTS FOR (c:Class) REQUIRE (c.name, c.module, c.repository, c.start_line) IS UNIQUE",  # noqa: E501
             # Dependency constraints
-            "CREATE CONSTRAINT dependency_unique IF NOT EXISTS FOR (d:Dependency) REQUIRE (d.name, d.repository) IS UNIQUE",
+            "CREATE CONSTRAINT dependency_unique IF NOT EXISTS FOR (d:Dependency) REQUIRE (d.name, d.repository) IS UNIQUE",  # noqa: E501
             # Agent constraints
-            "CREATE CONSTRAINT agent_unique IF NOT EXISTS FOR (a:Agent) REQUIRE (a.name, a.module, a.repository) IS UNIQUE",
+            "CREATE CONSTRAINT agent_unique IF NOT EXISTS FOR (a:Agent) REQUIRE (a.name, a.module, a.repository) IS UNIQUE",  # noqa: E501
             # Tool constraints
-            "CREATE CONSTRAINT tool_unique IF NOT EXISTS FOR (t:Tool) REQUIRE (t.name, t.module, t.repository) IS UNIQUE",
+            "CREATE CONSTRAINT tool_unique IF NOT EXISTS FOR (t:Tool) REQUIRE (t.name, t.module, t.repository) IS UNIQUE",  # noqa: E501
         ]
 
         for constraint in constraints:
@@ -343,39 +343,39 @@ class RepositorySchema:
         vector_indexes = [
             {
                 "name": "repository_embeddings",
-                "query": "CREATE VECTOR INDEX repository_embeddings IF NOT EXISTS FOR (r:Repository) ON (r.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",
+                "query": "CREATE VECTOR INDEX repository_embeddings IF NOT EXISTS FOR (r:Repository) ON (r.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",  # noqa: E501
             },
             {
                 "name": "directory_embeddings",
-                "query": "CREATE VECTOR INDEX directory_embeddings IF NOT EXISTS FOR (d:Directory) ON (d.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",
+                "query": "CREATE VECTOR INDEX directory_embeddings IF NOT EXISTS FOR (d:Directory) ON (d.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",  # noqa: E501
             },
             {
                 "name": "file_embeddings",
-                "query": "CREATE VECTOR INDEX file_embeddings IF NOT EXISTS FOR (f:File) ON (f.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",
+                "query": "CREATE VECTOR INDEX file_embeddings IF NOT EXISTS FOR (f:File) ON (f.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",  # noqa: E501
             },
             {
                 "name": "package_embeddings",
-                "query": "CREATE VECTOR INDEX package_embeddings IF NOT EXISTS FOR (p:Package) ON (p.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",
+                "query": "CREATE VECTOR INDEX package_embeddings IF NOT EXISTS FOR (p:Package) ON (p.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",  # noqa: E501
             },
             {
                 "name": "module_embeddings",
-                "query": "CREATE VECTOR INDEX module_embeddings IF NOT EXISTS FOR (m:Module) ON (m.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",
+                "query": "CREATE VECTOR INDEX module_embeddings IF NOT EXISTS FOR (m:Module) ON (m.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",  # noqa: E501
             },
             {
                 "name": "function_embeddings",
-                "query": "CREATE VECTOR INDEX function_embeddings IF NOT EXISTS FOR (f:Function) ON (f.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",
+                "query": "CREATE VECTOR INDEX function_embeddings IF NOT EXISTS FOR (f:Function) ON (f.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",  # noqa: E501
             },
             {
                 "name": "class_embeddings",
-                "query": "CREATE VECTOR INDEX class_embeddings IF NOT EXISTS FOR (c:Class) ON (c.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",
+                "query": "CREATE VECTOR INDEX class_embeddings IF NOT EXISTS FOR (c:Class) ON (c.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",  # noqa: E501
             },
             {
                 "name": "agent_embeddings",
-                "query": "CREATE VECTOR INDEX agent_embeddings IF NOT EXISTS FOR (a:Agent) ON (a.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",
+                "query": "CREATE VECTOR INDEX agent_embeddings IF NOT EXISTS FOR (a:Agent) ON (a.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",  # noqa: E501
             },
             {
                 "name": "tool_embeddings",
-                "query": "CREATE VECTOR INDEX tool_embeddings IF NOT EXISTS FOR (t:Tool) ON (t.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",
+                "query": "CREATE VECTOR INDEX tool_embeddings IF NOT EXISTS FOR (t:Tool) ON (t.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",  # noqa: E501
             },
         ]
 
@@ -384,9 +384,7 @@ class RepositorySchema:
                 self.client.execute_query(index_info["query"])
                 logger.info(f"Created vector index: {index_info['name']}")
             except Exception as e:
-                logger.debug(
-                    f"Vector index {index_info['name']} may already exist: {e}"
-                )
+                logger.debug(f"Vector index {index_info['name']} may already exist: {e}")
 
     def get_repository_schema_info(self) -> dict[str, Any]:
         """Get information about the repository schema."""
@@ -407,9 +405,7 @@ class RepositorySchema:
             ]
 
             for node_type in node_types:
-                count_result = self.client.execute_query(
-                    f"MATCH (n:{node_type}) RETURN count(n) as count"
-                )
+                count_result = self.client.execute_query(f"MATCH (n:{node_type}) RETURN count(n) as count")
                 node_counts[node_type] = count_result[0]["count"] if count_result else 0
 
             # Get relationship counts
@@ -432,12 +428,8 @@ class RepositorySchema:
             ]
 
             for rel_type in relationship_types:
-                count_result = self.client.execute_query(
-                    f"MATCH ()-[r:{rel_type}]->() RETURN count(r) as count"
-                )
-                relationship_counts[rel_type] = (
-                    count_result[0]["count"] if count_result else 0
-                )
+                count_result = self.client.execute_query(f"MATCH ()-[r:{rel_type}]->() RETURN count(r) as count")
+                relationship_counts[rel_type] = count_result[0]["count"] if count_result else 0
 
             return {
                 "node_counts": node_counts,

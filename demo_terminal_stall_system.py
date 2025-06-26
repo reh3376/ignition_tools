@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Terminal Stall Monitoring System - Comprehensive Demo
+"""Terminal Stall Monitoring System - Comprehensive Demo.
 
 This script demonstrates the complete terminal stall monitoring and auto-recovery
 system in action, showing all key features and capabilities.
@@ -25,9 +25,7 @@ async def demo_basic_usage():
     print("-" * 50)
 
     # Simple command
-    result = await execute_terminal_command(
-        ["echo", "Hello from stall monitoring system!"]
-    )
+    result = await execute_terminal_command(["echo", "Hello from stall monitoring system!"])
     print(f"✅ Simple command: {result.state.value} - Output: {result.stdout.strip()}")
     print(f"   Duration: {result.duration:.2f}s")
 

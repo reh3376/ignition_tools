@@ -1,4 +1,4 @@
-"""Phase 10: Enterprise Integration & Deployment - FastAPI Server
+"""Phase 10: Enterprise Integration & Deployment - FastAPI Server.
 
 This module provides REST API endpoints for testing, monitoring, and managing
 the Phase 10 enterprise modules using FastAPI and uvicorn following crawl_mcp.py methodology.
@@ -85,9 +85,7 @@ class DeploymentRequest(BaseModel):
         description="Deployment complexity level",
         pattern="^(basic|standard|advanced|enterprise)$",
     )
-    dry_run: bool = Field(
-        default=False, description="Perform dry run without actual deployment"
-    )
+    dry_run: bool = Field(default=False, description="Perform dry run without actual deployment")
 
 
 class DeploymentResponse(BaseModel):
@@ -119,9 +117,7 @@ class TestRequest(BaseModel):
         description="Test complexity level",
         pattern="^(basic|standard|advanced|enterprise)$",
     )
-    include_deployment: bool = Field(
-        default=False, description="Include deployment testing"
-    )
+    include_deployment: bool = Field(default=False, description="Include deployment testing")
 
 
 # Global module instances (initialized on startup)
@@ -200,9 +196,7 @@ async def health_check() -> None:
     try:
         # Calculate uptime
         uptime = datetime.now() - startup_time
-        uptime_str = (
-            f"{uptime.days}d {uptime.seconds // 3600}h {(uptime.seconds // 60) % 60}m"
-        )
+        uptime_str = f"{uptime.days}d {uptime.seconds // 3600}h {(uptime.seconds // 60) % 60}m"
 
         # Check module status
         modules_status = {}
@@ -211,9 +205,7 @@ async def health_check() -> None:
         if architecture_module:
             arch_status = architecture_module.get_status()
             env_validation = arch_status["environment_validation"]
-            modules_status["enterprise_architecture"] = (
-                "healthy" if env_validation["overall_valid"] else "degraded"
-            )
+            modules_status["enterprise_architecture"] = "healthy" if env_validation["overall_valid"] else "degraded"
             environment_scores.append(env_validation["validation_score"])
         else:
             modules_status["enterprise_architecture"] = "unavailable"
@@ -221,9 +213,7 @@ async def health_check() -> None:
         if cloud_module:
             cloud_status = cloud_module.get_status()
             cloud_validation = cloud_status["environment_validation"]
-            modules_status["cloud_integration"] = (
-                "healthy" if cloud_validation["overall_valid"] else "degraded"
-            )
+            modules_status["cloud_integration"] = "healthy" if cloud_validation["overall_valid"] else "degraded"
             environment_scores.append(cloud_validation["validation_score"])
         else:
             modules_status["cloud_integration"] = "unavailable"
@@ -231,24 +221,16 @@ async def health_check() -> None:
         if analytics_module:
             analytics_status = analytics_module.get_status()
             analytics_validation = analytics_status["environment_validation"]
-            modules_status["analytics_platform"] = (
-                "healthy" if analytics_validation["overall_valid"] else "degraded"
-            )
+            modules_status["analytics_platform"] = "healthy" if analytics_validation["overall_valid"] else "degraded"
             environment_scores.append(analytics_validation["validation_score"])
         else:
             modules_status["analytics_platform"] = "unavailable"
 
         # Calculate overall environment score
-        avg_environment_score = (
-            sum(environment_scores) / len(environment_scores)
-            if environment_scores
-            else 0.0
-        )
+        avg_environment_score = sum(environment_scores) / len(environment_scores) if environment_scores else 0.0
 
         # Determine overall status
-        healthy_modules = sum(
-            1 for status in modules_status.values() if status == "healthy"
-        )
+        healthy_modules = sum(1 for status in modules_status.values() if status == "healthy")
         total_modules = len(modules_status)
 
         if healthy_modules == total_modules:
@@ -341,26 +323,20 @@ async def validate_all_environments() -> None:
 async def validate_architecture_environment() -> None:
     """Validate enterprise architecture environment."""
     if not architecture_module:
-        raise HTTPException(
-            status_code=503, detail="Enterprise Architecture module not available"
-        )
+        raise HTTPException(status_code=503, detail="Enterprise Architecture module not available")
 
     try:
         return architecture_module.validate_environment()
     except Exception as e:
         logger.error(f"Architecture validation failed: {e}")
-        raise HTTPException(
-            status_code=500, detail=f"Architecture validation failed: {e!s}"
-        )
+        raise HTTPException(status_code=500, detail=f"Architecture validation failed: {e!s}")
 
 
 @app.get("/api/v1/validation/cloud", response_model=dict[str, Any])
 async def validate_cloud_environment() -> None:
     """Validate cloud integration environment."""
     if not cloud_module:
-        raise HTTPException(
-            status_code=503, detail="Cloud Integration module not available"
-        )
+        raise HTTPException(status_code=503, detail="Cloud Integration module not available")
 
     try:
         return cloud_module.validate_environment()
@@ -373,34 +349,26 @@ async def validate_cloud_environment() -> None:
 async def validate_analytics_environment() -> None:
     """Validate analytics platform environment."""
     if not analytics_module:
-        raise HTTPException(
-            status_code=503, detail="Analytics Platform module not available"
-        )
+        raise HTTPException(status_code=503, detail="Analytics Platform module not available")
 
     try:
         return analytics_module.validate_environment()
     except Exception as e:
         logger.error(f"Analytics validation failed: {e}")
-        raise HTTPException(
-            status_code=500, detail=f"Analytics validation failed: {e!s}"
-        )
+        raise HTTPException(status_code=500, detail=f"Analytics validation failed: {e!s}")
 
 
 # Deployment Endpoints
 
 
 @app.post("/api/v1/deployment/architecture", response_model=DeploymentResponse)
-async def deploy_architecture(
-    request: DeploymentRequest, background_tasks: BackgroundTasks
-) -> None:
+async def deploy_architecture(request: DeploymentRequest, background_tasks: BackgroundTasks) -> None:
     """Deploy enterprise architecture with progressive complexity.
 
     Following crawl_mcp.py methodology: Step 5 - Progressive Complexity Support
     """
     if not architecture_module:
-        raise HTTPException(
-            status_code=503, detail="Enterprise Architecture module not available"
-        )
+        raise HTTPException(status_code=503, detail="Enterprise Architecture module not available")
 
     try:
         if request.dry_run:
@@ -439,14 +407,10 @@ async def deploy_architecture(
 
 
 @app.post("/api/v1/deployment/cloud", response_model=DeploymentResponse)
-async def deploy_cloud(
-    request: DeploymentRequest, background_tasks: BackgroundTasks
-) -> None:
+async def deploy_cloud(request: DeploymentRequest, background_tasks: BackgroundTasks) -> None:
     """Deploy cloud infrastructure with progressive complexity."""
     if not cloud_module:
-        raise HTTPException(
-            status_code=503, detail="Cloud Integration module not available"
-        )
+        raise HTTPException(status_code=503, detail="Cloud Integration module not available")
 
     try:
         if request.dry_run:
@@ -482,14 +446,10 @@ async def deploy_cloud(
 
 
 @app.post("/api/v1/deployment/analytics", response_model=DeploymentResponse)
-async def deploy_analytics(
-    request: DeploymentRequest, background_tasks: BackgroundTasks
-) -> None:
+async def deploy_analytics(request: DeploymentRequest, background_tasks: BackgroundTasks) -> None:
     """Deploy analytics platform with progressive complexity."""
     if not analytics_module:
-        raise HTTPException(
-            status_code=503, detail="Analytics Platform module not available"
-        )
+        raise HTTPException(status_code=503, detail="Analytics Platform module not available")
 
     try:
         if request.dry_run:
@@ -521,9 +481,7 @@ async def deploy_analytics(
 
     except Exception as e:
         logger.error(f"Analytics deployment failed: {e}")
-        raise HTTPException(
-            status_code=500, detail=f"Analytics deployment failed: {e!s}"
-        )
+        raise HTTPException(status_code=500, detail=f"Analytics deployment failed: {e!s}")
 
 
 # Testing Endpoints
@@ -549,14 +507,10 @@ async def run_comprehensive_tests(request: TestRequest) -> None:
             }
 
             if request.include_deployment:
-                arch_deployment = architecture_module.deploy_architecture(
-                    request.complexity_level
-                )
+                arch_deployment = architecture_module.deploy_architecture(request.complexity_level)
                 test_results["enterprise_architecture"]["deployment"] = arch_deployment
                 test_results["enterprise_architecture"]["status"] = (
-                    "passed"
-                    if (arch_validation["overall_valid"] and arch_deployment["success"])
-                    else "failed"
+                    "passed" if (arch_validation["overall_valid"] and arch_deployment["success"]) else "failed"
                 )
 
             if test_results["enterprise_architecture"]["status"] == "passed":
@@ -572,17 +526,10 @@ async def run_comprehensive_tests(request: TestRequest) -> None:
             }
 
             if request.include_deployment:
-                cloud_deployment = cloud_module.deploy_cloud_infrastructure(
-                    request.complexity_level
-                )
+                cloud_deployment = cloud_module.deploy_cloud_infrastructure(request.complexity_level)
                 test_results["cloud_integration"]["deployment"] = cloud_deployment
                 test_results["cloud_integration"]["status"] = (
-                    "passed"
-                    if (
-                        cloud_validation["overall_valid"]
-                        and cloud_deployment["success"]
-                    )
-                    else "failed"
+                    "passed" if (cloud_validation["overall_valid"] and cloud_deployment["success"]) else "failed"
                 )
 
             if test_results["cloud_integration"]["status"] == "passed":
@@ -594,22 +541,15 @@ async def run_comprehensive_tests(request: TestRequest) -> None:
             analytics_validation = analytics_module.validate_environment()
             test_results["analytics_platform"] = {
                 "environment_validation": analytics_validation,
-                "status": (
-                    "passed" if analytics_validation["overall_valid"] else "failed"
-                ),
+                "status": ("passed" if analytics_validation["overall_valid"] else "failed"),
             }
 
             if request.include_deployment:
-                analytics_deployment = analytics_module.deploy_analytics_platform(
-                    request.complexity_level
-                )
+                analytics_deployment = analytics_module.deploy_analytics_platform(request.complexity_level)
                 test_results["analytics_platform"]["deployment"] = analytics_deployment
                 test_results["analytics_platform"]["status"] = (
                     "passed"
-                    if (
-                        analytics_validation["overall_valid"]
-                        and analytics_deployment["success"]
-                    )
+                    if (analytics_validation["overall_valid"] and analytics_deployment["success"])
                     else "failed"
                 )
 
@@ -671,9 +611,7 @@ async def get_module_status() -> None:
 async def cleanup_after_delay(module_name: str, delay_seconds: int) -> None:
     """Clean up module resources after a delay."""
     await asyncio.sleep(delay_seconds)
-    logger.info(
-        f"🧹 Cleaning up {module_name} module resources after {delay_seconds} seconds"
-    )
+    logger.info(f"🧹 Cleaning up {module_name} module resources after {delay_seconds} seconds")
 
     if module_name == "architecture" and architecture_module:
         architecture_module.cleanup_resources()

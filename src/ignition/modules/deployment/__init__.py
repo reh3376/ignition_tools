@@ -73,6 +73,4 @@ def validate_deployment_environment() -> dict[str, bool]:
 # Environment validation on import
 _env_status = validate_deployment_environment()
 if not any(_env_status.values()):
-    print(
-        "Warning: Deployment environment variables not configured. See .env.example for required variables."
-    )
+    print("Warning: Deployment environment variables not configured. See .env.example for required variables.")

@@ -1,6 +1,7 @@
 """CLI commands for the core module framework."""
 
 from pathlib import Path
+from typing import Any
 
 import click
 
@@ -76,9 +77,7 @@ def demo_command(
         if verbose:
             module.diagnostics_manager.set_log_level("DEBUG")
 
-        click.echo(
-            f"✅ Module created: {module.metadata.name} v{module.metadata.version}"
-        )
+        click.echo(f"✅ Module created: {module.metadata.name} v{module.metadata.version}")
 
         # Load configuration
         click.echo("\nLoading module configuration...")
@@ -160,9 +159,7 @@ def demo_command(
         if module.config_manager.update(new_config):
             click.echo("✅ Configuration updated successfully")
             click.echo(f"  New batch_size: {module.config_manager.get('batch_size')}")
-            click.echo(
-                f"  New timeout_seconds: {module.config_manager.get('timeout_seconds')}"
-            )
+            click.echo(f"  New timeout_seconds: {module.config_manager.get('timeout_seconds')}")
         else:
             click.echo("❌ Configuration update failed")
 
@@ -337,8 +334,10 @@ def test_command(module_path: Path, verbose: bool) -> bool:
 
     if passed == total:
         click.echo("🎉 All tests passed!")
+        return True
     else:
         click.echo("❌ Some tests failed")
+        return False
 
 
 @core_group.command("info")
@@ -387,3 +386,14 @@ def info_command() -> None:
 def register_commands(cli) -> None:
     """Register core framework commands with the CLI."""
     cli.add_command(core_group)
+
+    # Register LLM Infrastructure commands (Phase 13.1)
+    try:
+        from ignition.modules.llm_infrastructure.cli_commands import (
+            llm_infrastructure_cli,
+        )
+
+        cli.add_command(llm_infrastructure_cli)
+    except ImportError:
+        # LLM Infrastructure module not available
+        pass

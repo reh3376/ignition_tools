@@ -1,4 +1,4 @@
-"""AI Model Preparation for Industrial Dataset Curation
+"""AI Model Preparation for Industrial Dataset Curation.
 
 Following crawl_mcp.py methodology for enterprise-ready implementation:
 - Environment validation first
@@ -38,25 +38,13 @@ class FeatureEngineeringConfig(BaseModel):
 
     enable_derivatives: bool = Field(True, description="Enable derivative features")
     enable_integrals: bool = Field(True, description="Enable integral features")
-    enable_moving_averages: bool = Field(
-        True, description="Enable moving average features"
-    )
-    enable_cross_correlations: bool = Field(
-        True, description="Enable cross-correlation features"
-    )
-    enable_frequency_features: bool = Field(
-        False, description="Enable frequency domain features"
-    )
+    enable_moving_averages: bool = Field(True, description="Enable moving average features")
+    enable_cross_correlations: bool = Field(True, description="Enable cross-correlation features")
+    enable_frequency_features: bool = Field(False, description="Enable frequency domain features")
 
-    window_sizes: list[int] = Field(
-        [5, 10, 30, 60], description="Window sizes for moving features"
-    )
-    derivative_orders: list[int] = Field(
-        [1, 2], description="Derivative orders to compute"
-    )
-    correlation_lags: list[int] = Field(
-        [1, 5, 10], description="Lag values for correlations"
-    )
+    window_sizes: list[int] = Field([5, 10, 30, 60], description="Window sizes for moving features")
+    derivative_orders: list[int] = Field([1, 2], description="Derivative orders to compute")
+    correlation_lags: list[int] = Field([1, 5, 10], description="Lag values for correlations")
 
     @validator("window_sizes")
     def validate_window_sizes(cls, v) -> Any:
@@ -68,26 +56,16 @@ class FeatureEngineeringConfig(BaseModel):
 class ModelPreparationConfig(BaseModel):
     """Configuration for model preparation operations."""
 
-    train_split: float = Field(
-        0.7, ge=0.1, le=0.9, description="Training data split ratio"
-    )
-    validation_split: float = Field(
-        0.15, ge=0.05, le=0.4, description="Validation data split ratio"
-    )
-    test_split: float = Field(
-        0.15, ge=0.05, le=0.4, description="Test data split ratio"
-    )
+    train_split: float = Field(0.7, ge=0.1, le=0.9, description="Training data split ratio")
+    validation_split: float = Field(0.15, ge=0.05, le=0.4, description="Validation data split ratio")
+    test_split: float = Field(0.15, ge=0.05, le=0.4, description="Test data split ratio")
 
     random_seed: int = Field(42, description="Random seed for reproducibility")
     normalize_features: bool = Field(True, description="Apply feature normalization")
     handle_missing_data: bool = Field(True, description="Handle missing data")
 
-    target_variables: list[str] = Field(
-        default_factory=list, description="Target variables for prediction"
-    )
-    feature_selection_method: str = Field(
-        "correlation", description="Feature selection method"
-    )
+    target_variables: list[str] = Field(default_factory=list, description="Target variables for prediction")
+    feature_selection_method: str = Field("correlation", description="Feature selection method")
 
     @validator("train_split", "validation_split", "test_split")
     def validate_splits(cls, v, values) -> Any:
@@ -110,17 +88,11 @@ class PreparedDataset(BaseModel):
     validation_samples: int = Field(..., description="Number of validation samples")
     test_samples: int = Field(..., description="Number of test samples")
 
-    feature_stats: dict[str, dict[str, float]] = Field(
-        ..., description="Feature statistics"
-    )
+    feature_stats: dict[str, dict[str, float]] = Field(..., description="Feature statistics")
     preparation_timestamp: datetime = Field(default_factory=datetime.now)
 
-    quality_score: float = Field(
-        ..., ge=0.0, le=1.0, description="Dataset quality score"
-    )
-    completeness_score: float = Field(
-        ..., ge=0.0, le=1.0, description="Data completeness score"
-    )
+    quality_score: float = Field(..., ge=0.0, le=1.0, description="Dataset quality score")
+    completeness_score: float = Field(..., ge=0.0, le=1.0, description="Data completeness score")
 
 
 def validate_environment() -> dict[str, bool]:
@@ -163,9 +135,7 @@ def validate_environment() -> dict[str, bool]:
         models_dir = Path(os.getenv("MODELS_DIRECTORY", "models"))
 
         validation_results["data_directory"] = data_dir.exists()
-        validation_results["models_directory"] = (
-            models_dir.exists() or models_dir.parent.exists()
-        )
+        validation_results["models_directory"] = models_dir.exists() or models_dir.parent.exists()
 
         # Check memory availability (basic check)
         try:
@@ -175,12 +145,10 @@ def validate_environment() -> dict[str, bool]:
             # Require at least 4GB available memory
             validation_results["memory_available"] = memory.available > 4 * 1024**3
         except ImportError:
-            validation_results["memory_available"] = (
-                True  # Assume sufficient if can't check
-            )
+            validation_results["memory_available"] = True  # Assume sufficient if can't check
 
         logger.info(
-            f"Environment validation completed: {sum(validation_results.values())}/{len(validation_results)} checks passed"
+            f"Environment validation completed: {sum(validation_results.values())}/{len(validation_results)} checks passed"  # noqa: E501
         )
         return validation_results
 
@@ -190,7 +158,7 @@ def validate_environment() -> dict[str, bool]:
 
 
 class AIModelPreparation:
-    """AI Model Preparation for Industrial Datasets
+    """AI Model Preparation for Industrial Datasets.
 
     Following crawl_mcp.py methodology:
     - Environment validation first
@@ -200,9 +168,7 @@ class AIModelPreparation:
     - Resource management
     """
 
-    def __init__(
-        self, curator: IndustrialDatasetCurator, complexity_level: str = "standard"
-    ):
+    def __init__(self, curator: IndustrialDatasetCurator, complexity_level: str = "standard"):
         """Initialize AI model preparation framework."""
         try:
             # Environment validation first (crawl_mcp.py pattern)
@@ -222,17 +188,13 @@ class AIModelPreparation:
             self.prepared_datasets: dict[str, PreparedDataset] = {}
             self.feature_cache: dict[str, pd.DataFrame] = {}
 
-            self.logger.info(
-                f"AIModelPreparation initialized with complexity: {complexity_level}"
-            )
+            self.logger.info(f"AIModelPreparation initialized with complexity: {complexity_level}")
 
         except Exception as e:
             logger.error(f"Failed to initialize AIModelPreparation: {e}")
             raise
 
-    def engineer_features(
-        self, dataset_name: str, config: FeatureEngineeringConfig | None = None
-    ) -> pd.DataFrame:
+    def engineer_features(self, dataset_name: str, config: FeatureEngineeringConfig | None = None) -> pd.DataFrame:
         """Engineer features from raw dataset following crawl_mcp.py error handling."""
         try:
             if config is None:
@@ -254,27 +216,19 @@ class AIModelPreparation:
 
             # Generate derivative features
             if config.enable_derivatives:
-                engineered_data = self._add_derivative_features(
-                    engineered_data, config.derivative_orders
-                )
+                engineered_data = self._add_derivative_features(engineered_data, config.derivative_orders)
 
             # Generate integral features
             if config.enable_integrals:
-                engineered_data = self._add_integral_features(
-                    engineered_data, config.window_sizes
-                )
+                engineered_data = self._add_integral_features(engineered_data, config.window_sizes)
 
             # Generate moving averages
             if config.enable_moving_averages:
-                engineered_data = self._add_moving_average_features(
-                    engineered_data, config.window_sizes
-                )
+                engineered_data = self._add_moving_average_features(engineered_data, config.window_sizes)
 
             # Generate cross-correlation features
             if config.enable_cross_correlations:
-                engineered_data = self._add_cross_correlation_features(
-                    engineered_data, config.correlation_lags
-                )
+                engineered_data = self._add_cross_correlation_features(engineered_data, config.correlation_lags)
 
             # Generate frequency domain features (advanced)
             if config.enable_frequency_features and self.complexity_level in [
@@ -286,18 +240,14 @@ class AIModelPreparation:
             # Cache results
             self.feature_cache[dataset_name] = engineered_data
 
-            self.logger.info(
-                f"Feature engineering completed: {len(engineered_data.columns)} features generated"
-            )
+            self.logger.info(f"Feature engineering completed: {len(engineered_data.columns)} features generated")
             return engineered_data
 
         except Exception as e:
             self.logger.error(f"Feature engineering failed for {dataset_name}: {e}")
             raise
 
-    def _add_derivative_features(
-        self, data: pd.DataFrame, orders: list[int]
-    ) -> pd.DataFrame:
+    def _add_derivative_features(self, data: pd.DataFrame, orders: list[int]) -> pd.DataFrame:
         """Add derivative features to dataset."""
         try:
             numeric_columns = data.select_dtypes(include=[np.number]).columns
@@ -314,27 +264,21 @@ class AIModelPreparation:
             self.logger.error(f"Failed to add derivative features: {e}")
             return data
 
-    def _add_integral_features(
-        self, data: pd.DataFrame, window_sizes: list[int]
-    ) -> pd.DataFrame:
+    def _add_integral_features(self, data: pd.DataFrame, window_sizes: list[int]) -> pd.DataFrame:
         """Add integral (cumulative sum) features to dataset."""
         try:
             numeric_columns = data.select_dtypes(include=[np.number]).columns
 
             for col in numeric_columns:
                 for window in window_sizes:
-                    data[f"{col}_integral_{window}"] = (
-                        data[col].rolling(window=window).sum()
-                    )
+                    data[f"{col}_integral_{window}"] = data[col].rolling(window=window).sum()
 
             return data
         except Exception as e:
             self.logger.error(f"Failed to add integral features: {e}")
             return data
 
-    def _add_moving_average_features(
-        self, data: pd.DataFrame, window_sizes: list[int]
-    ) -> pd.DataFrame:
+    def _add_moving_average_features(self, data: pd.DataFrame, window_sizes: list[int]) -> pd.DataFrame:
         """Add moving average features to dataset."""
         try:
             numeric_columns = data.select_dtypes(include=[np.number]).columns
@@ -349,15 +293,13 @@ class AIModelPreparation:
             self.logger.error(f"Failed to add moving average features: {e}")
             return data
 
-    def _add_cross_correlation_features(
-        self, data: pd.DataFrame, lags: list[int]
-    ) -> pd.DataFrame:
+    def _add_cross_correlation_features(self, data: pd.DataFrame, lags: list[int]) -> pd.DataFrame:
         """Add cross-correlation features between variables."""
         try:
             numeric_columns = data.select_dtypes(include=[np.number]).columns
 
             for i, col1 in enumerate(numeric_columns):
-                for j, col2 in enumerate(numeric_columns[i + 1 :], i + 1):
+                for _j, col2 in enumerate(numeric_columns[i + 1 :], i + 1):
                     for lag in lags:
                         # Lagged correlation
                         corr_data = data[col1].corr(data[col2].shift(lag))
@@ -389,18 +331,14 @@ class AIModelPreparation:
                 # Extract key frequency features
                 data[f"{col}_fft_mean"] = np.mean(np.abs(fft_values))
                 data[f"{col}_fft_std"] = np.std(np.abs(fft_values))
-                data[f"{col}_dominant_freq"] = frequencies[
-                    np.argmax(np.abs(fft_values[1:])) + 1
-                ]
+                data[f"{col}_dominant_freq"] = frequencies[np.argmax(np.abs(fft_values[1:])) + 1]
 
             return data
         except Exception as e:
             self.logger.error(f"Failed to add frequency features: {e}")
             return data
 
-    def prepare_training_data(
-        self, dataset_name: str, config: ModelPreparationConfig | None = None
-    ) -> PreparedDataset:
+    def prepare_training_data(self, dataset_name: str, config: ModelPreparationConfig | None = None) -> PreparedDataset:
         """Prepare data for ML model training following crawl_mcp.py methodology."""
         try:
             if config is None:
@@ -437,9 +375,7 @@ class AIModelPreparation:
 
             # Normalize features if requested
             if config.normalize_features:
-                train_data, val_data, test_data = self._normalize_features(
-                    train_data, val_data, test_data, features
-                )
+                train_data, val_data, test_data = self._normalize_features(train_data, val_data, test_data, features)
 
             # Calculate quality metrics
             quality_score = self._calculate_quality_score(data)
@@ -464,15 +400,11 @@ class AIModelPreparation:
             # Store prepared dataset
             self.prepared_datasets[dataset_name] = prepared_dataset
 
-            self.logger.info(
-                f"Training data preparation completed: {len(features)} features, {len(targets)} targets"
-            )
+            self.logger.info(f"Training data preparation completed: {len(features)} features, {len(targets)} targets")
             return prepared_dataset
 
         except Exception as e:
-            self.logger.error(
-                f"Failed to prepare training data for {dataset_name}: {e}"
-            )
+            self.logger.error(f"Failed to prepare training data for {dataset_name}: {e}")
             raise
 
     def _handle_missing_data(self: Self, data: pd.DataFrame) -> pd.DataFrame:
@@ -495,9 +427,7 @@ class AIModelPreparation:
             self.logger.error(f"Failed to handle missing data: {e}")
             return data
 
-    def _select_features(
-        self, data: pd.DataFrame, targets: list[str], method: str
-    ) -> tuple[list[str], list[str]]:
+    def _select_features(self, data: pd.DataFrame, targets: list[str], method: str) -> tuple[list[str], list[str]]:
         """Select features based on correlation or other methods."""
         try:
             all_features = [col for col in data.columns if col not in targets]
@@ -509,9 +439,7 @@ class AIModelPreparation:
                     if target in data.columns:
                         correlations = data[all_features].corrwith(data[target]).abs()
                         # Select features with correlation > 0.1
-                        high_corr_features = correlations[
-                            correlations > 0.1
-                        ].index.tolist()
+                        high_corr_features = correlations[correlations > 0.1].index.tolist()
                         selected_features.extend(high_corr_features)
 
                 # Remove duplicates
@@ -532,10 +460,7 @@ class AIModelPreparation:
             pv_columns = [
                 col
                 for col in data.columns
-                if any(
-                    keyword in col.lower()
-                    for keyword in ["pv", "process", "measurement", "sensor"]
-                )
+                if any(keyword in col.lower() for keyword in ["pv", "process", "measurement", "sensor"])
             ]
 
             if pv_columns:
@@ -564,9 +489,7 @@ class AIModelPreparation:
             np.random.seed(config.random_seed)
 
             # Shuffle data
-            shuffled_data = data.sample(
-                frac=1.0, random_state=config.random_seed
-            ).reset_index(drop=True)
+            shuffled_data = data.sample(frac=1.0, random_state=config.random_seed).reset_index(drop=True)
 
             # Calculate split indices
             n_samples = len(shuffled_data)
@@ -600,21 +523,15 @@ class AIModelPreparation:
 
             # Apply normalization
             train_normalized = train_data.copy()
-            train_normalized[features] = (
-                train_data[features] - feature_means
-            ) / feature_stds
+            train_normalized[features] = (train_data[features] - feature_means) / feature_stds
 
             val_normalized = val_data.copy()
             if not val_data.empty:
-                val_normalized[features] = (
-                    val_data[features] - feature_means
-                ) / feature_stds
+                val_normalized[features] = (val_data[features] - feature_means) / feature_stds
 
             test_normalized = test_data.copy()
             if not test_data.empty:
-                test_normalized[features] = (
-                    test_data[features] - feature_means
-                ) / feature_stds
+                test_normalized[features] = (test_data[features] - feature_means) / feature_stds
 
             return train_normalized, val_normalized, test_normalized
 
@@ -626,9 +543,7 @@ class AIModelPreparation:
         """Calculate overall data quality score."""
         try:
             # Factors: completeness, consistency, validity
-            completeness = 1.0 - (
-                data.isna().sum().sum() / (len(data) * len(data.columns))
-            )
+            completeness = 1.0 - (data.isna().sum().sum() / (len(data) * len(data.columns)))
 
             # Consistency: check for outliers (simplified)
             numeric_data = data.select_dtypes(include=[np.number])
@@ -638,10 +553,7 @@ class AIModelPreparation:
                 Q1 = numeric_data[col].quantile(0.25)
                 Q3 = numeric_data[col].quantile(0.75)
                 IQR = Q3 - Q1
-                outliers = (
-                    (numeric_data[col] < (Q1 - 1.5 * IQR))
-                    | (numeric_data[col] > (Q3 + 1.5 * IQR))
-                ).sum()
+                outliers = ((numeric_data[col] < (Q1 - 1.5 * IQR)) | (numeric_data[col] > (Q3 + 1.5 * IQR))).sum()
                 outlier_ratio += outliers / len(numeric_data)
 
             consistency = max(0.0, 1.0 - (outlier_ratio / len(numeric_data.columns)))
@@ -668,9 +580,7 @@ class AIModelPreparation:
             self.logger.error(f"Completeness score calculation failed: {e}")
             return 0.5
 
-    def _calculate_feature_statistics(
-        self, data: pd.DataFrame, features: list[str]
-    ) -> dict[str, dict[str, float]]:
+    def _calculate_feature_statistics(self, data: pd.DataFrame, features: list[str]) -> dict[str, dict[str, float]]:
         """Calculate statistics for each feature."""
         try:
             stats = {}
@@ -678,38 +588,18 @@ class AIModelPreparation:
                 if feature in data.columns:
                     feature_data = data[feature]
                     stats[feature] = {
-                        "mean": (
-                            float(feature_data.mean())
-                            if feature_data.dtype in ["int64", "float64"]
-                            else 0.0
-                        ),
-                        "std": (
-                            float(feature_data.std())
-                            if feature_data.dtype in ["int64", "float64"]
-                            else 0.0
-                        ),
-                        "min": (
-                            float(feature_data.min())
-                            if feature_data.dtype in ["int64", "float64"]
-                            else 0.0
-                        ),
-                        "max": (
-                            float(feature_data.max())
-                            if feature_data.dtype in ["int64", "float64"]
-                            else 0.0
-                        ),
-                        "missing_ratio": float(
-                            feature_data.isna().sum() / len(feature_data)
-                        ),
+                        "mean": (float(feature_data.mean()) if feature_data.dtype in ["int64", "float64"] else 0.0),
+                        "std": (float(feature_data.std()) if feature_data.dtype in ["int64", "float64"] else 0.0),
+                        "min": (float(feature_data.min()) if feature_data.dtype in ["int64", "float64"] else 0.0),
+                        "max": (float(feature_data.max()) if feature_data.dtype in ["int64", "float64"] else 0.0),
+                        "missing_ratio": float(feature_data.isna().sum() / len(feature_data)),
                     }
             return stats
         except Exception as e:
             self.logger.error(f"Feature statistics calculation failed: {e}")
             return {}
 
-    def export_dataset(
-        self, dataset_name: str, format: str = "pandas", output_path: str | None = None
-    ) -> Any:
+    def export_dataset(self, dataset_name: str, format: str = "pandas", output_path: str | None = None) -> Any:
         """Export prepared dataset in various formats."""
         try:
             if dataset_name not in self.prepared_datasets:

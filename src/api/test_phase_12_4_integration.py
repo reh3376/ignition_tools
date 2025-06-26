@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Phase 12.4 Authentication & Security Integration Tests
-Following crawl_mcp.py methodology for systematic testing
+Following crawl_mcp.py methodology for systematic testing.
 
 This test suite validates the complete authentication and security implementation
 using the step-by-step approach defined in crawl_mcp.py
@@ -25,11 +25,11 @@ TEST_TIMEOUT = 30
 
 
 class Phase124IntegrationTester:
-    """Integration tester following crawl_mcp.py methodology"""
+    """Integration tester following crawl_mcp.py methodology."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.api_base = API_BASE_URL
-        self.test_results = {
+        self.test_results: Any = {
             "environment_validation": {},
             "input_validation": {},
             "error_handling": {},
@@ -39,7 +39,7 @@ class Phase124IntegrationTester:
         self.start_time = time.time()
 
     async def run_comprehensive_tests(self) -> dict[str, Any]:
-        """Run comprehensive tests following crawl_mcp.py methodology"""
+        """Run comprehensive tests following crawl_mcp.py methodology."""
         print("🚀 Starting Phase 12.4 Authentication & Security Integration Tests")
         print("📋 Following crawl_mcp.py methodology for systematic validation\n")
 
@@ -61,8 +61,8 @@ class Phase124IntegrationTester:
         # Generate final report
         return await self._generate_test_report()
 
-    async def _test_environment_validation(self):
-        """Test environment validation (crawl_mcp.py Step 1)"""
+    async def _test_environment_validation(self) -> None:
+        """Test environment validation (crawl_mcp.py Step 1)."""
         print("🔍 Step 1: Environment Validation Testing")
 
         results = {
@@ -80,14 +80,10 @@ class Phase124IntegrationTester:
                     data = response.json()
                     results["auth_validation_endpoint"] = True
                     results["environment_variables"] = data.get("status") == "valid"
-                    results["security_features"] = bool(
-                        data.get("security_features", {})
-                    )
+                    results["security_features"] = bool(data.get("security_features", {}))
                     print(f"   ✅ Auth validation endpoint: {response.status_code}")
                     print(f"   ✅ Environment status: {data.get('status', 'unknown')}")
-                    print(
-                        f"   ✅ Security features: {len(data.get('security_features', {}))}"
-                    )
+                    print(f"   ✅ Security features: {len(data.get('security_features', {}))}")
                 else:
                     print(f"   ❌ Auth validation failed: {response.status_code}")
 
@@ -105,8 +101,8 @@ class Phase124IntegrationTester:
         success_rate = sum(results.values()) / len(results) * 100
         print(f"   📊 Environment Validation: {success_rate:.1f}% success rate\n")
 
-    async def _test_input_validation(self):
-        """Test input validation and sanitization (crawl_mcp.py Step 2)"""
+    async def _test_input_validation(self) -> None:
+        """Test input validation and sanitization (crawl_mcp.py Step 2)."""
         print("🔍 Step 2: Input Validation Testing")
 
         results = {
@@ -128,9 +124,7 @@ class Phase124IntegrationTester:
                     "role": "user",
                 }
 
-                response = await client.post(
-                    f"{self.api_base}/api/v1/auth/register", json=valid_user
-                )
+                response = await client.post(f"{self.api_base}/api/v1/auth/register", json=valid_user)
                 results["user_registration_validation"] = response.status_code in [
                     200,
                     201,
@@ -140,9 +134,7 @@ class Phase124IntegrationTester:
                 # Test login validation
                 login_data = {"username": "testuser123", "password": "SecurePass123!"}
 
-                response = await client.post(
-                    f"{self.api_base}/api/v1/auth/login", json=login_data
-                )
+                response = await client.post(f"{self.api_base}/api/v1/auth/login", json=login_data)
                 results["login_validation"] = response.status_code in [200, 201]
                 print(f"   ✅ Login validation: {response.status_code}")
 
@@ -155,13 +147,9 @@ class Phase124IntegrationTester:
                     "role": "user",
                 }
 
-                response = await client.post(
-                    f"{self.api_base}/api/v1/auth/register", json=weak_password_user
-                )
+                response = await client.post(f"{self.api_base}/api/v1/auth/register", json=weak_password_user)
                 results["password_validation"] = response.status_code == 422
-                print(
-                    f"   ✅ Password validation (weak rejected): {response.status_code}"
-                )
+                print(f"   ✅ Password validation (weak rejected): {response.status_code}")
 
                 # Test API key validation
                 api_key_data = {
@@ -172,19 +160,13 @@ class Phase124IntegrationTester:
                 }
 
                 # This should fail without authentication
-                response = await client.post(
-                    f"{self.api_base}/api/v1/auth/api-keys", json=api_key_data
-                )
+                response = await client.post(f"{self.api_base}/api/v1/auth/api-keys", json=api_key_data)
                 results["api_key_validation"] = response.status_code == 401
-                print(
-                    f"   ✅ API key validation (auth required): {response.status_code}"
-                )
+                print(f"   ✅ API key validation (auth required): {response.status_code}")
 
                 # Test malformed data rejection
                 malformed_data = {"invalid": "data", "structure": True}
-                response = await client.post(
-                    f"{self.api_base}/api/v1/auth/register", json=malformed_data
-                )
+                response = await client.post(f"{self.api_base}/api/v1/auth/register", json=malformed_data)
                 results["malformed_data_rejection"] = response.status_code == 422
                 print(f"   ✅ Malformed data rejection: {response.status_code}")
 
@@ -195,8 +177,8 @@ class Phase124IntegrationTester:
         success_rate = sum(results.values()) / len(results) * 100
         print(f"   📊 Input Validation: {success_rate:.1f}% success rate\n")
 
-    async def _test_error_handling(self):
-        """Test comprehensive error handling (crawl_mcp.py Step 3)"""
+    async def _test_error_handling(self) -> None:
+        """Test comprehensive error handling (crawl_mcp.py Step 3)."""
         print("🔍 Step 3: Error Handling Testing")
 
         results = {
@@ -223,7 +205,7 @@ class Phase124IntegrationTester:
 
                 # Test rate limit errors (attempt to trigger rate limit)
                 rate_limit_triggered = False
-                for i in range(15):  # Try to exceed rate limit
+                for _i in range(15):  # Try to exceed rate limit
                     response = await client.post(
                         f"{self.api_base}/api/v1/auth/login",
                         json={"username": "test", "password": "test"},
@@ -233,9 +215,7 @@ class Phase124IntegrationTester:
                         break
 
                 results["rate_limit_errors"] = rate_limit_triggered
-                print(
-                    f"   ✅ Rate limit error handling: {'Triggered' if rate_limit_triggered else 'Not triggered'}"
-                )
+                print(f"   ✅ Rate limit error handling: {'Triggered' if rate_limit_triggered else 'Not triggered'}")
 
                 # Test validation errors
                 response = await client.post(
@@ -252,8 +232,8 @@ class Phase124IntegrationTester:
         success_rate = sum(results.values()) / len(results) * 100
         print(f"   📊 Error Handling: {success_rate:.1f}% success rate\n")
 
-    async def _test_authentication_functionality(self):
-        """Test authentication functionality (crawl_mcp.py Step 4)"""
+    async def _test_authentication_functionality(self) -> None:
+        """Test authentication functionality (crawl_mcp.py Step 4)."""
         print("🔍 Step 4: Authentication Functionality Testing")
 
         results = {
@@ -278,9 +258,7 @@ class Phase124IntegrationTester:
                     "role": "user",
                 }
 
-                response = await client.post(
-                    f"{self.api_base}/api/v1/auth/register", json=user_data
-                )
+                response = await client.post(f"{self.api_base}/api/v1/auth/register", json=user_data)
                 results["user_registration"] = response.status_code in [200, 201]
                 print(f"   ✅ User registration: {response.status_code}")
 
@@ -290,9 +268,7 @@ class Phase124IntegrationTester:
                     "password": user_data["password"],
                 }
 
-                response = await client.post(
-                    f"{self.api_base}/api/v1/auth/login", json=login_data
-                )
+                response = await client.post(f"{self.api_base}/api/v1/auth/login", json=login_data)
 
                 if response.status_code in [200, 201]:
                     results["user_login"] = True
@@ -343,8 +319,8 @@ class Phase124IntegrationTester:
         success_rate = sum(results.values()) / len(results) * 100
         print(f"   📊 Authentication Functionality: {success_rate:.1f}% success rate\n")
 
-    async def _test_progressive_complexity(self):
-        """Test progressive complexity implementation (crawl_mcp.py Step 5)"""
+    async def _test_progressive_complexity(self) -> None:
+        """Test progressive complexity implementation (crawl_mcp.py Step 5)."""
         print("🔍 Step 5: Progressive Complexity Testing")
 
         results = {
@@ -375,9 +351,7 @@ class Phase124IntegrationTester:
                         basic_available += 1
 
                 results["basic_auth_endpoints"] = basic_available >= 2
-                print(
-                    f"   ✅ Basic auth endpoints: {basic_available}/{len(basic_endpoints)}"
-                )
+                print(f"   ✅ Basic auth endpoints: {basic_available}/{len(basic_endpoints)}")
 
                 # Standard: User management
                 standard_endpoints = [
@@ -393,9 +367,7 @@ class Phase124IntegrationTester:
                         standard_available += 1
 
                 results["standard_user_management"] = standard_available >= 2
-                print(
-                    f"   ✅ Standard user management: {standard_available}/{len(standard_endpoints)}"
-                )
+                print(f"   ✅ Standard user management: {standard_available}/{len(standard_endpoints)}")
 
                 # Advanced: API key management
                 advanced_endpoints = [
@@ -412,9 +384,7 @@ class Phase124IntegrationTester:
                         advanced_available += 1
 
                 results["advanced_api_keys"] = advanced_available >= 1
-                print(
-                    f"   ✅ Advanced API keys: {advanced_available}/{len(advanced_endpoints)}"
-                )
+                print(f"   ✅ Advanced API keys: {advanced_available}/{len(advanced_endpoints)}")
 
                 # Enterprise: Role-based access control
                 enterprise_endpoints = [
@@ -429,9 +399,7 @@ class Phase124IntegrationTester:
                         enterprise_available += 1
 
                 results["enterprise_role_based_access"] = enterprise_available >= 1
-                print(
-                    f"   ✅ Enterprise RBAC: {enterprise_available}/{len(enterprise_endpoints)}"
-                )
+                print(f"   ✅ Enterprise RBAC: {enterprise_available}/{len(enterprise_endpoints)}")
 
                 # Security features validation
                 response = await client.get(f"{self.api_base}/api/v1/auth/validate")
@@ -439,9 +407,7 @@ class Phase124IntegrationTester:
                     data = response.json()
                     security_features = data.get("security_features", {})
                     results["security_features"] = len(security_features) >= 3
-                    print(
-                        f"   ✅ Security features: {len(security_features)} available"
-                    )
+                    print(f"   ✅ Security features: {len(security_features)} available")
 
         except Exception as e:
             print(f"   ❌ Progressive complexity error: {e}")
@@ -451,7 +417,7 @@ class Phase124IntegrationTester:
         print(f"   📊 Progressive Complexity: {success_rate:.1f}% success rate\n")
 
     async def _generate_test_report(self) -> dict[str, Any]:
-        """Generate comprehensive test report"""
+        """Generate comprehensive test report."""
         execution_time = time.time() - self.start_time
 
         # Calculate overall success rates
@@ -476,31 +442,19 @@ class Phase124IntegrationTester:
 
         # Determine completion status
         completion_criteria = {
-            "environment_validation": category_success_rates.get(
-                "environment_validation", {}
-            ).get("success_rate", 0)
+            "environment_validation": category_success_rates.get("environment_validation", {}).get("success_rate", 0)
             >= 75,
-            "input_validation": category_success_rates.get("input_validation", {}).get(
+            "input_validation": category_success_rates.get("input_validation", {}).get("success_rate", 0) >= 80,
+            "error_handling": category_success_rates.get("error_handling", {}).get("success_rate", 0) >= 75,
+            "authentication_functionality": category_success_rates.get("authentication_functionality", {}).get(
                 "success_rate", 0
             )
             >= 80,
-            "error_handling": category_success_rates.get("error_handling", {}).get(
-                "success_rate", 0
-            )
-            >= 75,
-            "authentication_functionality": category_success_rates.get(
-                "authentication_functionality", {}
-            ).get("success_rate", 0)
-            >= 80,
-            "progressive_complexity": category_success_rates.get(
-                "progressive_complexity", {}
-            ).get("success_rate", 0)
+            "progressive_complexity": category_success_rates.get("progressive_complexity", {}).get("success_rate", 0)
             >= 80,
         }
 
-        completion_status = (
-            sum(completion_criteria.values()) >= 4
-        )  # At least 4 out of 5 criteria met
+        completion_status = sum(completion_criteria.values()) >= 4  # At least 4 out of 5 criteria met
 
         report = {
             "phase": "12.4 - Authentication & Security",
@@ -520,43 +474,31 @@ class Phase124IntegrationTester:
         return report
 
     def _generate_recommendations(self, category_results: dict[str, Any]) -> list[str]:
-        """Generate recommendations based on test results"""
+        """Generate recommendations based on test results."""
         recommendations = []
 
         for category, results in category_results.items():
             success_rate = results.get("success_rate", 0)
             if success_rate < 80:
                 if category == "environment_validation":
-                    recommendations.append(
-                        "Review authentication environment configuration and security settings"
-                    )
+                    recommendations.append("Review authentication environment configuration and security settings")
                 elif category == "input_validation":
-                    recommendations.append(
-                        "Strengthen input validation and sanitization mechanisms"
-                    )
+                    recommendations.append("Strengthen input validation and sanitization mechanisms")
                 elif category == "error_handling":
-                    recommendations.append(
-                        "Improve error handling and user-friendly error messages"
-                    )
+                    recommendations.append("Improve error handling and user-friendly error messages")
                 elif category == "authentication_functionality":
-                    recommendations.append(
-                        "Debug authentication flow and token management"
-                    )
+                    recommendations.append("Debug authentication flow and token management")
                 elif category == "progressive_complexity":
-                    recommendations.append(
-                        "Complete implementation of advanced security features"
-                    )
+                    recommendations.append("Complete implementation of advanced security features")
 
         if not recommendations:
-            recommendations.append(
-                "All authentication and security features are working correctly"
-            )
+            recommendations.append("All authentication and security features are working correctly")
 
         return recommendations
 
 
-async def main():
-    """Main test execution following crawl_mcp.py methodology"""
+async def main() -> Any:
+    """Main test execution following crawl_mcp.py methodology."""
     tester = Phase124IntegrationTester()
 
     try:
@@ -576,7 +518,7 @@ async def main():
         for category, results in report["category_results"].items():
             status = "✅" if results["success_rate"] >= 75 else "❌"
             print(
-                f"   {status} {category.replace('_', ' ').title()}: {results['success_rate']:.1f}% ({results['passed']}/{results['total']})"
+                f"   {status} {category.replace('_', ' ').title()}: {results['success_rate']:.1f}% ({results['passed']}/{results['total']})"  # noqa: E501
             )
 
         print("\n💡 Recommendations:")

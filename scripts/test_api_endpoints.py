@@ -42,9 +42,7 @@ class APITester:
         self.test_results: list[dict[str, Any]] = []
         self.session_id = None
 
-    def log_test(
-        self, test_name: str, success: bool, details: dict[str, Any] | None = None
-    ):
+    def log_test(self, test_name: str, success: bool, details: dict[str, Any] | None = None):
         """Log test results."""
         result = {
             "test_name": test_name,
@@ -103,9 +101,7 @@ class APITester:
                 try:
                     data = response.json()
                     details["health_status"] = data.get("status")
-                    details["agent_status"] = data.get("agent_status", {}).get(
-                        "initialized", False
-                    )
+                    details["agent_status"] = data.get("agent_status", {}).get("initialized", False)
                 except (ValueError, requests.exceptions.JSONDecodeError):
                     details["response_text"] = response.text[:200]
             else:
@@ -127,9 +123,7 @@ class APITester:
                 "context": "I'm learning about industrial automation software.",
             }
 
-            response = self.session.post(
-                f"{self.base_url}/chat", json=payload, timeout=30
-            )
+            response = self.session.post(f"{self.base_url}/chat", json=payload, timeout=30)
 
             success = response.status_code == 200
 
@@ -207,9 +201,7 @@ class APITester:
         if passed == total:
             print("\n🎉 All tests passed! FastAPI server is working correctly.")
         else:
-            print(
-                f"\n⚠️ {total - passed} test(s) failed. Please check the server and try again."
-            )
+            print(f"\n⚠️ {total - passed} test(s) failed. Please check the server and try again.")
 
         return summary
 

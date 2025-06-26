@@ -24,7 +24,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.math.calculateTrigonometric",
                 "description": "Calculate trigonometric functions with precision and units",
-                "parameters": "function:str:required, value:float:required, inputUnit:str:optional:radians, precision:int:optional:6",
+                "parameters": "function:str:required, value:float:required, inputUnit:str:optional:radians, precision:int:optional:6",  # noqa: E501
                 "returns": "float - Trigonometric calculation result with metadata",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Mathematical Operations",
@@ -38,7 +38,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.math.matrixOperations",
                 "description": "Perform matrix operations for engineering calculations",
-                "parameters": "operation:str:required, matrixA:list:required, matrixB:list:optional, validateDimensions:bool:optional:true",
+                "parameters": "operation:str:required, matrixA:list:required, matrixB:list:optional, validateDimensions:bool:optional:true",  # noqa: E501
                 "returns": "list - Result matrix with operation metadata",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Mathematical Operations",
@@ -52,7 +52,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.math.convertUnits",
                 "description": "Convert between engineering units with precision",
-                "parameters": "value:float:required, fromUnit:str:required, toUnit:str:required, unitCategory:str:optional, precision:int:optional:4",
+                "parameters": "value:float:required, fromUnit:str:required, toUnit:str:required, unitCategory:str:optional, precision:int:optional:4",  # noqa: E501
                 "returns": "dict - Converted value with conversion metadata",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Mathematical Operations",
@@ -66,7 +66,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.math.calculateLogarithmic",
                 "description": "Calculate logarithmic and exponential functions",
-                "parameters": "function:str:required, value:float:required, base:float:optional:10.0, power:float:optional:1.0",
+                "parameters": "function:str:required, value:float:required, base:float:optional:10.0, power:float:optional:1.0",  # noqa: E501
                 "returns": "float - Logarithmic/exponential calculation result",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Mathematical Operations",
@@ -80,7 +80,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.math.interpolateValues",
                 "description": "Interpolate values using various methods",
-                "parameters": "xValues:list:required, yValues:list:required, targetX:float:required, method:str:optional:linear, extrapolate:bool:optional:false",
+                "parameters": "xValues:list:required, yValues:list:required, targetX:float:required, method:str:optional:linear, extrapolate:bool:optional:false",  # noqa: E501
                 "returns": "float - Interpolated Y value with method metadata",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Mathematical Operations",
@@ -94,7 +94,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.math.calculateDerivative",
                 "description": "Calculate numerical derivatives for trend analysis",
-                "parameters": "dataPoints:list:required, order:int:optional:1, method:str:optional:central, smoothing:bool:optional:true",
+                "parameters": "dataPoints:list:required, order:int:optional:1, method:str:optional:central, smoothing:bool:optional:true",  # noqa: E501
                 "returns": "list - Derivative values with calculation metadata",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Mathematical Operations",
@@ -108,7 +108,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.math.calculateIntegral",
                 "description": "Calculate numerical integrals for area under curves",
-                "parameters": "dataPoints:list:required, method:str:optional:trapezoidal, lowerBound:float:optional, upperBound:float:optional",
+                "parameters": "dataPoints:list:required, method:str:optional:trapezoidal, lowerBound:float:optional, upperBound:float:optional",  # noqa: E501
                 "returns": "float - Integral value with calculation metadata",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Mathematical Operations",
@@ -122,7 +122,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.math.solvePIDController",
                 "description": "Calculate PID controller output for process control",
-                "parameters": "setpoint:float:required, processValue:float:required, Kp:float:required, Ki:float:required, Kd:float:required, dt:float:required, integralSum:float:optional:0.0, previousError:float:optional:0.0",
+                "parameters": "setpoint:float:required, processValue:float:required, Kp:float:required, Ki:float:required, Kd:float:required, dt:float:required, integralSum:float:optional:0.0, previousError:float:optional:0.0",  # noqa: E501
                 "returns": "dict - PID output with component values and updated state",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Mathematical Operations",
@@ -136,7 +136,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.math.optimizeFunction",
                 "description": "Optimize functions using numerical methods",
-                "parameters": "functionData:list:required, optimizationType:str:required, method:str:optional:gradient, constraints:dict:optional, tolerance:float:optional:1e-6",
+                "parameters": "functionData:list:required, optimizationType:str:required, method:str:optional:gradient, constraints:dict:optional, tolerance:float:optional:1e-6",  # noqa: E501
                 "returns": "dict - Optimized parameters with convergence info",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Mathematical Operations",
@@ -150,7 +150,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.math.calculateFourierTransform",
                 "description": "Perform Fourier transform for frequency analysis",
-                "parameters": "timeSeriesData:list:required, samplingRate:float:required, transformType:str:optional:FFT, windowFunction:str:optional:hamming, zeroPadding:bool:optional:true",
+                "parameters": "timeSeriesData:list:required, samplingRate:float:required, transformType:str:optional:FFT, windowFunction:str:optional:hamming, zeroPadding:bool:optional:true",  # noqa: E501
                 "returns": "dict - Frequency domain data with magnitude and phase",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Mathematical Operations",
@@ -173,7 +173,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.statistics.calculateDescriptiveStats",
                 "description": "Calculate comprehensive descriptive statistics",
-                "parameters": "dataset:list:required, includeOutliers:bool:optional:true, confidenceLevel:float:optional:0.95, precision:int:optional:4",
+                "parameters": "dataset:list:required, includeOutliers:bool:optional:true, confidenceLevel:float:optional:0.95, precision:int:optional:4",  # noqa: E501
                 "returns": "dict - Complete statistical summary with all metrics",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Statistical Analysis",
@@ -187,7 +187,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.statistics.performRegressionAnalysis",
                 "description": "Perform regression analysis with multiple methods",
-                "parameters": "xData:list:required, yData:list:required, regressionType:str:optional:linear, polynomialDegree:int:optional:2, includeStatistics:bool:optional:true",
+                "parameters": "xData:list:required, yData:list:required, regressionType:str:optional:linear, polynomialDegree:int:optional:2, includeStatistics:bool:optional:true",  # noqa: E501
                 "returns": "dict - Regression results with equation and statistics",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Statistical Analysis",
@@ -201,7 +201,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.statistics.detectAnomalies",
                 "description": "Detect statistical anomalies in datasets",
-                "parameters": "dataset:list:required, method:str:optional:zscore, threshold:float:optional:3.0, contextWindow:int:optional:50",
+                "parameters": "dataset:list:required, method:str:optional:zscore, threshold:float:optional:3.0, contextWindow:int:optional:50",  # noqa: E501
                 "returns": "dict - Anomaly detection results with indices and scores",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Statistical Analysis",
@@ -215,7 +215,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.statistics.calculateCorrelation",
                 "description": "Calculate correlation between multiple variables",
-                "parameters": "datasets:list:required, correlationType:str:optional:pearson, includeMatrix:bool:optional:true, significanceTest:bool:optional:true",
+                "parameters": "datasets:list:required, correlationType:str:optional:pearson, includeMatrix:bool:optional:true, significanceTest:bool:optional:true",  # noqa: E501
                 "returns": "dict - Correlation results with matrix and significance",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Statistical Analysis",
@@ -229,7 +229,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.statistics.performHypothesisTest",
                 "description": "Perform statistical hypothesis tests",
-                "parameters": "sample1:list:required, sample2:list:optional, testType:str:required, alpha:float:optional:0.05, alternative:str:optional:two-sided",
+                "parameters": "sample1:list:required, sample2:list:optional, testType:str:required, alpha:float:optional:0.05, alternative:str:optional:two-sided",  # noqa: E501
                 "returns": "dict - Test results with statistics and p-values",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Statistical Analysis",
@@ -243,7 +243,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.statistics.generateDistribution",
                 "description": "Generate and analyze statistical distributions",
-                "parameters": "distributionType:str:required, parameters:dict:required, sampleSize:int:optional:1000, calculateFit:bool:optional:true",
+                "parameters": "distributionType:str:required, parameters:dict:required, sampleSize:int:optional:1000, calculateFit:bool:optional:true",  # noqa: E501
                 "returns": "dict - Distribution data with samples and fit statistics",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Statistical Analysis",
@@ -257,7 +257,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.statistics.performTimeSeriesAnalysis",
                 "description": "Analyze time series data for trends and seasonality",
-                "parameters": "timeSeriesData:list:required, analysisType:str:optional:decomposition, seasonalPeriod:int:optional:12, smoothingFactor:float:optional:0.3",
+                "parameters": "timeSeriesData:list:required, analysisType:str:optional:decomposition, seasonalPeriod:int:optional:12, smoothingFactor:float:optional:0.3",  # noqa: E501
                 "returns": "dict - Time series analysis with components and forecasts",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Statistical Analysis",
@@ -271,7 +271,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.statistics.calculateControlLimits",
                 "description": "Calculate statistical process control limits",
-                "parameters": "processData:list:required, controlType:str:required, subgroupSize:int:optional:5, sigmaLevel:float:optional:3.0",
+                "parameters": "processData:list:required, controlType:str:required, subgroupSize:int:optional:5, sigmaLevel:float:optional:3.0",  # noqa: E501
                 "returns": "dict - Control limits with centerline and violation points",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Statistical Analysis",
@@ -285,7 +285,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.statistics.performSurvivalAnalysis",
                 "description": "Perform survival analysis for reliability studies",
-                "parameters": "eventTimes:list:required, censoringData:list:optional, analysisMethod:str:optional:kaplan_meier, confidenceLevel:float:optional:0.95",
+                "parameters": "eventTimes:list:required, censoringData:list:optional, analysisMethod:str:optional:kaplan_meier, confidenceLevel:float:optional:0.95",  # noqa: E501
                 "returns": "dict - Survival analysis with curves and statistics",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Statistical Analysis",
@@ -299,7 +299,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.statistics.performClusterAnalysis",
                 "description": "Perform cluster analysis for data grouping",
-                "parameters": "dataset:list:required, clusteringMethod:str:optional:kmeans, numberOfClusters:int:optional:3, distanceMetric:str:optional:euclidean",
+                "parameters": "dataset:list:required, clusteringMethod:str:optional:kmeans, numberOfClusters:int:optional:3, distanceMetric:str:optional:euclidean",  # noqa: E501
                 "returns": "dict - Cluster analysis with assignments and centroids",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Statistical Analysis",
@@ -322,7 +322,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.analytics.calculateKPIs",
                 "description": "Calculate key performance indicators for operations",
-                "parameters": "kpiDefinitions:dict:required, dataSource:str:required, timeRange:dict:required, aggregationLevel:str:optional:daily, includeTargets:bool:optional:true",
+                "parameters": "kpiDefinitions:dict:required, dataSource:str:required, timeRange:dict:required, aggregationLevel:str:optional:daily, includeTargets:bool:optional:true",  # noqa: E501
                 "returns": "dict - KPI values with trends and target comparisons",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Data Analytics",
@@ -336,7 +336,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.analytics.performPredictiveAnalysis",
                 "description": "Perform predictive analysis using machine learning",
-                "parameters": "historicalData:list:required, targetVariable:str:required, predictionModel:str:optional:linear, forecastHorizon:int:optional:10, includeConfidenceIntervals:bool:optional:true",
+                "parameters": "historicalData:list:required, targetVariable:str:required, predictionModel:str:optional:linear, forecastHorizon:int:optional:10, includeConfidenceIntervals:bool:optional:true",  # noqa: E501
                 "returns": "dict - Predictions with confidence intervals and model metrics",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Data Analytics",
@@ -350,7 +350,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.analytics.detectPatterns",
                 "description": "Detect patterns in process data using advanced algorithms",
-                "parameters": "dataset:list:required, patternType:str:required, minSupport:float:optional:0.1, minConfidence:float:optional:0.5, windowSize:int:optional:100",
+                "parameters": "dataset:list:required, patternType:str:required, minSupport:float:optional:0.1, minConfidence:float:optional:0.5, windowSize:int:optional:100",  # noqa: E501
                 "returns": "dict - Detected patterns with support and confidence metrics",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Data Analytics",
@@ -364,7 +364,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.analytics.optimizeProcess",
                 "description": "Optimize process parameters using data-driven methods",
-                "parameters": "processData:list:required, objectiveFunction:str:required, constraints:dict:optional, optimizationMethod:str:optional:genetic_algorithm, maxIterations:int:optional:1000",
+                "parameters": "processData:list:required, objectiveFunction:str:required, constraints:dict:optional, optimizationMethod:str:optional:genetic_algorithm, maxIterations:int:optional:1000",  # noqa: E501
                 "returns": "dict - Optimized parameters with performance improvements",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Data Analytics",
@@ -378,7 +378,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.analytics.calculateOEE",
                 "description": "Calculate Overall Equipment Effectiveness metrics",
-                "parameters": "productionData:dict:required, timeRange:dict:required, plannedProductionTime:float:required, idealCycleTime:float:required, includeBreakdown:bool:optional:true",
+                "parameters": "productionData:dict:required, timeRange:dict:required, plannedProductionTime:float:required, idealCycleTime:float:required, includeBreakdown:bool:optional:true",  # noqa: E501
                 "returns": "dict - OEE metrics with availability, performance, and quality",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Data Analytics",
@@ -392,7 +392,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.analytics.performRootCauseAnalysis",
                 "description": "Perform automated root cause analysis on system events",
-                "parameters": "eventData:list:required, timeWindow:int:optional:60, correlationThreshold:float:optional:0.7, includeSystemModel:bool:optional:true",
+                "parameters": "eventData:list:required, timeWindow:int:optional:60, correlationThreshold:float:optional:0.7, includeSystemModel:bool:optional:true",  # noqa: E501
                 "returns": "dict - Root cause analysis with ranked probable causes",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Data Analytics",
@@ -406,7 +406,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.analytics.generateRecommendations",
                 "description": "Generate operational recommendations using analytics",
-                "parameters": "operationalData:dict:required, historicalPerformance:list:required, recommendationType:str:required, confidenceThreshold:float:optional:0.8",
+                "parameters": "operationalData:dict:required, historicalPerformance:list:required, recommendationType:str:required, confidenceThreshold:float:optional:0.8",  # noqa: E501
                 "returns": "dict - Ranked recommendations with confidence and impact",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Data Analytics",
@@ -420,7 +420,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.analytics.detectEquipmentDegradation",
                 "description": "Detect equipment performance degradation trends",
-                "parameters": "equipmentData:list:required, baselineData:list:required, degradationMetrics:list:required, alertThreshold:float:optional:0.15",
+                "parameters": "equipmentData:list:required, baselineData:list:required, degradationMetrics:list:required, alertThreshold:float:optional:0.15",  # noqa: E501
                 "returns": "dict - Degradation analysis with severity and predictions",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Data Analytics",
@@ -434,7 +434,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.analytics.calculateEnergyEfficiency",
                 "description": "Calculate energy efficiency metrics and optimization opportunities",
-                "parameters": "energyData:dict:required, productionData:dict:required, benchmarkData:dict:optional, analysisLevel:str:optional:equipment",
+                "parameters": "energyData:dict:required, productionData:dict:required, benchmarkData:dict:optional, analysisLevel:str:optional:equipment",  # noqa: E501
                 "returns": "dict - Energy efficiency metrics with improvement opportunities",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Data Analytics",
@@ -448,7 +448,7 @@ def get_math_analytics_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.analytics.performRiskAssessment",
                 "description": "Perform quantitative risk assessment using operational data",
-                "parameters": "riskFactors:dict:required, probabilityModel:str:optional:monte_carlo, impactScenarios:list:required, confidenceLevel:float:optional:0.95",
+                "parameters": "riskFactors:dict:required, probabilityModel:str:optional:monte_carlo, impactScenarios:list:required, confidenceLevel:float:optional:0.95",  # noqa: E501
                 "returns": "dict - Risk assessment with probability and impact analysis",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Data Analytics",

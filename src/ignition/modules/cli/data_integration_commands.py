@@ -44,9 +44,7 @@ def _create_test_module() -> None:
         )
 
         # Create module using factory function
-        module = create_data_integration_module(
-            context, "Test Data Integration", "1.0.0"
-        )
+        module = create_data_integration_module(context, "Test Data Integration", "1.0.0")
 
         return module
     except Exception as e:
@@ -84,9 +82,7 @@ def demo_command(verbose: bool, fake_data: bool) -> None:
         if verbose:
             console.print("Verbose mode enabled")
 
-        console.print(
-            f"✅ Module created: {module.metadata.name} v{module.metadata.version}"
-        )
+        console.print(f"✅ Module created: {module.metadata.name} v{module.metadata.version}")
 
         # Configure module with default settings
         console.print("\nConfiguring module...")
@@ -207,12 +203,8 @@ def demo_command(verbose: bool, fake_data: bool) -> None:
             max_value=100.0,
         )
 
-        console.print(
-            f"✅ PV Metadata: {pv_metadata.variable_type.value} - {pv_metadata.engineering_units}"
-        )
-        console.print(
-            f"✅ CV Metadata: {cv_metadata.variable_type.value} - {cv_metadata.engineering_units}"
-        )
+        console.print(f"✅ PV Metadata: {pv_metadata.variable_type.value} - {pv_metadata.engineering_units}")
+        console.print(f"✅ CV Metadata: {cv_metadata.variable_type.value} - {cv_metadata.engineering_units}")
 
         if fake_data:
             console.print("\nGenerating fake data...")
@@ -320,11 +312,7 @@ def test_command(verbose: bool, supabase: bool) -> None:
         if not module.configure_module(default_config):
             return False
 
-        return (
-            module.initialize_module()
-            and module.startup_module()
-            and module.shutdown_module()
-        )
+        return module.initialize_module() and module.startup_module() and module.shutdown_module()
 
     # Test 3: Data Source Configuration
     def test_data_source_configuration() -> None:
@@ -452,9 +440,7 @@ def test_command(verbose: bool, supabase: bool) -> None:
         summary_table.add_row(test_name, status, error_text)
 
     console.print(summary_table)
-    console.print(
-        f"\n📈 Results: {passed}/{total} tests passed ({passed / total * 100:.1f}%)"
-    )
+    console.print(f"\n📈 Results: {passed}/{total} tests passed ({passed / total * 100:.1f}%)")
 
 
 @data_integration_group.command("sources")
@@ -499,9 +485,7 @@ def list_sources_command(type: str, enabled: bool) -> None:
             if type and type.upper() not in source_type.value.upper():
                 continue
 
-            category, description = source_categories.get(
-                source_type, ("Other", "Data source")
-            )
+            category, description = source_categories.get(source_type, ("Other", "Data source"))
             sources_table.add_row(source_type.value, category, description)
 
         console.print(sources_table)
@@ -538,9 +522,7 @@ def list_sources_command(type: str, enabled: bool) -> None:
 @click.option("--type", "-t", required=True, help="Data source type")
 @click.option("--params", "-p", help="Connection parameters as JSON")
 @click.option("--enabled/--disabled", default=True, help="Enable/disable source")
-def configure_source_command(
-    source_name: str, type: str, params: str, enabled: bool
-) -> None:
+def configure_source_command(source_name: str, type: str, params: str, enabled: bool) -> None:
     """Configure a data source."""
     console.print(f"⚙️ Configuring Data Source: {source_name}")
     console.print("=" * 50)
@@ -591,9 +573,7 @@ def configure_source_command(
 
 @data_integration_group.command("faker")
 @click.option("--count", "-c", default=100, help="Number of fake records to generate")
-@click.option(
-    "--sources", "-s", default="opcua,database", help="Comma-separated source types"
-)
+@click.option("--sources", "-s", default="opcua,database", help="Comma-separated source types")
 @click.option("--supabase", is_flag=True, help="Store fake data in Supabase")
 def generate_fake_data_command(count: int, sources: str, supabase: bool) -> None:
     """Generate fake data for testing."""
@@ -625,9 +605,7 @@ def _generate_fake_data_sync(module_or_count, sources=None, use_supabase=False) 
         count = 10
         source_types = ["opcua", "database"]
 
-    console.print(
-        f"🎭 Generating {count} fake records for sources: {', '.join(source_types)}"
-    )
+    console.print(f"🎭 Generating {count} fake records for sources: {', '.join(source_types)}")
 
     # Generate fake data based on source types
     all_fake_data = []
@@ -703,9 +681,7 @@ def _generate_fake_opcua_record(fake, index: int) -> dict[str, Any]:
                 },
             },
         },
-        "process_state": fake.random_element(
-            ["startup", "steady_state", "shutdown", "maintenance"]
-        ),
+        "process_state": fake.random_element(["startup", "steady_state", "shutdown", "maintenance"]),
     }
 
 
@@ -825,9 +801,7 @@ def _store_fake_data_in_supabase(fake_data: list[dict[str, Any]]) -> None:
                 timestamp = record_copy.pop("timestamp")
                 source_type = record_copy.pop("source_type")
 
-                f.write(
-                    "INSERT INTO industrial_data (id, timestamp, source_type, data) VALUES (\n"
-                )
+                f.write("INSERT INTO industrial_data (id, timestamp, source_type, data) VALUES (\n")
                 f.write(f"  '{record_id}',\n")
                 f.write(f"  '{timestamp}',\n")
                 f.write(f"  '{source_type}',\n")
@@ -895,18 +869,14 @@ def info_command() -> None:
         console.print("\n📁 Example Usage:")
         console.print("  ign module data demo --verbose --fake-data")
         console.print("  ign module data test --supabase")
-        console.print(
-            "  ign module data faker --count 500 --sources opcua,mqtt --supabase"
-        )
+        console.print("  ign module data faker --count 500 --sources opcua,mqtt --supabase")
         console.print(
             '  ign module data config my_opcua --type opc_ua --params \'{"server_url":"opc.tcp://localhost:4840"}\''
         )
 
         console.print("\n✨ Features:")
         console.print("  • 25+ enterprise data source types")
-        console.print(
-            "  • Industrial variable metadata injection (PV/CV/DV/SP/Process_State)"
-        )
+        console.print("  • Industrial variable metadata injection (PV/CV/DV/SP/Process_State)")
         console.print("  • JSON model preparation for AI/ML")
         console.print("  • Real-time streaming and batch processing")
         console.print("  • Connection pooling and health monitoring")

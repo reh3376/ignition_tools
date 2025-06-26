@@ -61,10 +61,9 @@ class AdvancedTypeFixer(TypeAnnotationFixer):
 
         try:
             for error in errors:
-                if error.rule_code == "attr-defined":
-                    if self._fix_attribute_error(error):
-                        fixes_applied += 1
-                        files_processed.add(error.file_path)
+                if error.rule_code == "attr-defined" and self._fix_attribute_error(error):
+                    fixes_applied += 1
+                    files_processed.add(error.file_path)
 
             return FixResult(
                 success=True,
@@ -96,12 +95,10 @@ class AdvancedTypeFixer(TypeAnnotationFixer):
             if error.line_number > len(lines):
                 return False
 
-            line = lines[error.line_number - 1]
+            lines[error.line_number - 1]
 
             # Extract object and attribute from error
-            obj_attr_match = re.search(
-                r'"(.+?)" has no attribute "(.+?)"', error.message
-            )
+            obj_attr_match = re.search(r'"(.+?)" has no attribute "(.+?)"', error.message)
             if not obj_attr_match:
                 return False
 
@@ -115,14 +112,10 @@ class AdvancedTypeFixer(TypeAnnotationFixer):
             return False
 
         except Exception as e:
-            logger.warning(
-                f"Failed to fix attribute error in {error.file_path}:{error.line_number}: {e}"
-            )
+            logger.warning(f"Failed to fix attribute error in {error.file_path}:{error.line_number}: {e}")
             return False
 
-    def _fix_object_attribute(
-        self, file_path: Path, lines: list[str], error: MypyError, attr_name: str
-    ) -> bool:
+    def _fix_object_attribute(self, file_path: Path, lines: list[str], error: MypyError, attr_name: str) -> bool:
         """Fix object attribute access by inferring proper type."""
         try:
             # Find the variable assignment in the function
@@ -152,9 +145,7 @@ class AdvancedTypeFixer(TypeAnnotationFixer):
                                     var_part = line[:assignment_pos].strip()
                                     value_part = line[assignment_pos:]
 
-                                    new_line = (
-                                        f"{var_part}: {inferred_type}{value_part}"
-                                    )
+                                    new_line = f"{var_part}: {inferred_type}{value_part}"
                                     lines[i] = new_line
 
                                     # Write back to file
@@ -177,10 +168,9 @@ class AdvancedTypeFixer(TypeAnnotationFixer):
 
         try:
             for error in errors:
-                if error.rule_code == "index":
-                    if self._fix_index_error(error):
-                        fixes_applied += 1
-                        files_processed.add(error.file_path)
+                if error.rule_code == "index" and self._fix_index_error(error):
+                    fixes_applied += 1
+                    files_processed.add(error.file_path)
 
             return FixResult(
                 success=True,
@@ -222,17 +212,13 @@ class AdvancedTypeFixer(TypeAnnotationFixer):
                         var_name = var_match.group(1)
 
                         # Look for variable assignment to add type annotation
-                        if self._add_type_annotation_to_var(
-                            file_path, var_name, suggested_type
-                        ):
+                        if self._add_type_annotation_to_var(file_path, var_name, suggested_type):
                             return True
 
             return False
 
         except Exception as e:
-            logger.warning(
-                f"Failed to fix index error in {error.file_path}:{error.line_number}: {e}"
-            )
+            logger.warning(f"Failed to fix index error in {error.file_path}:{error.line_number}: {e}")
             return False
 
     def fix_assignment_errors(self, errors: list[MypyError]) -> FixResult:
@@ -244,10 +230,9 @@ class AdvancedTypeFixer(TypeAnnotationFixer):
 
         try:
             for error in errors:
-                if error.rule_code == "assignment":
-                    if self._fix_assignment_error(error):
-                        fixes_applied += 1
-                        files_processed.add(error.file_path)
+                if error.rule_code == "assignment" and self._fix_assignment_error(error):
+                    fixes_applied += 1
+                    files_processed.add(error.file_path)
 
             return FixResult(
                 success=True,
@@ -282,9 +267,7 @@ class AdvancedTypeFixer(TypeAnnotationFixer):
 
             # Parse assignment mismatch message
             # Example: Incompatible types in assignment (expression has type "None", variable has type "dict[str, Any]")
-            mismatch_pattern = (
-                r'expression has type "([^"]+)", variable has type "([^"]+)"'
-            )
+            mismatch_pattern = r'expression has type "([^"]+)", variable has type "([^"]+)"'
             match = re.search(mismatch_pattern, error.message)
 
             if match:
@@ -299,14 +282,9 @@ class AdvancedTypeFixer(TypeAnnotationFixer):
                         if ":" in var_name:
                             # Already has type annotation, make it Optional
                             type_part = var_name.split(":")[1].strip()
-                            if (
-                                not type_part.startswith("Optional")
-                                and "|" not in type_part
-                            ):
+                            if not type_part.startswith("Optional") and "|" not in type_part:
                                 new_type = f"Optional[{type_part}]"
-                                new_line = line.replace(
-                                    f": {type_part}", f": {new_type}"
-                                )
+                                new_line = line.replace(f": {type_part}", f": {new_type}")
                                 lines[error.line_number - 1] = new_line
 
                                 # Add Optional import if needed
@@ -320,14 +298,10 @@ class AdvancedTypeFixer(TypeAnnotationFixer):
             return False
 
         except Exception as e:
-            logger.warning(
-                f"Failed to fix assignment error in {error.file_path}:{error.line_number}: {e}"
-            )
+            logger.warning(f"Failed to fix assignment error in {error.file_path}:{error.line_number}: {e}")
             return False
 
-    def _add_type_annotation_to_var(
-        self, file_path: Path, var_name: str, suggested_type: str
-    ) -> bool:
+    def _add_type_annotation_to_var(self, file_path: Path, var_name: str, suggested_type: str) -> bool:
         """Add type annotation to a variable."""
         try:
             with open(file_path, encoding="utf-8") as f:
@@ -397,9 +371,7 @@ class AdvancedTypeFixer(TypeAnnotationFixer):
             logger.warning(f"Failed to ensure Optional import: {e}")
             return False
 
-    def fix_all_advanced_errors(
-        self, error_types: list[str] | None = None
-    ) -> dict[str, FixResult]:
+    def fix_all_advanced_errors(self, error_types: list[str] | None = None) -> dict[str, FixResult]:
         """Fix all advanced mypy errors systematically."""
         logger.info("🚀 Starting advanced mypy error fixing")
 
@@ -423,14 +395,10 @@ class AdvancedTypeFixer(TypeAnnotationFixer):
             # Fix each error type
             for error_type in error_types:
                 if error_type in errors_by_type:
-                    logger.info(
-                        f"🔧 Processing {error_type} errors ({len(errors_by_type[error_type])} found)"
-                    )
+                    logger.info(f"🔧 Processing {error_type} errors ({len(errors_by_type[error_type])} found)")
 
                     if error_type == "attr-defined":
-                        result = self.fix_attr_defined_errors(
-                            errors_by_type[error_type]
-                        )
+                        result = self.fix_attr_defined_errors(errors_by_type[error_type])
                     elif error_type == "index":
                         result = self.fix_index_errors(errors_by_type[error_type])
                     elif error_type == "assignment":

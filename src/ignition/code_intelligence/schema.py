@@ -98,8 +98,8 @@ class CodeSchema:
         constraints = [
             "CREATE CONSTRAINT code_file_path IF NOT EXISTS FOR (f:CodeFile) REQUIRE f.path IS UNIQUE",
             "CREATE CONSTRAINT class_unique IF NOT EXISTS FOR (c:Class) REQUIRE (c.name, c.file_path) IS UNIQUE",
-            "CREATE CONSTRAINT method_unique IF NOT EXISTS FOR (m:Method) REQUIRE (m.name, m.file_path, m.start_line) IS UNIQUE",
-            "CREATE CONSTRAINT import_unique IF NOT EXISTS FOR (i:Import) REQUIRE (i.module, i.file_path, i.line_number) IS UNIQUE",
+            "CREATE CONSTRAINT method_unique IF NOT EXISTS FOR (m:Method) REQUIRE (m.name, m.file_path, m.start_line) IS UNIQUE",  # noqa: E501
+            "CREATE CONSTRAINT import_unique IF NOT EXISTS FOR (i:Import) REQUIRE (i.module, i.file_path, i.line_number) IS UNIQUE",  # noqa: E501
         ]
 
         for constraint in constraints:
@@ -131,15 +131,15 @@ class CodeSchema:
         vector_indexes = [
             {
                 "name": "code_file_embeddings",
-                "query": "CREATE VECTOR INDEX code_file_embeddings IF NOT EXISTS FOR (f:CodeFile) ON (f.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",
+                "query": "CREATE VECTOR INDEX code_file_embeddings IF NOT EXISTS FOR (f:CodeFile) ON (f.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",  # noqa: E501
             },
             {
                 "name": "class_embeddings",
-                "query": "CREATE VECTOR INDEX class_embeddings IF NOT EXISTS FOR (c:Class) ON (c.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",
+                "query": "CREATE VECTOR INDEX class_embeddings IF NOT EXISTS FOR (c:Class) ON (c.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",  # noqa: E501
             },
             {
                 "name": "method_embeddings",
-                "query": "CREATE VECTOR INDEX method_embeddings IF NOT EXISTS FOR (m:Method) ON (m.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",
+                "query": "CREATE VECTOR INDEX method_embeddings IF NOT EXISTS FOR (m:Method) ON (m.embedding) OPTIONS {indexConfig: {`vector.dimensions`: 384, `vector.similarity_function`: 'cosine'}}",  # noqa: E501
             },
         ]
 
@@ -148,9 +148,7 @@ class CodeSchema:
                 self.client.execute_query(index_info["query"])
                 logger.info(f"Created vector index: {index_info['name']}")
             except Exception as e:
-                logger.debug(
-                    f"Vector index {index_info['name']} may already exist: {e}"
-                )
+                logger.debug(f"Vector index {index_info['name']} may already exist: {e}")
 
     def get_schema_info(self: Self) -> dict[str, Any]:
         """Get information about the current schema."""
@@ -166,9 +164,7 @@ class CodeSchema:
             # Get node counts
             node_counts = {}
             for node_type in ["CodeFile", "Class", "Method", "Import"]:
-                count_result = self.client.execute_query(
-                    f"MATCH (n:{node_type}) RETURN count(n) as count"
-                )
+                count_result = self.client.execute_query(f"MATCH (n:{node_type}) RETURN count(n) as count")
                 node_counts[node_type] = count_result[0]["count"] if count_result else 0
 
             return {

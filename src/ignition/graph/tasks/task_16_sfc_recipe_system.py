@@ -112,7 +112,7 @@ success = sfc.start("Plant/Line1/MainSequence", {
 
 if success:
     system.gui.messageBox("SFC chart started successfully")
-else:
+        else:
     system.gui.errorBox("Failed to start SFC chart", "SFC Error")
 """,
             additional_info={
@@ -159,7 +159,7 @@ if success:
 
     # Update status display
     system.tag.writeBlocking(["[default]SFC/Status"], ["Stopped"])
-else:
+        else:
     system.gui.warningBox("Failed to stop SFC chart", "SFC Warning")
 """,
             additional_info={
@@ -243,7 +243,7 @@ if success:
         "Running",
         None
     ])
-else:
+        else:
     system.gui.errorBox("Cannot resume - safety conditions not met", "Resume Error")
 """,
             additional_info={
@@ -568,7 +568,7 @@ if recipe_data:
         system.gui.messageBox(f"Recipe loaded for batch: {batch_id}")
     else:
         system.gui.errorBox(f"Recipe incomplete - missing: {missing_fields}", "Recipe Error")
-else:
+        else:
     system.gui.errorBox("Failed to load recipe", "Load Error")
 """,
             additional_info={
@@ -633,7 +633,7 @@ if success:
     ])
 
     system.gui.messageBox("Recipe saved successfully")
-else:
+        else:
     system.gui.errorBox("Failed to save recipe", "Save Error")
 """,
             additional_info={
@@ -696,7 +696,7 @@ if execution_id:
     # Log execution start
     logger = system.util.getLogger("Recipe")
     logger.info(f"Recipe execution started: {execution_id}")
-else:
+        else:
     system.gui.errorBox("Failed to start recipe execution", "Execution Error")
 """,
             additional_info={
@@ -758,7 +758,7 @@ if execution_id:
         logger.warning(f"Recipe execution aborted: {execution_id}")
     else:
         system.gui.errorBox("Failed to abort recipe execution", "Abort Error")
-else:
+        else:
     system.gui.warningBox("No active execution to abort", "No Active Execution")
 """,
             additional_info={
@@ -815,10 +815,10 @@ if execution_id:
             status_msg += f"Estimated Completion: {status.get('estimated_completion', 'N/A')}"
             system.gui.messageBox(status_msg, "Recipe Status")
         elif status["status"] == "error":
-            system.gui.errorBox(f"Recipe execution error: {status.get('error_message', 'Unknown error')}", "Execution Error")
+            system.gui.errorBox(f"Recipe execution error: {status.get('error_message', 'Unknown error')}", "Execution Error")  # noqa: E501
     else:
         system.gui.warningBox("Could not retrieve execution status", "Status Warning")
-else:
+        else:
     system.gui.warningBox("No active execution found", "No Active Execution")
 """,
             additional_info={
@@ -881,7 +881,7 @@ if history:
         history_msg += f"Duration: {latest_execution.get('duration_minutes', 'N/A')} minutes\\n"
         history_msg += f"Success Rate: {(len(successful_executions) / len(history)) * 100:.1f}%"
         system.gui.messageBox(history_msg, "Recipe History")
-else:
+        else:
     system.gui.messageBox("No execution history found for this recipe", "No History")
 """,
             additional_info={
@@ -949,7 +949,7 @@ if success:
         logger.info(f"Recipe {recipe_data['recipe_id']} bound to SFC chart")
     else:
         system.gui.errorBox("Failed to start SFC with recipe", "Execution Error")
-else:
+        else:
     system.gui.errorBox("Recipe incompatible with SFC chart", "Compatibility Error")
 """,
             additional_info={
@@ -1002,7 +1002,7 @@ if recipe_data:
     # Show detailed recipe info in popup
     recipe_details = f"Recipe: {recipe_name}\\nProgress: {batch_progress}%"
     system.gui.messageBox(recipe_details, "Current Recipe Status")
-else:
+        else:
     system.gui.warningBox("No recipe data found for SFC chart", "Recipe Warning")
 """,
             additional_info={

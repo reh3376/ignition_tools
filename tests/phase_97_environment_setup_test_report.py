@@ -76,9 +76,7 @@ class Phase97EnvironmentTestReporter:
             assert hasattr(setup, "setup_development_environment")
             assert hasattr(setup, "generate_final_report")
 
-            self.log_test_result(
-                "Module Import", True, "All required methods available"
-            )
+            self.log_test_result("Module Import", True, "All required methods available")
             return {
                 "passed": True,
                 "details": "Phase97EnvironmentSetup class imported and initialized successfully",
@@ -214,9 +212,7 @@ class Phase97EnvironmentTestReporter:
                     missing_keys.append(key)
 
             if missing_keys:
-                self.log_test_result(
-                    "Development Setup", False, f"Missing result keys: {missing_keys}"
-                )
+                self.log_test_result("Development Setup", False, f"Missing result keys: {missing_keys}")
                 return {"passed": False, "missing_keys": missing_keys}
 
             self.log_test_result(
@@ -350,24 +346,18 @@ class Phase97EnvironmentTestReporter:
         try:
             # Check if running on macOS
             if platform.system() != "Darwin":
-                self.log_test_result(
-                    "Homebrew Integration", True, "Skipped (not macOS)"
-                )
+                self.log_test_result("Homebrew Integration", True, "Skipped (not macOS)")
                 return {"passed": True, "skipped": True, "reason": "Not macOS"}
 
             # Check if Homebrew is available
             try:
-                result = subprocess.run(
-                    ["which", "brew"], capture_output=True, text=True
-                )
+                result = subprocess.run(["which", "brew"], capture_output=True, text=True)
                 homebrew_available = result.returncode == 0
             except Exception:
                 homebrew_available = False
 
             if not homebrew_available:
-                self.log_test_result(
-                    "Homebrew Integration", False, "Homebrew not found"
-                )
+                self.log_test_result("Homebrew Integration", False, "Homebrew not found")
                 return {"passed": False, "error": "Homebrew not available"}
 
             # Test Homebrew availability and basic setup functionality
@@ -407,9 +397,7 @@ class Phase97EnvironmentTestReporter:
             TextColumn("[progress.description]{task.description}"),
             console=self.console,
         ) as progress:
-            task = progress.add_task(
-                "Running Phase 9.7 Environment Setup Tests...", total=7
-            )
+            task = progress.add_task("Running Phase 9.7 Environment Setup Tests...", total=7)
 
             # Test 1: Module Import
             progress.update(task, description="Testing Module Import...")
@@ -418,23 +406,17 @@ class Phase97EnvironmentTestReporter:
 
             # Test 2: Environment Variables
             progress.update(task, description="Testing Environment Variables...")
-            self.results["environment_variables"] = (
-                self.test_environment_variable_validation()
-            )
+            self.results["environment_variables"] = self.test_environment_variable_validation()
             progress.advance(task)
 
             # Test 3: System Requirements
             progress.update(task, description="Testing System Requirements...")
-            self.results["system_requirements"] = (
-                self.test_system_requirements_validation()
-            )
+            self.results["system_requirements"] = self.test_system_requirements_validation()
             progress.advance(task)
 
             # Test 4: Development Setup
             progress.update(task, description="Testing Development Setup...")
-            self.results["development_setup"] = (
-                self.test_development_environment_setup()
-            )
+            self.results["development_setup"] = self.test_development_environment_setup()
             progress.advance(task)
 
             # Test 5: Final Report
@@ -453,9 +435,7 @@ class Phase97EnvironmentTestReporter:
             progress.advance(task)
 
         # Calculate overall score
-        passed_tests = sum(
-            1 for result in self.results.values() if result.get("passed", False)
-        )
+        passed_tests = sum(1 for result in self.results.values() if result.get("passed", False))
         total_tests = len(self.results)
         success_rate = (passed_tests / total_tests) * 100 if total_tests > 0 else 0
 
@@ -473,27 +453,13 @@ class Phase97EnvironmentTestReporter:
             },
             "test_results": self.results,
             "environment_setup_readiness": {
-                "module_ready": self.results.get("module_import", {}).get(
-                    "passed", False
-                ),
-                "validation_ready": self.results.get("environment_variables", {}).get(
-                    "passed", False
-                ),
-                "system_check_ready": self.results.get("system_requirements", {}).get(
-                    "passed", False
-                ),
-                "setup_ready": self.results.get("development_setup", {}).get(
-                    "passed", False
-                ),
-                "reporting_ready": self.results.get("final_report", {}).get(
-                    "passed", False
-                ),
-                "cli_ready": self.results.get("cli_integration", {}).get(
-                    "passed", False
-                ),
-                "automation_ready": self.results.get("homebrew_integration", {}).get(
-                    "passed", False
-                ),
+                "module_ready": self.results.get("module_import", {}).get("passed", False),
+                "validation_ready": self.results.get("environment_variables", {}).get("passed", False),
+                "system_check_ready": self.results.get("system_requirements", {}).get("passed", False),
+                "setup_ready": self.results.get("development_setup", {}).get("passed", False),
+                "reporting_ready": self.results.get("final_report", {}).get("passed", False),
+                "cli_ready": self.results.get("cli_integration", {}).get("passed", False),
+                "automation_ready": self.results.get("homebrew_integration", {}).get("passed", False),
             },
             "recommendations": self._generate_recommendations(),
             "next_steps": self._generate_next_steps(),
@@ -518,9 +484,7 @@ class Phase97EnvironmentTestReporter:
             recommendations.append("🟡 Configure missing environment variables")
 
         if not self.results.get("system_requirements", {}).get("passed", False):
-            recommendations.append(
-                "🔴 Install missing system requirements (Java, Gradle)"
-            )
+            recommendations.append("🔴 Install missing system requirements (Java, Gradle)")
 
         if not self.results.get("homebrew_integration", {}).get("passed", False):
             recommendations.append("🟡 Install Homebrew for automated setup on macOS")
@@ -537,16 +501,12 @@ class Phase97EnvironmentTestReporter:
         # Check system requirements
         sys_result = self.results.get("system_requirements", {})
         if sys_result.get("passed") and sys_result.get("invalid_count", 0) > 0:
-            next_steps.append(
-                "Run 'ign deploy install-requirements --all' to install missing tools"
-            )
+            next_steps.append("Run 'ign deploy install-requirements --all' to install missing tools")
 
         # Check environment variables
         env_result = self.results.get("environment_variables", {})
         if env_result.get("passed") and env_result.get("invalid_count", 0) > 0:
-            next_steps.append(
-                "Run 'ign deploy setup-environment' to configure environment"
-            )
+            next_steps.append("Run 'ign deploy setup-environment' to configure environment")
 
         # Check overall readiness
         if self.passed_count == self.test_count:
@@ -653,14 +613,10 @@ def main():
         console.print("🎉 Environment setup system is excellent!", style="green bold")
         exit_code = 0
     elif success_rate >= 70:
-        console.print(
-            "⚠️  Environment setup system needs minor improvements", style="yellow bold"
-        )
+        console.print("⚠️  Environment setup system needs minor improvements", style="yellow bold")
         exit_code = 0
     else:
-        console.print(
-            "❌ Environment setup system needs significant work", style="red bold"
-        )
+        console.print("❌ Environment setup system needs significant work", style="red bold")
         exit_code = 1
 
     return exit_code

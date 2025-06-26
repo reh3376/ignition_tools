@@ -149,9 +149,7 @@ class TemplateSearchEngine:
 
         return results[:limit]
 
-    def find_similar_templates(
-        self, template_path: str, limit: int = 10
-    ) -> list[TemplateSearchResult]:
+    def find_similar_templates(self, template_path: str, limit: int = 10) -> list[TemplateSearchResult]:
         """Find templates similar to a given template.
 
         Args:
@@ -191,9 +189,7 @@ class TemplateSearchEngine:
                 matched_fields.extend([f"tag:{tag}" for tag in shared_tags])
 
             # Similar parameters
-            shared_params = set(metadata.parameters.keys()) & set(
-                reference_metadata.parameters.keys()
-            )
+            shared_params = set(metadata.parameters.keys()) & set(reference_metadata.parameters.keys())
             if shared_params:
                 score += len(shared_params) * 1.0
                 matched_fields.append(f"params:{len(shared_params)}")
@@ -238,9 +234,7 @@ class TemplateSearchEngine:
 
         return results
 
-    def get_recently_modified_templates(
-        self, limit: int = 10
-    ) -> list[TemplateSearchResult]:
+    def get_recently_modified_templates(self, limit: int = 10) -> list[TemplateSearchResult]:
         """Get recently modified templates.
 
         Args:

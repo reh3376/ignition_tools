@@ -1,4 +1,4 @@
-"""Phase 10: Enterprise Integration & Deployment
+"""Phase 10: Enterprise Integration & Deployment.
 
 This module implements enterprise-grade deployment, scalability, security, and integration
 capabilities for Ignition modules following the crawl_mcp.py systematic methodology.
@@ -82,9 +82,7 @@ class Phase10EnterpriseIntegration:
             self.validation_results = env_validation
 
             if not env_validation.get("overall_valid", False):
-                self.logger.warning(
-                    "Environment validation failed - some features may be limited"
-                )
+                self.logger.warning("Environment validation failed - some features may be limited")
                 return
 
             self.components_initialized = True
@@ -95,7 +93,7 @@ class Phase10EnterpriseIntegration:
             raise
 
     def validate_environment(self) -> dict[str, Any]:
-        """Step 1: Environment Variable Validation First
+        """Step 1: Environment Variable Validation First.
 
         Validate all required environment variables for enterprise deployment
         following crawl_mcp.py validation patterns.
@@ -111,9 +109,7 @@ class Phase10EnterpriseIntegration:
         }
 
         # Calculate overall validation status
-        valid_components = sum(
-            1 for result in validation_results.values() if result.valid
-        )
+        valid_components = sum(1 for result in validation_results.values() if result.valid)
         total_components = len(validation_results)
         overall_valid = valid_components == total_components
 
@@ -154,9 +150,7 @@ class Phase10EnterpriseIntegration:
                     "cluster",
                     "cloud",
                 ]:
-                    invalid_vars.append(
-                        f"{var}={value} (must be: standalone, cluster, or cloud)"
-                    )
+                    invalid_vars.append(f"{var}={value} (must be: standalone, cluster, or cloud)")
                 elif var in [
                     "HIGH_AVAILABILITY_ENABLED",
                     "DISASTER_RECOVERY_ENABLED",
@@ -180,11 +174,7 @@ class Phase10EnterpriseIntegration:
                 error=(
                     f"Missing: {missing_vars}, Invalid: {invalid_vars}"
                     if missing_vars and invalid_vars
-                    else (
-                        f"Missing: {missing_vars}"
-                        if missing_vars
-                        else f"Invalid: {invalid_vars}"
-                    )
+                    else (f"Missing: {missing_vars}" if missing_vars else f"Invalid: {invalid_vars}")
                 ),
             )
 
@@ -219,9 +209,7 @@ class Phase10EnterpriseIntegration:
                     "gcp",
                     "multi",
                 ]:
-                    invalid_vars.append(
-                        f"{var}={value} (must be: aws, azure, gcp, or multi)"
-                    )
+                    invalid_vars.append(f"{var}={value} (must be: aws, azure, gcp, or multi)")
                 elif var == "KUBERNETES_ENABLED" and value.lower() not in [
                     "true",
                     "false",
@@ -242,11 +230,7 @@ class Phase10EnterpriseIntegration:
                 error=(
                     f"Missing: {missing_vars}, Invalid: {invalid_vars}"
                     if missing_vars and invalid_vars
-                    else (
-                        f"Missing: {missing_vars}"
-                        if missing_vars
-                        else f"Invalid: {invalid_vars}"
-                    )
+                    else (f"Missing: {missing_vars}" if missing_vars else f"Invalid: {invalid_vars}")
                 ),
             )
 
@@ -301,11 +285,7 @@ class Phase10EnterpriseIntegration:
                 error=(
                     f"Missing: {missing_vars}, Invalid: {invalid_vars}"
                     if missing_vars and invalid_vars
-                    else (
-                        f"Missing: {missing_vars}"
-                        if missing_vars
-                        else f"Invalid: {invalid_vars}"
-                    )
+                    else (f"Missing: {missing_vars}" if missing_vars else f"Invalid: {invalid_vars}")
                 ),
             )
 
@@ -346,25 +326,19 @@ class Phase10EnterpriseIntegration:
                     "high",
                     "critical",
                 ]:
-                    invalid_vars.append(
-                        f"{var}={value} (must be: basic, standard, high, or critical)"
-                    )
+                    invalid_vars.append(f"{var}={value} (must be: basic, standard, high, or critical)")
                 elif var == "COMPLIANCE_FRAMEWORK" and value not in [
                     "iso27001",
                     "sox",
                     "hipaa",
                     "gdpr",
                 ]:
-                    invalid_vars.append(
-                        f"{var}={value} (must be: iso27001, sox, hipaa, or gdpr)"
-                    )
+                    invalid_vars.append(f"{var}={value} (must be: iso27001, sox, hipaa, or gdpr)")
                 elif var == "AUDIT_LOG_RETENTION_DAYS":
                     try:
                         days = int(value)
                         if days < 1 or days > 3650:  # 1 day to 10 years
-                            invalid_vars.append(
-                                f"{var}={value} (must be between 1 and 3650 days)"
-                            )
+                            invalid_vars.append(f"{var}={value} (must be between 1 and 3650 days)")
                     except ValueError:
                         invalid_vars.append(f"{var}={value} (must be a valid number)")
 
@@ -382,11 +356,7 @@ class Phase10EnterpriseIntegration:
                 error=(
                     f"Missing: {missing_vars}, Invalid: {invalid_vars}"
                     if missing_vars and invalid_vars
-                    else (
-                        f"Missing: {missing_vars}"
-                        if missing_vars
-                        else f"Invalid: {invalid_vars}"
-                    )
+                    else (f"Missing: {missing_vars}" if missing_vars else f"Invalid: {invalid_vars}")
                 ),
             )
 
@@ -423,23 +393,20 @@ class Phase10EnterpriseIntegration:
                     "staging",
                     "production",
                 ]:
-                    invalid_vars.append(
-                        f"{var}={value} (must be: development, staging, or production)"
-                    )
+                    invalid_vars.append(f"{var}={value} (must be: development, staging, or production)")
                 elif var in [
                     "MONITORING_STACK_URL",
                     "BACKUP_STORAGE_URL",
                     "PERFORMANCE_METRICS_URL",
                     "ALERTING_WEBHOOK_URL",
-                ]:
-                    if not (
-                        value.startswith("http://")
-                        or value.startswith("https://")
-                        or value.startswith("s3://")
-                        or value.startswith("gs://")
-                        or value.startswith("azure://")
-                    ):
-                        invalid_vars.append(f"{var}={value} (must be a valid URL)")
+                ] and not (
+                    value.startswith("http://")
+                    or value.startswith("https://")
+                    or value.startswith("s3://")
+                    or value.startswith("gs://")
+                    or value.startswith("azure://")
+                ):
+                    invalid_vars.append(f"{var}={value} (must be a valid URL)")
 
         if missing_vars or invalid_vars:
             error_details = {}
@@ -455,11 +422,7 @@ class Phase10EnterpriseIntegration:
                 error=(
                     f"Missing: {missing_vars}, Invalid: {invalid_vars}"
                     if missing_vars and invalid_vars
-                    else (
-                        f"Missing: {missing_vars}"
-                        if missing_vars
-                        else f"Invalid: {invalid_vars}"
-                    )
+                    else (f"Missing: {missing_vars}" if missing_vars else f"Invalid: {invalid_vars}")
                 ),
             )
 
@@ -469,9 +432,7 @@ class Phase10EnterpriseIntegration:
             details={"deployment_env": os.getenv("DEPLOYMENT_ENVIRONMENT")},
         )
 
-    def _display_environment_validation(
-        self, validation_results: dict[str, Any]
-    ) -> Any:
+    def _display_environment_validation(self, validation_results: dict[str, Any]) -> Any:
         """Display environment validation results in a rich table."""
         table = Table(title="Phase 10 Enterprise Integration - Environment Validation")
         table.add_column("Component", style="cyan")
@@ -493,15 +454,13 @@ class Phase10EnterpriseIntegration:
                 message = result.message
                 details = str(result.details) if result.details else ""
 
-                table.add_row(
-                    component.replace("_", " ").title(), status, message, details
-                )
+                table.add_row(component.replace("_", " ").title(), status, message, details)
 
         # Add overall status
         overall_status = (
             "✅ All Valid"
             if validation_results.get("overall_valid")
-            else f"⚠️ {validation_results.get('valid_components', 0)}/{validation_results.get('total_components', 0)} Valid"
+            else f"⚠️ {validation_results.get('valid_components', 0)}/{validation_results.get('total_components', 0)} Valid"  # noqa: E501
         )
         validation_score = validation_results.get("validation_score", 0)
 
@@ -509,7 +468,7 @@ class Phase10EnterpriseIntegration:
             "Overall Status",
             overall_status,
             f"Validation Score: {validation_score:.1f}%",
-            f"{validation_results.get('valid_components', 0)} of {validation_results.get('total_components', 0)} components valid",
+            f"{validation_results.get('valid_components', 0)} of {validation_results.get('total_components', 0)} components valid",  # noqa: E501
         )
 
         console.print(table)
@@ -520,9 +479,7 @@ class Phase10EnterpriseIntegration:
             console.print("1. set missing environment variables in your .env file")
             console.print("2. Correct invalid environment variable values")
             console.print("3. Run validation again to verify fixes")
-            console.print(
-                "4. Check Phase 10 documentation for environment variable requirements"
-            )
+            console.print("4. Check Phase 10 documentation for environment variable requirements")
 
     def get_validation_status(self) -> dict[str, Any]:
         """Get current validation status."""
@@ -530,9 +487,7 @@ class Phase10EnterpriseIntegration:
 
     def is_ready(self) -> bool:
         """Check if Phase 10 is ready for operation."""
-        return self.components_initialized and self.validation_results.get(
-            "overall_valid", False
-        )
+        return self.components_initialized and self.validation_results.get("overall_valid", False)
 
     def get_status(self) -> dict[str, Any]:
         """Get overall status of Phase 10 Enterprise Integration."""

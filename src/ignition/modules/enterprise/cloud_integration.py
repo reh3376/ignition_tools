@@ -1,4 +1,4 @@
-"""Phase 10.2: Cloud Integration Module
+"""Phase 10.2: Cloud Integration Module.
 
 This module implements multi-cloud deployment capabilities, containerization,
 orchestration, API gateway, and enterprise identity management following
@@ -104,13 +104,11 @@ class CloudIntegrationModule:
             self._initialize_components()
 
     def _validate_environment_variables(self) -> dict[str, Any]:
-        """Step 1: Environment Variable Validation First
+        """Step 1: Environment Variable Validation First.
 
         Validate cloud integration environment variables following crawl_mcp.py patterns.
         """
-        self.console.print(
-            "🔍 Cloud Integration: Environment Validation", style="bold blue"
-        )
+        self.console.print("🔍 Cloud Integration: Environment Validation", style="bold blue")
 
         required_vars = {
             "CLOUD_PROVIDER": {
@@ -175,10 +173,8 @@ class CloudIntegrationModule:
 
         return final_results
 
-    def _validate_single_environment_variable(
-        self, var_name: str, var_config: dict[str, Any]
-    ) -> CloudValidationResult:
-        """Step 2: Comprehensive Input Validation
+    def _validate_single_environment_variable(self, var_name: str, var_config: dict[str, Any]) -> CloudValidationResult:
+        """Step 2: Comprehensive Input Validation.
 
         Validate a single environment variable with comprehensive checks.
         """
@@ -238,16 +234,10 @@ class CloudIntegrationModule:
             details={"value": value},
         )
 
-    def _validate_format(
-        self, value: str, format_type: str, var_name: str
-    ) -> CloudValidationResult:
+    def _validate_format(self, value: str, format_type: str, var_name: str) -> CloudValidationResult:
         """Validate specific format types."""
         if format_type == "url":
-            if not (
-                value.startswith("http://")
-                or value.startswith("https://")
-                or "://" in value
-            ):
+            if not (value.startswith("http://") or value.startswith("https://") or "://" in value):
                 return CloudValidationResult(
                     valid=False,
                     component=var_name,
@@ -258,10 +248,9 @@ class CloudIntegrationModule:
                         f"Current value: {value}",
                     ],
                 )
-        elif format_type == "comma_separated":
-            if "," not in value and len(value.strip()) > 0:
-                # Single value is acceptable
-                pass
+        elif format_type == "comma_separated" and "," not in value and len(value.strip()) > 0:
+            # Single value is acceptable
+            pass
 
         return CloudValidationResult(
             valid=True,
@@ -270,30 +259,25 @@ class CloudIntegrationModule:
         )
 
     def _load_and_validate_config(self) -> CloudConfig:
-        """Step 2: Comprehensive Input Validation
+        """Step 2: Comprehensive Input Validation.
 
         Load and validate cloud configuration.
         """
         config = CloudConfig(
             cloud_provider=os.getenv("CLOUD_PROVIDER", "aws"),
             container_registry_url=os.getenv("CONTAINER_REGISTRY_URL"),
-            kubernetes_enabled=os.getenv("KUBERNETES_ENABLED", "false").lower()
-            == "true",
+            kubernetes_enabled=os.getenv("KUBERNETES_ENABLED", "false").lower() == "true",
             api_gateway_url=os.getenv("API_GATEWAY_URL"),
             identity_provider_url=os.getenv("IDENTITY_PROVIDER_URL"),
             deployment_region=os.getenv("DEPLOYMENT_REGION", "us-east-1"),
-            auto_scaling_enabled=os.getenv("AUTO_SCALING_ENABLED", "true").lower()
-            == "true",
-            load_balancing_enabled=os.getenv("LOAD_BALANCING_ENABLED", "true").lower()
-            == "true",
+            auto_scaling_enabled=os.getenv("AUTO_SCALING_ENABLED", "true").lower() == "true",
+            load_balancing_enabled=os.getenv("LOAD_BALANCING_ENABLED", "true").lower() == "true",
         )
 
         # Validate configuration consistency
         validation_errors = self._validate_config_consistency(config)
         if validation_errors:
-            self.logger.warning(
-                f"Configuration validation warnings: {validation_errors}"
-            )
+            self.logger.warning(f"Configuration validation warnings: {validation_errors}")
 
         return config
 
@@ -308,9 +292,7 @@ class CloudIntegrationModule:
         # Validate URL consistency
         if config.api_gateway_url and config.identity_provider_url:
             if config.api_gateway_url == config.identity_provider_url:
-                errors.append(
-                    "API Gateway and Identity Provider should have different URLs"
-                )
+                errors.append("API Gateway and Identity Provider should have different URLs")
 
         return errors
 
@@ -328,9 +310,7 @@ class CloudIntegrationModule:
             self.logger.error(f"Failed to initialize cloud components: {e}")
             raise
 
-    def _display_environment_validation(
-        self, validation_results: dict[str, Any]
-    ) -> Any:
+    def _display_environment_validation(self, validation_results: dict[str, Any]) -> Any:
         """Display environment validation results in a formatted table."""
         table = Table(title="Cloud Integration - Environment Validation")
         table.add_column("Variable", style="cyan")
@@ -365,9 +345,7 @@ class CloudIntegrationModule:
         """Public method to get environment validation results."""
         return self.env_validation
 
-    def deploy_cloud_infrastructure(
-        self, complexity_level: str = "basic"
-    ) -> dict[str, Any]:
+    def deploy_cloud_infrastructure(self, complexity_level: str = "basic") -> dict[str, Any]:
         """Step 4: Deploy cloud infrastructure with progressive complexity.
 
         Following crawl_mcp.py methodology for deployment.
@@ -512,7 +490,7 @@ class CloudIntegrationModule:
             return {"success": False, "message": f"Unknown deployment step: {step}"}
 
     def _format_deployment_error(self, error: Exception) -> str:
-        """Step 3: Error Handling and User-Friendly Messages
+        """Step 3: Error Handling and User-Friendly Messages.
 
         Format deployment errors for user-friendly display.
         """
@@ -524,14 +502,12 @@ class CloudIntegrationModule:
         }
 
         error_type = type(error).__name__
-        user_friendly_message = error_mappings.get(
-            error_type, f"Deployment error: {error!s}"
-        )
+        user_friendly_message = error_mappings.get(error_type, f"Deployment error: {error!s}")
 
         return user_friendly_message
 
     def cleanup_resources(self) -> Any:
-        """Step 6: Resource Management and Cleanup
+        """Step 6: Resource Management and Cleanup.
 
         Clean up allocated resources.
         """

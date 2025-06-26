@@ -89,9 +89,7 @@ class Phase125IntegrationTester:
                 api_success = response.status_code in [200, 201]
                 api_response = (
                     response.json()
-                    if response.headers.get("content-type", "").startswith(
-                        "application/json"
-                    )
+                    if response.headers.get("content-type", "").startswith("application/json")
                     else {"status_code": response.status_code}
                 )
         except Exception as e:
@@ -117,9 +115,7 @@ class Phase125IntegrationTester:
         # Log result
         status = "✅ CONSISTENT" if mapping_consistent else "❌ INCONSISTENT"
         print(f"   {status} {test_name}")
-        print(
-            f"     CLI: {'✅' if cli_success else '❌'} | API: {'✅' if api_success else '❌'}"
-        )
+        print(f"     CLI: {'✅' if cli_success else '❌'} | API: {'✅' if api_success else '❌'}")
 
         return result
 
@@ -240,19 +236,13 @@ class Phase125IntegrationTester:
                     print(f"   ❌ FAILED {test['test_name']}: {e}")
 
         # Calculate results
-        consistent_mappings = sum(
-            1 for r in integration_results if r.mapping_consistent
-        )
+        consistent_mappings = sum(1 for r in integration_results if r.mapping_consistent)
         total_mappings = len(integration_results)
-        mapping_consistency_rate = (
-            consistent_mappings / total_mappings * 100 if total_mappings > 0 else 0
-        )
+        mapping_consistency_rate = consistent_mappings / total_mappings * 100 if total_mappings > 0 else 0
 
         api_successes = sum(1 for r in api_only_results if r["success"])
         total_api_tests = len(api_only_results)
-        api_success_rate = (
-            api_successes / total_api_tests * 100 if total_api_tests > 0 else 0
-        )
+        api_success_rate = api_successes / total_api_tests * 100 if total_api_tests > 0 else 0
 
         overall_success = mapping_consistency_rate >= 70 and api_success_rate >= 80
         execution_time = time.time() - start_time
@@ -274,9 +264,7 @@ class Phase125IntegrationTester:
                 "successful_api_tests": api_successes,
                 "total_api_tests": total_api_tests,
             },
-            "recommendations": self._generate_recommendations(
-                integration_results, api_only_results
-            ),
+            "recommendations": self._generate_recommendations(integration_results, api_only_results),
         }
 
         # Print summary
@@ -324,9 +312,7 @@ class Phase125IntegrationTester:
             )
 
         # Check for CLI-only failures
-        cli_only_failures = [
-            r for r in integration_results if not r.cli_success and r.api_success
-        ]
+        cli_only_failures = [r for r in integration_results if not r.cli_success and r.api_success]
         if cli_only_failures:
             recommendations.append(
                 f"⚙️  Fix {len(cli_only_failures)} CLI command issues while API works: "
@@ -335,9 +321,7 @@ class Phase125IntegrationTester:
             )
 
         # Check for API-only failures
-        api_only_failures = [
-            r for r in integration_results if r.cli_success and not r.api_success
-        ]
+        api_only_failures = [r for r in integration_results if r.cli_success and not r.api_success]
         if api_only_failures:
             recommendations.append(
                 f"🌐 Fix {len(api_only_failures)} API endpoint issues while CLI works: "
@@ -346,9 +330,7 @@ class Phase125IntegrationTester:
             )
 
         if not recommendations:
-            recommendations.append(
-                "🎉 Excellent! All CLI-API integration tests passed successfully."
-            )
+            recommendations.append("🎉 Excellent! All CLI-API integration tests passed successfully.")
 
         return recommendations
 

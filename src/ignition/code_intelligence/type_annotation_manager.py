@@ -30,22 +30,12 @@ F = TypeVar("F", bound=Callable[..., Any])
 class TypeAnnotationConfig(BaseModel):
     """Configuration for type annotation management."""
 
-    auto_fix_enabled: bool = Field(
-        default=True, description="Enable automatic type annotation fixes"
-    )
-    strict_mode: bool = Field(
-        default=False, description="Enable strict type checking mode"
-    )
-    validation_enabled: bool = Field(
-        default=True, description="Enable validation result type checking"
-    )
-    pydantic_validator_fix: bool = Field(
-        default=True, description="Fix Pydantic validator decorators"
-    )
+    auto_fix_enabled: bool = Field(default=True, description="Enable automatic type annotation fixes")
+    strict_mode: bool = Field(default=False, description="Enable strict type checking mode")
+    validation_enabled: bool = Field(default=True, description="Enable validation result type checking")
+    pydantic_validator_fix: bool = Field(default=True, description="Fix Pydantic validator decorators")
     neo4j_type_fix: bool = Field(default=True, description="Fix Neo4j type annotations")
-    excluded_files: list[str] = Field(
-        default_factory=list, description="Files to exclude from processing"
-    )
+    excluded_files: list[str] = Field(default_factory=list, description="Files to exclude from processing")
 
     @field_validator("excluded_files")
     @classmethod
@@ -108,9 +98,7 @@ class PydanticValidatorFix:
         """Fix validator function type annotations."""
         if hasattr(func, "__annotations__"):
             # Update annotations for proper typing
-            func.__annotations__.update(
-                {"cls": type[BaseModel], "v": Any, "return": Any}
-            )
+            func.__annotations__.update({"cls": type[BaseModel], "v": Any, "return": Any})
 
             @wraps(func)
             def typed_validator(cls: type[BaseModel], v: Any) -> Any:
@@ -161,18 +149,14 @@ class OptionalTypeHandler:
         return getattr(obj, attr, default)
 
     @staticmethod
-    def safe_dict_access(
-        obj: dict[str, Any] | None, key: str, default: Any = None
-    ) -> Any:
+    def safe_dict_access(obj: dict[str, Any] | None, key: str, default: Any = None) -> Any:
         """Safely access dictionary key on potentially None dict."""
         if obj is None:
             return default
         return obj.get(key, default)
 
     @staticmethod
-    def ensure_not_none(
-        obj: Any | None, error_msg: str = "Object cannot be None"
-    ) -> Any:
+    def ensure_not_none(obj: Any | None, error_msg: str = "Object cannot be None") -> Any:
         """Ensure object is not None."""
         if obj is None:
             raise ValueError(error_msg)
@@ -209,10 +193,7 @@ class TypeAnnotationAnalyzer:
             return {
                 "file": str(file_path),
                 "total_issues": sum(len(issue.get("issues", [])) for issue in issues),
-                "fixable": sum(
-                    len([i for i in issue.get("issues", []) if i.get("fixable")])
-                    for issue in issues
-                ),
+                "fixable": sum(len([i for i in issue.get("issues", []) if i.get("fixable")]) for issue in issues),
                 "issues": issues,
             }
 
@@ -273,11 +254,7 @@ class TypeAnnotationAnalyzer:
                     }
                 )
 
-        return (
-            {"function": node.name, "line": node.lineno, "issues": issues}
-            if issues
-            else None
-        )
+        return {"function": node.name, "line": node.lineno, "issues": issues} if issues else None
 
     def _analyze_class(self, node: ast.ClassDef) -> list[dict[str, Any]]:
         """Analyze a class for type annotation issues."""
@@ -305,9 +282,7 @@ class TypeAnnotationAnalyzer:
 
         return fixes
 
-    def _generate_fix_for_issue(
-        self, issue: dict[str, Any], context: dict[str, Any]
-    ) -> str | None:
+    def _generate_fix_for_issue(self, issue: dict[str, Any], context: dict[str, Any]) -> str | None:
         """Generate a specific fix for an issue."""
         issue_type = issue.get("type")
 
@@ -353,9 +328,7 @@ class TypeAnnotationManager:
             if missing_packages:
                 return self.validation_helper.create_validation_result(
                     valid=False,
-                    errors=[
-                        f"Missing required packages: {', '.join(missing_packages)}"
-                    ],
+                    errors=[f"Missing required packages: {', '.join(missing_packages)}"],
                 )
 
             # Check Python version compatibility
@@ -433,7 +406,7 @@ class TypeAnnotationManager:
                 )
 
             # Step 2: Input validation and sanitization
-            if not file_path.suffix == ".py":
+            if file_path.suffix != ".py":
                 return self.validation_helper.create_validation_result(
                     valid=False, errors=[f"File is not a Python file: {file_path}"]
                 )
@@ -452,7 +425,6 @@ class TypeAnnotationManager:
             # Step 3: Comprehensive error handling - Read file content
             try:
                 content = file_path.read_text(encoding="utf-8")
-                original_content = content
             except Exception as e:
                 return self.validation_helper.create_validation_result(
                     valid=False, errors=[f"Could not read file: {e}"]
@@ -471,9 +443,7 @@ class TypeAnnotationManager:
             fixes_applied += self._apply_parameter_annotation_fixes(file_path, content)
             content = file_path.read_text(encoding="utf-8")  # Re-read after fixes
 
-            fixes_applied += self._apply_return_type_annotation_fixes(
-                file_path, content
-            )
+            fixes_applied += self._apply_return_type_annotation_fixes(file_path, content)
 
             # Step 5: Progressive complexity - Verify fixes worked
             final_analysis = self.analyzer.analyze_file(file_path)
@@ -491,14 +461,10 @@ class TypeAnnotationManager:
                     },
                 )
             else:
-                logger.warning(
-                    f"⚠️ {remaining_issues} issues remain in {file_path.name}"
-                )
+                logger.warning(f"⚠️ {remaining_issues} issues remain in {file_path.name}")
                 return self.validation_helper.create_validation_result(
                     valid=True,
-                    warnings=[
-                        f"{remaining_issues} issues could not be automatically fixed"
-                    ],
+                    warnings=[f"{remaining_issues} issues could not be automatically fixed"],
                     components={
                         "fixes_applied": fixes_applied,
                         "remaining_issues": remaining_issues,
@@ -508,9 +474,7 @@ class TypeAnnotationManager:
 
         except Exception as e:
             logger.error(f"❌ Error applying fixes to {file_path}: {e}")
-            return self.validation_helper.create_validation_result(
-                valid=False, errors=[f"Error applying fixes: {e!s}"]
-            )
+            return self.validation_helper.create_validation_result(valid=False, errors=[f"Error applying fixes: {e!s}"])
 
     def _apply_self_parameter_fixes(self, file_path: Path, content: str) -> int:
         """Apply fixes for missing self parameter type annotations."""
@@ -519,9 +483,7 @@ class TypeAnnotationManager:
         try:
             # Add Self import if not present
             if "from typing import" in content and "Self" not in content:
-                content = content.replace(
-                    "from typing import", "from typing import Self,"
-                )
+                content = content.replace("from typing import", "from typing import Self,")
                 file_path.write_text(content, encoding="utf-8")
                 fixes_applied += 1
             elif "from typing import" not in content:
@@ -568,14 +530,8 @@ class TypeAnnotationManager:
 
         try:
             # Check if Any is used but not imported
-            if (
-                ": Any" in content
-                and "from typing import" in content
-                and "Any" not in content
-            ):
-                content = content.replace(
-                    "from typing import", "from typing import Any,"
-                )
+            if ": Any" in content and "from typing import" in content and "Any" not in content:
+                content = content.replace("from typing import", "from typing import Any,")
                 file_path.write_text(content, encoding="utf-8")
                 fixes_applied += 1
 
@@ -653,11 +609,7 @@ class TypeAnnotationManager:
                             re.escape(full_match),
                             replacement.replace("\\1", match.group(1)).replace(
                                 "\\2",
-                                (
-                                    match.group(2)
-                                    if match.lastindex and match.lastindex >= 2
-                                    else ""
-                                ),
+                                (match.group(2) if match.lastindex and match.lastindex >= 2 else ""),
                             ),
                             new_content,
                             count=1,
@@ -677,9 +629,7 @@ class TypeAnnotationManager:
 
         Following crawl_mcp.py methodology for batch operations.
         """
-        logger.info(
-            f"🔧 Batch applying type annotation fixes to {len(target_files)} files"
-        )
+        logger.info(f"🔧 Batch applying type annotation fixes to {len(target_files)} files")
 
         results = {}
         total_fixes = 0
@@ -716,9 +666,7 @@ def ensure_typed_validation_result(func: F) -> F:
 
         # Ensure result is properly typed
         if not ValidationResultType.is_validation_result(result):
-            logger.warning(
-                f"Function {func.__name__} returned improperly typed validation result"
-            )
+            logger.warning(f"Function {func.__name__} returned improperly typed validation result")
             return ValidationResultType.create_validation_result(
                 valid=False,
                 errors=["Invalid validation result format"],
@@ -749,9 +697,7 @@ async def test_type_annotation_manager() -> ValidationResult:
 
     try:
         # Initialize manager
-        config = TypeAnnotationConfig(
-            auto_fix_enabled=True, strict_mode=False, validation_enabled=True
-        )
+        config = TypeAnnotationConfig(auto_fix_enabled=True, strict_mode=False, validation_enabled=True)
 
         manager = TypeAnnotationManager(config)
 
@@ -782,9 +728,7 @@ async def test_type_annotation_manager() -> ValidationResult:
 
     except Exception as e:
         logger.error(f"❌ Type annotation manager test failed: {e}")
-        return ValidationResultType.create_validation_result(
-            valid=False, errors=[f"Test failed: {e!s}"]
-        )
+        return ValidationResultType.create_validation_result(valid=False, errors=[f"Test failed: {e!s}"])
 
 
 if __name__ == "__main__":
@@ -798,9 +742,7 @@ if __name__ == "__main__":
             print("✅ Type Annotation Manager test passed")
             if result.get("components", {}).get("analysis"):
                 analysis = result["components"]["analysis"]
-                print(
-                    f"📊 Analysis: {analysis['files_with_issues']} files with {analysis['total_issues']} issues"
-                )
+                print(f"📊 Analysis: {analysis['files_with_issues']} files with {analysis['total_issues']} issues")
         else:
             print("❌ Type Annotation Manager test failed")
             for error in result.get("errors", []):

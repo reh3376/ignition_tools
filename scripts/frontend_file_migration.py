@@ -77,14 +77,10 @@ class FrontendFileMigrationManager:
     def _validate_configuration(self) -> None:
         """Validate configuration following crawl_mcp.py patterns."""
         if not self.source_path.exists():
-            raise ValueError(
-                f"Source repository path does not exist: {self.source_path}"
-            )
+            raise ValueError(f"Source repository path does not exist: {self.source_path}")
 
         if not self.source_path.is_dir():
-            raise ValueError(
-                f"Source repository path is not a directory: {self.source_path}"
-            )
+            raise ValueError(f"Source repository path is not a directory: {self.source_path}")
 
         try:
             self.source_repo = git.Repo(self.source_path)
@@ -213,17 +209,13 @@ class FrontendFileMigrationManager:
 
                 if not self.config.dry_run:
                     print("  📥 Cloning frontend repository...")
-                    git.Repo.clone_from(
-                        self.config.frontend_repo_url, frontend_repo_path
-                    )
+                    git.Repo.clone_from(self.config.frontend_repo_url, frontend_repo_path)
                     frontend_repo = git.Repo(frontend_repo_path)
                 else:
                     print(f"  [DRY RUN] Would clone: {self.config.frontend_repo_url}")
 
                 # Migrate files by category (priority order)
-                sorted_categories = sorted(
-                    self.file_categories, key=lambda x: x.priority
-                )
+                sorted_categories = sorted(self.file_categories, key=lambda x: x.priority)
 
                 for category in sorted_categories:
                     if category.files:
@@ -245,7 +237,7 @@ class FrontendFileMigrationManager:
                 # Commit and push changes
                 if not self.config.dry_run and result.files_migrated:
                     print("\n  📤 Committing and pushing changes...")
-                    frontend_repo.index.add([f for f in result.files_migrated])
+                    frontend_repo.index.add(list(result.files_migrated))
                     frontend_repo.index.commit(
                         f"feat: migrate {len(result.files_migrated)} frontend files from backend repo\n\n"
                         f"Migrated files:\n"
@@ -259,9 +251,7 @@ class FrontendFileMigrationManager:
                     frontend_repo.remote().push()
                     print("    ✅ Changes pushed to frontend repository")
                 else:
-                    print(
-                        f"  [DRY RUN] Would commit and push {len(result.files_migrated)} files"
-                    )
+                    print(f"  [DRY RUN] Would commit and push {len(result.files_migrated)} files")
 
         except Exception as e:
             result.success = False
@@ -271,15 +261,11 @@ class FrontendFileMigrationManager:
         # Calculate timing
         end_time = datetime.now()
         result.migration_time = (end_time - start_time).total_seconds()
-        result.total_files_processed = len(result.files_migrated) + len(
-            result.files_skipped
-        )
+        result.total_files_processed = len(result.files_migrated) + len(result.files_skipped)
 
         return result
 
-    def _migrate_single_file(
-        self, file_path: str, frontend_repo_path: Path | None = None
-    ) -> bool:
+    def _migrate_single_file(self, file_path: str, frontend_repo_path: Path | None = None) -> bool:
         """Migrate a single file to the frontend repository."""
         if self.config.dry_run:
             return True
@@ -319,11 +305,7 @@ class FrontendFileMigrationManager:
 
         # Create backup if requested
         if self.config.create_backup:
-            backup_dir = (
-                self.source_path
-                / "migration_backup"
-                / datetime.now().strftime("%Y%m%d_%H%M%S")
-            )
+            backup_dir = self.source_path / "migration_backup" / datetime.now().strftime("%Y%m%d_%H%M%S")
             backup_dir.mkdir(parents=True, exist_ok=True)
 
             for file_path in migrated_files:
@@ -366,14 +348,8 @@ class FrontendFileMigrationManager:
 
             # Step 3: Cleanup (only if migration successful)
             cleanup_result = None
-            if (
-                migration_result.success
-                and migration_result.files_migrated
-                and not self.config.dry_run
-            ):
-                cleanup_result = self.cleanup_source_files(
-                    migration_result.files_migrated
-                )
+            if migration_result.success and migration_result.files_migrated and not self.config.dry_run:
+                cleanup_result = self.cleanup_source_files(migration_result.files_migrated)
 
             # Generate report
             report = {
@@ -381,9 +357,7 @@ class FrontendFileMigrationManager:
                     "timestamp": datetime.now().isoformat(),
                     "dry_run": self.config.dry_run,
                     "success": migration_result.success,
-                    "total_files_identified": sum(
-                        len(files) for files in files_identified.values()
-                    ),
+                    "total_files_identified": sum(len(files) for files in files_identified.values()),
                     "files_migrated": len(migration_result.files_migrated),
                     "files_skipped": len(migration_result.files_skipped),
                     "migration_time_seconds": migration_result.migration_time,
@@ -409,19 +383,14 @@ class FrontendFileMigrationManager:
 
             # Save report
             report_file = (
-                self.source_path
-                / f"frontend_migration_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+                self.source_path / f"frontend_migration_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
             )
             with open(report_file, "w") as f:
                 json.dump(report, f, indent=2)
 
             print(f"\n📊 Migration Report: {report_file}")
             print("=" * 70)
-            print(
-                "✅ MIGRATION COMPLETED SUCCESSFULLY"
-                if migration_result.success
-                else "❌ MIGRATION FAILED"
-            )
+            print("✅ MIGRATION COMPLETED SUCCESSFULLY" if migration_result.success else "❌ MIGRATION FAILED")
 
             return report
 
@@ -450,12 +419,8 @@ def main():
         default="https://github.com/reh3376/ignition_tools_front.git",
         help="Frontend repository URL",
     )
-    parser.add_argument(
-        "--dry-run", action="store_true", help="Perform dry run without actual changes"
-    )
-    parser.add_argument(
-        "--no-backup", action="store_true", help="Skip creating backup of files"
-    )
+    parser.add_argument("--dry-run", action="store_true", help="Perform dry run without actual changes")
+    parser.add_argument("--no-backup", action="store_true", help="Skip creating backup of files")
 
     args = parser.parse_args()
 

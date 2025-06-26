@@ -521,7 +521,7 @@ def validate_llm_environment() -> dict[str, Any]:
     Returns:
         dict containing validation results
     """
-    validation_result = {
+        validation_result: dict[str, Any] = {
         "valid": True,
         "errors": [],
         "warnings": [],
@@ -731,7 +731,7 @@ class LLMModelManager:
         self.cache_dir.mkdir(exist_ok=True)
 
         # Validate environment
-        self.validation_result = validate_llm_environment()
+self.validation_result: dict[str, Any] = validate_llm_environment()
         if not self.validation_result["valid"]:
             raise LLMValidationError(
                 f"Environment validation failed: {self.validation_result['errors']}"
@@ -760,7 +760,7 @@ class LLMModelManager:
         gpu_memory_gb = system_info.get("gpu_memory_gb", [])
         cuda_available = system_info.get("cuda_available", False)
 
-        requirements_check = {
+        requirements_check: dict[str, Any] = {
             "meets_requirements": True,
             "model_info": model_info,
             "checks": {},

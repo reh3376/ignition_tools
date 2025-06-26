@@ -59,9 +59,7 @@ API Documentation will be available at:
         help="Port to bind the server to (default: 8000)",
     )
 
-    parser.add_argument(
-        "--workers", type=int, default=1, help="Number of worker processes (default: 1)"
-    )
+    parser.add_argument("--workers", type=int, default=1, help="Number of worker processes (default: 1)")
 
     # Development options
     parser.add_argument(
@@ -70,9 +68,7 @@ API Documentation will be available at:
         help="Enable development mode (auto-reload, debug)",
     )
 
-    parser.add_argument(
-        "--reload", action="store_true", help="Enable auto-reload on code changes"
-    )
+    parser.add_argument("--reload", action="store_true", help="Enable auto-reload on code changes")
 
     # Logging options
     parser.add_argument(
@@ -107,9 +103,7 @@ API Documentation will be available at:
     # Validate SSL configuration
     if args.ssl_keyfile or args.ssl_certfile:
         if not (args.ssl_keyfile and args.ssl_certfile):
-            logger.error(
-                "❌ Both --ssl-keyfile and --ssl-certfile must be provided for SSL"
-            )
+            logger.error("❌ Both --ssl-keyfile and --ssl-certfile must be provided for SSL")
             sys.exit(1)
 
         if not Path(args.ssl_keyfile).exists():
@@ -165,9 +159,7 @@ API Documentation will be available at:
             "src.ignition.modules.sme_agent.web_interface:app",
             host=args.host,
             port=args.port,
-            workers=(
-                args.workers if not args.reload else 1
-            ),  # Workers > 1 incompatible with reload
+            workers=(args.workers if not args.reload else 1),  # Workers > 1 incompatible with reload
             reload=args.reload,
             log_level=args.log_level,
             access_log=args.access_log,

@@ -118,13 +118,9 @@ def module(
         _display_environment_validation(env_validation)
 
         # Check for critical issues
-        critical_issues = [
-            k for k, v in env_validation.items() if not v and "critical" in k.lower()
-        ]
+        critical_issues = [k for k, v in env_validation.items() if not v and "critical" in k.lower()]
         if critical_issues and not dry_run:
-            console.print(
-                "❌ Critical environment issues detected. Cannot proceed with deployment."
-            )
+            console.print("❌ Critical environment issues detected. Cannot proceed with deployment.")
             return
 
         if dry_run:
@@ -225,9 +221,7 @@ def batch(
         console.print(f"  • Success rate: {(successful / len(results) * 100):.1f}%")
 
         if failed > 0 and not continue_on_error:
-            console.print(
-                "❌ Some deployments failed. Use --continue-on-error to ignore failures."
-            )
+            console.print("❌ Some deployments failed. Use --continue-on-error to ignore failures.")
 
     except Exception as e:
         console.print(f"❌ Batch deployment error: {e!s}")
@@ -570,9 +564,7 @@ def validate_env(
         console.print(f"❌ Validation error: {e!s}")
 
 
-def _display_environment_validation(
-    validation_results: dict, title: str = "Environment Validation"
-) -> None:
+def _display_environment_validation(validation_results: dict, title: str = "Environment Validation") -> None:
     """Display environment validation results in a table."""
     table = Table(title=title)
     table.add_column("Check", style="cyan")
@@ -596,15 +588,9 @@ def _display_environment_validation(
 
 
 @deployment_cli.command("setup-environment")
-@click.option(
-    "--interactive/--non-interactive", default=True, help="Run in interactive mode"
-)
-@click.option(
-    "--force", is_flag=True, help="Force setup even if environment appears configured"
-)
-@click.option(
-    "--report-only", is_flag=True, help="Generate report without making changes"
-)
+@click.option("--interactive/--non-interactive", default=True, help="Run in interactive mode")
+@click.option("--force", is_flag=True, help="Force setup even if environment appears configured")
+@click.option("--report-only", is_flag=True, help="Generate report without making changes")
 def setup_environment(interactive: bool, force: bool, report_only: bool) -> None:
     """Set up Phase 9.7 development environment following crawl_mcp.py methodology.
 
@@ -657,9 +643,7 @@ def setup_environment(interactive: bool, force: bool, report_only: bool) -> None
 
         # Check if setup is needed
         if env_score >= 80 and sys_score >= 80 and not force:
-            console.print(
-                "✅ Environment appears to be already configured!", style="green"
-            )
+            console.print("✅ Environment appears to be already configured!", style="green")
             if interactive:
                 proceed = Confirm.ask("Run setup anyway?", default=False)
                 if not proceed:
@@ -668,10 +652,8 @@ def setup_environment(interactive: bool, force: bool, report_only: bool) -> None
 
         # Step 3: Development Environment Setup (Progressive Complexity)
         if env_score < 80 or sys_score < 80 or force:
-            console.print(
-                "\n🔧 Step 3: Development Environment Setup", style="bold blue"
-            )
-            setup_results = setup.setup_development_environment(interactive=interactive)
+            console.print("\n🔧 Step 3: Development Environment Setup", style="bold blue")
+            setup.setup_development_environment(interactive=interactive)
 
         # Step 4: Generate Final Report
         console.print("\n📊 Step 4: Final Validation and Report", style="bold blue")
@@ -709,9 +691,7 @@ def setup_environment(interactive: bool, force: bool, report_only: bool) -> None
 
 @deployment_cli.command("check-environment")
 @click.option("--detailed", is_flag=True, help="Show detailed validation results")
-@click.option(
-    "--suggestions/--no-suggestions", default=True, help="Show fix suggestions"
-)
+@click.option("--suggestions/--no-suggestions", default=True, help="Show fix suggestions")
 def check_environment(detailed: bool, suggestions: bool) -> None:
     """Check Phase 9.7 environment configuration following crawl_mcp.py validation patterns.
 
@@ -744,29 +724,17 @@ def check_environment(detailed: bool, suggestions: bool) -> None:
         table.add_row(
             "Environment Variables",
             f"{env_score:.1f}/100",
-            (
-                "✅ Ready"
-                if env_score >= 80
-                else "⚠️ Partial" if env_score >= 50 else "❌ Needs Setup"
-            ),
+            ("✅ Ready" if env_score >= 80 else "⚠️ Partial" if env_score >= 50 else "❌ Needs Setup"),
         )
         table.add_row(
             "System Requirements",
             f"{sys_score:.1f}/100",
-            (
-                "✅ Ready"
-                if sys_score >= 80
-                else "⚠️ Partial" if sys_score >= 50 else "❌ Needs Setup"
-            ),
+            ("✅ Ready" if sys_score >= 80 else "⚠️ Partial" if sys_score >= 50 else "❌ Needs Setup"),
         )
         table.add_row(
             "Overall",
             f"{overall_score:.1f}/100",
-            (
-                "✅ Ready"
-                if overall_score >= 80
-                else "⚠️ Partial" if overall_score >= 50 else "❌ Needs Setup"
-            ),
+            ("✅ Ready" if overall_score >= 80 else "⚠️ Partial" if overall_score >= 50 else "❌ Needs Setup"),
         )
 
         console.print(table)
@@ -776,26 +744,18 @@ def check_environment(detailed: bool, suggestions: bool) -> None:
             console.print("\n📋 Detailed Environment Variable Results:", style="bold")
             for env_var, result in env_results.items():
                 status = "✅" if result.valid else "❌"
-                req = next(
-                    (r for r in setup.requirements if r.env_var == env_var), None
-                )
+                req = next((r for r in setup.requirements if r.env_var == env_var), None)
                 name = req.name if req else env_var
-                console.print(
-                    f"  {status} {name}: {setup._format_validation_message(result)}"
-                )
+                console.print(f"  {status} {name}: {setup._format_validation_message(result)}")
 
             console.print("\n🔧 System Requirements Results:", style="bold")
             for component, result in sys_results.items():
                 status = "✅" if result.valid else "❌"
-                console.print(
-                    f"  {status} {component.title()}: {setup._format_validation_message(result)}"
-                )
+                console.print(f"  {status} {component.title()}: {setup._format_validation_message(result)}")
 
         # Show suggestions if requested
         if suggestions and overall_score < 80:
-            recommendations = setup._generate_setup_recommendations(
-                env_results, sys_results
-            )
+            recommendations = setup._generate_setup_recommendations(env_results, sys_results)
             console.print("\n💡 Recommendations:", style="bold yellow")
             for rec in recommendations:
                 console.print(f"  {rec}")
@@ -805,9 +765,7 @@ def check_environment(detailed: bool, suggestions: bool) -> None:
             for step in next_steps:
                 console.print(f"  • {step}")
 
-            console.print(
-                "\n🔧 To fix issues automatically, run: [bold]ign deploy setup-environment[/bold]"
-            )
+            console.print("\n🔧 To fix issues automatically, run: [bold]ign deploy setup-environment[/bold]")
 
         # set exit code based on results
         if overall_score < 50:
@@ -816,9 +774,7 @@ def check_environment(detailed: bool, suggestions: bool) -> None:
         elif overall_score < 80:
             console.print("\n⚠️ Environment partially configured.", style="yellow")
         else:
-            console.print(
-                "\n✅ Environment ready for Phase 9.7 deployment!", style="green"
-            )
+            console.print("\n✅ Environment ready for Phase 9.7 deployment!", style="green")
 
     except Exception as e:
         console.print(f"❌ Environment check failed: {e}", style="red")
@@ -854,9 +810,7 @@ def install_requirements(java: bool, gradle: bool, all: bool, dry_run: bool) -> 
         try:
             subprocess.run(["brew", "--version"], capture_output=True, check=True)
         except (FileNotFoundError, subprocess.CalledProcessError):
-            console.print(
-                "❌ Homebrew not found. Please install Homebrew first:", style="red"
-            )
+            console.print("❌ Homebrew not found. Please install Homebrew first:", style="red")
             console.print("https://brew.sh/")
             raise click.Exit(1)
 
@@ -866,7 +820,7 @@ def install_requirements(java: bool, gradle: bool, all: bool, dry_run: bool) -> 
         commands.extend(
             [
                 "brew install openjdk@11",
-                "sudo ln -sfn $(brew --prefix)/opt/openjdk@11/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-11.jdk",
+                "sudo ln -sfn $(brew --prefix)/opt/openjdk@11/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-11.jdk",  # noqa: E501
             ]
         )
 
@@ -905,9 +859,7 @@ def install_requirements(java: bool, gradle: bool, all: bool, dry_run: bool) -> 
     # Verify Java
     if java or all:
         try:
-            result = subprocess.run(
-                ["java", "-version"], capture_output=True, text=True
-            )
+            result = subprocess.run(["java", "-version"], capture_output=True, text=True)
             if result.returncode == 0:
                 console.print("  ✅ Java installed successfully", style="green")
                 console.print("    set JAVA_HOME=$(brew --prefix)/opt/openjdk@11")
@@ -919,15 +871,11 @@ def install_requirements(java: bool, gradle: bool, all: bool, dry_run: bool) -> 
     # Verify Gradle
     if gradle or all:
         try:
-            result = subprocess.run(
-                ["gradle", "--version"], capture_output=True, text=True
-            )
+            result = subprocess.run(["gradle", "--version"], capture_output=True, text=True)
             if result.returncode == 0:
                 console.print("  ✅ Gradle installed successfully", style="green")
             else:
-                console.print(
-                    "  ❌ Gradle installation verification failed", style="red"
-                )
+                console.print("  ❌ Gradle installation verification failed", style="red")
         except FileNotFoundError:
             console.print("  ❌ Gradle not found after installation", style="red")
 

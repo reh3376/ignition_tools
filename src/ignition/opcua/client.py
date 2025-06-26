@@ -137,9 +137,7 @@ class IgnitionOPCUAClient:
             except Exception as e:
                 logger.error("Error during disconnect: %s", e)
 
-    async def browse_tree(
-        self, node_id: str = "i=85", max_depth: int = 3
-    ) -> dict[str, Any]:
+    async def browse_tree(self, node_id: str = "i=85", max_depth: int = 3) -> dict[str, Any]:
         """Browse OPC-UA address space tree.
 
         Args:
@@ -235,9 +233,7 @@ class IgnitionOPCUAClient:
         if not self.connected:
             raise RuntimeError("Not connected to OPC-UA server")
 
-        return await self.subscription_manager.create_subscription(
-            node_ids, callback, interval
-        )
+        return await self.subscription_manager.create_subscription(node_ids, callback, interval)
 
     async def unsubscribe(self, subscription_id: str) -> bool:
         """Remove a subscription.
@@ -250,9 +246,7 @@ class IgnitionOPCUAClient:
         """
         return await self.subscription_manager.remove_subscription(subscription_id)
 
-    async def execute_method(
-        self, object_id: str, method_id: str, args: list[Any] | None = None
-    ) -> Any:
+    async def execute_method(self, object_id: str, method_id: str, args: list[Any] | None = None) -> Any:
         """Execute OPC-UA method on server.
 
         Args:

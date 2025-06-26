@@ -135,9 +135,7 @@ def populate_gui_system_functions() -> bool:
                 CREATE (f)-[:AVAILABLE_IN]->(s)
                 """
 
-                db_manager.execute_query(
-                    create_scope_query, {"func_name": func["name"], "scope_name": scope}
-                )
+                db_manager.execute_query(create_scope_query, {"func_name": func["name"], "scope_name": scope})
 
             # Create common pattern relationships
             for pattern in func["common_patterns"]:

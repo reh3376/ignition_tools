@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Real-Time Knowledge Updates for SME Agent
-Phase 11.3: SME Agent Integration & Interfaces
+Phase 11.3: SME Agent Integration & Interfaces.
 
 This module provides real-time knowledge updates following crawl_mcp.py methodology:
 - Monitor new Ignition releases and feature updates

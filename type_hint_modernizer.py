@@ -137,9 +137,7 @@ class TypeHintModernizer:
             return f"{actual_type} | None"
 
         # Pattern for Optional[...]
-        content = re.sub(
-            r"Optional\[([^\[\]]*(?:\[[^\]]*\][^\[\]]*)*)\]", replace_optional, content
-        )
+        content = re.sub(r"Optional\[([^\[\]]*(?:\[[^\]]*\][^\[\]]*)*)\]", replace_optional, content)
         return content
 
     def _convert_union(self, content: str) -> str:
@@ -169,9 +167,7 @@ class TypeHintModernizer:
             return " | ".join(types)
 
         # Pattern for Union[...]
-        content = re.sub(
-            r"Union\[([^\[\]]*(?:\[[^\]]*\][^\[\]]*)*)\]", replace_union, content
-        )
+        content = re.sub(r"Union\[([^\[\]]*(?:\[[^\]]*\][^\[\]]*)*)\]", replace_union, content)
         return content
 
     def _convert_collections(self, content: str) -> str:
@@ -213,9 +209,7 @@ class TypeHintModernizer:
                         if len(imports) == 1:
                             new_lines.append(f"from typing import {imports[0]}")
                         else:
-                            new_lines.append(
-                                f"from typing import {', '.join(sorted(imports))}"
-                            )
+                            new_lines.append(f"from typing import {', '.join(sorted(imports))}")
                     # If no imports to keep, skip the line entirely
                     continue
 
@@ -231,9 +225,7 @@ class TypeHintModernizer:
         except SyntaxError:
             return False
 
-    def scan_directory(
-        self, directory: Path, extensions: list[str] | None = None
-    ) -> list[Path]:
+    def scan_directory(self, directory: Path, extensions: list[str] | None = None) -> list[Path]:
         """Scan directory for Python files to modernize."""
         if extensions is None:
             extensions = [".py"]
@@ -245,18 +237,13 @@ class TypeHintModernizer:
         # Filter out __pycache__ and other unwanted directories
         filtered_files = []
         for file_path in files:
-            if any(
-                part.startswith(".") or part == "__pycache__"
-                for part in file_path.parts
-            ):
+            if any(part.startswith(".") or part == "__pycache__" for part in file_path.parts):
                 continue
             filtered_files.append(file_path)
 
         return sorted(filtered_files)
 
-    def modernize_project(
-        self, base_path: Path | None = None, target_dirs: list[str] | None = None
-    ) -> dict[str, Any]:
+    def modernize_project(self, base_path: Path | None = None, target_dirs: list[str] | None = None) -> dict[str, Any]:
         """Modernize type hints across the entire project."""
         if base_path is None:
             base_path = Path.cwd()
@@ -305,9 +292,7 @@ class TypeHintModernizer:
                         dir_results["failed"] += 1
 
             results["directories"][target_dir] = dir_results
-            print(
-                f"  📊 {dir_results['modified']}/{dir_results['total']} files modified"
-            )
+            print(f"  📊 {dir_results['modified']}/{dir_results['total']} files modified")
 
         return results
 
@@ -351,9 +336,7 @@ def main() -> None:
         print("\n📝 Next steps:")
         print("1. Run: python -m py_compile <modified_files>")
         print("2. Run: python -m pytest tests/")
-        print(
-            "3. Run: git add . && git commit -m 'Modernize type hints to Python 3.11+ syntax'"
-        )
+        print("3. Run: git add . && git commit -m 'Modernize type hints to Python 3.11+ syntax'")
     else:
         print("\n✅ No files needed modernization!")
 

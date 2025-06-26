@@ -1,4 +1,4 @@
-"""AI Supervisor for Control Optimization - Phase 11.6
+"""AI Supervisor for Control Optimization - Phase 11.6.
 
 This module implements an AI supervisor for PID and hybrid MPC control optimization,
 following the crawl_mcp.py methodology with environment validation first, comprehensive
@@ -112,30 +112,21 @@ class ConstraintConfig(BaseModel):
     @field_validator("max_value")
     @classmethod
     def validate_constraints(cls, v, info) -> Any:
-        if (
-            hasattr(info, "data")
-            and info.data.get("min_value") is not None
-            and v is not None
-        ):
-            if v <= info.data["min_value"]:
-                raise ValueError("Max value must be greater than min value")
+        if (hasattr(info, "data") and info.data.get("min_value") is not None and v is not None) and v <= info.data[
+            "min_value"
+        ]:
+            raise ValueError("Max value must be greater than min value")
         return v
 
 
 class MPCConfig(BaseModel):
     """MPC configuration with validation."""
 
-    prediction_horizon: int = Field(
-        default=10, ge=1, le=100, description="Prediction horizon"
-    )
+    prediction_horizon: int = Field(default=10, ge=1, le=100, description="Prediction horizon")
     control_horizon: int = Field(default=3, ge=1, le=50, description="Control horizon")
     sample_time: float = Field(default=1.0, gt=0, description="Sample time in seconds")
-    model_type: ProcessModelType = Field(
-        default=ProcessModelType.FOPDT, description="Process model type"
-    )
-    constraints: list[ConstraintConfig] = Field(
-        default_factory=list, description="Process constraints"
-    )
+    model_type: ProcessModelType = Field(default=ProcessModelType.FOPDT, description="Process model type")
+    constraints: list[ConstraintConfig] = Field(default_factory=list, description="Process constraints")
 
     @field_validator("control_horizon")
     @classmethod
@@ -174,7 +165,12 @@ def validate_environment() -> dict[str, Any]:
     """
     logger.info("🔍 Validating AI Control Supervisor environment...")
 
-    validation_results = {"valid": True, "errors": [], "warnings": [], "components": {}}
+    validation_results: dict[str, Any] = {
+        "valid": True,
+        "errors": [],
+        "warnings": [],
+        "components": {},
+    }
 
     # Check required environment variables
     required_env_vars = [
@@ -190,9 +186,7 @@ def validate_environment() -> dict[str, Any]:
             missing_vars.append(var)
 
     if missing_vars:
-        validation_results["errors"].append(
-            f"Missing environment variables: {', '.join(missing_vars)}"
-        )
+        validation_results["errors"].append(f"Missing environment variables: {', '.join(missing_vars)}")
         validation_results["valid"] = False
 
     # Validate OPC-UA configuration
@@ -206,9 +200,7 @@ def validate_environment() -> dict[str, Any]:
     neo4j_config = validate_neo4j_environment()
     validation_results["components"]["neo4j"] = neo4j_config
     if not neo4j_config["valid"]:
-        validation_results["warnings"].append(
-            "Neo4j not available - knowledge graph features disabled"
-        )
+        validation_results["warnings"].append("Neo4j not available - knowledge graph features disabled")
 
     # Check Python packages
     package_config = validate_required_packages()
@@ -221,9 +213,7 @@ def validate_environment() -> dict[str, Any]:
     if validation_results["valid"]:
         logger.info("✅ Environment validation successful")
     else:
-        logger.error(
-            f"❌ Environment validation failed: {validation_results['errors']}"
-        )
+        logger.error(f"❌ Environment validation failed: {validation_results['errors']}")
 
     return validation_results
 
@@ -350,7 +340,7 @@ def validate_process_data(data: list[dict[str, Any]]) -> dict[str, Any]:
             if gap > max_gap:
                 return {
                     "valid": False,
-                    "error": f"Data gap detected: {gap} between {sorted_data[i - 1].timestamp} and {sorted_data[i].timestamp}",
+                    "error": f"Data gap detected: {gap} between {sorted_data[i - 1].timestamp} and {sorted_data[i].timestamp}",  # noqa: E501
                 }
 
         return {"valid": True, "data": validated_data, "count": len(validated_data)}
@@ -465,7 +455,9 @@ class AIControlSupervisor:
                 return {"success": False, "error": "Neo4j credentials not configured"}
 
             # Type narrowing - we know these are strings now
-            assert uri is not None and user is not None and password is not None
+            assert uri is not None
+            assert user is not None
+            assert password is not None
 
             self._neo4j_driver = AsyncGraphDatabase.driver(uri, auth=(user, password))
 
@@ -514,9 +506,7 @@ class AIControlSupervisor:
         try:
             initialization_result = await self.initialize()
             if not initialization_result["success"]:
-                raise RuntimeError(
-                    f"Initialization failed: {initialization_result['error']}"
-                )
+                raise RuntimeError(f"Initialization failed: {initialization_result['error']}")
 
             yield self
 
@@ -548,68 +538,42 @@ class AIControlSupervisor:
 
     # PID Tuning Methods (Classical Implementations)
 
-    def _ziegler_nichols_open_loop(
-        self, process_data: list[ProcessData], **kwargs
-    ) -> PIDParameters:
+    def _ziegler_nichols_open_loop(self, process_data: list[ProcessData], **kwargs) -> PIDParameters:
         """Ziegler-Nichols open-loop tuning method."""
         # Implementation placeholder - would contain actual tuning algorithm
         logger.info("Applying Ziegler-Nichols open-loop tuning...")
-        return PIDParameters(
-            kp=1.0, ki=0.1, kd=0.01, setpoint=kwargs.get("setpoint", 50.0)
-        )
+        return PIDParameters(kp=1.0, ki=0.1, kd=0.01, setpoint=kwargs.get("setpoint", 50.0))
 
-    def _ziegler_nichols_closed_loop(
-        self, process_data: list[ProcessData], **kwargs
-    ) -> PIDParameters:
+    def _ziegler_nichols_closed_loop(self, process_data: list[ProcessData], **kwargs) -> PIDParameters:
         """Ziegler-Nichols closed-loop tuning method."""
         logger.info("Applying Ziegler-Nichols closed-loop tuning...")
-        return PIDParameters(
-            kp=1.2, ki=0.12, kd=0.012, setpoint=kwargs.get("setpoint", 50.0)
-        )
+        return PIDParameters(kp=1.2, ki=0.12, kd=0.012, setpoint=kwargs.get("setpoint", 50.0))
 
-    def _cohen_coon_tuning(
-        self, process_data: list[ProcessData], **kwargs
-    ) -> PIDParameters:
+    def _cohen_coon_tuning(self, process_data: list[ProcessData], **kwargs) -> PIDParameters:
         """Cohen-Coon tuning method for processes with dead time."""
         logger.info("Applying Cohen-Coon tuning...")
-        return PIDParameters(
-            kp=1.1, ki=0.11, kd=0.011, setpoint=kwargs.get("setpoint", 50.0)
-        )
+        return PIDParameters(kp=1.1, ki=0.11, kd=0.011, setpoint=kwargs.get("setpoint", 50.0))
 
-    def _tyreus_luyben_tuning(
-        self, process_data: list[ProcessData], **kwargs
-    ) -> PIDParameters:
+    def _tyreus_luyben_tuning(self, process_data: list[ProcessData], **kwargs) -> PIDParameters:
         """Tyreus-Luyben tuning method for improved robustness."""
         logger.info("Applying Tyreus-Luyben tuning...")
-        return PIDParameters(
-            kp=0.9, ki=0.09, kd=0.009, setpoint=kwargs.get("setpoint", 50.0)
-        )
+        return PIDParameters(kp=0.9, ki=0.09, kd=0.009, setpoint=kwargs.get("setpoint", 50.0))
 
     def _imc_tuning(self, process_data: list[ProcessData], **kwargs) -> PIDParameters:
         """Internal Model Control (IMC) tuning method."""
         logger.info("Applying IMC tuning...")
-        return PIDParameters(
-            kp=1.3, ki=0.13, kd=0.013, setpoint=kwargs.get("setpoint", 50.0)
-        )
+        return PIDParameters(kp=1.3, ki=0.13, kd=0.013, setpoint=kwargs.get("setpoint", 50.0))
 
-    def _lambda_tuning(
-        self, process_data: list[ProcessData], **kwargs
-    ) -> PIDParameters:
+    def _lambda_tuning(self, process_data: list[ProcessData], **kwargs) -> PIDParameters:
         """Lambda tuning method."""
         logger.info("Applying Lambda tuning...")
-        return PIDParameters(
-            kp=1.15, ki=0.115, kd=0.0115, setpoint=kwargs.get("setpoint", 50.0)
-        )
+        return PIDParameters(kp=1.15, ki=0.115, kd=0.0115, setpoint=kwargs.get("setpoint", 50.0))
 
-    def _ai_enhanced_tuning(
-        self, process_data: list[ProcessData], **kwargs
-    ) -> PIDParameters:
+    def _ai_enhanced_tuning(self, process_data: list[ProcessData], **kwargs) -> PIDParameters:
         """AI-enhanced PID tuning using machine learning."""
         logger.info("Applying AI-enhanced tuning...")
         # This would integrate with the ML models from Phase 11.5
-        return PIDParameters(
-            kp=1.25, ki=0.125, kd=0.0125, setpoint=kwargs.get("setpoint", 50.0)
-        )
+        return PIDParameters(kp=1.25, ki=0.125, kd=0.0125, setpoint=kwargs.get("setpoint", 50.0))
 
 
 # Utility Functions
@@ -620,9 +584,7 @@ async def create_ai_control_supervisor(
 ) -> AIControlSupervisor:
     """Factory function to create and initialize AI Control Supervisor."""
     # Create OPC-UA configuration
-    opcua_config = OPCUAConfig(
-        server_url=opcua_server_url, username=username, password=password
-    )
+    opcua_config = OPCUAConfig(server_url=opcua_server_url, username=username, password=password)
 
     # Create MPC configuration with defaults
     mpc_config = MPCConfig()

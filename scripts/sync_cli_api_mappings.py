@@ -87,9 +87,7 @@ class Neo4jService:
                 console.print("[red]❌ Neo4j configuration not properly set[/red]")
                 return False
 
-            self.driver = GraphDatabase.driver(
-                self.uri, auth=(self.user, self.password)
-            )
+            self.driver = GraphDatabase.driver(self.uri, auth=(self.user, self.password))
             # Test connection
             with self.driver.session(database=self.database) as session:
                 session.run("RETURN 1")
@@ -133,9 +131,7 @@ class Neo4jService:
                         "api_method": mapping.api_endpoint.method,
                         "api_description": mapping.api_endpoint.description or "",
                         "request_body": (
-                            json.dumps(mapping.api_endpoint.request_body)
-                            if mapping.api_endpoint.request_body
-                            else ""
+                            json.dumps(mapping.api_endpoint.request_body) if mapping.api_endpoint.request_body else ""
                         ),
                     },
                 )
@@ -192,15 +188,11 @@ def get_cli_api_mappings() -> list[CLIAPIMapping]:
             ),
         ),
         CLIAPIMapping(
-            CLICommand(
-                "ign script list", "List available scripts", "Script Generation"
-            ),
+            CLICommand("ign script list", "List available scripts", "Script Generation"),
             APIEndpoint("/api/v1/scripts", "GET"),
         ),
         CLIAPIMapping(
-            CLICommand(
-                "ign script analyze <file>", "Analyze script file", "Script Generation"
-            ),
+            CLICommand("ign script analyze <file>", "Analyze script file", "Script Generation"),
             APIEndpoint("/api/v1/scripts/analyze", "POST", {"file_path": "string"}),
         ),
         CLIAPIMapping(
@@ -209,9 +201,7 @@ def get_cli_api_mappings() -> list[CLIAPIMapping]:
                 "Validate script content",
                 "Script Generation",
             ),
-            APIEndpoint(
-                "/api/v1/scripts/validate", "POST", {"script_content": "string"}
-            ),
+            APIEndpoint("/api/v1/scripts/validate", "POST", {"script_content": "string"}),
         ),
     ]
     mappings.extend(script_mappings)
@@ -219,21 +209,15 @@ def get_cli_api_mappings() -> list[CLIAPIMapping]:
     # Template Management Commands
     template_mappings = [
         CLIAPIMapping(
-            CLICommand(
-                "ign template list", "List available templates", "Template Management"
-            ),
+            CLICommand("ign template list", "List available templates", "Template Management"),
             APIEndpoint("/api/v1/templates", "GET"),
         ),
         CLIAPIMapping(
-            CLICommand(
-                "ign template get <name>", "Get template by name", "Template Management"
-            ),
+            CLICommand("ign template get <name>", "Get template by name", "Template Management"),
             APIEndpoint("/api/v1/templates/{name}", "GET"),
         ),
         CLIAPIMapping(
-            CLICommand(
-                "ign template create", "Create new template", "Template Management"
-            ),
+            CLICommand("ign template create", "Create new template", "Template Management"),
             APIEndpoint(
                 "/api/v1/templates",
                 "POST",
@@ -246,9 +230,7 @@ def get_cli_api_mappings() -> list[CLIAPIMapping]:
     # SME Agent Commands
     sme_mappings = [
         CLIAPIMapping(
-            CLICommand(
-                "ign module sme validate-env", "Validate SME environment", "SME Agent"
-            ),
+            CLICommand("ign module sme validate-env", "Validate SME environment", "SME Agent"),
             APIEndpoint("/api/v1/sme/validate-env", "GET"),
         ),
         CLIAPIMapping(
@@ -261,9 +243,7 @@ def get_cli_api_mappings() -> list[CLIAPIMapping]:
                 "Ask SME agent a question",
                 "SME Agent",
             ),
-            APIEndpoint(
-                "/api/v1/sme/ask", "POST", {"question": "string", "context": "object"}
-            ),
+            APIEndpoint("/api/v1/sme/ask", "POST", {"question": "string", "context": "object"}),
         ),
     ]
     mappings.extend(sme_mappings)
@@ -271,15 +251,11 @@ def get_cli_api_mappings() -> list[CLIAPIMapping]:
     # Refactoring Commands
     refactor_mappings = [
         CLIAPIMapping(
-            CLICommand(
-                "refactor detect", "Detect files needing refactoring", "Refactoring"
-            ),
+            CLICommand("refactor detect", "Detect files needing refactoring", "Refactoring"),
             APIEndpoint("/api/v1/refactor/detect", "GET"),
         ),
         CLIAPIMapping(
-            CLICommand(
-                "refactor analyze <file>", "Analyze file for refactoring", "Refactoring"
-            ),
+            CLICommand("refactor analyze <file>", "Analyze file for refactoring", "Refactoring"),
             APIEndpoint("/api/v1/refactor/analyze", "POST", {"file_path": "string"}),
         ),
         CLIAPIMapping(
@@ -351,9 +327,7 @@ def main():
                     success_count += 1
                 progress.update(task, advance=1)
 
-        console.print(
-            f"\n[green]✅ Successfully synced {success_count}/{len(mappings)} mappings[/green]"
-        )
+        console.print(f"\n[green]✅ Successfully synced {success_count}/{len(mappings)} mappings[/green]")
 
         # Step 6: Show updated statistics
         console.print("\n[yellow]Step 6: Updated Knowledge Graph Statistics[/yellow]")
@@ -371,15 +345,11 @@ def main():
             change = after - before
             change_str = f"+{change}" if change > 0 else str(change)
 
-            table.add_row(
-                metric.replace("_", " ").title(), str(before), str(after), change_str
-            )
+            table.add_row(metric.replace("_", " ").title(), str(before), str(after), change_str)
 
         console.print(table)
 
-        console.print(
-            "\n[green]✅ CLI to API mapping sync completed successfully![/green]"
-        )
+        console.print("\n[green]✅ CLI to API mapping sync completed successfully![/green]")
 
     except Exception as e:
         console.print(f"\n[red]❌ Error during sync: {e}[/red]")

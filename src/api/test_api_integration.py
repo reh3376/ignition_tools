@@ -1,4 +1,4 @@
-"""Phase 12.1 API Integration Tests
+"""Phase 12.1 API Integration Tests.
 
 Following crawl_mcp.py methodology:
 - Environment validation first
@@ -26,9 +26,9 @@ from main import (
 
 
 class Phase12APITester:
-    """Comprehensive API testing following crawl_mcp.py methodology"""
+    """Comprehensive API testing following crawl_mcp.py methodology."""
 
-    def __init__(self):
+    def __init__(self) -> Any:
         self.test_results = {
             "environment_validation": False,
             "error_handling": False,
@@ -39,7 +39,7 @@ class Phase12APITester:
         self.detailed_results = []
 
     def validate_environment_first(self) -> bool:
-        """Step 1: Environment validation (crawl_mcp.py methodology)"""
+        """Step 1: Environment validation (crawl_mcp.py methodology)."""
         try:
             print("🔍 Step 1: Environment Validation")
             env_status = validate_environment()
@@ -50,9 +50,7 @@ class Phase12APITester:
                 "python_version",
                 "cli_available",
             ]
-            all_valid = all(
-                env_status.get(component, False) for component in required_components
-            )
+            all_valid = all(env_status.get(component, False) for component in required_components)
 
             print(f"   ✅ Neo4j Available: {env_status.get('neo4j_available', False)}")
             print(f"   ✅ Neo4j User: {env_status.get('neo4j_user', False)}")
@@ -76,7 +74,7 @@ class Phase12APITester:
             return False
 
     def test_error_handling(self) -> bool:
-        """Step 2: Comprehensive error handling testing"""
+        """Step 2: Comprehensive error handling testing."""
         try:
             print("\n🔍 Step 2: Error Handling Testing")
 
@@ -94,9 +92,7 @@ class Phase12APITester:
             for error_input, expected_pattern in test_errors:
                 formatted = format_error_message(error_input)
                 passed = expected_pattern.lower() in formatted.lower()
-                print(
-                    f"   {'✅' if passed else '❌'} Error '{error_input}' -> '{formatted}'"
-                )
+                print(f"   {'✅' if passed else '❌'} Error '{error_input}' -> '{formatted}'")
                 if not passed:
                     all_passed = False
 
@@ -116,7 +112,7 @@ class Phase12APITester:
             return False
 
     async def test_cli_mapping(self) -> bool:
-        """Step 3: CLI to API mapping validation"""
+        """Step 3: CLI to API mapping validation."""
         try:
             print("\n🔍 Step 3: CLI Mapping Testing")
 
@@ -132,7 +128,7 @@ class Phase12APITester:
                     result = await run_cli_command(command)
                     passed = isinstance(result, CLIResponse)
                     print(
-                        f"   {'✅' if passed else '❌'} Command {' '.join(command[:3])}... -> {result.success if passed else 'Failed'}"
+                        f"   {'✅' if passed else '❌'} Command {' '.join(command[:3])}... -> {result.success if passed else 'Failed'}"  # noqa: E501
                     )
                     if not passed:
                         all_passed = False
@@ -156,7 +152,7 @@ class Phase12APITester:
             return False
 
     def test_input_validation(self) -> bool:
-        """Step 4: Input validation testing"""
+        """Step 4: Input validation testing."""
         try:
             print("\n🔍 Step 4: Input Validation Testing")
 
@@ -198,7 +194,7 @@ class Phase12APITester:
 
                 # Test valid data
                 try:
-                    valid_instance = model(**test["valid_data"])
+                    model(**test["valid_data"])
                     print(f"   ✅ {model.__name__} valid data accepted")
                 except Exception as e:
                     print(f"   ❌ {model.__name__} valid data rejected: {e}")
@@ -206,10 +202,8 @@ class Phase12APITester:
 
                 # Test invalid data
                 try:
-                    invalid_instance = model(**test["invalid_data"])
-                    print(
-                        f"   ❌ {model.__name__} invalid data accepted (should be rejected)"
-                    )
+                    model(**test["invalid_data"])
+                    print(f"   ❌ {model.__name__} invalid data accepted (should be rejected)")
                     all_passed = False
                 except Exception:
                     print(f"   ✅ {model.__name__} invalid data properly rejected")
@@ -230,7 +224,7 @@ class Phase12APITester:
             return False
 
     def test_progressive_complexity(self) -> bool:
-        """Step 5: Progressive complexity validation"""
+        """Step 5: Progressive complexity validation."""
         try:
             print("\n🔍 Step 5: Progressive Complexity Testing")
 
@@ -244,9 +238,7 @@ class Phase12APITester:
                 "enterprise": ["/api/v1/setup/configure", "/api/v1/advanced/features"],
             }
 
-            total_endpoints = sum(
-                len(endpoints) for endpoints in endpoint_categories.values()
-            )
+            total_endpoints = sum(len(endpoints) for endpoints in endpoint_categories.values())
             print(f"   ✅ Total API endpoints: {total_endpoints}")
 
             for category, endpoints in endpoint_categories.items():
@@ -255,14 +247,10 @@ class Phase12APITester:
                     print(f"      - {endpoint}")
 
             # Validate API versioning
-            versioned_endpoints = [
-                route.path for route in app.routes if "/api/v1/" in route.path
-            ]
+            versioned_endpoints = [route.path for route in app.routes if "/api/v1/" in route.path]
             print(f"   ✅ Versioned endpoints: {len(versioned_endpoints)}")
 
-            complexity_valid = (
-                total_endpoints >= 20
-            )  # Should have at least 20 endpoints
+            complexity_valid = total_endpoints >= 20  # Should have at least 20 endpoints
 
             self.test_results["progressive_complexity"] = complexity_valid
             self.detailed_results.append(
@@ -284,7 +272,7 @@ class Phase12APITester:
             return False
 
     async def run_comprehensive_test(self) -> dict[str, Any]:
-        """Run complete test suite following crawl_mcp.py methodology"""
+        """Run complete test suite following crawl_mcp.py methodology."""
         print("🚀 Phase 12.1 API Integration Testing")
         print("📋 Following crawl_mcp.py methodology")
         print("=" * 60)
@@ -296,21 +284,21 @@ class Phase12APITester:
             return self.generate_test_report()
 
         # Step 2: Error handling testing
-        error_handling_valid = self.test_error_handling()
+        self.test_error_handling()
 
         # Step 3: CLI mapping testing
-        cli_mapping_valid = await self.test_cli_mapping()
+        await self.test_cli_mapping()
 
         # Step 4: Input validation testing
-        input_validation_valid = self.test_input_validation()
+        self.test_input_validation()
 
         # Step 5: Progressive complexity testing
-        complexity_valid = self.test_progressive_complexity()
+        self.test_progressive_complexity()
 
         return self.generate_test_report()
 
     def generate_test_report(self) -> dict[str, Any]:
-        """Generate comprehensive test report"""
+        """Generate comprehensive test report."""
         total_tests = len(self.test_results)
         passed_tests = sum(1 for result in self.test_results.values() if result)
         success_rate = (passed_tests / total_tests) * 100 if total_tests > 0 else 0
@@ -328,9 +316,7 @@ class Phase12APITester:
             print(f"{status} {test_name.replace('_', ' ').title()}")
 
         overall_success = success_rate >= 80  # 80% pass rate required
-        print(
-            f"\n🎯 Overall Result: {'✅ SUCCESS' if overall_success else '❌ NEEDS IMPROVEMENT'}"
-        )
+        print(f"\n🎯 Overall Result: {'✅ SUCCESS' if overall_success else '❌ NEEDS IMPROVEMENT'}")
 
         if overall_success:
             print("🎉 Phase 12.1 API Layer Development: COMPLETE")
@@ -347,8 +333,8 @@ class Phase12APITester:
         }
 
 
-async def main():
-    """Main test execution"""
+async def main() -> Any:
+    """Main test execution."""
     tester = Phase12APITester()
     results = await tester.run_comprehensive_test()
 

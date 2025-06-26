@@ -1,4 +1,4 @@
-"""Intelligent Module collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.Generator using Code Intelligence."""
+"""Intelligent Module collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.Generator using Code Intelligence."""  # noqa: E501
 
 from dataclasses import dataclass
 from pathlib import Path
@@ -41,7 +41,7 @@ class GeneratedModule:
 
 
 class ModuleGenerator:
-    """collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.Generator for intelligent Ignition modules using code intelligence."""
+    """collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.Generator for intelligent Ignition modules using code intelligence."""  # noqa: E501
 
     def __init__(
         self,
@@ -252,9 +252,7 @@ class ModuleGenerator:
         # Generate custom files based on template and intelligence
         generated_files = []
         try:
-            generated_files = self._generate_custom_files(
-                project_path, template, requirements, analysis
-            )
+            generated_files = self._generate_custom_files(project_path, template, requirements, analysis)
         except Exception as e:
             console.print(f"⚠️ Error generating custom files: {e}")
 
@@ -303,9 +301,7 @@ class ModuleGenerator:
         for filename, content_template in template.template_files.items():
             try:
                 # Customize content based on requirements and intelligence
-                content = self._customize_template_content(
-                    content_template, requirements, analysis
-                )
+                content = self._customize_template_content(content_template, requirements, analysis)
 
                 # Find appropriate location for the file
                 target_path = self._find_target_path(project_path, filename)
@@ -313,9 +309,7 @@ class ModuleGenerator:
                     target_path.parent.mkdir(parents=True, exist_ok=True)
                     target_path.write_text(content)
                     generated_files.append(target_path)
-                    console.print(
-                        f"📝 Generated: {target_path.relative_to(project_path)}"
-                    )
+                    console.print(f"📝 Generated: {target_path.relative_to(project_path)}")
 
             except Exception as e:
                 console.print(f"⚠️ Error generating {filename}: {e}")
@@ -343,14 +337,10 @@ class ModuleGenerator:
         # Replace placeholders with actual values
         replacements = {
             "{{MODULE_NAME}}": requirements.get("name", "CustomModule"),
-            "{{MODULE_DESCRIPTION}}": requirements.get(
-                "description", "Custom Ignition Module"
-            ),
+            "{{MODULE_DESCRIPTION}}": requirements.get("description", "Custom Ignition Module"),
             "{{PACKAGE_NAME}}": requirements.get("package", "com.ignscripts.modules"),
             "{{MIN_VERSION}}": requirements.get("min_version", "8.1.0"),
-            "{{FUNCTIONS}}": self._generate_function_implementations(
-                requirements.get("functions", []), analysis
-            ),
+            "{{FUNCTIONS}}": self._generate_function_implementations(requirements.get("functions", []), analysis),
         }
 
         for placeholder, value in replacements.items():
@@ -358,9 +348,7 @@ class ModuleGenerator:
 
         return content
 
-    def _generate_function_implementations(
-        self, functions: list[str], analysis: dict[str, Any]
-    ) -> str:
+    def _generate_function_implementations(self, functions: list[str], analysis: dict[str, Any]) -> str:
         """Generate function implementations based on intelligence.
 
         Args:
@@ -425,9 +413,7 @@ class ModuleGenerator:
 
         return None
 
-    def _display_generation_summary(
-        self, result: GeneratedModule, analysis: dict[str, Any]
-    ) -> None:
+    def _display_generation_summary(self, result: GeneratedModule, analysis: dict[str, Any]) -> None:
         """Display a summary of the module generation.
 
         Args:

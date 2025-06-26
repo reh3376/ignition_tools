@@ -1,4 +1,4 @@
-"""Industrial Dataset Curation & AI Model Preparation Module
+"""Industrial Dataset Curation & AI Model Preparation Module.
 
 Following the crawl_mcp.py methodology for structured development:
 - Comprehensive validation and error handling
@@ -30,25 +30,24 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
 class VariableType(Enum):
     """Variable type classification for industrial datasets."""
-    PRIMARY_PV = "primary_pv"        # Primary Process Variable
-    SECONDARY_PV = "secondary_pv"    # Secondary Process Variable (SPC)
-    CONTROL_VARIABLE = "cv"          # Control Variable
-    DISTURBANCE_VARIABLE = "dv"      # Disturbance Variable
-    SETPOINT = "sp"                  # Setpoint Variable
-    PROCESS_STATE = "state"          # Process State Variable
+
+    PRIMARY_PV = "primary_pv"  # Primary Process Variable
+    SECONDARY_PV = "secondary_pv"  # Secondary Process Variable (SPC)
+    CONTROL_VARIABLE = "cv"  # Control Variable
+    DISTURBANCE_VARIABLE = "dv"  # Disturbance Variable
+    SETPOINT = "sp"  # Setpoint Variable
+    PROCESS_STATE = "state"  # Process State Variable
 
 
 class ControllerType(Enum):
     """Controller type classification."""
+
     P = "proportional"
     PI = "proportional_integral"
     PID = "proportional_integral_derivative"
@@ -58,6 +57,7 @@ class ControllerType(Enum):
 
 class DataSourceType(Enum):
     """Data source type classification."""
+
     CSV_XLS = "csv_xls"
     OPC_UA = "opc_ua"
     INFLUX_DB = "influx_db"
@@ -69,6 +69,7 @@ class DataSourceType(Enum):
 @dataclass
 class VariableMetadata:
     """Metadata for industrial process variables."""
+
     name: str
     variable_type: VariableType
     engineering_units: str
@@ -83,6 +84,7 @@ class VariableMetadata:
 @dataclass
 class ControllerMetadata:
     """Metadata for control system configuration."""
+
     name: str
     controller_type: ControllerType
     controlled_variable: str
@@ -106,13 +108,14 @@ def validate_environment() -> dict[str, bool]:
         "required_packages": True,
         "data_directories": True,
         "database_connections": True,
-        "opc_ua_config": True
+        "opc_ua_config": True,
     }
 
     try:
         # Check required packages
         import numpy as np
         import pandas as pd
+
         validation_results["required_packages"] = True
     except ImportError as e:
         logger.error(f"Missing required packages: {e}")
@@ -185,7 +188,10 @@ def validate_data_source(source_path: str, source_type: DataSourceType) -> dict[
     elif source_type in [DataSourceType.INFLUX_DB, DataSourceType.TIMESCALE_DB]:
         # Validate database connection string format
         if "://" not in source_path:
-            return {"valid": False, "error": "Invalid database connection string format"}
+            return {
+                "valid": False,
+                "error": "Invalid database connection string format",
+            }
         return {"valid": True, "connection_string": source_path}
 
     else:
@@ -240,26 +246,21 @@ class IndustrialDatasetCurator:
 
             # Check for critical failures
             critical_components = ["python_environment", "required_packages"]
-            failed_critical = [
-                comp for comp in critical_components
-                if not self.validation_results.get(comp, False)
-            ]
+            failed_critical = [comp for comp in critical_components if not self.validation_results.get(comp, False)]
 
             if failed_critical:
-                raise RuntimeError(
-                    f"Critical environment validation failed: {failed_critical}"
-                )
+                raise RuntimeError(f"Critical environment validation failed: {failed_critical}")
 
             # Warn about non-critical failures
             failed_components = [
-                comp for comp, status in self.validation_results.items()
+                comp
+                for comp, status in self.validation_results.items()
                 if not status and comp not in critical_components
             ]
 
             if failed_components:
                 logger.warning(
-                    f"Non-critical components failed validation: {failed_components}. "
-                    "Some features may be unavailable."
+                    f"Non-critical components failed validation: {failed_components}. Some features may be unavailable."
                 )
 
             logger.info("Industrial dataset curator initialized successfully")
@@ -276,7 +277,7 @@ class IndustrialDatasetCurator:
             "variables_configured": len(self.variables),
             "controllers_configured": len(self.controllers),
             "datasets_loaded": len(self.datasets),
-            "timestamp": datetime.now().isoformat()
+            "timestamp": datetime.now().isoformat(),
         }
 
     def add_variable(self, metadata: VariableMetadata) -> bool:
@@ -298,9 +299,11 @@ class IndustrialDatasetCurator:
                 logger.warning(f"Variable {metadata.name} already exists, updating")
 
             # Validate limits if provided
-            if (metadata.high_limit is not None and
-                metadata.low_limit is not None and
-                metadata.high_limit <= metadata.low_limit):
+            if (
+                metadata.high_limit is not None
+                and metadata.low_limit is not None
+                and metadata.high_limit <= metadata.low_limit
+            ):
                 logger.error(f"High limit must be greater than low limit for {metadata.name}")
                 return False
 
@@ -364,12 +367,7 @@ class DataIngestionFramework:
         self.active_connections: dict[str, Any] = {}
         self.ingestion_stats: dict[str, Any] = {}
 
-    async def ingest_csv_data(
-        self,
-        file_path: str,
-        timestamp_column: str = "timestamp",
-        **kwargs
-    ) -> dict[str, Any]:
+    async def ingest_csv_data(self, file_path: str, timestamp_column: str = "timestamp", **kwargs) -> dict[str, Any]:
         """Ingest CSV/XLS data with comprehensive validation.
 
         Args:
@@ -387,7 +385,7 @@ class DataIngestionFramework:
                 return {
                     "success": False,
                     "error": validation["error"],
-                    "rows_processed": 0
+                    "rows_processed": 0,
                 }
 
             # Read data based on file type
@@ -403,7 +401,7 @@ class DataIngestionFramework:
                     "success": False,
                     "error": f"Timestamp column '{timestamp_column}' not found in data",
                     "available_columns": list(df.columns),
-                    "rows_processed": 0
+                    "rows_processed": 0,
                 }
 
             # Convert timestamp column
@@ -414,7 +412,7 @@ class DataIngestionFramework:
                 return {
                     "success": False,
                     "error": f"Cannot parse timestamp column: {e}",
-                    "rows_processed": 0
+                    "rows_processed": 0,
                 }
 
             # Validate data quality
@@ -432,10 +430,10 @@ class DataIngestionFramework:
                 "columns_ingested": len(df.columns),
                 "timestamp_range": {
                     "start": df.index.min().isoformat(),
-                    "end": df.index.max().isoformat()
+                    "end": df.index.max().isoformat(),
                 },
                 "quality_report": quality_report,
-                "ingestion_time": datetime.now().isoformat()
+                "ingestion_time": datetime.now().isoformat(),
             }
 
             logger.info(f"Successfully ingested {len(df)} rows from {file_path}")
@@ -446,23 +444,16 @@ class DataIngestionFramework:
                 "rows_processed": len(df),
                 "columns_processed": len(df.columns),
                 "quality_report": quality_report,
-                "timestamp_range": self.ingestion_stats[dataset_name]["timestamp_range"]
+                "timestamp_range": self.ingestion_stats[dataset_name]["timestamp_range"],
             }
 
         except Exception as e:
             error_msg = format_validation_error(e, "CSV/XLS ingestion")
             logger.error(error_msg)
-            return {
-                "success": False,
-                "error": error_msg,
-                "rows_processed": 0
-            }
+            return {"success": False, "error": error_msg, "rows_processed": 0}
 
     async def setup_opcua_streaming(
-        self,
-        server_url: str,
-        node_ids: list[str],
-        sampling_interval: float = 1000.0
+        self, server_url: str, node_ids: list[str], sampling_interval: float = 1000.0
     ) -> dict[str, Any]:
         """Set up OPC-UA real-time data streaming.
 
@@ -481,7 +472,7 @@ class DataIngestionFramework:
                 return {
                     "success": False,
                     "error": validation["error"],
-                    "nodes_configured": 0
+                    "nodes_configured": 0,
                 }
 
             # Check OPC-UA credentials
@@ -492,7 +483,7 @@ class DataIngestionFramework:
                 return {
                     "success": False,
                     "error": "OPC-UA credentials not configured in environment",
-                    "nodes_configured": 0
+                    "nodes_configured": 0,
                 }
 
             # Validate node IDs
@@ -500,7 +491,7 @@ class DataIngestionFramework:
                 return {
                     "success": False,
                     "error": "Node IDs list is required",
-                    "nodes_configured": 0
+                    "nodes_configured": 0,
                 }
 
             # Store OPC-UA configuration
@@ -512,7 +503,7 @@ class DataIngestionFramework:
                 "sampling_interval": sampling_interval,
                 "username": username,
                 "status": "configured",
-                "created_at": datetime.now().isoformat()
+                "created_at": datetime.now().isoformat(),
             }
 
             logger.info(f"Configured OPC-UA streaming for {len(node_ids)} nodes")
@@ -522,23 +513,16 @@ class DataIngestionFramework:
                 "connection_name": connection_name,
                 "nodes_configured": len(node_ids),
                 "sampling_interval": sampling_interval,
-                "server_url": server_url
+                "server_url": server_url,
             }
 
         except Exception as e:
             error_msg = format_validation_error(e, "OPC-UA setup")
             logger.error(error_msg)
-            return {
-                "success": False,
-                "error": error_msg,
-                "nodes_configured": 0
-            }
+            return {"success": False, "error": error_msg, "nodes_configured": 0}
 
     async def connect_database_historian(
-        self,
-        connection_string: str,
-        historian_type: DataSourceType,
-        table_name: str
+        self, connection_string: str, historian_type: DataSourceType, table_name: str
     ) -> dict[str, Any]:
         """Connect to database historian (InfluxDB, TimescaleDB, Canary Labs).
 
@@ -557,7 +541,7 @@ class DataIngestionFramework:
                 return {
                     "success": False,
                     "error": validation["error"],
-                    "connection_established": False
+                    "connection_established": False,
                 }
 
             # Validate table name
@@ -565,7 +549,7 @@ class DataIngestionFramework:
                 return {
                     "success": False,
                     "error": "Table/measurement name is required",
-                    "connection_established": False
+                    "connection_established": False,
                 }
 
             # Store database connection configuration
@@ -575,7 +559,7 @@ class DataIngestionFramework:
                 "connection_string": connection_string,
                 "table_name": table_name,
                 "status": "configured",
-                "created_at": datetime.now().isoformat()
+                "created_at": datetime.now().isoformat(),
             }
 
             logger.info(f"Configured {historian_type.value} historian connection")
@@ -585,7 +569,7 @@ class DataIngestionFramework:
                 "connection_name": connection_name,
                 "historian_type": historian_type.value,
                 "table_name": table_name,
-                "connection_established": True
+                "connection_established": True,
             }
 
         except Exception as e:
@@ -594,7 +578,7 @@ class DataIngestionFramework:
             return {
                 "success": False,
                 "error": error_msg,
-                "connection_established": False
+                "connection_established": False,
             }
 
     def _validate_data_quality(self, df: pd.DataFrame) -> dict[str, Any]:
@@ -627,7 +611,7 @@ class DataIngestionFramework:
                         "min": df[col].min(),
                         "max": df[col].max(),
                         "missing_count": missing_data[col],
-                        "missing_percentage": missing_percentage[col]
+                        "missing_percentage": missing_percentage[col],
                     }
 
             # Detect potential outliers (simple IQR method)
@@ -642,7 +626,7 @@ class DataIngestionFramework:
                     outliers = df[(df[col] < lower_bound) | (df[col] > upper_bound)][col]
                     outlier_summary[col] = {
                         "outlier_count": len(outliers),
-                        "outlier_percentage": round((len(outliers) / total_rows * 100), 2)
+                        "outlier_percentage": round((len(outliers) / total_rows * 100), 2),
                     }
 
             # Time series validation if index is datetime
@@ -652,28 +636,29 @@ class DataIngestionFramework:
                     "time_range": {
                         "start": df.index.min(),
                         "end": df.index.max(),
-                        "duration_days": (df.index.max() - df.index.min()).days
+                        "duration_days": (df.index.max() - df.index.min()).days,
                     },
                     "sampling_frequency": self._detect_sampling_frequency(df.index),
-                    "time_gaps": self._detect_time_gaps(df.index)
+                    "time_gaps": self._detect_time_gaps(df.index),
                 }
 
-            quality_score = self._calculate_quality_score(
-                missing_percentage, outlier_summary, total_rows
-            )
+            quality_score = self._calculate_quality_score(missing_percentage, outlier_summary, total_rows)
 
             return {
                 "total_rows": total_rows,
                 "total_columns": total_columns,
                 "missing_data_summary": {
-                    col: {"count": int(missing_data[col]), "percentage": float(missing_percentage[col])}
+                    col: {
+                        "count": int(missing_data[col]),
+                        "percentage": float(missing_percentage[col]),
+                    }
                     for col in df.columns
                 },
                 "numeric_statistics": numeric_stats,
                 "outlier_summary": outlier_summary,
                 "time_series_stats": time_series_stats,
                 "quality_score": quality_score,
-                "validation_timestamp": datetime.now().isoformat()
+                "validation_timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
@@ -681,7 +666,7 @@ class DataIngestionFramework:
             return {
                 "error": f"Quality validation failed: {e}",
                 "quality_score": 0.0,
-                "validation_timestamp": datetime.now().isoformat()
+                "validation_timestamp": datetime.now().isoformat(),
             }
 
     def _detect_sampling_frequency(self, time_index: pd.DatetimeIndex) -> str:
@@ -725,17 +710,21 @@ class DataIngestionFramework:
             return {
                 "gap_count": len(gaps),
                 "largest_gap": str(gaps.max()) if len(gaps) > 0 else None,
-                "gap_threshold": str(gap_threshold)
+                "gap_threshold": str(gap_threshold),
             }
 
         except Exception:
-            return {"gap_count": 0, "largest_gap": None, "error": "gap_detection_failed"}
+            return {
+                "gap_count": 0,
+                "largest_gap": None,
+                "error": "gap_detection_failed",
+            }
 
     def _calculate_quality_score(
         self,
         missing_percentage: pd.Series,
         outlier_summary: dict[str, Any],
-        total_rows: int
+        total_rows: int,
     ) -> float:
         """Calculate overall data quality score (0-100)."""
         try:
@@ -748,10 +737,7 @@ class DataIngestionFramework:
 
             # Penalize for outliers
             if outlier_summary:
-                avg_outliers = np.mean([
-                    stats["outlier_percentage"]
-                    for stats in outlier_summary.values()
-                ])
+                avg_outliers = np.mean([stats["outlier_percentage"] for stats in outlier_summary.values()])
                 score -= min(avg_outliers, 30)  # Max 30 point penalty
 
             # Penalize for insufficient data
@@ -783,17 +769,33 @@ class VariableTypeClassifier:
         """Load default variable classification rules."""
         self.classification_rules = {
             "primary_pv_patterns": [
-                r".*temp.*", r".*temperature.*", r".*press.*", r".*pressure.*",
-                r".*flow.*", r".*level.*", r".*ph.*", r".*density.*"
+                r".*temp.*",
+                r".*temperature.*",
+                r".*press.*",
+                r".*pressure.*",
+                r".*flow.*",
+                r".*level.*",
+                r".*ph.*",
+                r".*density.*",
             ],
             "control_variable_patterns": [
-                r".*valve.*", r".*output.*", r".*cv.*", r".*actuator.*",
-                r".*speed.*", r".*position.*"
+                r".*valve.*",
+                r".*output.*",
+                r".*cv.*",
+                r".*actuator.*",
+                r".*speed.*",
+                r".*position.*",
             ],
             "setpoint_patterns": [
-                r".*sp.*", r".*setpoint.*", r".*target.*", r".*set.*"
+                r".*sp.*",
+                r".*setpoint.*",
+                r".*target.*",
+                r".*set.*",
             ],
             "disturbance_patterns": [
-                r".*ambient.*", r".*feed.*", r".*load.*", r".*disturbance.*"
-            ]
+                r".*ambient.*",
+                r".*feed.*",
+                r".*load.*",
+                r".*disturbance.*",
+            ],
         }

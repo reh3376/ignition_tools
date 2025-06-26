@@ -139,12 +139,10 @@ class LLMResponse:
 def validate_llm_infrastructure_environment() -> dict[str, Any]:
     """Validate LLM infrastructure environment following crawl_mcp.py methodology.
 
-    Step 1: Environment validation first - comprehensive validation of all requirements.
-
     Returns:
         dict containing validation results and component availability.
     """
-    validation_result = {
+    validation_result: dict[str, Any] = {
         "validation_score": 0,
         "total_checks": 12,
         "components": {},
@@ -172,11 +170,7 @@ def validate_llm_infrastructure_environment() -> dict[str, Any]:
             "available": True,
             "version": torch.__version__,
             "cuda_available": torch.cuda.is_available(),
-            "mps_available": (
-                torch.backends.mps.is_available()
-                if hasattr(torch.backends, "mps")
-                else False
-            ),
+            "mps_available": (torch.backends.mps.is_available() if hasattr(torch.backends, "mps") else False),
         }
         validation_result["validation_score"] += 1
     else:
@@ -194,14 +188,10 @@ def validate_llm_infrastructure_environment() -> dict[str, Any]:
             validation_result["validation_score"] += 1
         except Exception:
             validation_result["components"]["docker"] = {"available": False}
-            validation_result["recommendations"].append(
-                "Docker not available - container deployment disabled"
-            )
+            validation_result["recommendations"].append("Docker not available - container deployment disabled")
     else:
         validation_result["components"]["docker"] = {"available": False}
-        validation_result["recommendations"].append(
-            "Docker not installed - container deployment disabled"
-        )
+        validation_result["recommendations"].append("Docker not installed - container deployment disabled")
 
     # 2. Check environment variables
     env_vars = {
@@ -230,27 +220,20 @@ def validate_llm_infrastructure_environment() -> dict[str, Any]:
         validation_result["hardware"]["gpu"] = {
             "available": True,
             "device_count": torch.cuda.device_count(),
-            "device_names": [
-                torch.cuda.get_device_name(i) for i in range(torch.cuda.device_count())
-            ],
+            "device_names": [torch.cuda.get_device_name(i) for i in range(torch.cuda.device_count())],
             "total_memory": [
-                torch.cuda.get_device_properties(i).total_memory / 1e9
-                for i in range(torch.cuda.device_count())
+                torch.cuda.get_device_properties(i).total_memory / 1e9 for i in range(torch.cuda.device_count())
             ],
         }
         validation_result["validation_score"] += 2
     else:
         validation_result["hardware"]["gpu"] = {"available": False}
-        validation_result["recommendations"].append(
-            "GPU not available - CPU inference will be slower"
-        )
+        validation_result["recommendations"].append("GPU not available - CPU inference will be slower")
 
     # Calculate final score
     max_score = validation_result["total_checks"]
     actual_score = validation_result["validation_score"]
-    validation_result["validation_percentage"] = round(
-        (actual_score / max_score) * 100, 1
-    )
+    validation_result["validation_percentage"] = round((actual_score / max_score) * 100, 1)
 
     return validation_result
 
@@ -274,7 +257,7 @@ class LLMInfrastructure:
         self.pipeline = None
         self.docker_client = None
         self.container = None
-        self.validation_result = None
+        self.validation_result: dict[str, Any] | None = None
 
         # Version management
         self.model_versions = {}
@@ -320,21 +303,15 @@ class LLMInfrastructure:
 
             elif self.config.complexity_level == LLMComplexityLevel.STANDARD:
                 await self._initialize_standard()
-                init_result["components_initialized"].extend(
-                    ["tokenizer", "quantized_model", "gpu_support"]
-                )
+                init_result["components_initialized"].extend(["tokenizer", "quantized_model", "gpu_support"])
 
             elif self.config.complexity_level == LLMComplexityLevel.ADVANCED:
                 await self._initialize_advanced()
-                init_result["components_initialized"].extend(
-                    ["tokenizer", "advanced_quantization", "flash_attention"]
-                )
+                init_result["components_initialized"].extend(["tokenizer", "advanced_quantization", "flash_attention"])
 
             elif self.config.complexity_level == LLMComplexityLevel.ENTERPRISE:
                 await self._initialize_enterprise()
-                init_result["components_initialized"].extend(
-                    ["docker_container", "multi_gpu", "load_balancing"]
-                )
+                init_result["components_initialized"].extend(["docker_container", "multi_gpu", "load_balancing"])
 
             # Step 3: Setup versioning if enabled
             if self.config.enable_versioning:
@@ -344,9 +321,7 @@ class LLMInfrastructure:
             return init_result
 
         except Exception as e:
-            raise SMEAgentValidationError(
-                f"LLM infrastructure initialization failed: {e}"
-            )
+            raise SMEAgentValidationError(f"LLM infrastructure initialization failed: {e}")
 
     async def _initialize_basic(self) -> None:
         """Initialize basic CPU-only deployment."""
@@ -434,14 +409,10 @@ class LLMInfrastructure:
     async def _initialize_enterprise(self) -> Any:
         """Initialize enterprise deployment with Docker and multi-GPU support."""
         if not DOCKER_AVAILABLE:
-            raise SMEAgentValidationError(
-                "Docker not available for enterprise deployment"
-            )
+            raise SMEAgentValidationError("Docker not available for enterprise deployment")
 
         if not self.validation_result["components"]["docker"]["available"]:
-            raise SMEAgentValidationError(
-                "Docker not available for enterprise deployment"
-            )
+            raise SMEAgentValidationError("Docker not available for enterprise deployment")
 
         # Initialize Docker client
         self.docker_client = docker.from_env()
@@ -450,7 +421,7 @@ class LLMInfrastructure:
         docker_image = self.config.docker_image or self._get_default_docker_image()
 
         # Run container with GPU support
-        container_config = {
+        container_config: dict[str, Any] = {
             "image": docker_image,
             "detach": True,
             "ports": {"8000/tcp": 8000},
@@ -535,9 +506,7 @@ class LLMInfrastructure:
             },
             "hardware": {
                 "device": self.config.device,
-                "gpu_available": (
-                    torch.cuda.is_available() if TRANSFORMERS_AVAILABLE else False
-                ),
+                "gpu_available": (torch.cuda.is_available() if TRANSFORMERS_AVAILABLE else False),
                 "docker_deployment": self.container is not None,
             },
             "performance": self.inference_stats,
@@ -613,9 +582,7 @@ async def create_llm_infrastructure(
     }
 
     config = LLMConfig(
-        complexity_level=complexity_map.get(
-            complexity_level, LLMComplexityLevel.STANDARD
-        ),
+        complexity_level=complexity_map.get(complexity_level, LLMComplexityLevel.STANDARD),
         model_type=model_map.get(model_type, ModelType.LLAMA3_1_8B),
         **kwargs,
     )

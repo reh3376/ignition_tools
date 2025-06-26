@@ -1,4 +1,4 @@
-"""Report collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.Generator for Ignition Data Integration."""
+"""Report collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.Generator for Ignition Data Integration."""  # noqa: E501
 
 import csv
 import json
@@ -55,7 +55,7 @@ class ReportData:
 
 
 class ReportGenerator:
-    """collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.Generator for various types of industrial reports."""
+    """collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.Generator for various types of industrial reports."""  # noqa: E501
 
     def __init__(self) -> None:
         """Initialize the report generator."""
@@ -261,9 +261,7 @@ class ReportGenerator:
                 headers = ["Metric", "Value"]
                 rows = self._flatten_dict_to_rows(summary_data)
 
-                report_data = ReportData(
-                    headers=headers, rows=rows, metadata={"report_type": "summary"}
-                )
+                report_data = ReportData(headers=headers, rows=rows, metadata={"report_type": "summary"})
 
                 return self._format_report(report_data, format_type)
 
@@ -271,9 +269,7 @@ class ReportGenerator:
             self.logger.error(f"Summary report generation failed: {e}")
             return {"success": False, "error": str(e)}
 
-    def _format_report(
-        self, report_data: ReportData, format_type: ReportFormat
-    ) -> dict[str, Any]:
+    def _format_report(self, report_data: ReportData, format_type: ReportFormat) -> dict[str, Any]:
         """Format report data into the specified format."""
         try:
             if format_type == ReportFormat.CSV:
@@ -378,9 +374,7 @@ class ReportGenerator:
             "row_count": len(report_data.rows),
         }
 
-    def _flatten_dict_to_rows(
-        self, data: dict[str, Any], prefix: str = ""
-    ) -> list[list[str]]:
+    def _flatten_dict_to_rows(self, data: dict[str, Any], prefix: str = "") -> list[list[str]]:
         """Flatten nested dictionary into rows for tabular format."""
         rows = []
 
@@ -394,9 +388,7 @@ class ReportGenerator:
 
         return rows
 
-    def generate_ignition_report_script(
-        self, report_config: ReportConfig, output_path: str
-    ) -> str:
+    def generate_ignition_report_script(self, report_config: ReportConfig, output_path: str) -> str:
         """Generate Ignition script for report creation."""
         script_lines = [
             '"""Generated Report Script for Ignition"""',

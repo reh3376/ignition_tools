@@ -50,9 +50,7 @@ class DeploymentConfig:
     repository_config: RepositoryConfig | None = None
 
     # Deployment settings
-    deployment_environment: str = field(
-        default_factory=lambda: os.getenv("DEPLOYMENT_ENVIRONMENT", "development")
-    )
+    deployment_environment: str = field(default_factory=lambda: os.getenv("DEPLOYMENT_ENVIRONMENT", "development"))
     deployment_notes: str = ""
     deployment_tags: list[str] = field(default_factory=list)
 
@@ -61,12 +59,8 @@ class DeploymentConfig:
     backup_previous_version: bool = True
 
     # Notification settings
-    notification_webhook: str = field(
-        default_factory=lambda: os.getenv("DEPLOYMENT_WEBHOOK_URL", "")
-    )
-    notification_email: str = field(
-        default_factory=lambda: os.getenv("DEPLOYMENT_NOTIFICATION_EMAIL", "")
-    )
+    notification_webhook: str = field(default_factory=lambda: os.getenv("DEPLOYMENT_WEBHOOK_URL", ""))
+    notification_email: str = field(default_factory=lambda: os.getenv("DEPLOYMENT_NOTIFICATION_EMAIL", ""))
 
     def __post_init__(self) -> None:
         """Initialize component configurations if not provided."""
@@ -125,9 +119,7 @@ def validate_deployment_environment() -> dict[str, Any]:
 
     # Check Gradle
     try:
-        result = subprocess.run(
-            ["gradle", "--version"], capture_output=True, timeout=10
-        )
+        result = subprocess.run(["gradle", "--version"], capture_output=True, timeout=10)
         validation_results["gradle_available"] = result.returncode == 0
     except (subprocess.TimeoutExpired, FileNotFoundError):
         validation_results["gradle_available"] = False
@@ -141,8 +133,7 @@ def validate_deployment_environment() -> dict[str, Any]:
     validation_results["repository_configured"] = bool(
         os.getenv("MODULE_REPOSITORY_URL")
         and (
-            os.getenv("REPOSITORY_API_TOKEN")
-            or (os.getenv("REPOSITORY_USERNAME") and os.getenv("REPOSITORY_PASSWORD"))
+            os.getenv("REPOSITORY_API_TOKEN") or (os.getenv("REPOSITORY_USERNAME") and os.getenv("REPOSITORY_PASSWORD"))
         )
     )
 
@@ -151,9 +142,7 @@ def validate_deployment_environment() -> dict[str, Any]:
         "DEPLOYMENT_ENVIRONMENT",
         "MODULE_REPOSITORY_URL",
     ]
-    validation_results["environment_variables_set"] = all(
-        os.getenv(var) for var in required_env_vars
-    )
+    validation_results["environment_variables_set"] = all(os.getenv(var) for var in required_env_vars)
 
     return validation_results
 
@@ -169,9 +158,7 @@ class DeploymentManager:
         # Initialize components
         self.packager = ModulePackager(self.config.packaging_config)
         self.signer = ModuleSigner(self.config.signing_config or SigningConfig())
-        self.repository_manager = RepositoryManager(
-            self.config.repository_config or RepositoryConfig()
-        )
+        self.repository_manager = RepositoryManager(self.config.repository_config or RepositoryConfig())
 
     def validate_environment(self) -> dict[str, bool]:
         """Validate deployment environment following crawl_mcp.py patterns."""
@@ -180,21 +167,15 @@ class DeploymentManager:
         # Add component-specific validations
         if self.config.enable_packaging:
             packaging_env = self.packager.validate_environment()
-            validation_results.update(
-                {f"packaging_{k}": v for k, v in packaging_env.items()}
-            )
+            validation_results.update({f"packaging_{k}": v for k, v in packaging_env.items()})
 
         if self.config.enable_signing:
             signing_env = self.signer.validate_environment()
-            validation_results.update(
-                {f"signing_{k}": v for k, v in signing_env.items()}
-            )
+            validation_results.update({f"signing_{k}": v for k, v in signing_env.items()})
 
         if self.config.enable_repository_upload:
             repository_env = self.repository_manager.validate_environment()
-            validation_results.update(
-                {f"repository_{k}": v for k, v in repository_env.items()}
-            )
+            validation_results.update({f"repository_{k}": v for k, v in repository_env.items()})
 
         return validation_results
 
@@ -226,9 +207,7 @@ class DeploymentManager:
         env_validation = self.validate_environment()
         missing_requirements = [k for k, v in env_validation.items() if not v]
         if missing_requirements:
-            result.warnings.extend(
-                [f"Missing requirement: {req}" for req in missing_requirements]
-            )
+            result.warnings.extend([f"Missing requirement: {req}" for req in missing_requirements])
 
         try:
             with Progress(
@@ -240,9 +219,7 @@ class DeploymentManager:
             ) as progress:
                 self.console.print(f"\n🚀 Starting deployment: {project_path.name}")
                 self.console.print(f"📋 Deployment ID: {deployment_id}")
-                self.console.print(
-                    f"🌍 Environment: {self.config.deployment_environment}"
-                )
+                self.console.print(f"🌍 Environment: {self.config.deployment_environment}")
 
                 total_steps = sum(
                     [
@@ -253,9 +230,7 @@ class DeploymentManager:
                     ]
                 )
 
-                overall_task = progress.add_task(
-                    "Overall deployment progress", total=total_steps
-                )
+                overall_task = progress.add_task("Overall deployment progress", total=total_steps)
 
                 # Step 1: Package module
                 if self.config.enable_packaging:
@@ -263,12 +238,7 @@ class DeploymentManager:
 
                     result.packaging_result = self.packager.package_module(project_path)
                     if not result.packaging_result.success:
-                        result.errors.extend(
-                            [
-                                f"Packaging: {err}"
-                                for err in result.packaging_result.errors
-                            ]
-                        )
+                        result.errors.extend([f"Packaging: {err}" for err in result.packaging_result.errors])
                         return self._finalize_result(result, start_time)
 
                     if result.packaging_result.package_file:
@@ -279,20 +249,12 @@ class DeploymentManager:
                     self.console.print("✅ Module packaged successfully")
 
                 # Step 2: Sign module
-                if (
-                    self.config.enable_signing
-                    and result.packaging_result
-                    and result.packaging_result.module_file
-                ):
+                if self.config.enable_signing and result.packaging_result and result.packaging_result.module_file:
                     step_task = progress.add_task("🔐 Signing module...", total=1)
 
-                    result.signing_result = self.signer.sign_module(
-                        result.packaging_result.module_file
-                    )
+                    result.signing_result = self.signer.sign_module(result.packaging_result.module_file)
                     if not result.signing_result.success:
-                        result.errors.extend(
-                            [f"Signing: {err}" for err in result.signing_result.errors]
-                        )
+                        result.errors.extend([f"Signing: {err}" for err in result.signing_result.errors])
                         return self._finalize_result(result, start_time)
 
                     if result.signing_result.signed_file:
@@ -310,9 +272,7 @@ class DeploymentManager:
                     and result.packaging_result
                     and result.packaging_result.package_file
                 ):
-                    step_task = progress.add_task(
-                        "📤 Uploading to repository...", total=1
-                    )
+                    step_task = progress.add_task("📤 Uploading to repository...", total=1)
 
                     # Prepare metadata
                     metadata = self._prepare_upload_metadata(project_path, result)
@@ -321,12 +281,7 @@ class DeploymentManager:
                         result.packaging_result.package_file, metadata
                     )
                     if not result.repository_result.success:
-                        result.errors.extend(
-                            [
-                                f"Repository: {err}"
-                                for err in result.repository_result.errors
-                            ]
-                        )
+                        result.errors.extend([f"Repository: {err}" for err in result.repository_result.errors])
                         return self._finalize_result(result, start_time)
 
                     progress.update(step_task, completed=1)
@@ -335,9 +290,7 @@ class DeploymentManager:
 
                 # Step 4: Validation
                 if self.config.enable_validation:
-                    step_task = progress.add_task(
-                        "✅ Validating deployment...", total=1
-                    )
+                    step_task = progress.add_task("✅ Validating deployment...", total=1)
 
                     validation_result = self._validate_deployment(result)
                     if not validation_result["success"]:
@@ -362,9 +315,7 @@ class DeploymentManager:
 
         return self._finalize_result(result, start_time)
 
-    def deploy_multiple_modules(
-        self, project_paths: list[Path]
-    ) -> list[DeploymentResult]:
+    def deploy_multiple_modules(self, project_paths: list[Path]) -> list[DeploymentResult]:
         """Deploy multiple modules in batch.
 
         Args:
@@ -378,9 +329,7 @@ class DeploymentManager:
         self.console.print(f"\n🚀 Batch deployment: {len(project_paths)} modules")
 
         for i, project_path in enumerate(project_paths, 1):
-            self.console.print(
-                f"\n📦 Deploying {i}/{len(project_paths)}: {project_path.name}"
-            )
+            self.console.print(f"\n📦 Deploying {i}/{len(project_paths)}: {project_path.name}")
             result = self.deploy_module(project_path)
             results.append(result)
 
@@ -441,9 +390,7 @@ class DeploymentManager:
             "timestamp": datetime.now().isoformat(),
         }
 
-    def _prepare_upload_metadata(
-        self, project_path: Path, result: DeploymentResult
-    ) -> dict[str, Any]:
+    def _prepare_upload_metadata(self, project_path: Path, result: DeploymentResult) -> dict[str, Any]:
         """Prepare metadata for repository upload."""
         metadata = {
             "name": result.project_name,
@@ -479,23 +426,17 @@ class DeploymentManager:
 
         # Check packaging
         if self.config.enable_packaging and not result.packaging_result:
-            validation_result["errors"].append(
-                "Packaging was enabled but no packaging result found"
-            )
+            validation_result["errors"].append("Packaging was enabled but no packaging result found")
             validation_result["success"] = False
 
         # Check signing
         if self.config.enable_signing and not result.signing_result:
-            validation_result["errors"].append(
-                "Signing was enabled but no signing result found"
-            )
+            validation_result["errors"].append("Signing was enabled but no signing result found")
             validation_result["success"] = False
 
         # Check repository upload
         if self.config.enable_repository_upload and not result.repository_result:
-            validation_result["errors"].append(
-                "Repository upload was enabled but no upload result found"
-            )
+            validation_result["errors"].append("Repository upload was enabled but no upload result found")
             validation_result["success"] = False
 
         # Check artifacts
@@ -522,9 +463,7 @@ class DeploymentManager:
                     "warnings": result.warnings,
                 }
 
-                requests.post(
-                    self.config.notification_webhook, json=notification_data, timeout=30
-                )
+                requests.post(self.config.notification_webhook, json=notification_data, timeout=30)
 
         except Exception as e:
             self.console.print(f"⚠️  Notification failed: {e!s}")
@@ -568,9 +507,7 @@ class DeploymentManager:
 
         self.console.print(table)
 
-    def _finalize_result(
-        self, result: DeploymentResult, start_time: float
-    ) -> DeploymentResult:
+    def _finalize_result(self, result: DeploymentResult, start_time: float) -> DeploymentResult:
         """Finalize deployment result with timing and additional info."""
         import time
 

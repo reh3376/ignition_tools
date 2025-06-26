@@ -81,9 +81,7 @@ class OPCUAWebUI:
         )
 
         # Header
-        st.markdown(
-            '<h1 class="main-header">🔗 OPC-UA Interface</h1>', unsafe_allow_html=True
-        )
+        st.markdown('<h1 class="main-header">🔗 OPC-UA Interface</h1>', unsafe_allow_html=True)
 
         # Sidebar navigation
         self._render_sidebar()
@@ -143,12 +141,8 @@ class OPCUAWebUI:
             st.subheader("Configurations")
             configs = self.config_manager.list_configurations()
             if configs:
-                selected_config = st.selectbox(
-                    "Load Config", ["None", *list(configs.keys())]
-                )
-                if selected_config != "None" and st.button(
-                    "Load", use_container_width=True
-                ):
+                selected_config = st.selectbox("Load Config", ["None", *list(configs.keys())])
+                if selected_config != "None" and st.button("Load", use_container_width=True):
                     self._load_configuration(selected_config)
 
     def _render_connection_page(self: Self) -> None:
@@ -172,9 +166,7 @@ class OPCUAWebUI:
                 # Authentication
                 col_auth1, col_auth2 = st.columns(2)
                 with col_auth1:
-                    username = st.text_input(
-                        "Username", value=os.getenv("OPCUA_USERNAME", "admin")
-                    )
+                    username = st.text_input("Username", value=os.getenv("OPCUA_USERNAME", "admin"))
                 with col_auth2:
                     password = st.text_input("Password", type="password", value="")
 
@@ -189,9 +181,7 @@ class OPCUAWebUI:
                         index=1,
                     )
                 with col_sec2:
-                    security_mode = st.selectbox(
-                        "Security Mode", ["None", "Sign", "SignAndEncrypt"], index=2
-                    )
+                    security_mode = st.selectbox("Security Mode", ["None", "Sign", "SignAndEncrypt"], index=2)
 
             with col2:
                 st.subheader("Connection Status")
@@ -373,9 +363,7 @@ class OPCUAWebUI:
                             {
                                 "server_url": config_data.get("server_url", ""),
                                 "username": config_data.get("username", ""),
-                                "security_policy": config_data.get(
-                                    "security_policy", ""
-                                ),
+                                "security_policy": config_data.get("security_policy", ""),
                                 "security_mode": config_data.get("security_mode", ""),
                             }
                         )
@@ -446,9 +434,7 @@ class OPCUAWebUI:
         st.subheader("🔐 Security Settings")
 
         with st.container():
-            st.checkbox(
-                "Enforce Encryption", value=True, help="Require encrypted connections"
-            )
+            st.checkbox("Enforce Encryption", value=True, help="Require encrypted connections")
 
             st.checkbox(
                 "Validate Server Certificate",
@@ -526,9 +512,7 @@ class OPCUAWebUI:
         except Exception as e:
             st.error(f"❌ Disconnect failed: {e!s}")
 
-    def _browse_nodes(
-        self: Self, root_node: str, max_depth: int, variables_only: bool
-    ) -> None:
+    def _browse_nodes(self: Self, root_node: str, max_depth: int, variables_only: bool) -> None:
         """Browse OPC-UA nodes."""
         # Simulated node browsing for demo
         sample_nodes = [
@@ -583,9 +567,7 @@ class OPCUAWebUI:
                         st.text("-")
 
                 with col4:
-                    if node["type"] == "Variable" and st.button(
-                        "📊", key=f"monitor_{node['id']}"
-                    ):
+                    if node["type"] == "Variable" and st.button("📊", key=f"monitor_{node['id']}"):
                         self._add_monitor(node["id"], 2)
 
     def _add_monitor(self: Self, node_id: str, interval: int) -> None:
@@ -608,9 +590,7 @@ class OPCUAWebUI:
     def _save_configuration(self: Self, name: str) -> None:
         """Save current configuration."""
         if st.session_state.current_config:
-            self.config_manager.save_configuration(
-                name, st.session_state.current_config
-            )
+            self.config_manager.save_configuration(name, st.session_state.current_config)
             st.success(f"✅ Configuration '{name}' saved successfully!")
 
     def _load_configuration(self: Self, name: str) -> None:

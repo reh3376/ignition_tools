@@ -1,4 +1,4 @@
-"""SME Agent Infrastructure CLI Commands - Deployment and System Management
+"""SME Agent Infrastructure CLI Commands - Deployment and System Management.
 
 Following crawl_mcp.py methodology:
 - Step 5: Progressive complexity support
@@ -15,7 +15,10 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
-from ..sme_agent_module import SMEAgentModule, SMEAgentValidationError
+from src.ignition.modules.sme_agent.sme_agent_module import (
+    SMEAgentModule,
+    SMEAgentValidationError,
+)
 
 # Import workflow commands for Phase 11.3 completion
 try:
@@ -48,14 +51,14 @@ def handle_sme_agent_error(func: Any) -> None:
 
 @click.group(name="infrastructure")
 def infrastructure_commands() -> None:
-    """SME Agent Infrastructure Commands - Deployment and System Management"""
+    """SME Agent Infrastructure Commands - Deployment and System Management."""
     pass
 
 
 @infrastructure_commands.command("llm-status")
 @handle_sme_agent_error
 def llm_status() -> None:
-    """Check Local LLM Infrastructure Status"""
+    """Check Local LLM Infrastructure Status."""
     console.print("[bold blue]🔍 Local LLM Infrastructure Status[/bold blue]")
 
     try:
@@ -72,7 +75,7 @@ def llm_status() -> None:
 @infrastructure_commands.command("env-optimize")
 @handle_sme_agent_error
 def env_optimize() -> None:
-    """Optimize Environment for Local LLM Performance"""
+    """Optimize Environment for Local LLM Performance."""
     console.print("[bold blue]⚡ Environment Optimization for Local LLMs[/bold blue]")
 
     try:
@@ -102,10 +105,8 @@ def env_optimize() -> None:
 @click.option("--use-docker", is_flag=True, help="Deploy using Docker container")
 @click.option("--gpu", is_flag=True, help="Enable GPU acceleration")
 @handle_sme_agent_error
-def deploy_llm_infrastructure(
-    model: str, complexity: str, use_docker: bool, gpu: bool
-) -> None:
-    """Deploy Local LLM Infrastructure"""
+def deploy_llm_infrastructure(model: str, complexity: str, use_docker: bool, gpu: bool) -> None:
+    """Deploy Local LLM Infrastructure."""
     console.print(f"[bold blue]🚀 Deploying LLM Infrastructure: {model}[/bold blue]")
     console.print(f"Complexity: {complexity}, Docker: {use_docker}, GPU: {gpu}")
 
@@ -130,7 +131,7 @@ def deploy_llm_infrastructure(
 @infrastructure_commands.command("infrastructure-status")
 @handle_sme_agent_error
 def infrastructure_status() -> None:
-    """Check Overall Infrastructure Status"""
+    """Check Overall Infrastructure Status."""
     console.print("[bold blue]🏗️ SME Agent Infrastructure Status[/bold blue]")
 
     try:
@@ -160,11 +161,9 @@ def start_api_server(host: str, port: int, reload: bool) -> None:
 
     try:
         # Import here to avoid circular imports
-        from ..web_interface import run_server
+        from src.ignition.modules.sme_agent.web_interface import run_server
 
-        console.print(
-            f"[green]✅ Starting FastAPI server on http://{host}:{port}[/green]"
-        )
+        console.print(f"[green]✅ Starting FastAPI server on http://{host}:{port}[/green]")
         console.print("📖 API Documentation will be available at:")
         console.print(f"   • Swagger UI: http://{host}:{port}/docs")
         console.print(f"   • ReDoc: http://{host}:{port}/redoc")
@@ -211,14 +210,10 @@ def start_web_interface(port: int, host: str) -> None:
         interface_path = Path(__file__).parent.parent / "streamlit_interface.py"
 
         if not interface_path.exists():
-            console.print(
-                f"[red]❌ Streamlit interface not found at: {interface_path}[/red]"
-            )
+            console.print(f"[red]❌ Streamlit interface not found at: {interface_path}[/red]")
             sys.exit(1)
 
-        console.print(
-            f"[green]✅ Starting Streamlit interface on http://{host}:{port}[/green]"
-        )
+        console.print(f"[green]✅ Starting Streamlit interface on http://{host}:{port}[/green]")
         console.print("🎯 Features available:")
         console.print("   • 💬 Interactive chat with conversation history")
         console.print("   • 📄 File analysis capabilities")
@@ -293,7 +288,7 @@ def check_interface_status() -> None:
 
     # Check SME Agent core
     try:
-        from ..sme_agent_module import SMEAgentModule
+        from src.ignition.modules.sme_agent.sme_agent_module import SMEAgentModule
 
         with SMEAgentModule() as agent:
             validation_result = agent.validate_environment()
@@ -363,16 +358,12 @@ def demo_all_interfaces(api_port: int, web_port: int) -> None:
     console.print(f"🌐 REST API endpoints (when running on port {api_port}):")
     console.print(f"   curl -X POST http://localhost:{api_port}/chat \\")
     console.print("        -H 'Content-Type: application/json' \\")
-    console.print(
-        '        -d \'{"question": "How do I configure OPC-UA?", "complexity": "standard"}\''
-    )
+    console.print('        -d \'{"question": "How do I configure OPC-UA?", "complexity": "standard"}\'')
 
     console.print("\n   # Streaming endpoint")
     console.print(f"   curl -X POST http://localhost:{api_port}/chat/stream \\")
     console.print("        -H 'Content-Type: application/json' \\")
-    console.print(
-        '        -d \'{"question": "Explain Ignition architecture", "stream": true}\''
-    )
+    console.print('        -d \'{"question": "Explain Ignition architecture", "stream": true}\'')
 
     # Web Demo
     console.print("\n[bold cyan]3. Streamlit Interface Demo[/bold cyan]")
@@ -433,9 +424,7 @@ def demo_all_interfaces(api_port: int, web_port: int) -> None:
 
 
 # Async helper functions
-async def _deploy_llm_async(
-    agent: SMEAgentModule, config: dict[str, Any]
-) -> dict[str, Any]:
+async def _deploy_llm_async(agent: SMEAgentModule, config: dict[str, Any]) -> dict[str, Any]:
     """Deploy LLM infrastructure asynchronously."""
     console.print("🔄 Starting LLM deployment...")
 
@@ -526,9 +515,7 @@ def _display_infrastructure_status(status: dict[str, Any]) -> None:
     table.add_column("Details", style="white")
 
     for component, details in status.get("components", {}).items():
-        health_status = (
-            "✅ Healthy" if details.get("healthy", False) else "❌ Unhealthy"
-        )
+        health_status = "✅ Healthy" if details.get("healthy", False) else "❌ Unhealthy"
         table.add_row(
             component,
             details.get("status", "Unknown"),
@@ -553,8 +540,6 @@ def setup_infrastructure_commands(cli_group: Any) -> None:
             register_workflow_commands(cli_group)
             console.print("[green]✅ Phase 11.3 workflow commands registered[/green]")
         except Exception as e:
-            console.print(
-                f"[yellow]⚠️  Failed to register workflow commands: {e}[/yellow]"
-            )
+            console.print(f"[yellow]⚠️  Failed to register workflow commands: {e}[/yellow]")
     else:
         console.print("[yellow]⚠️  Phase 11.3 workflow commands not available[/yellow]")

@@ -1,4 +1,4 @@
-"""SME Agent Knowledge CLI Commands - Knowledge Extraction and Vector Enhancement
+"""SME Agent Knowledge CLI Commands - Knowledge Extraction and Vector Enhancement.
 
 Following crawl_mcp.py methodology:
 - Step 5: Progressive complexity support
@@ -15,7 +15,10 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
-from ..sme_agent_module import SMEAgentModule, SMEAgentValidationError
+from src.ignition.modules.sme_agent.sme_agent_module import (
+    SMEAgentModule,
+    SMEAgentValidationError,
+)
 
 console = Console()
 logger = logging.getLogger(__name__)
@@ -40,7 +43,7 @@ def handle_sme_agent_error(func) -> Any:
 
 @click.group(name="knowledge")
 def knowledge_commands() -> None:
-    """SME Agent Knowledge Commands - Knowledge Extraction and Vector Enhancement"""
+    """SME Agent Knowledge Commands - Knowledge Extraction and Vector Enhancement."""
     pass
 
 
@@ -48,9 +51,7 @@ def knowledge_commands() -> None:
 @click.option(
     "--types",
     multiple=True,
-    type=click.Choice(
-        ["functions", "components", "patterns", "troubleshooting", "workflows", "all"]
-    ),
+    type=click.Choice(["functions", "components", "patterns", "troubleshooting", "workflows", "all"]),
     default=["all"],
     help="Types of knowledge to extract",
 )
@@ -63,10 +64,8 @@ def knowledge_commands() -> None:
     help="Output format for dataset",
 )
 @handle_sme_agent_error
-def extract_knowledge_dataset(
-    types: tuple[str], max_records: int | None, output_format: str
-):
-    """Extract Knowledge Dataset for Training"""
+def extract_knowledge_dataset(types: tuple[str], max_records: int | None, output_format: str):
+    """Extract Knowledge Dataset for Training."""
     console.print("[bold blue]📚 Knowledge Dataset Extraction[/bold blue]")
     console.print(f"Types: {', '.join(types)}")
     console.print(f"Format: {output_format}")
@@ -113,10 +112,8 @@ def extract_knowledge_dataset(
 @click.option("--enable-gpu", is_flag=True, help="Enable GPU acceleration for FAISS")
 @click.option("--rerank", is_flag=True, help="Enable result reranking")
 @handle_sme_agent_error
-def enhance_vector_embeddings(
-    model: str, search_mode: str, enable_gpu: bool, rerank: bool
-):
-    """Enhance Vector Embeddings and Search"""
+def enhance_vector_embeddings(model: str, search_mode: str, enable_gpu: bool, rerank: bool):
+    """Enhance Vector Embeddings and Search."""
     console.print("[bold blue]🔍 Vector Embeddings Enhancement[/bold blue]")
     console.print(f"Model: {model}")
     console.print(f"Search Mode: {search_mode}")
@@ -141,9 +138,7 @@ def enhance_vector_embeddings(
 
 
 # Async helper functions
-async def _extract_knowledge_async(
-    agent: SMEAgentModule, config: dict[str, Any]
-) -> dict[str, Any]:
+async def _extract_knowledge_async(agent: SMEAgentModule, config: dict[str, Any]) -> dict[str, Any]:
     """Extract knowledge dataset asynchronously."""
     console.print("🔄 Starting knowledge extraction...")
 
@@ -170,9 +165,7 @@ async def _extract_knowledge_async(
     }
 
 
-async def _enhance_vectors_async(
-    agent: SMEAgentModule, config: dict[str, Any]
-) -> dict[str, Any]:
+async def _enhance_vectors_async(agent: SMEAgentModule, config: dict[str, Any]) -> dict[str, Any]:
     """Enhance vector embeddings asynchronously."""
     console.print("🔄 Starting vector enhancement...")
 

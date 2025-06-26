@@ -1,4 +1,4 @@
-"""Phase 12.6: Deployment & Infrastructure Implementation
+"""Phase 12.6: Deployment & Infrastructure Implementation.
 
 Following crawl_mcp.py methodology:
 1. Environment validation first
@@ -87,9 +87,7 @@ def validate_deployment_environment() -> dict[str, Any]:
         if not missing_vars:
             validation_results["environment_variables"] = True
         else:
-            validation_results["errors"].append(
-                f"Missing environment variables: {missing_vars}"
-            )
+            validation_results["errors"].append(f"Missing environment variables: {missing_vars}")
 
         # Check deployment files
         deployment_files = ["Dockerfile", "docker-compose.yml"]
@@ -101,14 +99,11 @@ def validate_deployment_environment() -> dict[str, Any]:
         if not missing_files:
             validation_results["deployment_files"] = True
         else:
-            validation_results["warnings"].append(
-                f"Missing deployment files: {missing_files}"
-            )
+            validation_results["warnings"].append(f"Missing deployment files: {missing_files}")
 
         # Overall validation
         validation_results["valid"] = (
-            validation_results["docker_available"]
-            and validation_results["environment_variables"]
+            validation_results["docker_available"] and validation_results["environment_variables"]
         )
 
         return validation_results
@@ -146,20 +141,18 @@ class DockerConfig(BaseModel):
     image_name: str = Field(..., description="Docker image name")
     tag: str = Field(default="latest", description="Docker image tag")
     ports: dict[int, int] = Field(default_factory=dict, description="Port mappings")
-    environment: dict[str, str] = Field(
-        default_factory=dict, description="Environment variables"
-    )
+    environment: dict[str, str] = Field(default_factory=dict, description="Environment variables")
     volumes: list[str] = Field(default_factory=list, description="Volume mounts")
     restart_policy: str = Field(default="unless-stopped", description="Restart policy")
 
     @validator("image_name")
-    def validate_image_name(cls, v):
+    def validate_image_name(cls, v) -> Any:
         if not v or not isinstance(v, str):
             raise ValueError("Image name must be a non-empty string")
         return v
 
     @validator("restart_policy")
-    def validate_restart_policy(cls, v):
+    def validate_restart_policy(cls, v) -> Any:
         valid_policies = ["no", "always", "unless-stopped", "on-failure"]
         if v not in valid_policies:
             raise ValueError(f"Restart policy must be one of: {valid_policies}")
@@ -170,12 +163,8 @@ class HealthCheckConfig(BaseModel):
     """Health check configuration."""
 
     endpoint: str = Field(default="/health", description="Health check endpoint")
-    interval: int = Field(
-        default=30, ge=1, description="Health check interval in seconds"
-    )
-    timeout: int = Field(
-        default=10, ge=1, description="Health check timeout in seconds"
-    )
+    interval: int = Field(default=30, ge=1, description="Health check interval in seconds")
+    timeout: int = Field(default=10, ge=1, description="Health check timeout in seconds")
     retries: int = Field(default=3, ge=1, description="Health check retries")
     start_period: int = Field(default=60, ge=0, description="Start period in seconds")
 
@@ -189,12 +178,10 @@ class DeploymentConfig(BaseModel):
     monitoring_enabled: bool = Field(default=True, description="Enable monitoring")
     backup_enabled: bool = Field(default=True, description="Enable backups")
     auto_restart: bool = Field(default=True, description="Enable auto-restart")
-    resource_limits: dict[str, str] = Field(
-        default_factory=dict, description="Resource limits"
-    )
+    resource_limits: dict[str, str] = Field(default_factory=dict, description="Resource limits")
 
     @validator("environment")
-    def validate_environment(cls, v):
+    def validate_environment(cls, v) -> Any:
         valid_environments = ["development", "staging", "production"]
         if v not in valid_environments:
             raise ValueError(f"Environment must be one of: {valid_environments}")
@@ -219,7 +206,7 @@ class DeploymentResult:
     warnings: list[str] = field(default_factory=list)
 
 
-async def main():
+async def main() -> Any:
     """Main execution function for Phase 12.6."""
     print("🚀 Phase 12.6: Deployment & Infrastructure Implementation")
     print("Following crawl_mcp.py methodology")

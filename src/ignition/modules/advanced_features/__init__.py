@@ -1,4 +1,4 @@
-"""Phase 9.8: Advanced Module Features
+"""Phase 9.8: Advanced Module Features.
 ==================================
 
 Following crawl_mcp.py methodology for systematic development:
@@ -67,7 +67,7 @@ _phase_status = Phase98Status()
 # Environment validation following crawl_mcp.py patterns
 def validate_phase98_environment() -> dict[str, bool]:
     """Step 1: Environment Variable Validation First
-    Following crawl_mcp.py methodology for Phase 9.8
+    Following crawl_mcp.py methodology for Phase 9.8.
     """
     validation_results = {
         "python_version": sys.version_info >= (3, 8),

@@ -80,9 +80,7 @@ class RecipeManager:
             self.logger.error(f"Error creating recipe {name}: {e}")
             return ""
 
-    def load_recipe(
-        self, recipe_name: str, version: str = "latest"
-    ) -> dict[str, Any] | None:
+    def load_recipe(self, recipe_name: str, version: str = "latest") -> dict[str, Any] | None:
         """Load an existing recipe.
 
         Args:
@@ -120,9 +118,7 @@ class RecipeManager:
             self.logger.error(f"Error loading recipe {recipe_name}: {e}")
             return None
 
-    def save_recipe(
-        self, recipe_name: str, recipe_data: dict[str, Any], overwrite: bool = False
-    ) -> bool:
+    def save_recipe(self, recipe_name: str, recipe_data: dict[str, Any], overwrite: bool = False) -> bool:
         """Save recipe data to the recipe database.
 
         Args:
@@ -144,9 +140,7 @@ class RecipeManager:
             # Check for existing recipe
             existing_recipe = self._find_recipe_by_name(recipe_name)
             if existing_recipe and not overwrite:
-                self.logger.warning(
-                    f"Recipe already exists and overwrite=False: {recipe_name}"
-                )
+                self.logger.warning(f"Recipe already exists and overwrite=False: {recipe_name}")
                 return False
 
             # Generate or use existing recipe ID
@@ -210,11 +204,7 @@ class RecipeManager:
                 "status": "running",
                 "start_time": datetime.now(),
                 "progress_percent": 0,
-                "current_step": (
-                    recipe_data["steps"][0]["name"]
-                    if recipe_data["steps"]
-                    else "initial"
-                ),
+                "current_step": (recipe_data["steps"][0]["name"] if recipe_data["steps"] else "initial"),
                 "execution_parameters": execution_parameters or {},
                 "step_history": [],
             }
@@ -246,9 +236,7 @@ class RecipeManager:
             bool: True if aborted successfully
         """
         try:
-            self.logger.info(
-                f"Aborting execution: {execution_id} (reason: {abort_reason})"
-            )
+            self.logger.info(f"Aborting execution: {execution_id} (reason: {abort_reason})")
 
             if execution_id not in self.active_executions:
                 self.logger.warning(f"Execution not found: {execution_id}")
@@ -274,9 +262,7 @@ class RecipeManager:
             self.logger.error(f"Error aborting execution {execution_id}: {e}")
             return False
 
-    def get_execution_status(
-        self, execution_id: str, include_details: bool = False
-    ) -> dict[str, Any] | None:
+    def get_execution_status(self, execution_id: str, include_details: bool = False) -> dict[str, Any] | None:
         """Get execution status of a running recipe.
 
         Args:
@@ -299,13 +285,9 @@ class RecipeManager:
 
             # Add estimated completion time
             if execution_data["status"] == "running":
-                estimated_total_time = self._estimate_total_execution_time(
-                    execution_data
-                )
+                estimated_total_time = self._estimate_total_execution_time(execution_data)
                 if estimated_total_time:
-                    estimated_completion = (
-                        execution_data["start_time"] + estimated_total_time
-                    )
+                    estimated_completion = execution_data["start_time"] + estimated_total_time
                     execution_data["estimated_completion"] = estimated_completion
 
             if not include_details:
@@ -353,9 +335,7 @@ class RecipeManager:
                             "end_time": execution_data.get("end_time"),
                             "duration_minutes": execution_data.get("duration_minutes"),
                             "status": execution_data["status"],
-                            "operator_id": execution_data.get(
-                                "execution_parameters", {}
-                            ).get("operator_id"),
+                            "operator_id": execution_data.get("execution_parameters", {}).get("operator_id"),
                             "equipment_id": execution_data["equipment_id"],
                             "batch_id": execution_data["batch_id"],
                         }
@@ -388,9 +368,7 @@ class RecipeManager:
                 return recipe_data
         return None
 
-    def _estimate_total_execution_time(
-        self, execution_data: dict[str, Any]
-    ) -> datetime | None:
+    def _estimate_total_execution_time(self, execution_data: dict[str, Any]) -> datetime | None:
         """Estimate total execution time based on recipe steps."""
         # Placeholder implementation - would use step timing data
         # to estimate total execution time

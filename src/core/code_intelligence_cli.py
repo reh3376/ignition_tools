@@ -68,9 +68,7 @@ def status(detailed: bool) -> None:
             console.print("\n🗄️ Database Schema", style="bold")
             console.print(f"Constraints: {len(schema_info.get('constraints', []))}")
             console.print(f"Indexes: {len(schema_info.get('indexes', []))}")
-            console.print(
-                f"Schema Version: {schema_info.get('schema_version', 'Unknown')}"
-            )
+            console.print(f"Schema Version: {schema_info.get('schema_version', 'Unknown')}")
 
             # Node counts
             node_counts = schema_info.get("node_counts", {})
@@ -129,14 +127,10 @@ def analyze(file_path: str, detailed: bool) -> None:
                     file_info = context.get("file", {})
                     console.print(f"Lines: {file_info.get('lines', 'N/A')}")
                     console.print(f"Complexity: {file_info.get('complexity', 'N/A')}")
-                    console.print(
-                        f"Maintainability: {file_info.get('maintainability_index', 'N/A'):.1f}"
-                    )
+                    console.print(f"Maintainability: {file_info.get('maintainability_index', 'N/A'):.1f}")
 
                     classes = context.get("classes", [])
-                    methods = context.get("class_methods", []) + context.get(
-                        "file_methods", []
-                    )
+                    methods = context.get("class_methods", []) + context.get("file_methods", [])
                     imports = context.get("imports", [])
 
                     console.print(f"Classes: {len(classes)}")
@@ -146,16 +140,12 @@ def analyze(file_path: str, detailed: bool) -> None:
                     if classes:
                         console.print("\n📦 Classes:")
                         for cls in classes[:5]:  # Show first 5
-                            console.print(
-                                f"  • {cls.get('name')} (complexity: {cls.get('complexity')})"
-                            )
+                            console.print(f"  • {cls.get('name')} (complexity: {cls.get('complexity')})")
 
                     if methods:
                         console.print("\n🔧 Methods:")
                         for method in methods[:5]:  # Show first 5
-                            console.print(
-                                f"  • {method.get('name')} (complexity: {method.get('complexity')})"
-                            )
+                            console.print(f"  • {method.get('name')} (complexity: {method.get('complexity')})")
         else:
             console.print(f"❌ Failed to analyze: {file_path}", style="red")
 
@@ -193,9 +183,7 @@ def scan(directory_path: str, recursive: bool) -> None:
             progress.update(task, description=f"Scanning {directory_path}...")
             results = manager.analyze_and_store_directory(dir_path, recursive)
 
-        console.print(
-            f"\n📂 Directory Scan Results: {directory_path}", style="bold blue"
-        )
+        console.print(f"\n📂 Directory Scan Results: {directory_path}", style="bold blue")
         console.print(f"Files processed: {results['files_processed']}")
         console.print(f"Files successful: {results['files_successful']}", style="green")
         console.print(
@@ -251,12 +239,8 @@ def search(query: str, search_type: str, limit: int) -> None:
             console.print(f"No results found for '{query}'", style="yellow")
             return
 
-        console.print(
-            f"\n🔍 Search Results for '{query}' ({search_type})", style="bold blue"
-        )
-        console.print(
-            f"Found {len(results)} results (showing first {min(limit, len(results))})"
-        )
+        console.print(f"\n🔍 Search Results for '{query}' ({search_type})", style="bold blue")
+        console.print(f"Found {len(results)} results (showing first {min(limit, len(results))})")
 
         # Create results table
         table = Table()
@@ -307,9 +291,7 @@ def context(file_path: str) -> None:
 
         if not context_data or not context_data.get("file"):
             console.print(f"No context found for '{file_path}'", style="yellow")
-            console.print(
-                "Make sure the file has been analyzed first using 'ign code analyze'"
-            )
+            console.print("Make sure the file has been analyzed first using 'ign code analyze'")
             return
 
         console.print(f"\n📁 File Context: {file_path}", style="bold blue")
@@ -332,7 +314,7 @@ def context(file_path: str) -> None:
             console.print(f"\n📦 Classes ({len(classes)}):")
             for cls in classes:
                 console.print(
-                    f"  • {cls.get('name')} (lines {cls.get('start_line')}-{cls.get('end_line')}, complexity: {cls.get('complexity')})"
+                    f"  • {cls.get('name')} (lines {cls.get('start_line')}-{cls.get('end_line')}, complexity: {cls.get('complexity')})"  # noqa: E501
                 )
 
         # Methods
@@ -343,11 +325,9 @@ def context(file_path: str) -> None:
         if all_methods:
             console.print(f"\n🔧 Methods ({len(all_methods)}):")
             for method in all_methods:
-                class_info = (
-                    f" [{method.get('class_name')}]" if method.get("class_name") else ""
-                )
+                class_info = f" [{method.get('class_name')}]" if method.get("class_name") else ""
                 console.print(
-                    f"  • {method.get('name')}{class_info} (line {method.get('start_line')}, complexity: {method.get('complexity')})"
+                    f"  • {method.get('name')}{class_info} (line {method.get('start_line')}, complexity: {method.get('complexity')})"  # noqa: E501
                 )
 
         # Imports

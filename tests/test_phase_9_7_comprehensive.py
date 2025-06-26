@@ -69,12 +69,8 @@ class Phase97TestValidator:
 
         required_vars = {
             # Core deployment variables
-            "DEPLOYMENT_TEMP_DIR": os.getenv(
-                "DEPLOYMENT_TEMP_DIR", "/tmp/ign_deployment"
-            ),
-            "DEPLOYMENT_OUTPUT_DIR": os.getenv(
-                "DEPLOYMENT_OUTPUT_DIR", "/tmp/ign_output"
-            ),
+            "DEPLOYMENT_TEMP_DIR": os.getenv("DEPLOYMENT_TEMP_DIR", "/tmp/ign_deployment"),
+            "DEPLOYMENT_OUTPUT_DIR": os.getenv("DEPLOYMENT_OUTPUT_DIR", "/tmp/ign_output"),
             # Gradle build variables
             "GRADLE_HOME": os.getenv("GRADLE_HOME"),
             "JAVA_HOME": os.getenv("JAVA_HOME"),
@@ -117,9 +113,7 @@ class Phase97TestValidator:
         elif "permission" in error_str or "access" in error_str:
             return "Permission error. Check file permissions and directory access."
         elif "network" in error_str or "connection" in error_str:
-            return (
-                "Network error. Check internet connection and repository accessibility."
-            )
+            return "Network error. Check internet connection and repository accessibility."
         else:
             return f"Deployment error: {error!s}"
 
@@ -134,7 +128,7 @@ class Phase97TestValidator:
 
         # Validate project path
         project_path = kwargs.get("project_path")
-        if not project_path or not isinstance(project_path, (str, Path)):
+        if not project_path or not isinstance(project_path, str | Path):
             validation_results["project_path"] = {
                 "valid": False,
                 "error": "Project path is required",
@@ -179,9 +173,7 @@ class Phase97TestValidator:
                     "valid": False,
                     "error": "Repository URL must be a non-empty string",
                 }
-            elif not (
-                repo_url.startswith("http://") or repo_url.startswith("https://")
-            ):
+            elif not (repo_url.startswith("http://") or repo_url.startswith("https://")):
                 validation_results["repository_url"] = {
                     "valid": False,
                     "error": "Repository URL must start with http:// or https://",
@@ -300,7 +292,7 @@ public class TestModule implements Module {
         # Test ModulePackager initialization
         try:
             packaging_config = PackagingConfig()
-            packager = ModulePackager(packaging_config)
+            ModulePackager(packaging_config)
             results["module_packager"] = {
                 "success": True,
                 "component": "ModulePackager",
@@ -313,7 +305,7 @@ public class TestModule implements Module {
         # Test ModuleSigner initialization
         try:
             signing_config = SigningConfig()
-            signer = ModuleSigner(signing_config)
+            ModuleSigner(signing_config)
             results["module_signer"] = {"success": True, "component": "ModuleSigner"}
             print("  ✅ ModuleSigner initialized successfully")
         except Exception as e:
@@ -323,7 +315,7 @@ public class TestModule implements Module {
         # Test RepositoryManager initialization
         try:
             repo_config = RepositoryConfig()
-            repo_manager = RepositoryManager(repo_config)
+            RepositoryManager(repo_config)
             results["repository_manager"] = {
                 "success": True,
                 "component": "RepositoryManager",
@@ -336,7 +328,7 @@ public class TestModule implements Module {
         # Test DeploymentManager initialization
         try:
             deployment_config = DeploymentConfig()
-            deployment_manager = DeploymentManager(deployment_config)
+            DeploymentManager(deployment_config)
             results["deployment_manager"] = {
                 "success": True,
                 "component": "DeploymentManager",
@@ -410,7 +402,7 @@ public class TestModule implements Module {
                 temp_directory=self.temp_dir / "temp",
                 output_directory=self.temp_dir / "output",
             )
-            packager = ModulePackager(packaging_config)
+            ModulePackager(packaging_config)
 
             # Create mock package result
             mock_result = Mock()
@@ -440,7 +432,7 @@ public class TestModule implements Module {
                 certificate_path=Path("mock_cert.pem"),
                 private_key_path=Path("mock_key.pem"),
             )
-            signer = ModuleSigner(signing_config)
+            ModuleSigner(signing_config)
 
             results["level_2_signing"] = {
                 "success": True,
@@ -463,7 +455,7 @@ public class TestModule implements Module {
                 download_directory=self.temp_dir / "downloads",
                 cache_directory=self.temp_dir / "cache",
             )
-            repo_manager = RepositoryManager(repo_config)
+            RepositoryManager(repo_config)
 
             results["level_3_repository"] = {
                 "success": True,
@@ -486,7 +478,7 @@ public class TestModule implements Module {
                 signing_config=SigningConfig(),
                 repository_config=RepositoryConfig(),
             )
-            deployment_manager = DeploymentManager(deployment_config)
+            DeploymentManager(deployment_config)
 
             results["level_4_full_deployment"] = {
                 "success": True,
@@ -516,7 +508,7 @@ public class TestModule implements Module {
         # Test invalid project path
         try:
             deployment_config = DeploymentConfig()
-            deployment_manager = DeploymentManager(deployment_config)
+            DeploymentManager(deployment_config)
 
             # This should fail gracefully
             invalid_path = Path("/nonexistent/path")
@@ -540,18 +532,14 @@ public class TestModule implements Module {
         try:
             with patch.dict(os.environ, {}, clear=True):
                 env_validation = self.validate_environment_variables()
-                missing_vars = [
-                    var for var, valid in env_validation.items() if not valid
-                ]
+                missing_vars = [var for var, valid in env_validation.items() if not valid]
 
                 results["missing_env_vars"] = {
                     "success": True,
                     "missing_variables_detected": len(missing_vars) > 0,
                     "missing_count": len(missing_vars),
                 }
-                print(
-                    f"  ✅ Missing environment variables detected: {len(missing_vars)}"
-                )
+                print(f"  ✅ Missing environment variables detected: {len(missing_vars)}")
 
         except Exception as e:
             results["missing_env_vars"] = {
@@ -562,9 +550,7 @@ public class TestModule implements Module {
 
         # Test invalid module file
         try:
-            validation = self.validate_input_parameters(
-                module_file="/nonexistent/module.txt"  # Wrong extension
-            )
+            validation = self.validate_input_parameters(module_file="/nonexistent/module.txt")  # Wrong extension
 
             results["invalid_module_file"] = {
                 "success": True,
@@ -626,7 +612,7 @@ public class TestModule implements Module {
             # Test validate-env command (safest to test)
             try:
                 # This should not raise an exception even if environment is not configured
-                validate_result = validate_env_command()
+                validate_env_command()
                 results["validate_env_command"] = {
                     "success": True,
                     "command": "validate-env",
@@ -699,9 +685,7 @@ public class TestModule implements Module {
                             "success": result.get("success", False),
                             "error": result.get("error", ""),
                             "component": result.get("component", ""),
-                            "missing_requirements": result.get(
-                                "missing_requirements", []
-                            ),
+                            "missing_requirements": result.get("missing_requirements", []),
                         }
                     else:
                         clean_results[category][test_name] = result
@@ -735,9 +719,7 @@ public class TestModule implements Module {
         missing_vars = [var for var, valid in env_results.items() if not valid]
 
         if missing_vars:
-            recommendations.append(
-                f"Configure missing environment variables: {', '.join(missing_vars)}"
-            )
+            recommendations.append(f"Configure missing environment variables: {', '.join(missing_vars)}")
 
         # Check component validation results
         component_results = self.test_results.get("component_validation", {})
@@ -748,14 +730,10 @@ public class TestModule implements Module {
         ]
 
         if failed_components:
-            recommendations.append(
-                f"Fix component initialization issues: {', '.join(failed_components)}"
-            )
+            recommendations.append(f"Fix component initialization issues: {', '.join(failed_components)}")
 
         if not recommendations:
-            recommendations.append(
-                "All tests passed! Phase 9.7 is ready for production use."
-            )
+            recommendations.append("All tests passed! Phase 9.7 is ready for production use.")
 
         return recommendations
 
@@ -783,7 +761,7 @@ async def run_comprehensive_phase_97_tests():
 
     try:
         # Step 1: Environment Variable Validation First
-        env_validation = validator.validate_environment_variables()
+        validator.validate_environment_variables()
         print()
 
         # Step 2: Setup Test Environment
@@ -791,23 +769,23 @@ async def run_comprehensive_phase_97_tests():
         print()
 
         # Step 3: Component Testing
-        component_results = validator.test_component_initialization()
+        validator.test_component_initialization()
         print()
 
         # Step 4: Environment Validation Methods
-        env_method_results = validator.test_environment_validation_methods()
+        validator.test_environment_validation_methods()
         print()
 
         # Step 5: Progressive Complexity Testing
-        complexity_results = validator.test_progressive_complexity(test_project)
+        validator.test_progressive_complexity(test_project)
         print()
 
         # Step 6: Error Handling Testing
-        error_handling_results = validator.test_error_handling_scenarios()
+        validator.test_error_handling_scenarios()
         print()
 
         # Step 7: Test CLI Commands
-        cli_results = validator.test_cli_commands()
+        validator.test_cli_commands()
         print()
 
         # Step 8: Generate Comprehensive Report

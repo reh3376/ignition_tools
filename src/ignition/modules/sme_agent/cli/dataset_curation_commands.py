@@ -1,4 +1,4 @@
-"""CLI Commands for Industrial Dataset Curation & AI Model Preparation
+"""CLI Commands for Industrial Dataset Curation & AI Model Preparation.
 
 Following the crawl_mcp.py methodology for structured development:
 - Comprehensive validation and error handling
@@ -25,21 +25,27 @@ from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
-from ..ai_model_preparation import (
+from src.ignition.modules.sme_agent.ai_model_preparation import (
     AIModelPreparation,
     FeatureEngineeringConfig,
     ModelPreparationConfig,
 )
-from ..ai_model_preparation import validate_environment as validate_ai_env
-from ..data_ingestion_framework import DataIngestionFramework
-from ..industrial_dataset_curation import (
+from src.ignition.modules.sme_agent.ai_model_preparation import (
+    validate_environment as validate_ai_env,
+)
+from src.ignition.modules.sme_agent.data_ingestion_framework import (
+    DataIngestionFramework,
+)
+from src.ignition.modules.sme_agent.industrial_dataset_curation import (
     DataSourceType,
     IndustrialDatasetCurator,
     VariableMetadata,
     VariableType,
     validate_environment,
 )
-from ..variable_type_classifier import VariableTypeClassifier
+from src.ignition.modules.sme_agent.variable_type_classifier import (
+    VariableTypeClassifier,
+)
 
 # Load environment variables
 load_dotenv()
@@ -68,9 +74,7 @@ def dataset_curation() -> None:
 def validate_env(complexity_level: str) -> None:
     """Validate environment for dataset curation system."""
     try:
-        console.print(
-            "\n🔍 [bold blue]Validating Dataset Curation Environment[/bold blue]"
-        )
+        console.print("\n🔍 [bold blue]Validating Dataset Curation Environment[/bold blue]")
 
         with Progress(
             SpinnerColumn(),
@@ -108,17 +112,11 @@ def validate_env(complexity_level: str) -> None:
         total = len(validation_results)
 
         if passed == total:
-            console.print(
-                f"\n✅ [bold green]All {total} components validated successfully![/bold green]"
-            )
-            console.print(
-                f"📊 Complexity level: [bold cyan]{complexity_level}[/bold cyan]"
-            )
+            console.print(f"\n✅ [bold green]All {total} components validated successfully![/bold green]")
+            console.print(f"📊 Complexity level: [bold cyan]{complexity_level}[/bold cyan]")
         else:
             failed = total - passed
-            console.print(
-                f"\n⚠️ [bold yellow]{failed}/{total} components need attention[/bold yellow]"
-            )
+            console.print(f"\n⚠️ [bold yellow]{failed}/{total} components need attention[/bold yellow]")
             console.print("💡 Check environment variables and dependencies")
 
     except Exception as e:
@@ -136,6 +134,9 @@ def validate_env(complexity_level: str) -> None:
 def info(complexity_level: str) -> None:
     """Show dataset curation system information."""
     try:
+        pass  # TODO: Add try block content
+    except Exception:
+        pass  # TODO: Handle exception
         # Initialize curator to get status
         curator = IndustrialDatasetCurator(complexity_level)
         status = curator.get_validation_status()
@@ -165,18 +166,14 @@ def info(complexity_level: str) -> None:
 • Automated quality scoring
         """
 
-        console.print(
-            Panel(info_text, title="Dataset Curation System", border_style="blue")
-        )
+        console.print(Panel(info_text, title="Dataset Curation System", border_style="blue"))
 
         # Environment validation summary
         env_results = validate_environment()
         valid_components = sum(env_results.values())
         total_components = len(env_results)
 
-        console.print(
-            f"\n📋 Environment: {valid_components}/{total_components} components ready"
-        )
+        console.print(f"\n📋 Environment: {valid_components}/{total_components} components ready")
 
     except Exception as e:
         console.print(f"\n❌ [bold red]Error getting system info: {e}[/bold red]")
@@ -185,9 +182,7 @@ def info(complexity_level: str) -> None:
 
 @dataset_curation.command()
 @click.argument("file_path", type=click.Path(exists=True))
-@click.option(
-    "--timestamp-column", default="timestamp", help="Name of timestamp column"
-)
+@click.option("--timestamp-column", default="timestamp", help="Name of timestamp column")
 @click.option("--dataset-name", help="Custom name for dataset (defaults to filename)")
 @click.option(
     "--complexity-level",
@@ -218,9 +213,7 @@ def ingest_csv(
 
             # Ingest data
             result = asyncio.run(
-                ingestion_framework.ingest_csv_data(
-                    file_path=file_path, timestamp_column=timestamp_column
-                )
+                ingestion_framework.ingest_csv_data(file_path=file_path, timestamp_column=timestamp_column)
             )
 
             progress.update(task, description="Data ingestion complete")
@@ -236,9 +229,7 @@ def ingest_csv(
             table.add_row("Dataset Name", result["dataset_name"])
             table.add_row("Rows Processed", str(result["rows_processed"]))
             table.add_row("Columns Processed", str(result["columns_processed"]))
-            table.add_row(
-                "Quality Score", f"{result['quality_report']['quality_score']:.1f}/100"
-            )
+            table.add_row("Quality Score", f"{result['quality_report']['quality_score']:.1f}/100")
             table.add_row(
                 "Time Range",
                 f"{result['timestamp_range']['start']} to {result['timestamp_range']['end']}",
@@ -249,21 +240,13 @@ def ingest_csv(
             # Quality report summary
             quality_report = result["quality_report"]
             if quality_report["quality_score"] >= 80:
-                console.print(
-                    "\n🌟 [bold green]High quality dataset - ready for analysis![/bold green]"
-                )
+                console.print("\n🌟 [bold green]High quality dataset - ready for analysis![/bold green]")
             elif quality_report["quality_score"] >= 60:
-                console.print(
-                    "\n⚠️ [bold yellow]Moderate quality dataset - review recommended[/bold yellow]"
-                )
+                console.print("\n⚠️ [bold yellow]Moderate quality dataset - review recommended[/bold yellow]")
             else:
-                console.print(
-                    "\n❌ [bold red]Low quality dataset - data cleaning required[/bold red]"
-                )
+                console.print("\n❌ [bold red]Low quality dataset - data cleaning required[/bold red]")
         else:
-            console.print(
-                f"\n❌ [bold red]Ingestion failed: {result['error']}[/bold red]"
-            )
+            console.print(f"\n❌ [bold red]Ingestion failed: {result['error']}[/bold red]")
             raise click.ClickException(result["error"])
 
     except Exception as e:
@@ -285,14 +268,10 @@ def ingest_csv(
     type=click.Choice(["basic", "standard", "advanced", "enterprise"]),
     help="Deployment complexity level",
 )
-def classify_variables(
-    dataset_name: str, confidence_threshold: float, complexity_level: str
-) -> None:
+def classify_variables(dataset_name: str, confidence_threshold: float, complexity_level: str) -> None:
     """Automatically classify variables in a dataset."""
     try:
-        console.print(
-            f"\n🔍 [bold blue]Classifying Variables in {dataset_name}[/bold blue]"
-        )
+        console.print(f"\n🔍 [bold blue]Classifying Variables in {dataset_name}[/bold blue]")
 
         # Initialize components
         curator = IndustrialDatasetCurator(complexity_level)
@@ -345,9 +324,7 @@ def classify_variables(
                 for var_type, count in type_counts.items():
                     console.print(f"  • {var_type.replace('_', ' ').title()}: {count}")
         else:
-            console.print(
-                f"\n❌ [bold red]Classification failed: {result['error']}[/bold red]"
-            )
+            console.print(f"\n❌ [bold red]Classification failed: {result['error']}[/bold red]")
             raise click.ClickException(result["error"])
 
     except Exception as e:
@@ -385,18 +362,10 @@ def status(complexity_level: str) -> None:
         env_results = validate_environment()
         valid_env = sum(env_results.values())
         total_env = len(env_results)
-        env_status = (
-            "✅ Ready"
-            if valid_env == total_env
-            else f"⚠️ {total_env - valid_env} issues"
-        )
+        env_status = "✅ Ready" if valid_env == total_env else f"⚠️ {total_env - valid_env} issues"
 
-        status_table.add_row(
-            "Environment", env_status, f"{valid_env}/{total_env} components valid"
-        )
-        status_table.add_row(
-            "Complexity Level", f"📊 {complexity_level}", "Deployment configuration"
-        )
+        status_table.add_row("Environment", env_status, f"{valid_env}/{total_env} components valid")
+        status_table.add_row("Complexity Level", f"📊 {complexity_level}", "Deployment configuration")
         status_table.add_row(
             "Variables",
             f"🔧 {curator_status['variables_configured']}",
@@ -407,24 +376,16 @@ def status(complexity_level: str) -> None:
             f"⚙️ {curator_status['controllers_configured']}",
             "Configured controllers",
         )
-        status_table.add_row(
-            "Datasets", f"💾 {curator_status['datasets_loaded']}", "Loaded datasets"
-        )
+        status_table.add_row("Datasets", f"💾 {curator_status['datasets_loaded']}", "Loaded datasets")
 
         console.print(status_table)
 
         # Classification summary
         if not classification_summary.get("error"):
             console.print("\n📈 [bold cyan]Classification Summary:[/bold cyan]")
-            console.print(
-                f"  • Datasets Processed: {classification_summary['total_datasets_processed']}"
-            )
-            console.print(
-                f"  • Variables Analyzed: {classification_summary['total_variables_analyzed']}"
-            )
-            console.print(
-                f"  • Variables Classified: {classification_summary['total_variables_classified']}"
-            )
+            console.print(f"  • Datasets Processed: {classification_summary['total_datasets_processed']}")
+            console.print(f"  • Variables Analyzed: {classification_summary['total_variables_analyzed']}")
+            console.print(f"  • Variables Classified: {classification_summary['total_variables_classified']}")
 
             if classification_summary["total_variables_analyzed"] > 0:
                 rate = classification_summary["classification_rate"]
@@ -433,9 +394,7 @@ def status(complexity_level: str) -> None:
             # Variable type distribution
             if classification_summary.get("variable_type_distribution"):
                 console.print("\n🏷️ [bold cyan]Variable Types:[/bold cyan]")
-                for var_type, count in classification_summary[
-                    "variable_type_distribution"
-                ].items():
+                for var_type, count in classification_summary["variable_type_distribution"].items():
                     console.print(f"  • {var_type.replace('_', ' ').title()}: {count}")
 
         console.print(f"\n⏰ Last updated: {curator_status['timestamp']}")
@@ -490,9 +449,7 @@ def add_variable(
         success = curator.add_variable(metadata)
 
         if success:
-            console.print(
-                f"✅ [bold green]Successfully added variable '{variable_name}'[/bold green]"
-            )
+            console.print(f"✅ [bold green]Successfully added variable '{variable_name}'[/bold green]")
 
             # Display variable details
             details_table = Table(title="Variable Details")
@@ -512,9 +469,7 @@ def add_variable(
 
             console.print(details_table)
         else:
-            console.print(
-                f"❌ [bold red]Failed to add variable '{variable_name}'[/bold red]"
-            )
+            console.print(f"❌ [bold red]Failed to add variable '{variable_name}'[/bold red]")
             raise click.ClickException("Variable addition failed")
 
     except Exception as e:
@@ -543,9 +498,7 @@ def list_variable_types() -> None:
         }
 
         for var_type in VariableType:
-            description = descriptions.get(
-                var_type.value, "Industrial process variable"
-            )
+            description = descriptions.get(var_type.value, "Industrial process variable")
             table.add_row(var_type.name, var_type.value, description)
 
         console.print(table)
@@ -556,11 +509,9 @@ def list_variable_types() -> None:
             "  ign dataset-curation add-variable 'reactor_temp' primary_pv '°C' --high-limit 150 --low-limit 0"
         )
         console.print(
-            "  ign dataset-curation add-variable 'pressure_sensor' secondary_pv 'bar' --description 'Backup pressure reading'"
+            "  ign dataset-curation add-variable 'pressure_sensor' secondary_pv 'bar' --description 'Backup pressure reading'"  # noqa: E501
         )
-        console.print(
-            "  ign dataset-curation add-variable 'valve_output' cv '%' --high-limit 100 --low-limit 0"
-        )
+        console.print("  ign dataset-curation add-variable 'valve_output' cv '%' --high-limit 100 --low-limit 0")
 
     except Exception as e:
         console.print(f"\n❌ [bold red]Error listing variable types: {e}[/bold red]")
@@ -584,9 +535,7 @@ def ai_model_prep() -> None:
 def validate_ai_env_cmd(complexity_level: str) -> None:
     """Validate environment for AI model preparation."""
     try:
-        console.print(
-            "\n🔍 [bold blue]Validating AI Model Preparation Environment[/bold blue]"
-        )
+        console.print("\n🔍 [bold blue]Validating AI Model Preparation Environment[/bold blue]")
 
         with Progress(
             SpinnerColumn(),
@@ -642,25 +591,17 @@ def validate_ai_env_cmd(complexity_level: str) -> None:
         total = len(validation_results)
 
         if passed == total:
-            console.print(
-                f"\n✅ [bold green]All {total} components validated successfully![/bold green]"
-            )
+            console.print(f"\n✅ [bold green]All {total} components validated successfully![/bold green]")
             console.print(
                 f"🤖 AI Model Preparation ready for complexity level: [bold cyan]{complexity_level}[/bold cyan]"
             )
         else:
             failed = total - passed
-            console.print(
-                f"\n⚠️ [bold yellow]{failed}/{total} components need attention[/bold yellow]"
-            )
-            console.print(
-                "💡 Install missing packages: pip install numpy pandas scikit-learn"
-            )
+            console.print(f"\n⚠️ [bold yellow]{failed}/{total} components need attention[/bold yellow]")
+            console.print("💡 Install missing packages: pip install numpy pandas scikit-learn")
 
     except Exception as e:
-        console.print(
-            f"\n❌ [bold red]AI environment validation failed: {e}[/bold red]"
-        )
+        console.print(f"\n❌ [bold red]AI environment validation failed: {e}[/bold red]")
         raise click.ClickException(str(e))
 
 
@@ -674,6 +615,9 @@ def validate_ai_env_cmd(complexity_level: str) -> None:
 def ai_model_prep_info(complexity_level: str) -> None:
     """Show AI model preparation system information."""
     try:
+        pass  # TODO: Add try block content
+    except Exception:
+        pass  # TODO: Handle exception
         # Create info panel
         info_text = f"""
 🤖 [bold]AI Model Preparation System[/bold]
@@ -707,23 +651,17 @@ def ai_model_prep_info(complexity_level: str) -> None:
 • HuggingFace datasets for transformer models
         """
 
-        console.print(
-            Panel(info_text, title="AI Model Preparation System", border_style="blue")
-        )
+        console.print(Panel(info_text, title="AI Model Preparation System", border_style="blue"))
 
         # Environment validation summary
         env_results = validate_ai_env()
         valid_components = sum(env_results.values())
         total_components = len(env_results)
 
-        console.print(
-            f"\n📋 Environment: {valid_components}/{total_components} components ready"
-        )
+        console.print(f"\n📋 Environment: {valid_components}/{total_components} components ready")
 
     except Exception as e:
-        console.print(
-            f"\n❌ [bold red]Error getting AI model prep info: {e}[/bold red]"
-        )
+        console.print(f"\n❌ [bold red]Error getting AI model prep info: {e}[/bold red]")
         raise click.ClickException(str(e))
 
 
@@ -734,9 +672,7 @@ def ai_model_prep_info(complexity_level: str) -> None:
     default=True,
     help="Enable derivative features",
 )
-@click.option(
-    "--enable-integrals/--no-integrals", default=True, help="Enable integral features"
-)
+@click.option("--enable-integrals/--no-integrals", default=True, help="Enable integral features")
 @click.option(
     "--enable-moving-averages/--no-moving-averages",
     default=True,
@@ -752,9 +688,7 @@ def ai_model_prep_info(complexity_level: str) -> None:
     default=False,
     help="Enable frequency domain features",
 )
-@click.option(
-    "--window-sizes", default="5,10,30,60", help="Comma-separated window sizes"
-)
+@click.option("--window-sizes", default="5,10,30,60", help="Comma-separated window sizes")
 @click.option(
     "--complexity-level",
     default="standard",
@@ -773,9 +707,7 @@ def engineer_features(
 ) -> None:
     """Engineer features from raw dataset."""
     try:
-        console.print(
-            f"\n🔧 [bold blue]Engineering Features for Dataset: {dataset_name}[/bold blue]"
-        )
+        console.print(f"\n🔧 [bold blue]Engineering Features for Dataset: {dataset_name}[/bold blue]")
 
         # Parse window sizes
         window_list = [int(w.strip()) for w in window_sizes.split(",")]
@@ -817,27 +749,11 @@ def engineer_features(
 
         results_table.add_row(
             "Original Features",
-            str(
-                len(
-                    [
-                        col
-                        for col in engineered_data.columns
-                        if not col.startswith("engineered_")
-                    ]
-                )
-            ),
+            str(len([col for col in engineered_data.columns if not col.startswith("engineered_")])),
         )
         results_table.add_row(
             "Engineered Features",
-            str(
-                len(
-                    [
-                        col
-                        for col in engineered_data.columns
-                        if col.startswith("engineered_")
-                    ]
-                )
-            ),
+            str(len([col for col in engineered_data.columns if col.startswith("engineered_")])),
         )
         results_table.add_row("Total Features", str(len(engineered_data.columns)))
         results_table.add_row("Dataset Rows", str(len(engineered_data)))
@@ -867,9 +783,7 @@ def engineer_features(
             for category, features in feature_categories.items():
                 console.print(f"  • {category}: {len(features)} features")
 
-        console.print(
-            f"\n✅ [bold green]Feature engineering completed for dataset: {dataset_name}[/bold green]"
-        )
+        console.print(f"\n✅ [bold green]Feature engineering completed for dataset: {dataset_name}[/bold green]")
 
     except Exception as e:
         console.print(f"\n❌ [bold red]Feature engineering failed: {e}[/bold red]")
@@ -878,20 +792,12 @@ def engineer_features(
 
 @ai_model_prep.command("prepare-training-data")
 @click.argument("dataset_name")
-@click.option(
-    "--train-split", default=0.7, type=float, help="Training data split ratio"
-)
-@click.option(
-    "--validation-split", default=0.15, type=float, help="Validation data split ratio"
-)
+@click.option("--train-split", default=0.7, type=float, help="Training data split ratio")
+@click.option("--validation-split", default=0.15, type=float, help="Validation data split ratio")
 @click.option("--test-split", default=0.15, type=float, help="Test data split ratio")
 @click.option("--target-variables", help="Comma-separated list of target variables")
-@click.option(
-    "--normalize/--no-normalize", default=True, help="Apply feature normalization"
-)
-@click.option(
-    "--handle-missing/--no-handle-missing", default=True, help="Handle missing data"
-)
+@click.option("--normalize/--no-normalize", default=True, help="Apply feature normalization")
+@click.option("--handle-missing/--no-handle-missing", default=True, help="Handle missing data")
 @click.option(
     "--feature-selection",
     default="correlation",
@@ -917,15 +823,11 @@ def prepare_training_data(
 ) -> None:
     """Prepare training data with train/validation/test splits."""
     try:
-        console.print(
-            f"\n🎯 [bold blue]Preparing Training Data for Dataset: {dataset_name}[/bold blue]"
-        )
+        console.print(f"\n🎯 [bold blue]Preparing Training Data for Dataset: {dataset_name}[/bold blue]")
 
         # Validate splits
         if abs(train_split + validation_split + test_split - 1.0) > 0.01:
-            raise click.ClickException(
-                "Train, validation, and test splits must sum to 1.0"
-            )
+            raise click.ClickException("Train, validation, and test splits must sum to 1.0")
 
         # Parse target variables
         target_list = []
@@ -937,9 +839,7 @@ def prepare_training_data(
             TextColumn("[progress.description]{task.description}"),
             console=console,
         ) as progress:
-            task = progress.add_task(
-                "Initializing training data preparation...", total=None
-            )
+            task = progress.add_task("Initializing training data preparation...", total=None)
 
             # Initialize curator and AI model preparation
             curator = IndustrialDatasetCurator(complexity_level)
@@ -973,43 +873,29 @@ def prepare_training_data(
         results_table.add_row("Features", str(len(prepared_dataset.features)))
         results_table.add_row("Target Variables", str(len(prepared_dataset.targets)))
         results_table.add_row("Training Samples", str(prepared_dataset.train_samples))
-        results_table.add_row(
-            "Validation Samples", str(prepared_dataset.validation_samples)
-        )
+        results_table.add_row("Validation Samples", str(prepared_dataset.validation_samples))
         results_table.add_row("Test Samples", str(prepared_dataset.test_samples))
         results_table.add_row("Quality Score", f"{prepared_dataset.quality_score:.3f}")
-        results_table.add_row(
-            "Completeness Score", f"{prepared_dataset.completeness_score:.3f}"
-        )
+        results_table.add_row("Completeness Score", f"{prepared_dataset.completeness_score:.3f}")
 
         console.print(results_table)
 
         # Show feature and target information
-        console.print(
-            f"\n📊 [bold yellow]Features ({len(prepared_dataset.features)}):[/bold yellow]"
-        )
-        for i, feature in enumerate(prepared_dataset.features[:10]):  # Show first 10
+        console.print(f"\n📊 [bold yellow]Features ({len(prepared_dataset.features)}):[/bold yellow]")
+        for _i, feature in enumerate(prepared_dataset.features[:10]):  # Show first 10
             console.print(f"  • {feature}")
         if len(prepared_dataset.features) > 10:
-            console.print(
-                f"  ... and {len(prepared_dataset.features) - 10} more features"
-            )
+            console.print(f"  ... and {len(prepared_dataset.features) - 10} more features")
 
         if prepared_dataset.targets:
-            console.print(
-                f"\n🎯 [bold yellow]Target Variables ({len(prepared_dataset.targets)}):[/bold yellow]"
-            )
+            console.print(f"\n🎯 [bold yellow]Target Variables ({len(prepared_dataset.targets)}):[/bold yellow]")
             for target in prepared_dataset.targets:
                 console.print(f"  • {target}")
 
-        console.print(
-            f"\n✅ [bold green]Training data prepared successfully for: {dataset_name}[/bold green]"
-        )
+        console.print(f"\n✅ [bold green]Training data prepared successfully for: {dataset_name}[/bold green]")
 
     except Exception as e:
-        console.print(
-            f"\n❌ [bold red]Training data preparation failed: {e}[/bold red]"
-        )
+        console.print(f"\n❌ [bold red]Training data preparation failed: {e}[/bold red]")
         raise click.ClickException(str(e))
 
 
@@ -1054,9 +940,7 @@ def export_dataset(
             progress.update(task, description=f"Exporting to {export_format} format...")
 
             # Export dataset
-            exported_data = ai_prep.export_dataset(
-                dataset_name, export_format, output_path
-            )
+            exported_data = ai_prep.export_dataset(dataset_name, export_format, output_path)
 
             progress.update(task, description="Export complete!")
 
@@ -1064,18 +948,14 @@ def export_dataset(
         if export_format == "pandas":
             console.print("✅ [bold green]Exported as Pandas DataFrame[/bold green]")
             console.print(f"Shape: {exported_data.shape}")
-            console.print(
-                f"Memory usage: {exported_data.memory_usage(deep=True).sum() / 1024**2:.2f} MB"
-            )
+            console.print(f"Memory usage: {exported_data.memory_usage(deep=True).sum() / 1024**2:.2f} MB")
         elif export_format == "numpy":
             console.print("✅ [bold green]Exported as NumPy arrays[/bold green]")
             console.print(f"Features shape: {exported_data['X'].shape}")
             if "y" in exported_data:
                 console.print(f"Targets shape: {exported_data['y'].shape}")
         elif export_format in ["tensorflow", "pytorch", "huggingface"]:
-            console.print(
-                f"✅ [bold green]Exported as {export_format} dataset[/bold green]"
-            )
+            console.print(f"✅ [bold green]Exported as {export_format} dataset[/bold green]")
             console.print(f"Dataset type: {type(exported_data)}")
 
         if output_path:
@@ -1131,9 +1011,7 @@ def ai_model_prep_status(complexity_level: str) -> None:
             str(status["prepared_datasets"]),
             "Datasets ready for training",
         )
-        status_table.add_row(
-            "Feature Cache", str(status["feature_cache_size"]), "Cached feature sets"
-        )
+        status_table.add_row("Feature Cache", str(status["feature_cache_size"]), "Cached feature sets")
 
         # Capabilities status
         capabilities = [
@@ -1165,9 +1043,7 @@ def ai_model_prep_status(complexity_level: str) -> None:
         )
 
     except Exception as e:
-        console.print(
-            f"\n❌ [bold red]Error getting AI model prep status: {e}[/bold red]"
-        )
+        console.print(f"\n❌ [bold red]Error getting AI model prep status: {e}[/bold red]")
         raise click.ClickException(str(e))
 
 

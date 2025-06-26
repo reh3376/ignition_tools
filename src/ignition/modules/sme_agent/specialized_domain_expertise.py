@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Specialized Domain Expertise for SME Agent
-Phase 11.4: Advanced SME Agent Features
+Phase 11.4: Advanced SME Agent Features.
 
 This module provides deep technical knowledge following crawl_mcp.py methodology:
 1. Environment validation first
@@ -147,9 +147,7 @@ class SpecializedDomainExpertise:
             }
 
         except Exception as e:
-            self.logger.error(
-                f"Specialized domain expertise initialization failed: {e}"
-            )
+            self.logger.error(f"Specialized domain expertise initialization failed: {e}")
             return {
                 "status": "error",
                 "message": f"Initialization failed: {e!s}",
@@ -162,9 +160,7 @@ class SpecializedDomainExpertise:
         """Get database integration advice with optimization recommendations."""
         try:
             # Step 2: Comprehensive input validation
-            validation_result = self._validate_database_query(
-                database_type, use_case, complexity
-            )
+            validation_result = self._validate_database_query(database_type, use_case, complexity)
             if not validation_result["valid"]:
                 return {
                     "status": "error",
@@ -182,14 +178,10 @@ class SpecializedDomainExpertise:
 
             if not relevant_patterns:
                 # Generate generic advice based on database type
-                advice = await self._generate_generic_database_advice(
-                    database_type, use_case, complexity
-                )
+                advice = await self._generate_generic_database_advice(database_type, use_case, complexity)
             else:
                 # Use specific patterns
-                advice = await self._compile_database_advice(
-                    relevant_patterns, complexity
-                )
+                advice = await self._compile_database_advice(relevant_patterns, complexity)
 
             self.expertise_stats["queries_processed"] += 1
 
@@ -231,10 +223,7 @@ class SpecializedDomainExpertise:
                 symptom_matches = sum(
                     1
                     for symptom in symptoms
-                    if any(
-                        symptom.lower() in case_symptom.lower()
-                        for case_symptom in case.symptoms
-                    )
+                    if any(symptom.lower() in case_symptom.lower() for case_symptom in case.symptoms)
                 )
                 if symptom_matches > 0:
                     matching_cases.append((case, symptom_matches))
@@ -243,13 +232,9 @@ class SpecializedDomainExpertise:
             matching_cases.sort(key=lambda x: x[1], reverse=True)
 
             if not matching_cases:
-                diagnosis = await self._generate_generic_opcua_diagnosis(
-                    symptoms, complexity
-                )
+                diagnosis = await self._generate_generic_opcua_diagnosis(symptoms, complexity)
             else:
-                diagnosis = await self._compile_opcua_diagnosis(
-                    matching_cases, server_info, complexity
-                )
+                diagnosis = await self._compile_opcua_diagnosis(matching_cases, server_info, complexity)
 
             self.expertise_stats["queries_processed"] += 1
 
@@ -277,9 +262,7 @@ class SpecializedDomainExpertise:
         """Design alarm management strategy with notification configuration."""
         try:
             # Step 2: Comprehensive input validation
-            validation_result = self._validate_alarm_query(
-                system_requirements, complexity
-            )
+            validation_result = self._validate_alarm_query(system_requirements, complexity)
             if not validation_result["valid"]:
                 return {
                     "status": "error",
@@ -291,10 +274,7 @@ class SpecializedDomainExpertise:
             relevant_strategies = []
             for strategy in self.alarm_strategies:
                 if compliance_needs:
-                    compliance_match = any(
-                        comp in strategy.compliance_requirements
-                        for comp in compliance_needs
-                    )
+                    compliance_match = any(comp in strategy.compliance_requirements for comp in compliance_needs)
                     if compliance_match:
                         relevant_strategies.append(strategy)
 
@@ -333,9 +313,7 @@ class SpecializedDomainExpertise:
         """Validate security implementation with compliance checking."""
         try:
             # Step 2: Comprehensive input validation
-            validation_result = self._validate_security_query(
-                security_domain, implementation_details, complexity
-            )
+            validation_result = self._validate_security_query(security_domain, implementation_details, complexity)
             if not validation_result["valid"]:
                 return {
                     "status": "error",
@@ -354,10 +332,7 @@ class SpecializedDomainExpertise:
                 relevant_implementations = [
                     impl
                     for impl in relevant_implementations
-                    if any(
-                        framework in impl.compliance_frameworks
-                        for framework in compliance_frameworks
-                    )
+                    if any(framework in impl.compliance_frameworks for framework in compliance_frameworks)
                 ]
 
             # Perform validation
@@ -503,8 +478,8 @@ class SpecializedDomainExpertise:
                     "recommended_timeout": 45000,
                 },
                 example_scripts=[
-                    "SELECT tag_name, AVG(value) FROM analytics_data WHERE timestamp > NOW() - INTERVAL '7 days' GROUP BY tag_name",
-                    "CREATE MATERIALIZED VIEW daily_summary AS SELECT DATE(timestamp), tag_name, AVG(value) FROM tag_data GROUP BY DATE(timestamp), tag_name",
+                    "SELECT tag_name, AVG(value) FROM analytics_data WHERE timestamp > NOW() - INTERVAL '7 days' GROUP BY tag_name",  # noqa: E501
+                    "CREATE MATERIALIZED VIEW daily_summary AS SELECT DATE(timestamp), tag_name, AVG(value) FROM tag_data GROUP BY DATE(timestamp), tag_name",  # noqa: E501
                 ],
             ),
         ]
@@ -714,13 +689,9 @@ class SpecializedDomainExpertise:
         ]
 
         self.security_implementations.extend(implementations)
-        self.expertise_stats["security_implementations_loaded"] = len(
-            self.security_implementations
-        )
+        self.expertise_stats["security_implementations_loaded"] = len(self.security_implementations)
 
-    def _validate_database_query(
-        self, database_type: str, use_case: str, complexity: str
-    ) -> dict[str, Any]:
+    def _validate_database_query(self, database_type: str, use_case: str, complexity: str) -> dict[str, Any]:
         """Validate database integration query parameters."""
         if not database_type or not isinstance(database_type, str):
             return {
@@ -743,9 +714,7 @@ class SpecializedDomainExpertise:
 
         return {"valid": True}
 
-    def _validate_opcua_query(
-        self, symptoms: list[str], complexity: str
-    ) -> dict[str, Any]:
+    def _validate_opcua_query(self, symptoms: list[str], complexity: str) -> dict[str, Any]:
         """Validate OPC-UA troubleshooting query parameters."""
         if not symptoms or not isinstance(symptoms, list):
             return {"valid": False, "error": "Symptoms must be provided as a list"}
@@ -762,9 +731,7 @@ class SpecializedDomainExpertise:
 
         return {"valid": True}
 
-    def _validate_alarm_query(
-        self, system_requirements: dict[str, Any], complexity: str
-    ) -> dict[str, Any]:
+    def _validate_alarm_query(self, system_requirements: dict[str, Any], complexity: str) -> dict[str, Any]:
         """Validate alarm management query parameters."""
         if not system_requirements or not isinstance(system_requirements, dict):
             return {
@@ -845,35 +812,21 @@ class SpecializedDomainExpertise:
 
         for pattern in patterns:
             combined_advice["optimization_tips"].extend(pattern.optimization_tips)
-            combined_advice["security_considerations"].extend(
-                pattern.security_considerations
-            )
-            combined_advice["ignition_configuration"].update(
-                pattern.ignition_specific_config
-            )
+            combined_advice["security_considerations"].extend(pattern.security_considerations)
+            combined_advice["ignition_configuration"].update(pattern.ignition_specific_config)
             combined_advice["example_scripts"].extend(pattern.example_scripts)
             combined_advice["performance_metrics"].update(pattern.performance_metrics)
 
         # Remove duplicates
-        combined_advice["optimization_tips"] = list(
-            set(combined_advice["optimization_tips"])
-        )
-        combined_advice["security_considerations"] = list(
-            set(combined_advice["security_considerations"])
-        )
-        combined_advice["example_scripts"] = list(
-            set(combined_advice["example_scripts"])
-        )
+        combined_advice["optimization_tips"] = list(set(combined_advice["optimization_tips"]))
+        combined_advice["security_considerations"] = list(set(combined_advice["security_considerations"]))
+        combined_advice["example_scripts"] = list(set(combined_advice["example_scripts"]))
 
-        combined_advice["complexity_specific"] = self._get_complexity_specific_advice(
-            complexity
-        )
+        combined_advice["complexity_specific"] = self._get_complexity_specific_advice(complexity)
 
         return combined_advice
 
-    async def _generate_generic_opcua_diagnosis(
-        self, symptoms: list[str], complexity: str
-    ) -> dict[str, Any]:
+    async def _generate_generic_opcua_diagnosis(self, symptoms: list[str], complexity: str) -> dict[str, Any]:
         """Generate generic OPC-UA troubleshooting diagnosis."""
         return {
             "symptoms_analyzed": symptoms,
@@ -916,7 +869,7 @@ class SpecializedDomainExpertise:
             "server_compatibility": {},
         }
 
-        for case, relevance in matching_cases[:3]:  # Top 3 most relevant cases
+        for case, _relevance in matching_cases[:3]:  # Top 3 most relevant cases
             diagnosis["root_causes"].extend(case.root_causes)
             diagnosis["diagnostic_steps"].extend(case.diagnostic_steps)
             diagnosis["solutions"].extend(case.solutions)
@@ -935,9 +888,7 @@ class SpecializedDomainExpertise:
             diagnosis[key] = list(set(diagnosis[key]))
 
         diagnosis["cases_analyzed"] = len(matching_cases)
-        diagnosis["complexity_specific"] = self._get_complexity_specific_advice(
-            complexity
-        )
+        diagnosis["complexity_specific"] = self._get_complexity_specific_advice(complexity)
 
         return diagnosis
 
@@ -988,13 +939,9 @@ class SpecializedDomainExpertise:
 
         # Incorporate base strategies if available
         if base_strategies:
-            strategy["base_strategies_referenced"] = [
-                s.strategy_id for s in base_strategies
-            ]
+            strategy["base_strategies_referenced"] = [s.strategy_id for s in base_strategies]
 
-        strategy["complexity_specific"] = self._get_complexity_specific_advice(
-            complexity
-        )
+        strategy["complexity_specific"] = self._get_complexity_specific_advice(complexity)
 
         return strategy
 
@@ -1025,27 +972,17 @@ class SpecializedDomainExpertise:
 
         # Security recommendations from relevant implementations
         for impl in relevant_implementations:
-            validation_results["security_recommendations"].extend(
-                impl.mitigation_strategies
-            )
+            validation_results["security_recommendations"].extend(impl.mitigation_strategies)
             validation_results["validation_tests"].extend(impl.validation_tests)
             validation_results["audit_requirements"].extend(impl.audit_requirements)
             validation_results["risk_assessment"].update(impl.risk_assessment)
 
         # Remove duplicates
-        validation_results["security_recommendations"] = list(
-            set(validation_results["security_recommendations"])
-        )
-        validation_results["validation_tests"] = list(
-            set(validation_results["validation_tests"])
-        )
-        validation_results["audit_requirements"] = list(
-            set(validation_results["audit_requirements"])
-        )
+        validation_results["security_recommendations"] = list(set(validation_results["security_recommendations"]))
+        validation_results["validation_tests"] = list(set(validation_results["validation_tests"]))
+        validation_results["audit_requirements"] = list(set(validation_results["audit_requirements"]))
 
-        validation_results["complexity_specific"] = (
-            self._get_complexity_specific_advice(complexity)
-        )
+        validation_results["complexity_specific"] = self._get_complexity_specific_advice(complexity)
         validation_results["implementations_analyzed"] = len(relevant_implementations)
 
         return validation_results

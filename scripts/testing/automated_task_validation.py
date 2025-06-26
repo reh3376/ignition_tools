@@ -251,9 +251,7 @@ class TaskValidator:
         if success:
             print(f"\n🎉 **Task 1 VALIDATION PASSED** ({passed_tests}/{total_tests})")
         else:
-            print(
-                f"\n❌ **Task 1 VALIDATION FAILED** ({passed_tests}/{total_tests} passed)"
-            )
+            print(f"\n❌ **Task 1 VALIDATION FAILED** ({passed_tests}/{total_tests} passed)")
 
         return {
             "success": success,
@@ -439,9 +437,7 @@ class TaskValidator:
         if success:
             print(f"\n🎉 **Task 2 VALIDATION PASSED** ({passed_tests}/{total_tests})")
         else:
-            print(
-                f"\n❌ **Task 2 VALIDATION FAILED** ({passed_tests}/{total_tests} passed)"
-            )
+            print(f"\n❌ **Task 2 VALIDATION FAILED** ({passed_tests}/{total_tests} passed)")
 
         return {
             "success": success,
@@ -587,9 +583,7 @@ class TaskValidator:
             "GUI Operations",
         ]
 
-        missing_categories = [
-            cat for cat in expected_categories if cat not in categories
-        ]
+        missing_categories = [cat for cat in expected_categories if cat not in categories]
 
         if len(missing_categories) == 0 and len(categories) >= 4:
             validation_results.append(
@@ -648,9 +642,7 @@ class TaskValidator:
         if success:
             print(f"\n🎉 **Task 3 VALIDATION PASSED** ({passed_tests}/{total_tests})")
         else:
-            print(
-                f"\n❌ **Task 3 VALIDATION FAILED** ({passed_tests}/{total_tests} passed)"
-            )
+            print(f"\n❌ **Task 3 VALIDATION FAILED** ({passed_tests}/{total_tests} passed)")
 
         return {
             "success": success,
@@ -844,9 +836,7 @@ class TaskValidator:
         if success:
             print(f"\n🎉 **Task 4 VALIDATION PASSED** ({passed_tests}/{total_tests})")
         else:
-            print(
-                f"\n❌ **Task 4 VALIDATION FAILED** ({passed_tests}/{total_tests} passed)"
-            )
+            print(f"\n❌ **Task 4 VALIDATION FAILED** ({passed_tests}/{total_tests} passed)")
 
         return {
             "success": success,
@@ -894,14 +884,10 @@ class TaskValidator:
             expected_count = 37  # Task 5 target
 
             if actual_count >= expected_count:
-                print(
-                    f"   ✅ Function count: {actual_count}/{expected_count} (Expected: ≥{expected_count})"
-                )
+                print(f"   ✅ Function count: {actual_count}/{expected_count} (Expected: ≥{expected_count})")
                 test_1_passed = True
             else:
-                print(
-                    f"   ❌ Function count: {actual_count}/{expected_count} (Expected: ≥{expected_count})"
-                )
+                print(f"   ❌ Function count: {actual_count}/{expected_count} (Expected: ≥{expected_count})")
                 test_1_passed = False
 
             # Test 2: Required Device Communication Functions
@@ -991,9 +977,7 @@ class TaskValidator:
             if test_3_passed:
                 print(f"   ✅ Pattern coverage: {active_patterns}/8 patterns active")
             else:
-                print(
-                    f"   ❌ Pattern coverage: {active_patterns}/8 patterns active (Expected: ≥6)"
-                )
+                print(f"   ❌ Pattern coverage: {active_patterns}/8 patterns active (Expected: ≥6)")
 
             # Test 4: Scope collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.collections.abc.Mapping Validation
             print(
@@ -1027,18 +1011,14 @@ class TaskValidator:
                 print(f"   📊 {scope_name}: {func_count} functions")
 
             # Most device communication functions should be Gateway scope
-            test_4_passed = (
-                gateway_functions >= 30
-            )  # Most device operations are gateway-side
+            test_4_passed = gateway_functions >= 30  # Most device operations are gateway-side
 
             if test_4_passed:
                 print(
                     f"   ✅ Scope distribution appropriate (Gateway: {gateway_functions}, Client: {client_functions})"
                 )
             else:
-                print(
-                    f"   ❌ Scope distribution issues (Gateway: {gateway_functions}, Client: {client_functions})"
-                )
+                print(f"   ❌ Scope distribution issues (Gateway: {gateway_functions}, Client: {client_functions})")
 
             # Test 5: Task Relationships
             print("\n🔗 Test 5: Task Relationships")
@@ -1253,9 +1233,7 @@ class TaskValidator:
         if success:
             print(f"\n🎉 **Task 6 VALIDATION PASSED** ({passed_tests}/{total_tests})")
         else:
-            print(
-                f"\n❌ **Task 6 VALIDATION FAILED** ({passed_tests}/{total_tests} passed)"
-            )
+            print(f"\n❌ **Task 6 VALIDATION FAILED** ({passed_tests}/{total_tests} passed)")
 
         return {
             "success": success,
@@ -1435,9 +1413,7 @@ class TaskValidator:
         if success:
             print(f"\n🎉 **Task 7 VALIDATION PASSED** ({passed_tests}/{total_tests})")
         else:
-            print(
-                f"\n❌ **Task 7 VALIDATION FAILED** ({passed_tests}/{total_tests} passed)"
-            )
+            print(f"\n❌ **Task 7 VALIDATION FAILED** ({passed_tests}/{total_tests} passed)")
 
         return {
             "success": success,
@@ -1472,9 +1448,7 @@ class TaskValidator:
 
     def _get_total_function_count(self) -> int:
         """Get total function count."""
-        result = self.client.execute_query(
-            "MATCH (f:Function) RETURN count(f) as total"
-        )
+        result = self.client.execute_query("MATCH (f:Function) RETURN count(f) as total")
         return result[0]["total"]
 
     def _get_completion_percentage(self) -> float:

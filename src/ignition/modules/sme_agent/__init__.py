@@ -1,4 +1,4 @@
-"""SME Agent Module - Phase 11: Process SME Agent & AI Enhancement Platform
+"""SME Agent Module - Phase 11: Process SME Agent & AI Enhancement Platform.
 
 This module implements a comprehensive Ignition Subject Matter Expert (SME) Agent
 using an 8B parameter LLM fine-tuned with extensive Neo4j knowledge graph and vector embeddings.
@@ -32,14 +32,14 @@ class SMEAgentValidationError(Exception):
 
 
 def validate_sme_agent_environment() -> dict[str, Any]:
-    """Step 1: Environment Validation First (crawl_mcp.py methodology)
+    """Step 1: Environment Validation First (crawl_mcp.py methodology).
 
     Validate all required environment variables and dependencies for SME Agent.
 
     Returns:
         dict containing validation results and configuration
     """
-    validation_result = {
+    validation_result: dict[str, Any] = {
         "valid": True,
         "errors": [],
         "warnings": [],
@@ -73,9 +73,7 @@ def validate_sme_agent_environment() -> dict[str, Any]:
         value = os.getenv(env_var)
         if not value:
             validation_result["valid"] = False
-            validation_result["errors"].append(
-                f"Missing required environment variable: {env_var} ({description})"
-            )
+            validation_result["errors"].append(f"Missing required environment variable: {env_var} ({description})")
         else:
             validation_result["config"][env_var] = value
 
@@ -89,31 +87,21 @@ def validate_sme_agent_environment() -> dict[str, Any]:
             try:
                 int(value)
             except ValueError:
-                validation_result["warnings"].append(
-                    f"Invalid {env_var}: {value}, using default 8192"
-                )
+                validation_result["warnings"].append(f"Invalid {env_var}: {value}, using default 8192")
                 validation_result["config"][env_var] = "8192"
 
         elif env_var == "SME_AGENT_TEMPERATURE":
             try:
                 temp_val = float(value)
                 if not 0.0 <= temp_val <= 2.0:
-                    validation_result["warnings"].append(
-                        f"Temperature {value} outside recommended range [0.0, 2.0]"
-                    )
+                    validation_result["warnings"].append(f"Temperature {value} outside recommended range [0.0, 2.0]")
             except ValueError:
-                validation_result["warnings"].append(
-                    f"Invalid temperature: {value}, using default 0.7"
-                )
+                validation_result["warnings"].append(f"Invalid temperature: {value}, using default 0.7")
                 validation_result["config"][env_var] = "0.7"
 
     # Step 1.3: Check component availability
-    validation_result["components_available"]["neo4j"] = _check_neo4j_availability(
-        validation_result["config"]
-    )
-    validation_result["components_available"][
-        "transformers"
-    ] = _check_transformers_availability()
+    validation_result["components_available"]["neo4j"] = _check_neo4j_availability(validation_result["config"])
+    validation_result["components_available"]["transformers"] = _check_transformers_availability()
     validation_result["components_available"]["torch"] = _check_torch_availability()
     validation_result["components_available"]["fastapi"] = _check_fastapi_availability()
 
@@ -124,9 +112,7 @@ def validate_sme_agent_environment() -> dict[str, Any]:
     for dir_path in required_dirs:
         full_path = project_root / dir_path
         if not full_path.exists():
-            validation_result["warnings"].append(
-                f"Directory {dir_path} does not exist, will be created"
-            )
+            validation_result["warnings"].append(f"Directory {dir_path} does not exist, will be created")
 
     return validation_result
 
@@ -143,6 +129,10 @@ def _check_neo4j_availability(config: dict[str, str]) -> bool:
         if not all([uri, user, password]):
             return False
 
+        # Type guard to ensure values are not None
+        assert uri is not None
+        assert user is not None
+        assert password is not None
         driver = GraphDatabase.driver(uri, auth=(user, password))
         with driver.session() as session:
             session.run("RETURN 1")

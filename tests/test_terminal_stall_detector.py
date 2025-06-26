@@ -35,12 +35,8 @@ from src.terminal_stall_detector import (
 class TestConfig(BaseModel):
     """Test configuration."""
 
-    test_timeout: int = Field(
-        default=60, ge=10, le=300, description="Test timeout in seconds"
-    )
-    temp_dir: str | None = Field(
-        default=None, description="Temporary directory for tests"
-    )
+    test_timeout: int = Field(default=60, ge=10, le=300, description="Test timeout in seconds")
+    temp_dir: str | None = Field(default=None, description="Temporary directory for tests")
     cleanup_after_tests: bool = Field(default=True, description="Clean up after tests")
     verbose_output: bool = Field(default=True, description="Enable verbose test output")
 
@@ -103,9 +99,7 @@ class StallDetectorTestSuite:
             try:
                 import signal
 
-                validation_results["signal_handling_available"] = hasattr(
-                    signal, "SIGINT"
-                )
+                validation_results["signal_handling_available"] = hasattr(signal, "SIGINT")
             except ImportError:
                 pass
 
@@ -123,9 +117,7 @@ class StallDetectorTestSuite:
             try:
                 import subprocess
 
-                result = subprocess.run(
-                    ["echo", "test"], capture_output=True, text=True, timeout=5
-                )
+                result = subprocess.run(["echo", "test"], capture_output=True, text=True, timeout=5)
                 validation_results["basic_commands_work"] = result.returncode == 0
             except Exception:
                 pass
@@ -153,16 +145,10 @@ class StallDetectorTestSuite:
                 "async_support_available",
             ]
 
-            missing_components = [
-                comp
-                for comp in required_components
-                if not env_validation.get(comp, False)
-            ]
+            missing_components = [comp for comp in required_components if not env_validation.get(comp, False)]
 
             if missing_components:
-                raise RuntimeError(
-                    f"Missing required test components: {missing_components}"
-                )
+                raise RuntimeError(f"Missing required test components: {missing_components}")
 
             # Initialize detector with test configuration
             test_config = StallDetectorConfig(
@@ -193,11 +179,7 @@ class StallDetectorTestSuite:
                 self.detector.stop_monitoring()
 
             # Clean up temp directory
-            if (
-                self.temp_dir
-                and self.temp_dir.exists()
-                and self.test_config.cleanup_after_tests
-            ):
+            if self.temp_dir and self.temp_dir.exists() and self.test_config.cleanup_after_tests:
                 import shutil
 
                 shutil.rmtree(self.temp_dir, ignore_errors=True)
@@ -241,9 +223,7 @@ class StallDetectorTestSuite:
                 test_result["status"] = "passed"
             else:
                 test_result["status"] = "failed"
-                test_result["errors"].append(
-                    "Required environment components not available"
-                )
+                test_result["errors"].append("Required environment components not available")
 
         except Exception as e:
             test_result["status"] = "failed"
@@ -316,9 +296,7 @@ class StallDetectorTestSuite:
 
         try:
             # Test command that should timeout
-            result = await execute_with_stall_detection(
-                ["sleep", "10"], timeout=3, auto_recover=True
-            )
+            result = await execute_with_stall_detection(["sleep", "10"], timeout=3, auto_recover=True)
 
             test_result["details"]["timeout_test"] = {
                 "state": result.state.value,
@@ -331,16 +309,11 @@ class StallDetectorTestSuite:
             }
 
             # Validate timeout was detected and handled
-            if (
-                result.state in [CommandState.TIMEOUT, CommandState.RECOVERED]
-                and result.recovery_attempts > 0
-            ):
+            if result.state in [CommandState.TIMEOUT, CommandState.RECOVERED] and result.recovery_attempts > 0:
                 test_result["status"] = "passed"
             else:
                 test_result["status"] = "failed"
-                test_result["errors"].append(
-                    f"Expected timeout/recovery, got state: {result.state}"
-                )
+                test_result["errors"].append(f"Expected timeout/recovery, got state: {result.state}")
 
         except Exception as e:
             test_result["status"] = "failed"
@@ -409,9 +382,7 @@ print("Finally done!")
                     test_result["errors"].append("Stall was not detected")
             else:
                 test_result["status"] = "skipped"
-                test_result["errors"].append(
-                    "No temp directory available for stall test"
-                )
+                test_result["errors"].append("No temp directory available for stall test")
 
         except Exception as e:
             test_result["status"] = "failed"
@@ -441,9 +412,7 @@ print("Finally done!")
 
             # Test TERMINATE recovery
             try:
-                result = await execute_with_stall_detection(
-                    ["sleep", "20"], timeout=3, auto_recover=True
-                )
+                result = await execute_with_stall_detection(["sleep", "20"], timeout=3, auto_recover=True)
                 recovery_tests.append(
                     {
                         "recovery_type": "terminate",
@@ -458,17 +427,13 @@ print("Finally done!")
             test_result["details"]["recovery_tests"] = recovery_tests
 
             # Check if any recovery was attempted
-            recovery_attempted = any(
-                test.get("recovery_attempts", 0) > 0 for test in recovery_tests
-            )
+            recovery_attempted = any(test.get("recovery_attempts", 0) > 0 for test in recovery_tests)
 
             if recovery_attempted:
                 test_result["status"] = "passed"
             else:
                 test_result["status"] = "failed"
-                test_result["errors"].append(
-                    "No recovery mechanisms were tested successfully"
-                )
+                test_result["errors"].append("No recovery mechanisms were tested successfully")
 
         except Exception as e:
             test_result["status"] = "failed"
@@ -503,12 +468,7 @@ print("Finally done!")
             test_result["details"]["concurrent_test"] = {
                 "total_commands": len(results),
                 "successful_results": len(
-                    [
-                        r
-                        for r in results
-                        if isinstance(r, CommandExecution)
-                        and r.state == CommandState.COMPLETED
-                    ]
+                    [r for r in results if isinstance(r, CommandExecution) and r.state == CommandState.COMPLETED]
                 ),
                 "failed_results": len([r for r in results if isinstance(r, Exception)]),
                 "results": [],
@@ -531,16 +491,12 @@ print("Finally done!")
                     )
 
             # Validate concurrent execution
-            successful_count = test_result["details"]["concurrent_test"][
-                "successful_results"
-            ]
+            successful_count = test_result["details"]["concurrent_test"]["successful_results"]
             if successful_count >= 2:  # At least 2 out of 3 should succeed
                 test_result["status"] = "passed"
             else:
                 test_result["status"] = "failed"
-                test_result["errors"].append(
-                    f"Only {successful_count} out of {len(commands)} commands succeeded"
-                )
+                test_result["errors"].append(f"Only {successful_count} out of {len(commands)} commands succeeded")
 
         except Exception as e:
             test_result["status"] = "failed"
@@ -567,9 +523,7 @@ print("Finally done!")
         try:
             # Test invalid command - should be handled gracefully
             try:
-                result = await execute_with_stall_detection(
-                    ["nonexistent_command_12345"]
-                )
+                result = await execute_with_stall_detection(["nonexistent_command_12345"])
 
                 test_result["details"]["invalid_command_test"] = {
                     "state": result.state.value,
@@ -584,9 +538,7 @@ print("Finally done!")
                     test_result["status"] = "passed"
                 else:
                     test_result["status"] = "failed"
-                    test_result["errors"].append(
-                        f"Expected failure, got state: {result.state}"
-                    )
+                    test_result["errors"].append(f"Expected failure, got state: {result.state}")
 
             except Exception as cmd_error:
                 # If command execution throws an exception, that's also valid error handling
@@ -632,18 +584,12 @@ print("Finally done!")
             initial_stats = self.detector.get_statistics()
 
             # Execute a few commands using the same detector instance
-            await self.detector.execute_monitored_command(
-                MonitoredCommandRequest(command=["echo", "stats test 1"])
-            )
-            await self.detector.execute_monitored_command(
-                MonitoredCommandRequest(command=["echo", "stats test 2"])
-            )
+            await self.detector.execute_monitored_command(MonitoredCommandRequest(command=["echo", "stats test 1"]))
+            await self.detector.execute_monitored_command(MonitoredCommandRequest(command=["echo", "stats test 2"]))
 
             # Try a command that will fail
             try:
-                await self.detector.execute_monitored_command(
-                    MonitoredCommandRequest(command=["nonexistent_command"])
-                )
+                await self.detector.execute_monitored_command(MonitoredCommandRequest(command=["nonexistent_command"]))
             except:
                 pass  # Expected to fail
 
@@ -653,10 +599,8 @@ print("Finally done!")
             test_result["details"]["statistics_test"] = {
                 "initial_stats": initial_stats,
                 "final_stats": final_stats,
-                "commands_executed": final_stats["total_commands"]
-                - initial_stats["total_commands"],
-                "uptime_increase": final_stats["uptime_seconds"]
-                - initial_stats["uptime_seconds"],
+                "commands_executed": final_stats["total_commands"] - initial_stats["total_commands"],
+                "uptime_increase": final_stats["uptime_seconds"] - initial_stats["uptime_seconds"],
             }
 
             # Validate statistics were updated
@@ -737,9 +681,7 @@ print("Finally done!")
                     test_results["summary"]["skipped_tests"] += 1
                     print(f"⏭️  {test_name}: SKIPPED")
 
-                test_results["summary"]["total_duration"] += test_result.get(
-                    "duration", 0.0
-                )
+                test_results["summary"]["total_duration"] += test_result.get("duration", 0.0)
 
             except Exception as e:
                 error_result = {
@@ -758,14 +700,9 @@ print("Finally done!")
 
         # Final summary
         test_results["end_time"] = time.time()
-        test_results["total_execution_time"] = (
-            test_results["end_time"] - test_results["start_time"]
-        )
+        test_results["total_execution_time"] = test_results["end_time"] - test_results["start_time"]
 
-        success_rate = (
-            test_results["summary"]["passed_tests"]
-            / test_results["summary"]["total_tests"]
-        ) * 100
+        success_rate = (test_results["summary"]["passed_tests"] / test_results["summary"]["total_tests"]) * 100
 
         print("\n📊 Test Suite Complete:")
         print(f"   Total Tests: {test_results['summary']['total_tests']}")

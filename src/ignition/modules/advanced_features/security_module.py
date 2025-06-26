@@ -1,4 +1,4 @@
-"""Phase 9.8: Security and Compliance Module
+"""Phase 9.8: Security and Compliance Module.
 =========================================
 
 Following crawl_mcp.py methodology for systematic development:
@@ -73,9 +73,7 @@ class SecurityConfig:
     def __post_init__(self: Self) -> None:
         """Validate configuration following crawl_mcp.py methodology."""
         if not self.security_temp_dir:
-            self.security_temp_dir = os.getenv(
-                "SECURITY_TEMP_DIR", str(Path.home() / "tmp" / "ign_security")
-            )
+            self.security_temp_dir = os.getenv("SECURITY_TEMP_DIR", str(Path.home() / "tmp" / "ign_security"))
         if not self.audit_log_dir:
             self.audit_log_dir = os.getenv(
                 "SECURITY_AUDIT_LOG_DIR",
@@ -133,7 +131,7 @@ class ComplianceCheck:
 
 
 class SecurityComplianceModule:
-    """Security and Compliance Module for Ignition
+    """Security and Compliance Module for Ignition.
 
     Following crawl_mcp.py methodology:
     - Step 1: Environment Variable Validation First
@@ -170,11 +168,9 @@ class SecurityComplianceModule:
 
     def validate_environment(self: Self) -> dict[str, ValidationResult]:
         """Step 1: Environment Variable Validation First
-        Following crawl_mcp.py methodology
+        Following crawl_mcp.py methodology.
         """
-        self.console.print(
-            "🔍 Step 1: Security Environment Validation", style="bold blue"
-        )
+        self.console.print("🔍 Step 1: Security Environment Validation", style="bold blue")
 
         results = {}
 
@@ -208,18 +204,14 @@ class SecurityComplianceModule:
 
         return results
 
-    def _validate_directory(
-        self, path: str, description: str, create_if_missing: bool = False
-    ) -> ValidationResult:
+    def _validate_directory(self, path: str, description: str, create_if_missing: bool = False) -> ValidationResult:
         """Validate directory with security considerations."""
         try:
             path_obj = Path(path)
 
             if not path_obj.exists():
                 if create_if_missing:
-                    path_obj.mkdir(
-                        parents=True, exist_ok=True, mode=0o750
-                    )  # Secure permissions
+                    path_obj.mkdir(parents=True, exist_ok=True, mode=0o750)  # Secure permissions
                     return ValidationResult(
                         valid=True,
                         warning=f"{description} created at {path} with secure permissions",
@@ -229,9 +221,7 @@ class SecurityComplianceModule:
                     return ValidationResult(
                         valid=False,
                         error=f"{description} does not exist: {path}",
-                        suggestions=[
-                            f"Create directory with secure permissions: mkdir -m 750 -p {path}"
-                        ],
+                        suggestions=[f"Create directory with secure permissions: mkdir -m 750 -p {path}"],
                         security_level="insecure",
                     )
 
@@ -294,9 +284,7 @@ class SecurityComplianceModule:
             return ValidationResult(
                 valid=False,
                 error=f"Missing security packages: {', '.join(missing_packages)}",
-                suggestions=[
-                    "These are standard library modules - check Python installation"
-                ],
+                suggestions=["These are standard library modules - check Python installation"],
                 security_level="critical",
             )
 
@@ -320,9 +308,7 @@ class SecurityComplianceModule:
             return ValidationResult(
                 valid=False,
                 error=f"Missing encryption packages: {', '.join(missing_packages)}",
-                suggestions=[
-                    f"Install packages: pip install {' '.join(missing_packages)}"
-                ],
+                suggestions=[f"Install packages: pip install {' '.join(missing_packages)}"],
                 security_level="critical",
             )
 
@@ -363,9 +349,7 @@ class SecurityComplianceModule:
 
         return ValidationResult(valid=True, security_level="secure")
 
-    def _display_validation_results(
-        self: Self, results: dict[str, ValidationResult]
-    ) -> None:
+    def _display_validation_results(self: Self, results: dict[str, ValidationResult]) -> None:
         """Display validation results with security-focused formatting."""
         table = Table(title="Security Environment Validation")
         table.add_column("Component", style="cyan")
@@ -374,10 +358,7 @@ class SecurityComplianceModule:
         table.add_column("Details", style="dim")
 
         for component, result in results.items():
-            if result.valid:
-                status = "✅ Valid"
-            else:
-                status = "❌ Invalid"
+            status = "✅ Valid" if result.valid else "❌ Invalid"
 
             # Security level styling
             security_styles = {
@@ -404,7 +385,7 @@ class SecurityComplianceModule:
 
     def _initialize_security_components(self: Self) -> None:
         """Step 5: Progressive Complexity
-        Initialize security components based on security level and validation results
+        Initialize security components based on security level and validation results.
         """
         self.console.print(
             "🔧 Step 5: Progressive Security Component Initialization",
@@ -445,17 +426,13 @@ class SecurityComplianceModule:
 
     def _initialize_standard_security(self: Self) -> None:
         """Initialize standard security components."""
-        self.console.print(
-            "🔒 Initializing Standard Security Components", style="green"
-        )
+        self.console.print("🔒 Initializing Standard Security Components", style="green")
 
         # Initialize basic components first
         self._initialize_basic_security()
 
         # Add standard components
-        if self.environment_validation.get(
-            "compliance_dependencies", ValidationResult(False)
-        ).valid:
+        if self.environment_validation.get("compliance_dependencies", ValidationResult(False)).valid:
             self.compliance_checker = StandardComplianceChecker(self.config)
 
         if self.config.enable_incident_detection:
@@ -471,9 +448,7 @@ class SecurityComplianceModule:
         self._initialize_standard_security()
 
         # Add high security components
-        if self.environment_validation.get(
-            "encryption_dependencies", ValidationResult(False)
-        ).valid:
+        if self.environment_validation.get("encryption_dependencies", ValidationResult(False)).valid:
             self.auth_manager = AdvancedAuthManager(self.config)
             self.incident_detector = AdvancedIncidentDetector(self.config)
 
@@ -481,9 +456,7 @@ class SecurityComplianceModule:
 
     def _initialize_critical_security(self: Self) -> None:
         """Initialize critical security components."""
-        self.console.print(
-            "🔒 Initializing Critical Security Components", style="green"
-        )
+        self.console.print("🔒 Initializing Critical Security Components", style="green")
 
         # Initialize high security components first
         self._initialize_high_security()
@@ -494,11 +467,9 @@ class SecurityComplianceModule:
 
         self.console.print("✅ Critical security components initialized", style="green")
 
-    def log_security_event(
-        self, event: dict[str, Any] | SecurityEvent
-    ) -> dict[str, Any]:
+    def log_security_event(self, event: dict[str, Any] | SecurityEvent) -> dict[str, Any]:
         """Step 2: Comprehensive Input Validation
-        Log security event with full validation
+        Log security event with full validation.
         """
         try:
             # Validate input event
@@ -539,9 +510,7 @@ class SecurityComplianceModule:
                 "suggestions": ["Check event format and try again"],
             }
 
-    def _validate_security_event(
-        self, event: dict[str, Any] | SecurityEvent
-    ) -> dict[str, Any]:
+    def _validate_security_event(self, event: dict[str, Any] | SecurityEvent) -> dict[str, Any]:
         """Comprehensive security event validation following crawl_mcp.py patterns."""
         if event is None:
             return {
@@ -573,9 +542,7 @@ class SecurityComplianceModule:
                 return {
                     "valid": False,
                     "error": f"Event validation failed: {e!s}",
-                    "suggestions": [
-                        "Check event format: {'event_type': '...', 'user_id': '...', 'source_ip': '...'}"
-                    ],
+                    "suggestions": ["Check event format: {'event_type': '...', 'user_id': '...', 'source_ip': '...'}"],
                 }
         elif isinstance(event, SecurityEvent):
             security_event = event
@@ -665,7 +632,7 @@ class SecurityComplianceModule:
 
     def cleanup_resources(self: Self) -> None:
         """Step 6: Resource Management
-        Clean up security resources and sensitive data
+        Clean up security resources and sensitive data.
         """
         try:
             self.console.print("🧹 Cleaning up security resources...", style="yellow")
@@ -691,9 +658,7 @@ class SecurityComplianceModule:
                         f.write(b"0" * temp_file.stat().st_size)
                     temp_file.unlink()
 
-            self.console.print(
-                "✅ Security resources cleaned up successfully", style="green"
-            )
+            self.console.print("✅ Security resources cleaned up successfully", style="green")
 
         except Exception as e:
             self.console.print(f"⚠️ Error during security cleanup: {e!s}", style="red")
@@ -786,9 +751,7 @@ class BasicIncidentDetector:
     def __init__(self: Self, config: SecurityConfig):
         self.config = config
 
-    def detect_incidents(
-        self: Self, events: list[SecurityEvent]
-    ) -> list[dict[str, Any]]:
+    def detect_incidents(self: Self, events: list[SecurityEvent]) -> list[dict[str, Any]]:
         """Detect basic security incidents."""
         incidents = []
 
@@ -819,9 +782,7 @@ class AdvancedAuthManager:
             "authenticated": True,
             "user_id": username,
             "session_token": "jwt_token_placeholder",
-            "expires_at": (
-                datetime.now() + timedelta(minutes=self.config.session_timeout_minutes)
-            ).isoformat(),
+            "expires_at": (datetime.now() + timedelta(minutes=self.config.session_timeout_minutes)).isoformat(),
         }
 
 
@@ -831,9 +792,7 @@ class AdvancedIncidentDetector:
     def __init__(self: Self, config: SecurityConfig):
         self.config = config
 
-    def detect_incidents(
-        self: Self, events: list[SecurityEvent]
-    ) -> list[dict[str, Any]]:
+    def detect_incidents(self: Self, events: list[SecurityEvent]) -> list[dict[str, Any]]:
         """Detect advanced security incidents using pattern analysis."""
         incidents = []
 
@@ -875,9 +834,7 @@ class EnterpriseAuditLogger:
 # Main function for testing
 def main() -> None:
     """Test the security module following crawl_mcp.py methodology."""
-    console.print(
-        Panel.fit("🔒 Phase 9.8 Security and Compliance Module Test", style="red bold")
-    )
+    console.print(Panel.fit("🔒 Phase 9.8 Security and Compliance Module Test", style="red bold"))
 
     # Test with different security levels
     for security_level in ["basic", "standard", "high", "critical"]:

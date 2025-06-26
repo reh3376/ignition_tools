@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Development Workflow Integration for SME Agent
-Phase 11.3: SME Agent Integration & Interfaces
+Phase 11.3: SME Agent Integration & Interfaces.
 
 This module provides comprehensive development workflow integration following crawl_mcp.py methodology:
 1. Environment validation first
@@ -35,9 +35,7 @@ class DevelopmentToolConfig:
 
     # IDE Support
     enable_ide_integration: bool = True
-    supported_ides: list[str] = field(
-        default_factory=lambda: ["vscode", "pycharm", "sublime", "vim"]
-    )
+    supported_ides: list[str] = field(default_factory=lambda: ["vscode", "pycharm", "sublime", "vim"])
     ide_config_path: str | None = None
 
     # Git Integration
@@ -59,9 +57,7 @@ class DevelopmentToolConfig:
 
     # Documentation
     enable_auto_documentation: bool = True
-    documentation_formats: list[str] = field(
-        default_factory=lambda: ["markdown", "rst", "html"]
-    )
+    documentation_formats: list[str] = field(default_factory=lambda: ["markdown", "rst", "html"])
     documentation_output_dir: str = "docs/auto_generated"
 
 
@@ -157,7 +153,7 @@ class DevelopmentWorkflowIntegrator:
         """Initialize development workflow integrator with configuration."""
         self.config = config or DevelopmentToolConfig()
         self.project_root = Path.cwd()
-        self.validation_result = None
+        self.validation_result: dict[str, Any] = None
 
         # Component state
         self.git_available = False
@@ -185,11 +181,11 @@ class DevelopmentWorkflowIntegrator:
         Step 3: Resource management setup
         """
         # Step 1: Environment validation first
-        self.validation_result = await self._validate_environment()
+        self.validation_result: dict[str, Any] = await self._validate_environment()
 
         if self.validation_result["validation_percentage"] < 70:
             raise SMEAgentValidationError(
-                f"Development workflow integration validation failed: {self.validation_result['validation_percentage']}% "
+                f"Development workflow integration validation failed: {self.validation_result['validation_percentage']}% "  # noqa: E501
                 f"Errors: {', '.join(self.validation_result['errors'])}"
             )
 
@@ -213,18 +209,14 @@ class DevelopmentWorkflowIntegrator:
             if self.config.enable_ide_integration:
                 self.ide_detected = await self._detect_ide()
                 if self.ide_detected:
-                    init_result["components_initialized"].append(
-                        f"ide_support_{self.ide_detected}"
-                    )
+                    init_result["components_initialized"].append(f"ide_support_{self.ide_detected}")
                     await self._setup_ide_integration()
                 else:
                     init_result["warnings"].append("No supported IDE detected")
 
             # Initialize code intelligence
             if self.config.enable_code_intelligence:
-                self.code_intelligence_available = (
-                    await self._initialize_code_intelligence()
-                )
+                self.code_intelligence_available = await self._initialize_code_intelligence()
                 if self.code_intelligence_available:
                     init_result["components_initialized"].append("code_intelligence")
                 else:
@@ -237,13 +229,9 @@ class DevelopmentWorkflowIntegrator:
             return init_result
 
         except Exception as e:
-            raise SMEAgentValidationError(
-                f"Development workflow integration initialization failed: {e}"
-            )
+            raise SMEAgentValidationError(f"Development workflow integration initialization failed: {e}")
 
-    async def assess_project_health(
-        self, detailed: bool = False
-    ) -> ProjectHealthMetrics:
+    async def assess_project_health(self, detailed: bool = False) -> ProjectHealthMetrics:
         """Assess overall project health with SME Agent insights.
 
         Step 2: Comprehensive input validation
@@ -254,18 +242,14 @@ class DevelopmentWorkflowIntegrator:
             cache_key = f"health_{self.project_root}_{detailed}"
             if cache_key in self.health_cache:
                 cached_result = self.health_cache[cache_key]
-                if (
-                    datetime.now() - cached_result.timestamp
-                ).seconds < self.config.health_check_interval:
+                if (datetime.now() - cached_result.timestamp).seconds < self.config.health_check_interval:
                     return cached_result
 
             # Collect health metrics
             health_metrics = await self._collect_health_metrics(detailed)
 
             # Generate SME Agent recommendations
-            recommendations = await self._generate_health_recommendations(
-                health_metrics
-            )
+            recommendations = await self._generate_health_recommendations(health_metrics)
 
             # Create health assessment result
             result = ProjectHealthMetrics(
@@ -297,13 +281,9 @@ class DevelopmentWorkflowIntegrator:
         except Exception as e:
             # Step 3: Error handling and user-friendly messages
             error_msg = self._format_health_error(e)
-            raise SMEAgentValidationError(
-                f"Project health assessment failed: {error_msg}"
-            )
+            raise SMEAgentValidationError(f"Project health assessment failed: {error_msg}")
 
-    async def analyze_commit(
-        self, commit_hash: str | None = None
-    ) -> CommitAnalysisResult:
+    async def analyze_commit(self, commit_hash: str | None = None) -> CommitAnalysisResult:
         """Analyze git commit with SME Agent insights and recommendations.
 
         Step 2: Comprehensive input validation
@@ -332,9 +312,7 @@ class DevelopmentWorkflowIntegrator:
             change_analysis = await self._analyze_commit_changes(commit_hash)
 
             # Generate SME Agent insights
-            sme_insights = await self._generate_commit_insights(
-                commit_info, change_analysis
-            )
+            sme_insights = await self._generate_commit_insights(commit_info, change_analysis)
 
             # Create analysis result
             result = CommitAnalysisResult(
@@ -375,18 +353,14 @@ class DevelopmentWorkflowIntegrator:
         Step 3: Error handling and user-friendly messages
         """
         if not self.config.enable_auto_documentation:
-            raise SMEAgentValidationError(
-                "Automated documentation generation is disabled"
-            )
+            raise SMEAgentValidationError("Automated documentation generation is disabled")
 
         try:
             # Validate target paths
             if target_paths:
                 for path in target_paths:
                     if not Path(path).exists():
-                        raise SMEAgentValidationError(
-                            f"Target path does not exist: {path}"
-                        )
+                        raise SMEAgentValidationError(f"Target path does not exist: {path}")
             else:
                 target_paths = [str(self.project_root)]
 
@@ -394,33 +368,23 @@ class DevelopmentWorkflowIntegrator:
             cache_key = f"docs_{hash(tuple(target_paths))}"
             if not force_regenerate and cache_key in self.documentation_cache:
                 cached_result = self.documentation_cache[cache_key]
-                if (
-                    datetime.now() - cached_result.timestamp
-                ).seconds < 3600:  # 1 hour cache
+                if (datetime.now() - cached_result.timestamp).seconds < 3600:  # 1 hour cache
                     return cached_result
 
             # Analyze code for documentation
             code_analysis = await self._analyze_code_for_documentation(target_paths)
 
             # Generate documentation content
-            documentation_content = await self._generate_documentation_content(
-                code_analysis
-            )
+            documentation_content = await self._generate_documentation_content(code_analysis)
 
             # Write documentation files
-            generation_result = await self._write_documentation_files(
-                documentation_content
-            )
+            generation_result = await self._write_documentation_files(documentation_content)
 
             # Assess documentation quality
-            quality_metrics = await self._assess_documentation_quality(
-                generation_result
-            )
+            quality_metrics = await self._assess_documentation_quality(generation_result)
 
             # Generate improvement suggestions
-            improvement_suggestions = await self._generate_documentation_improvements(
-                quality_metrics
-            )
+            improvement_suggestions = await self._generate_documentation_improvements(quality_metrics)
 
             # Create generation result
             result = DocumentationGenerationResult(
@@ -443,9 +407,7 @@ class DevelopmentWorkflowIntegrator:
         except Exception as e:
             # Step 3: Error handling and user-friendly messages
             error_msg = self._format_documentation_error(e)
-            raise SMEAgentValidationError(
-                f"Documentation generation failed: {error_msg}"
-            )
+            raise SMEAgentValidationError(f"Documentation generation failed: {error_msg}")
 
     async def setup_git_hooks(self) -> bool:
         """Set up git hooks for SME Agent integration."""
@@ -483,7 +445,7 @@ class DevelopmentWorkflowIntegrator:
 
     async def _validate_environment(self) -> dict[str, Any]:
         """Step 1: Environment validation first."""
-        validation_result = {
+        validation_result: dict[str, Any] = {
             "validation_percentage": 0,
             "errors": [],
             "warnings": [],
@@ -515,13 +477,9 @@ class DevelopmentWorkflowIntegrator:
 
         # Check Python environment
         try:
-            import sys
 
-            if sys.version_info >= (3, 8):
-                validation_result["checks"]["python_environment"] = True
-                checks_passed += 1
-            else:
-                validation_result["errors"].append("Python 3.8+ required")
+            validation_result["checks"]["python_environment"] = True
+            checks_passed += 1
         except Exception as e:
             validation_result["errors"].append(f"Python environment check failed: {e}")
 
@@ -535,9 +493,7 @@ class DevelopmentWorkflowIntegrator:
         except ImportError as e:
             validation_result["errors"].append(f"Required dependencies missing: {e}")
 
-        validation_result["validation_percentage"] = (
-            checks_passed / total_checks
-        ) * 100
+        validation_result["validation_percentage"] = (checks_passed / total_checks) * 100
 
         return validation_result
 
@@ -672,7 +628,7 @@ class DevelopmentWorkflowIntegrator:
         """Initialize code intelligence integration."""
         try:
             # Check if code intelligence modules are available
-            from ...code_intelligence.manager import CodeIntelligenceManager
+            from src.ignition.code_intelligence.manager import CodeIntelligenceManager
 
             return True
         except ImportError:
@@ -731,9 +687,7 @@ class DevelopmentWorkflowIntegrator:
         metrics["complexity_violations"] = complexity_violations
 
         # Calculate scores (simplified for demonstration)
-        metrics["code_quality"] = max(
-            0, 100 - (complexity_violations / max(1, len(python_files)) * 100)
-        )
+        metrics["code_quality"] = max(0, 100 - (complexity_violations / max(1, len(python_files)) * 100))
         metrics["documentation_coverage"] = 75.0  # Placeholder
         metrics["test_coverage"] = 65.0  # Placeholder
         metrics["dependency_health"] = 80.0  # Placeholder
@@ -755,9 +709,7 @@ class DevelopmentWorkflowIntegrator:
 
         return metrics
 
-    async def _generate_health_recommendations(
-        self, metrics: dict[str, Any]
-    ) -> dict[str, list[str]]:
+    async def _generate_health_recommendations(self, metrics: dict[str, Any]) -> dict[str, list[str]]:
         """Generate SME Agent health recommendations."""
         recommendations: Any = {
             "general": [],
@@ -766,9 +718,7 @@ class DevelopmentWorkflowIntegrator:
 
         # Code quality recommendations
         if metrics["code_quality"] < 70:
-            recommendations["priority"].append(
-                "Improve code quality by reducing complexity"
-            )
+            recommendations["priority"].append("Improve code quality by reducing complexity")
             recommendations["general"].append("Consider refactoring large files")
 
         # Documentation recommendations
@@ -783,9 +733,7 @@ class DevelopmentWorkflowIntegrator:
 
         # Complexity recommendations
         if metrics["complexity_violations"] > 0:
-            recommendations["general"].append(
-                f"Refactor {metrics['complexity_violations']} complex files"
-            )
+            recommendations["general"].append(f"Refactor {metrics['complexity_violations']} complex files")
 
         return recommendations
 
@@ -831,9 +779,7 @@ class DevelopmentWorkflowIntegrator:
                 "message": parts[2] if len(parts) > 2 else "",
             }
         else:
-            raise SMEAgentValidationError(
-                f"Failed to get commit info for {commit_hash}"
-            )
+            raise SMEAgentValidationError(f"Failed to get commit info for {commit_hash}")
 
     async def _analyze_commit_changes(self, commit_hash: str) -> dict[str, Any]:
         """Analyze changes in a commit."""
@@ -845,9 +791,7 @@ class DevelopmentWorkflowIntegrator:
             cwd=self.project_root,
         )
 
-        files_changed = (
-            result.stdout.strip().split("\n") if result.stdout.strip() else []
-        )
+        files_changed = result.stdout.strip().split("\n") if result.stdout.strip() else []
 
         # Get line changes
         result = subprocess.run(
@@ -899,43 +843,27 @@ class DevelopmentWorkflowIntegrator:
         message = commit_info["message"].lower()
         if "fix" in message or "bug" in message:
             insights["recommendations"].append("Consider adding regression tests")
-            insights["best_practices"].append(
-                "Include issue reference in commit message"
-            )
+            insights["best_practices"].append("Include issue reference in commit message")
 
         if "refactor" in message:
-            insights["recommendations"].append(
-                "Verify behavior preservation with tests"
-            )
+            insights["recommendations"].append("Verify behavior preservation with tests")
             insights["best_practices"].append("Document refactoring rationale")
 
         # Analyze change size
-        total_changes = (
-            change_analysis["lines_added"] + change_analysis["lines_removed"]
-        )
+        total_changes = change_analysis["lines_added"] + change_analysis["lines_removed"]
         if total_changes > 200:
-            insights["potential_issues"].append(
-                "Large commit - consider breaking into smaller changes"
-            )
-            insights["improvement_suggestions"].append(
-                "Use feature branches for large changes"
-            )
+            insights["potential_issues"].append("Large commit - consider breaking into smaller changes")
+            insights["improvement_suggestions"].append("Use feature branches for large changes")
 
         # Analyze file types
-        python_files = [
-            f for f in change_analysis["files_changed"] if f.endswith(".py")
-        ]
+        python_files = [f for f in change_analysis["files_changed"] if f.endswith(".py")]
         if python_files:
-            insights["recommendations"].append(
-                "Run code quality checks on Python files"
-            )
+            insights["recommendations"].append("Run code quality checks on Python files")
             insights["best_practices"].append("Follow PEP 8 style guidelines")
 
         return insights
 
-    async def _analyze_code_for_documentation(
-        self, target_paths: list[str]
-    ) -> dict[str, Any]:
+    async def _analyze_code_for_documentation(self, target_paths: list[str]) -> dict[str, Any]:
         """Analyze code structure for documentation generation."""
         analysis: Any = {
             "modules": [],
@@ -1003,9 +931,7 @@ class DevelopmentWorkflowIntegrator:
                 "module_docstring": None,
             }
 
-    async def _generate_documentation_content(
-        self, code_analysis: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def _generate_documentation_content(self, code_analysis: dict[str, Any]) -> dict[str, Any]:
         """Generate documentation content from code analysis."""
         content: Any = {
             "api_docs": {},
@@ -1021,18 +947,14 @@ class DevelopmentWorkflowIntegrator:
             module_name = Path(module["file_path"]).stem
             content["api_docs"][module_name] = {
                 "title": f"{module_name} Module",
-                "description": module.get(
-                    "module_docstring", "No description available."
-                ),
+                "description": module.get("module_docstring", "No description available."),
                 "classes": module["classes"],
                 "functions": module["functions"],
             }
 
         return content
 
-    async def _write_documentation_files(
-        self, content: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def _write_documentation_files(self, content: dict[str, Any]) -> dict[str, Any]:
         """Write documentation files to disk."""
         result: Any = {
             "generated_files": [],
@@ -1107,9 +1029,7 @@ class DevelopmentWorkflowIntegrator:
 
         return "\n".join(lines)
 
-    async def _assess_documentation_quality(
-        self, generation_result: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def _assess_documentation_quality(self, generation_result: dict[str, Any]) -> dict[str, Any]:
         """Assess the quality of generated documentation."""
         return {
             "coverage": 75.0,  # Placeholder
@@ -1119,21 +1039,15 @@ class DevelopmentWorkflowIntegrator:
             "accuracy": 85.0,
         }
 
-    async def _generate_documentation_improvements(
-        self, quality_metrics: dict[str, Any]
-    ) -> list[str]:
+    async def _generate_documentation_improvements(self, quality_metrics: dict[str, Any]) -> list[str]:
         """Generate documentation improvement suggestions."""
         suggestions = []
 
         if quality_metrics["coverage"] < 80:
-            suggestions.append(
-                "Increase documentation coverage by adding more docstrings"
-            )
+            suggestions.append("Increase documentation coverage by adding more docstrings")
 
         if quality_metrics["readability"] < 80:
-            suggestions.append(
-                "Improve documentation readability with better structure"
-            )
+            suggestions.append("Improve documentation readability with better structure")
 
         if quality_metrics["completeness"] < 80:
             suggestions.append("Add more detailed examples and usage information")
@@ -1230,7 +1144,7 @@ async def validate_development_workflow_environment() -> dict[str, Any]:
 
     Step 1: Environment validation first (crawl_mcp.py methodology)
     """
-    validation_result = {
+    validation_result: dict[str, Any] = {
         "validation_percentage": 0,
         "errors": [],
         "warnings": [],
@@ -1247,13 +1161,9 @@ async def validate_development_workflow_environment() -> dict[str, Any]:
 
     # Check Python version
     try:
-        import sys
 
-        if sys.version_info >= (3, 8):
-            validation_result["requirements_met"]["python_version"] = True
-            checks_passed += 1
-        else:
-            validation_result["errors"].append("Python 3.8+ required")
+        validation_result["requirements_met"]["python_version"] = True
+        checks_passed += 1
     except Exception as e:
         validation_result["errors"].append(f"Python version check failed: {e}")
 

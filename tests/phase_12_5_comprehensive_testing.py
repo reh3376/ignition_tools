@@ -101,9 +101,7 @@ class Phase125ComprehensiveTester:
             try:
                 async with httpx.AsyncClient(timeout=TEST_TIMEOUT) as client:
                     response = await client.get(f"{self.api_base}/health")
-                    validation_results["api_server_running"] = (
-                        response.status_code == 200
-                    )
+                    validation_results["api_server_running"] = response.status_code == 200
                     self.log_test_result(
                         "API Server Health Check",
                         "environment",
@@ -202,11 +200,7 @@ class Phase125ComprehensiveTester:
                     "Required Packages",
                     "environment",
                     validation_results["required_packages"],
-                    (
-                        f"Missing packages: {missing_packages}"
-                        if missing_packages
-                        else "All packages available"
-                    ),
+                    (f"Missing packages: {missing_packages}" if missing_packages else "All packages available"),
                     {
                         "missing": missing_packages,
                         "total_required": len(required_packages),
@@ -230,19 +224,13 @@ class Phase125ComprehensiveTester:
                     "NEO4J_USER",
                     "NEO4J_PASSWORD",
                 ]
-                missing_env_vars = [
-                    var for var in required_env_vars if not os.getenv(var)
-                ]
+                missing_env_vars = [var for var in required_env_vars if not os.getenv(var)]
                 validation_results["environment_variables"] = len(missing_env_vars) == 0
                 self.log_test_result(
                     "Environment Variables",
                     "environment",
                     validation_results["environment_variables"],
-                    (
-                        f"Missing env vars: {missing_env_vars}"
-                        if missing_env_vars
-                        else "All env vars present"
-                    ),
+                    (f"Missing env vars: {missing_env_vars}" if missing_env_vars else "All env vars present"),
                     {
                         "missing": missing_env_vars,
                         "total_required": len(required_env_vars),
@@ -276,11 +264,7 @@ class Phase125ComprehensiveTester:
                     "File Permissions",
                     "environment",
                     validation_results["file_permissions"],
-                    (
-                        f"Permission issues: {permission_issues}"
-                        if permission_issues
-                        else "All permissions OK"
-                    ),
+                    (f"Permission issues: {permission_issues}" if permission_issues else "All permissions OK"),
                     {"issues": permission_issues, "dirs_checked": test_dirs},
                     time.time() - start_time,
                 )
@@ -295,12 +279,8 @@ class Phase125ComprehensiveTester:
                 )
 
             # Overall environment validation result
-            overall_success = (
-                sum(validation_results.values()) >= 4
-            )  # At least 4/6 must pass
-            success_rate = (
-                sum(validation_results.values()) / len(validation_results) * 100
-            )
+            overall_success = sum(validation_results.values()) >= 4  # At least 4/6 must pass
+            success_rate = sum(validation_results.values()) / len(validation_results) * 100
 
             print(f"   📊 Environment Validation: {success_rate:.1f}% success rate")
             return overall_success
@@ -402,9 +382,7 @@ class Phase125ComprehensiveTester:
                                 json=test["payload"],
                             )
                         else:
-                            response = await client.get(
-                                f"{self.api_base}{test['endpoint']}"
-                            )
+                            response = await client.get(f"{self.api_base}{test['endpoint']}")
 
                         success = response.status_code in test["expected_status"]
                         if success:
@@ -502,7 +480,7 @@ class Phase125ComprehensiveTester:
                         repeat_count = test.get("repeat", 1)
 
                         success = False
-                        for i in range(repeat_count):
+                        for _i in range(repeat_count):
                             if test["method"] == "GET":
                                 response = await client.get(
                                     f"{self.api_base}{test['endpoint']}",
@@ -647,21 +625,15 @@ class Phase125ComprehensiveTester:
                     test_start = time.time()
                     try:
                         if test["method"] == "GET":
-                            response = await client.get(
-                                f"{self.api_base}{test['endpoint']}"
-                            )
+                            response = await client.get(f"{self.api_base}{test['endpoint']}")
                         elif test["method"] == "POST":
-                            response = await client.post(
-                                f"{self.api_base}{test['endpoint']}"
-                            )
+                            response = await client.post(f"{self.api_base}{test['endpoint']}")
 
                         success = response.status_code == test["expected_status"]
                         if success:
                             passed_tests += 1
                             # Store performance data
-                            self.performance_results[test["name"]] = (
-                                time.time() - test_start
-                            )
+                            self.performance_results[test["name"]] = time.time() - test_start
 
                         self.log_test_result(
                             test["name"],
@@ -672,9 +644,7 @@ class Phase125ComprehensiveTester:
                                 "status_code": response.status_code,
                                 "expected": test["expected_status"],
                                 "endpoint": test["endpoint"],
-                                "response_time_ms": round(
-                                    (time.time() - test_start) * 1000, 2
-                                ),
+                                "response_time_ms": round((time.time() - test_start) * 1000, 2),
                             },
                             time.time() - test_start,
                         )
@@ -772,17 +742,12 @@ class Phase125ComprehensiveTester:
                     )
 
             # Overall progressive complexity validation
-            overall_success = all(
-                level_data["success_rate"] >= 60
-                for level_data in level_results.values()
+            all(level_data["success_rate"] >= 60 for level_data in level_results.values())
+            avg_success_rate = sum(level_data["success_rate"] for level_data in level_results.values()) / len(
+                level_results
             )
-            avg_success_rate = sum(
-                level_data["success_rate"] for level_data in level_results.values()
-            ) / len(level_results)
 
-            print(
-                f"   📊 Progressive Complexity: {avg_success_rate:.1f}% average success rate"
-            )
+            print(f"   📊 Progressive Complexity: {avg_success_rate:.1f}% average success rate")
             return avg_success_rate >= 70  # 70% average success rate required
 
         except Exception as e:
@@ -840,9 +805,7 @@ class Phase125ComprehensiveTester:
                     for _ in range(5):
                         test_start = time.time()
                         try:
-                            response = await client.get(
-                                f"{self.api_base}{test['endpoint']}"
-                            )
+                            response = await client.get(f"{self.api_base}{test['endpoint']}")
                             response_time_ms = (time.time() - test_start) * 1000
                             if response.status_code == 200:
                                 response_times.append(response_time_ms)
@@ -863,9 +826,7 @@ class Phase125ComprehensiveTester:
                             {
                                 "avg_response_time_ms": round(avg_response_time, 2),
                                 "max_allowed_ms": test["max_response_time_ms"],
-                                "all_response_times": [
-                                    round(rt, 2) for rt in response_times
-                                ],
+                                "all_response_times": [round(rt, 2) for rt in response_times],
                             },
                             avg_response_time / 1000,
                         )
@@ -969,9 +930,7 @@ class Phase125ComprehensiveTester:
 
                     # Test API endpoint
                     try:
-                        api_response = await client.get(
-                            f"{self.api_base}{mapping['api_endpoint']}"
-                        )
+                        api_response = await client.get(f"{self.api_base}{mapping['api_endpoint']}")
                         api_success = api_response.status_code in [200, 201]
                     except Exception:
                         api_success = False
@@ -985,7 +944,7 @@ class Phase125ComprehensiveTester:
                         mapping["name"],
                         "cli_api_mapping",
                         mapping_success,
-                        f"CLI: {'✅' if cli_success else '❌'}, API: {'✅' if api_success else '❌'} (consistent: {mapping_success})",
+                        f"CLI: {'✅' if cli_success else '❌'}, API: {'✅' if api_success else '❌'} (consistent: {mapping_success})",  # noqa: E501
                         {
                             "cli_success": cli_success,
                             "api_success": api_success,
@@ -1026,9 +985,7 @@ class Phase125ComprehensiveTester:
 
         try:
             # Step 1: Environment validation first (critical)
-            test_results["environment_validation"] = (
-                await self.test_environment_validation()
-            )
+            test_results["environment_validation"] = await self.test_environment_validation()
 
             # Step 2: Input validation and sanitization
             test_results["input_validation"] = await self.test_input_validation()
@@ -1040,14 +997,10 @@ class Phase125ComprehensiveTester:
             test_results["api_functionality"] = await self.test_api_functionality()
 
             # Step 5: Progressive complexity validation
-            test_results["progressive_complexity"] = (
-                await self.test_progressive_complexity()
-            )
+            test_results["progressive_complexity"] = await self.test_progressive_complexity()
 
             # Step 6: Performance benchmarking
-            test_results["performance_benchmarking"] = (
-                await self.test_performance_benchmarking()
-            )
+            test_results["performance_benchmarking"] = await self.test_performance_benchmarking()
 
             # Step 7: CLI-to-API mapping validation
             test_results["cli_api_mapping"] = await self.test_cli_api_mapping()
@@ -1057,18 +1010,10 @@ class Phase125ComprehensiveTester:
             test_results["execution_error"] = str(e)
 
         # Calculate overall results
-        passed_categories = sum(
-            test_results.values() if isinstance(test_results.values(), bool) else 0
-        )
-        total_categories = len(
-            [k for k, v in test_results.items() if isinstance(v, bool)]
-        )
-        overall_success_rate = (
-            passed_categories / total_categories * 100 if total_categories > 0 else 0
-        )
-        overall_success = (
-            overall_success_rate >= 75
-        )  # 75% success rate for Phase 12.5 completion
+        passed_categories = sum(test_results.values() if isinstance(test_results.values(), bool) else 0)
+        total_categories = len([k for k, v in test_results.items() if isinstance(v, bool)])
+        overall_success_rate = passed_categories / total_categories * 100 if total_categories > 0 else 0
+        overall_success = overall_success_rate >= 75  # 75% success rate for Phase 12.5 completion
 
         execution_time = time.time() - start_time
 
@@ -1081,9 +1026,7 @@ class Phase125ComprehensiveTester:
             "overall_success_rate": round(overall_success_rate, 1),
             "categories_passed": passed_categories,
             "categories_total": total_categories,
-            "completion_status": (
-                "COMPLETED" if overall_success else "NEEDS_IMPROVEMENT"
-            ),
+            "completion_status": ("COMPLETED" if overall_success else "NEEDS_IMPROVEMENT"),
             "test_results": test_results,
             "detailed_results": [result.dict() for result in self.test_results],
             "performance_results": self.performance_results,
@@ -1136,9 +1079,7 @@ class Phase125ComprehensiveTester:
             )
 
         if not test_results.get("api_functionality", True):
-            recommendations.append(
-                "⚙️ Fix API functionality: Debug failing endpoints and ensure proper responses"
-            )
+            recommendations.append("⚙️ Fix API functionality: Debug failing endpoints and ensure proper responses")
 
         if not test_results.get("progressive_complexity", True):
             recommendations.append(
@@ -1146,19 +1087,13 @@ class Phase125ComprehensiveTester:
             )
 
         if not test_results.get("performance_benchmarking", True):
-            recommendations.append(
-                "🚀 Optimize performance: Reduce response times and improve endpoint efficiency"
-            )
+            recommendations.append("🚀 Optimize performance: Reduce response times and improve endpoint efficiency")
 
         if not test_results.get("cli_api_mapping", True):
-            recommendations.append(
-                "🔗 Fix CLI-API mapping: Ensure consistency between CLI commands and API endpoints"
-            )
+            recommendations.append("🔗 Fix CLI-API mapping: Ensure consistency between CLI commands and API endpoints")
 
         if not recommendations:
-            recommendations.append(
-                "🎉 Excellent! All test categories passed. Ready for Phase 12.6 deployment."
-            )
+            recommendations.append("🎉 Excellent! All test categories passed. Ready for Phase 12.6 deployment.")
 
         return recommendations
 

@@ -1,5 +1,6 @@
-"""Phase 10: Enterprise Integration & Deployment CLI Commands"""
+"""Phase 10: Enterprise Integration & Deployment CLI Commands."""
 
+import contextlib
 import json
 import logging
 
@@ -75,9 +76,7 @@ def validate_architecture_env(output_format: str) -> None:
                 "❌ Enterprise Architecture environment validation failed!",
                 style="bold red",
             )
-            console.print(
-                f"Score: {validation_results['validation_score']:.1f}%", style="yellow"
-            )
+            console.print(f"Score: {validation_results['validation_score']:.1f}%", style="yellow")
 
     except Exception as e:
         console.print(f"❌ Validation failed: {e!s}", style="bold red")
@@ -125,21 +124,15 @@ def deploy_architecture(complexity: str) -> None:
                 style="cyan",
             )
         else:
-            console.print(
-                "❌ Enterprise Architecture deployment failed!", style="bold red"
-            )
-            console.print(
-                f"Error: {deployment_result.get('error', 'Unknown error')}", style="red"
-            )
+            console.print("❌ Enterprise Architecture deployment failed!", style="bold red")
+            console.print(f"Error: {deployment_result.get('error', 'Unknown error')}", style="red")
 
     except Exception as e:
         console.print(f"❌ Deployment failed: {e!s}", style="bold red")
         logger.error(f"Architecture deployment failed: {e}")
     finally:
-        try:
+        with contextlib.suppress(Exception):
             architecture_module.cleanup_resources()
-        except:
-            pass
 
 
 @enterprise_cli.group(name="cloud")
@@ -152,9 +145,7 @@ def cloud_group() -> None:
 def validate_cloud_env() -> None:
     """Validate cloud integration environment variables."""
     try:
-        console.print(
-            "☁️ Phase 10.2: Cloud Integration Environment Validation", style="bold blue"
-        )
+        console.print("☁️ Phase 10.2: Cloud Integration Environment Validation", style="bold blue")
 
         # Initialize module
         cloud_module = CloudIntegrationModule()
@@ -169,9 +160,7 @@ def validate_cloud_env() -> None:
                 style="bold green",
             )
         else:
-            console.print(
-                "❌ Cloud Integration environment validation failed!", style="bold red"
-            )
+            console.print("❌ Cloud Integration environment validation failed!", style="bold red")
 
     except Exception as e:
         console.print(f"❌ Validation failed: {e!s}", style="bold red")
@@ -210,12 +199,8 @@ def deploy_cloud(complexity: str) -> None:
                 style="cyan",
             )
         else:
-            console.print(
-                "❌ Cloud Infrastructure deployment failed!", style="bold red"
-            )
-            console.print(
-                f"Error: {deployment_result.get('error', 'Unknown error')}", style="red"
-            )
+            console.print("❌ Cloud Infrastructure deployment failed!", style="bold red")
+            console.print(f"Error: {deployment_result.get('error', 'Unknown error')}", style="red")
 
     except Exception as e:
         console.print(f"❌ Deployment failed: {e!s}", style="bold red")
@@ -250,9 +235,7 @@ def validate_analytics_env() -> None:
                 style="bold green",
             )
         else:
-            console.print(
-                "❌ Analytics Platform environment validation failed!", style="bold red"
-            )
+            console.print("❌ Analytics Platform environment validation failed!", style="bold red")
 
     except Exception as e:
         console.print(f"❌ Validation failed: {e!s}", style="bold red")
@@ -292,9 +275,7 @@ def deploy_analytics(complexity: str) -> None:
             )
         else:
             console.print("❌ Analytics Platform deployment failed!", style="bold red")
-            console.print(
-                f"Error: {deployment_result.get('error', 'Unknown error')}", style="red"
-            )
+            console.print(f"Error: {deployment_result.get('error', 'Unknown error')}", style="red")
 
     except Exception as e:
         console.print(f"❌ Deployment failed: {e!s}", style="bold red")
@@ -328,17 +309,13 @@ def test_all_components(complexity: str) -> Any:
             task = progress.add_task("Testing enterprise components...", total=100)
 
             # Test 1: Enterprise Architecture (33%)
-            progress.update(
-                task, advance=33, description="Testing Enterprise Architecture..."
-            )
+            progress.update(task, advance=33, description="Testing Enterprise Architecture...")
             try:
                 architecture_module = EnterpriseArchitectureModule()
                 arch_validation = architecture_module.env_validation
                 test_results["enterprise_architecture"] = {
                     "environment_validation": arch_validation,
-                    "status": (
-                        "passed" if arch_validation["overall_valid"] else "failed"
-                    ),
+                    "status": ("passed" if arch_validation["overall_valid"] else "failed"),
                 }
                 architecture_module.cleanup_resources()
             except Exception as e:
@@ -348,17 +325,13 @@ def test_all_components(complexity: str) -> Any:
                 }
 
             # Test 2: Cloud Integration (33%)
-            progress.update(
-                task, advance=33, description="Testing Cloud Integration..."
-            )
+            progress.update(task, advance=33, description="Testing Cloud Integration...")
             try:
                 cloud_module = CloudIntegrationModule()
                 cloud_validation = cloud_module.validate_environment()
                 test_results["cloud_integration"] = {
                     "environment_validation": cloud_validation,
-                    "status": (
-                        "passed" if cloud_validation["overall_valid"] else "failed"
-                    ),
+                    "status": ("passed" if cloud_validation["overall_valid"] else "failed"),
                 }
                 cloud_module.cleanup_resources()
             except Exception as e:
@@ -368,17 +341,13 @@ def test_all_components(complexity: str) -> Any:
                 }
 
             # Test 3: Advanced Analytics Platform (34%)
-            progress.update(
-                task, advance=34, description="Testing Advanced Analytics Platform..."
-            )
+            progress.update(task, advance=34, description="Testing Advanced Analytics Platform...")
             try:
                 analytics_module = AdvancedAnalyticsPlatformModule()
                 analytics_validation = analytics_module.validate_environment()
                 test_results["advanced_analytics"] = {
                     "environment_validation": analytics_validation,
-                    "status": (
-                        "passed" if analytics_validation["overall_valid"] else "failed"
-                    ),
+                    "status": ("passed" if analytics_validation["overall_valid"] else "failed"),
                 }
             except Exception as e:
                 test_results["advanced_analytics"] = {
@@ -389,9 +358,7 @@ def test_all_components(complexity: str) -> Any:
             progress.update(task, completed=100, description="Testing completed!")
 
         # Calculate overall results
-        passed_tests = sum(
-            1 for result in test_results.values() if result["status"] == "passed"
-        )
+        passed_tests = sum(1 for result in test_results.values() if result["status"] == "passed")
         total_tests = len(test_results)
         success_rate = (passed_tests / total_tests) * 100
 
@@ -413,22 +380,14 @@ def test_all_components(complexity: str) -> Any:
             results_table.add_row(component.replace("_", " ").title(), status, details)
 
         # Add overall status
-        overall_status = (
-            "✅ ALL PASSED"
-            if success_rate == 100
-            else f"⚠️ {passed_tests}/{total_tests} PASSED"
-        )
-        results_table.add_row(
-            "Overall Status", overall_status, f"Success Rate: {success_rate:.1f}%"
-        )
+        overall_status = "✅ ALL PASSED" if success_rate == 100 else f"⚠️ {passed_tests}/{total_tests} PASSED"
+        results_table.add_row("Overall Status", overall_status, f"Success Rate: {success_rate:.1f}%")
 
         console.print(results_table)
 
         # Final status message
         if success_rate == 100:
-            console.print(
-                "🎉 All enterprise components tested successfully!", style="bold green"
-            )
+            console.print("🎉 All enterprise components tested successfully!", style="bold green")
         else:
             console.print(
                 f"⚠️ {passed_tests}/{total_tests} components passed testing",

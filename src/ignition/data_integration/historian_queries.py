@@ -151,9 +151,7 @@ class HistorianQueryGenerator:
         elif self.historian_type == HistorianType.IGNITION_HISTORIAN:
             return self._generate_ignition_raw_query(tags, time_range, options)
         else:
-            raise ValueError(
-                f"Raw data queries not supported for {self.historian_type}"
-            )
+            raise ValueError(f"Raw data queries not supported for {self.historian_type}")
 
     def generate_aggregated_query(
         self,
@@ -169,25 +167,17 @@ class HistorianQueryGenerator:
             options = QueryOptions()
 
         if self.historian_type == HistorianType.INFLUXDB:
-            return self._generate_influxdb_aggregated_query(
-                tags, time_range, aggregation, interval, time_unit, options
-            )
+            return self._generate_influxdb_aggregated_query(tags, time_range, aggregation, interval, time_unit, options)
         elif self.historian_type == HistorianType.TIMESCALEDB:
             return self._generate_timescaledb_aggregated_query(
                 tags, time_range, aggregation, interval, time_unit, options
             )
         elif self.historian_type == HistorianType.IGNITION_HISTORIAN:
-            return self._generate_ignition_aggregated_query(
-                tags, time_range, aggregation, interval, time_unit, options
-            )
+            return self._generate_ignition_aggregated_query(tags, time_range, aggregation, interval, time_unit, options)
         else:
-            raise ValueError(
-                f"Aggregated queries not supported for {self.historian_type}"
-            )
+            raise ValueError(f"Aggregated queries not supported for {self.historian_type}")
 
-    def _generate_influxdb_raw_query(
-        self, tags: list[TagFilter], time_range: TimeRange, options: QueryOptions
-    ) -> str:
+    def _generate_influxdb_raw_query(self, tags: list[TagFilter], time_range: TimeRange, options: QueryOptions) -> str:
         """Generate InfluxDB raw data query."""
         # Build tag filters
         tag_filters = []
@@ -336,9 +326,7 @@ class HistorianQueryGenerator:
 
         return " ".join(query_parts)
 
-    def _generate_ignition_raw_query(
-        self, tags: list[TagFilter], time_range: TimeRange, options: QueryOptions
-    ) -> str:
+    def _generate_ignition_raw_query(self, tags: list[TagFilter], time_range: TimeRange, options: QueryOptions) -> str:
         """Generate Ignition historian raw data query."""
         # Build tag filters
         tag_conditions = []
@@ -426,9 +414,7 @@ class HistorianQueryGenerator:
         }
         return mapping.get(aggregation, "MEAN")
 
-    def _get_timescaledb_aggregation_function(
-        self, aggregation: AggregationType
-    ) -> str:
+    def _get_timescaledb_aggregation_function(self, aggregation: AggregationType) -> str:
         """Get TimescaleDB aggregation function name."""
         mapping = {
             AggregationType.AVERAGE: "AVG",
@@ -503,9 +489,7 @@ class HistorianQueryGenerator:
         else:
             raise ValueError(f"Tag listing not supported for {self.historian_type}")
 
-    def generate_data_availability_query(
-        self, tags: list[TagFilter], time_range: TimeRange
-    ) -> str:
+    def generate_data_availability_query(self, tags: list[TagFilter], time_range: TimeRange) -> str:
         """Generate query to check data availability for tags."""
         if self.historian_type == HistorianType.INFLUXDB:
             tag_filters = []
@@ -547,13 +531,9 @@ class HistorianQueryGenerator:
             ORDER BY tag_name
             """
         else:
-            raise ValueError(
-                f"Data availability queries not supported for {self.historian_type}"
-            )
+            raise ValueError(f"Data availability queries not supported for {self.historian_type}")
 
-    def create_time_range_from_duration(
-        self, duration_hours: int, end_time: datetime | None = None
-    ) -> TimeRange:
+    def create_time_range_from_duration(self, duration_hours: int, end_time: datetime | None = None) -> TimeRange:
         """Create a time range from duration in hours."""
         if end_time is None:
             end_time = datetime.now()

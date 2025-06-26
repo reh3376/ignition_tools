@@ -47,17 +47,11 @@ class TerminalWrapperIntegrationTest:
 
         for test_method in test_methods:
             try:
-                print(
-                    f"🔍 Running: {test_method.__name__.replace('test_', '').replace('_', ' ').title()}"
-                )
+                print(f"🔍 Running: {test_method.__name__.replace('test_', '').replace('_', ' ').title()}")
                 await test_method()
-                print(
-                    f"✅ {test_method.__name__.replace('test_', '').replace('_', ' ').title()}: PASSED"
-                )
+                print(f"✅ {test_method.__name__.replace('test_', '').replace('_', ' ').title()}: PASSED")
             except Exception as e:
-                print(
-                    f"❌ {test_method.__name__.replace('test_', '').replace('_', ' ').title()}: FAILED - {e}"
-                )
+                print(f"❌ {test_method.__name__.replace('test_', '').replace('_', ' ').title()}: FAILED - {e}")
                 self.test_results.append(
                     {
                         "name": test_method.__name__,
@@ -110,9 +104,7 @@ class TerminalWrapperIntegrationTest:
         wrapper1.initialize()
 
         # Test custom configuration
-        config = TerminalWrapperConfig(
-            enable_stall_detection=True, default_timeout=60, auto_recover=True
-        )
+        config = TerminalWrapperConfig(enable_stall_detection=True, default_timeout=60, auto_recover=True)
         wrapper2 = TerminalCommandWrapper(config)
         wrapper2.initialize()
 
@@ -169,9 +161,7 @@ class TerminalWrapperIntegrationTest:
         wrapper.initialize()
 
         # Test timeout detection
-        request = TerminalCommandRequest(
-            command=["sleep", "8"], timeout=3, auto_recover=True
-        )
+        request = TerminalCommandRequest(command=["sleep", "8"], timeout=3, auto_recover=True)
         result = await wrapper.execute_command(request)
 
         # Should detect timeout and attempt recovery
@@ -180,9 +170,7 @@ class TerminalWrapperIntegrationTest:
 
         # Check if stall was detected OR recovery was successful (both are valid outcomes)
         if not (result.stall_detected or result.recovery_attempted):
-            raise AssertionError(
-                "Neither stall detection nor recovery was attempted for timeout command"
-            )
+            raise AssertionError("Neither stall detection nor recovery was attempted for timeout command")
 
         self.test_results.append(
             {
@@ -210,9 +198,7 @@ class TerminalWrapperIntegrationTest:
         result = await wrapper.execute_command(request)
 
         if result.state != CommandState.FAILED:
-            raise AssertionError(
-                f"Expected failed state for invalid command, got: {result.state}"
-            )
+            raise AssertionError(f"Expected failed state for invalid command, got: {result.state}")
 
         if not result.errors:
             raise AssertionError("No errors recorded for invalid command")
@@ -250,9 +236,7 @@ class TerminalWrapperIntegrationTest:
         except RuntimeError as e:
             if "cannot be called from a running event loop" in str(e):
                 # This is expected when running in an async context
-                sync_helper_success = (
-                    True  # Mark as successful since it's an expected limitation
-                )
+                sync_helper_success = True  # Mark as successful since it's an expected limitation
             else:
                 raise AssertionError(f"Sync helper function failed: {e}")
 
@@ -279,12 +263,8 @@ class TerminalWrapperIntegrationTest:
         initial_stats = wrapper.get_statistics()
 
         # Execute some commands
-        await wrapper.execute_command(
-            TerminalCommandRequest(command=["echo", "stats test 1"])
-        )
-        await wrapper.execute_command(
-            TerminalCommandRequest(command=["echo", "stats test 2"])
-        )
+        await wrapper.execute_command(TerminalCommandRequest(command=["echo", "stats test 1"]))
+        await wrapper.execute_command(TerminalCommandRequest(command=["echo", "stats test 2"]))
 
         # Get final statistics
         final_stats = wrapper.get_statistics()
@@ -300,8 +280,7 @@ class TerminalWrapperIntegrationTest:
                 "details": {
                     "initial_total": initial_stats["total_commands"],
                     "final_total": final_stats["total_commands"],
-                    "commands_executed": final_stats["total_commands"]
-                    - initial_stats["total_commands"],
+                    "commands_executed": final_stats["total_commands"] - initial_stats["total_commands"],
                 },
                 "duration": time.time() - test_start,
             }
@@ -310,9 +289,7 @@ class TerminalWrapperIntegrationTest:
     def generate_test_report(self) -> dict[str, Any]:
         """Generate comprehensive test report."""
         total_tests = len(self.test_results)
-        passed_tests = sum(
-            1 for result in self.test_results if result.get("status") == "passed"
-        )
+        passed_tests = sum(1 for result in self.test_results if result.get("status") == "passed")
         failed_tests = total_tests - passed_tests
 
         total_duration = time.time() - self.start_time

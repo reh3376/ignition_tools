@@ -21,7 +21,7 @@ from rich.panel import Panel
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.table import Table
 
-from ..production_deployment import (
+from src.ignition.modules.sme_agent.production_deployment import (
     DockerConfig,
     PLCConfig,
     ProductionConfig,
@@ -69,9 +69,7 @@ def validate_deployment_environment() -> None:
     Checks Docker availability, required packages, environment variables,
     and network connectivity for production deployment readiness.
     """
-    console.print(
-        "[bold blue]🔍 Phase 11.7: Production Deployment Environment Validation[/bold blue]"
-    )
+    console.print("[bold blue]🔍 Phase 11.7: Production Deployment Environment Validation[/bold blue]")
 
     with Progress(
         SpinnerColumn(),
@@ -81,7 +79,7 @@ def validate_deployment_environment() -> None:
         task = progress.add_task("Validating environment...", total=None)
 
         # Perform validation
-        validation_result = validate_production_environment()
+        validation_result: dict[str, Any] = validate_production_environment()
 
         progress.update(task, completed=True)
 
@@ -92,9 +90,7 @@ def validate_deployment_environment() -> None:
         console.print("\n[red]❌ Environment validation failed![/red]")
 
     # Components table
-    components_table = Table(
-        title="🔧 Component Status", show_header=True, header_style="bold blue"
-    )
+    components_table = Table(title="🔧 Component Status", show_header=True, header_style="bold blue")
     components_table.add_column("Component", style="cyan")
     components_table.add_column("Status", style="white")
     components_table.add_column("Details", style="white")
@@ -151,7 +147,7 @@ def test_deployment_functionality() -> None:
     """
     console.print("[bold blue]🧪 Phase 11.7: Production Deployment Testing[/bold blue]")
 
-    async def run_test() -> None:
+    async def run_test() -> dict[str, Any]:
         with Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
@@ -160,14 +156,14 @@ def test_deployment_functionality() -> None:
             task = progress.add_task("Running deployment tests...", total=None)
 
             # Run tests
-            test_result = await test_production_deployment()
+            test_result: dict[str, Any] = await test_production_deployment()
 
             progress.update(task, completed=True)
 
         return test_result
 
     # Run the async test
-    test_result = asyncio.run(run_test())
+    test_result: dict[str, Any] = asyncio.run(run_test())
 
     # Display results
     if test_result["success"]:
@@ -195,7 +191,7 @@ def check_deployment_status(deployment_name: str) -> None:
     """
     console.print(f"[bold blue]📊 Deployment Status: {deployment_name}[/bold blue]")
 
-    async def get_status() -> None:
+    async def get_status() -> dict[str, Any]:
         try:
             # Create minimal config for status checking
             docker_config = DockerConfig(
@@ -212,12 +208,12 @@ def check_deployment_status(deployment_name: str) -> None:
             manager = ProductionDeploymentManager(config)
 
             # Initialize just Docker client for status check
-            docker_result = await manager._initialize_docker()
+            docker_result: dict[str, Any] = await manager._initialize_docker()
             if not docker_result["success"]:
                 return {"deployed": False, "error": docker_result["error"]}
 
             # Get status
-            status = manager.get_deployment_status()
+            status: dict[str, Any] = manager.get_deployment_status()
             await manager.cleanup()
 
             return status
@@ -229,18 +225,14 @@ def check_deployment_status(deployment_name: str) -> None:
     status = asyncio.run(get_status())
 
     if not status["deployed"]:
-        console.print(
-            f"[yellow]No active deployment found for: {deployment_name}[/yellow]"
-        )
+        console.print(f"[yellow]No active deployment found for: {deployment_name}[/yellow]")
         if "error" in status:
             console.print(f"[red]Error:[/red] {status['error']}")
         return
 
     # Display status using the manager's display method
     # Create a temporary manager for display
-    docker_config = DockerConfig(
-        image_name="ign-scripts", container_name=deployment_name, ports={8000: 8000}
-    )
+    docker_config = DockerConfig(image_name="ign-scripts", container_name=deployment_name, ports={8000: 8000})
 
     config = ProductionConfig(docker_config=docker_config, monitoring_enabled=False)
 
@@ -293,9 +285,7 @@ def deploy_production(
             with open(plc_config) as f:
                 plc_data = json.load(f)
                 plc_configs = [PLCConfig(**config) for config in plc_data]
-            console.print(
-                f"[green]✅ Loaded {len(plc_configs)} PLC configurations[/green]"
-            )
+            console.print(f"[green]✅ Loaded {len(plc_configs)} PLC configurations[/green]")
         except Exception as e:
             console.print(f"[red]❌ Failed to load PLC config: {e}[/red]")
             sys.exit(1)
@@ -308,7 +298,7 @@ def deploy_production(
         ) as progress:
             # Step 1: Environment validation
             task1 = progress.add_task("Validating environment...", total=None)
-            env_result = validate_production_environment()
+            env_result: dict[str, Any] = validate_production_environment()
             progress.update(task1, completed=True)
 
             if not env_result["valid"]:
@@ -327,11 +317,7 @@ def deploy_production(
                     docker_tag=tag,
                     container_name=name,
                     ports={api_port: 8000, web_port: 8501},
-                    plc_configs=(
-                        [config.dict() for config in plc_configs]
-                        if plc_configs
-                        else None
-                    ),
+                    plc_configs=([config.dict() for config in plc_configs] if plc_configs else None),
                 )
                 progress.update(task2, completed=True)
             except Exception as e:
@@ -345,13 +331,13 @@ def deploy_production(
 
                 # Step 4: Deploy container
                 task4 = progress.add_task("Deploying container...", total=None)
-                deploy_result = await deployment.deploy_container()
+                deploy_result: dict[str, Any] = await deployment.deploy_container()
                 progress.update(task4, completed=True)
 
                 return deploy_result
 
     # Perform deployment
-    result = asyncio.run(perform_deployment())
+    result: dict[str, Any] = asyncio.run(perform_deployment())
 
     # Display results
     if result["success"]:
@@ -362,9 +348,7 @@ def deploy_production(
         console.print(f"[green]Mode:[/green] {mode}")
 
         if plc_configs:
-            console.print(
-                f"[green]PLC Connections:[/green] {len(plc_configs)} configured"
-            )
+            console.print(f"[green]PLC Connections:[/green] {len(plc_configs)} configured")
 
         # Show access information
         access_panel = Panel(
@@ -383,9 +367,7 @@ def deploy_production(
 
 
 @deployment_group.command("stop")
-@click.option(
-    "--name", "-n", default="ign-scripts-production", help="Container name to stop"
-)
+@click.option("--name", "-n", default="ign-scripts-production", help="Container name to stop")
 @click.option("--force", "-f", is_flag=True, help="Force stop container")
 @handle_deployment_error
 def stop_deployment(name: str, force: bool) -> None:
@@ -405,18 +387,14 @@ def stop_deployment(name: str, force: bool) -> None:
 
             try:
                 # Create minimal manager for stop operation
-                docker_config = DockerConfig(
-                    image_name="ign-scripts", container_name=name, ports={8000: 8000}
-                )
+                docker_config = DockerConfig(image_name="ign-scripts", container_name=name, ports={8000: 8000})
 
-                config = ProductionConfig(
-                    docker_config=docker_config, monitoring_enabled=False
-                )
+                config = ProductionConfig(docker_config=docker_config, monitoring_enabled=False)
 
                 manager = ProductionDeploymentManager(config)
 
                 # Initialize and stop
-                init_result = await manager.initialize()
+                init_result: dict[str, Any] = await manager.initialize()
                 if not init_result["success"]:
                     progress.update(task, completed=True)
                     return {"success": False, "error": init_result["error"]}
@@ -424,7 +402,7 @@ def stop_deployment(name: str, force: bool) -> None:
                 # Set deployment info to enable stop operation
                 from datetime import datetime
 
-                from ..production_deployment import DeploymentInfo, DeploymentStatus
+                from src.ignition.modules.sme_agent.production_deployment import DeploymentInfo, DeploymentStatus
 
                 manager._deployment_info = DeploymentInfo(
                     container_name=name,
@@ -460,9 +438,7 @@ def stop_deployment(name: str, force: bool) -> None:
             import subprocess
 
             try:
-                subprocess.run(
-                    ["docker", "stop", name], check=True, capture_output=True
-                )
+                subprocess.run(["docker", "stop", name], check=True, capture_output=True)
                 subprocess.run(["docker", "rm", name], check=True, capture_output=True)
                 console.print(f"[green]✅ Force stopped container: {name}[/green]")
             except subprocess.CalledProcessError as e:
@@ -473,9 +449,7 @@ def stop_deployment(name: str, force: bool) -> None:
 
 
 @deployment_group.command("restart")
-@click.option(
-    "--name", "-n", default="ign-scripts-production", help="Container name to restart"
-)
+@click.option("--name", "-n", default="ign-scripts-production", help="Container name to restart")
 @handle_deployment_error
 def restart_deployment(name: str) -> None:
     """Restart production deployment.
@@ -494,13 +468,9 @@ def restart_deployment(name: str) -> None:
 
             try:
                 # Create minimal manager for restart operation
-                docker_config = DockerConfig(
-                    image_name="ign-scripts", container_name=name, ports={8000: 8000}
-                )
+                docker_config = DockerConfig(image_name="ign-scripts", container_name=name, ports={8000: 8000})
 
-                config = ProductionConfig(
-                    docker_config=docker_config, monitoring_enabled=False
-                )
+                config = ProductionConfig(docker_config=docker_config, monitoring_enabled=False)
 
                 manager = ProductionDeploymentManager(config)
 
@@ -513,7 +483,7 @@ def restart_deployment(name: str) -> None:
                 # Set deployment info to enable restart operation
                 from datetime import datetime
 
-                from ..production_deployment import DeploymentInfo, DeploymentStatus
+                from src.ignition.modules.sme_agent.production_deployment import DeploymentInfo, DeploymentStatus
 
                 manager._deployment_info = DeploymentInfo(
                     container_name=name,
@@ -574,9 +544,7 @@ def view_deployment_logs(name: str, follow: bool, tail: int) -> None:
 
     except subprocess.CalledProcessError as e:
         console.print(f"[red]❌ Failed to get logs: {e}[/red]")
-        console.print(
-            f"[yellow]Tip:[/yellow] Check if container '{name}' exists with: docker ps -a"
-        )
+        console.print(f"[yellow]Tip:[/yellow] Check if container '{name}' exists with: docker ps -a")
         sys.exit(1)
     except KeyboardInterrupt:
         console.print("\n[yellow]Log viewing interrupted[/yellow]")
@@ -592,9 +560,7 @@ def manage_deployment_config(template: bool, output: str | None) -> None:
     Generate configuration templates or validate existing configurations.
     """
     if template:
-        console.print(
-            "[bold blue]📝 Generating Deployment Configuration Template[/bold blue]"
-        )
+        console.print("[bold blue]📝 Generating Deployment Configuration Template[/bold blue]")
 
         # Create template configuration
         template_config = {
@@ -651,9 +617,7 @@ def manage_deployment_config(template: bool, output: str | None) -> None:
             console.print(json.dumps(template_config, indent=2))
 
     else:
-        console.print(
-            "[yellow]Use --template to generate a configuration template[/yellow]"
-        )
+        console.print("[yellow]Use --template to generate a configuration template[/yellow]")
 
 
 # Register commands with the main CLI
@@ -675,9 +639,7 @@ def test_deployment_commands() -> None:
         if result["valid"]:
             console.print("[green]✅ Environment validation test passed[/green]")
         else:
-            console.print(
-                "[yellow]⚠️  Environment validation test completed with warnings[/yellow]"
-            )
+            console.print("[yellow]⚠️  Environment validation test completed with warnings[/yellow]")
 
         console.print("[green]✅ All CLI command tests passed[/green]")
         return True

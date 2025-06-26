@@ -1,4 +1,4 @@
-"""Hybrid MPC (hMPC) Controller Implementation - Phase 11.6
+"""Hybrid MPC (hMPC) Controller Implementation - Phase 11.6.
 
 This module implements the hybrid Model Predictive Control (hMPC) system with:
 - MPC Model Development Pipeline (FOPDT, state-space, multi-variable models)
@@ -99,9 +99,7 @@ class MPCObjective(BaseModel):
         try:
             np_matrix = np.array(v)
             eigenvals = np.linalg.eigvals(np_matrix)
-            if not all(
-                eig >= -1e-10 for eig in eigenvals
-            ):  # Allow small numerical errors
+            if not all(eig >= -1e-10 for eig in eigenvals):  # Allow small numerical errors
                 raise ValueError("Weight matrix must be positive semi-definite")
         except Exception:
             raise ValueError("Invalid weight matrix format")
@@ -111,12 +109,8 @@ class MPCObjective(BaseModel):
 class MPCPrediction(BaseModel):
     """MPC prediction results."""
 
-    predicted_outputs: list[list[float]] = Field(
-        ..., description="Predicted output trajectory"
-    )
-    optimal_inputs: list[list[float]] = Field(
-        ..., description="Optimal control sequence"
-    )
+    predicted_outputs: list[list[float]] = Field(..., description="Predicted output trajectory")
+    optimal_inputs: list[list[float]] = Field(..., description="Optimal control sequence")
     cost: float = Field(..., description="Optimal cost value")
     feasible: bool = Field(..., description="Problem feasibility")
     solve_time: float = Field(..., description="Solver time in seconds")
@@ -129,7 +123,12 @@ def validate_mpc_environment() -> dict[str, Any]:
     """Validate MPC environment setup."""
     logger.info("🔍 Validating MPC environment...")
 
-    validation_results = {"valid": True, "errors": [], "warnings": [], "components": {}}
+    validation_results: dict[str, Any] = {
+        "valid": True,
+        "errors": [],
+        "warnings": [],
+        "components": {},
+    }
 
     # Check required packages
     required_packages = [
@@ -149,9 +148,7 @@ def validate_mpc_environment() -> dict[str, Any]:
             missing_packages.append(package_name)
 
     if missing_packages:
-        validation_results["errors"].append(
-            f"Missing packages: {', '.join(missing_packages)}"
-        )
+        validation_results["errors"].append(f"Missing packages: {', '.join(missing_packages)}")
         validation_results["valid"] = False
 
     validation_results["components"]["packages"] = available_packages
@@ -163,16 +160,12 @@ def validate_mpc_environment() -> dict[str, Any]:
             __import__(package)
             available_packages[package] = "available"
         except ImportError:
-            validation_results["warnings"].append(
-                f"Optional package {package} not available"
-            )
+            validation_results["warnings"].append(f"Optional package {package} not available")
 
     if validation_results["valid"]:
         logger.info("✅ MPC environment validation successful")
     else:
-        logger.error(
-            f"❌ MPC environment validation failed: {validation_results['errors']}"
-        )
+        logger.error(f"❌ MPC environment validation failed: {validation_results['errors']}")
 
     return validation_results
 
@@ -200,9 +193,7 @@ class ModelIdentification:
     """Process model identification from data."""
 
     @staticmethod
-    def identify_fopdt(
-        time_data: np.ndarray, input_data: np.ndarray, output_data: np.ndarray
-    ) -> FOPDTModel:
+    def identify_fopdt(time_data: np.ndarray, input_data: np.ndarray, output_data: np.ndarray) -> FOPDTModel:
         """Identify FOPDT model from step response data."""
         try:
             # Validate input data
@@ -241,9 +232,7 @@ class ModelIdentification:
             # Estimate time constant (time to 63.2% of final value)
             threshold_63 = y_initial + 0.632 * response_range
             tau_idx = np.where(y_response >= threshold_63)[0]
-            time_constant = (
-                t_response[tau_idx[0]] - dead_time if len(tau_idx) > 0 else 1.0
-            )
+            time_constant = t_response[tau_idx[0]] - dead_time if len(tau_idx) > 0 else 1.0
 
             return FOPDTModel(
                 gain=float(gain),
@@ -265,9 +254,7 @@ class ModelIdentification:
         """Validate identified model against data."""
         try:
             # Simulate model response
-            predicted_output = ModelIdentification._simulate_fopdt(
-                model, time_data, input_data
-            )
+            predicted_output = ModelIdentification._simulate_fopdt(model, time_data, input_data)
 
             # Calculate validation metrics
             r_squared = 1 - np.sum((output_data - predicted_output) ** 2) / np.sum(
@@ -296,9 +283,7 @@ class ModelIdentification:
             }
 
     @staticmethod
-    def _simulate_fopdt(
-        model: FOPDTModel, time_data: np.ndarray, input_data: np.ndarray
-    ) -> np.ndarray:
+    def _simulate_fopdt(model: FOPDTModel, time_data: np.ndarray, input_data: np.ndarray) -> np.ndarray:
         """Simulate FOPDT model response."""
         # Create transfer function
         num = [model.gain]
@@ -318,7 +303,7 @@ class ModelIdentification:
         system = signal.TransferFunction(num, den)
 
         # Interpolate input to match time grid
-        dt = time_data[1] - time_data[0] if len(time_data) > 1 else 1.0
+        time_data[1] - time_data[0] if len(time_data) > 1 else 1.0
         _, output, _ = signal.lsim(system, input_data, time_data)
 
         return output
@@ -395,9 +380,7 @@ class HybridMPCController:
             logger.error(f"❌ MPC initialization failed: {error_msg}")
             return {"success": False, "error": error_msg}
 
-    async def predict_and_control(
-        self, current_output: float, setpoint: float
-    ) -> dict[str, Any]:
+    async def predict_and_control(self, current_output: float, setpoint: float) -> dict[str, Any]:
         """Perform MPC prediction and control calculation."""
         if not self._initialized:
             return {"success": False, "error": "MPC controller not initialized"}
@@ -458,10 +441,9 @@ class HybridMPCController:
 
             # Setup optimization problem
             n_inputs = 1  # Single input for now
-            n_outputs = 1  # Single output for now
 
             # Decision variables: control sequence
-            u_sequence = np.zeros((self.control_horizon, n_inputs))
+            np.zeros((self.control_horizon, n_inputs))
 
             # Define cost function
             def cost_function(u_flat) -> Any:
@@ -535,9 +517,7 @@ class HybridMPCController:
 
             for k in range(self.prediction_horizon):
                 error = y_pred[k] - setpoint
-                tracking_cost += (
-                    error.T @ Q @ error if Q.ndim > 1 else Q[0][0] * error**2
-                )
+                tracking_cost += error.T @ Q @ error if Q.ndim > 1 else Q[0][0] * error**2
 
             # Control effort cost
             R = np.array(self.objective.R)
@@ -560,17 +540,11 @@ class HybridMPCController:
 
             if isinstance(self.model, FOPDTModel):
                 # Simple FOPDT prediction
-                current_output = (
-                    self._state_estimate[0] if self._state_estimate is not None else 0.0
-                )
+                current_output = self._state_estimate[0] if self._state_estimate is not None else 0.0
 
                 for k in range(self.prediction_horizon):
                     # Get control input for this step
-                    u_k = (
-                        u_sequence[min(k, len(u_sequence) - 1)][0]
-                        if k < self.control_horizon
-                        else u_sequence[-1][0]
-                    )
+                    u_k = u_sequence[min(k, len(u_sequence) - 1)][0] if k < self.control_horizon else u_sequence[-1][0]
 
                     # Simple first-order response
                     tau = self.model.time_constant
@@ -588,18 +562,10 @@ class HybridMPCController:
                 B = np.array(self.model.B)
                 C = np.array(self.model.C)
 
-                x = (
-                    self._state_estimate.copy()
-                    if self._state_estimate is not None
-                    else np.zeros(len(A))
-                )
+                x = self._state_estimate.copy() if self._state_estimate is not None else np.zeros(len(A))
 
                 for k in range(self.prediction_horizon):
-                    u_k = (
-                        u_sequence[min(k, len(u_sequence) - 1)]
-                        if k < self.control_horizon
-                        else u_sequence[-1]
-                    )
+                    u_k = u_sequence[min(k, len(u_sequence) - 1)] if k < self.control_horizon else u_sequence[-1]
 
                     # State update
                     x = A @ x + B @ u_k
@@ -624,10 +590,7 @@ class HybridMPCController:
                     for k in range(self.control_horizon):
                         constraint = {
                             "type": "ineq",
-                            "fun": lambda u, k=k, i=i, u_min=u_min: u.reshape(
-                                (self.control_horizon, -1)
-                            )[k, i]
-                            - u_min,
+                            "fun": lambda u, k=k, i=i, u_min=u_min: u.reshape((self.control_horizon, -1))[k, i] - u_min,
                         }
                         constraints.append(constraint)
 
@@ -636,8 +599,7 @@ class HybridMPCController:
                     for k in range(self.control_horizon):
                         constraint = {
                             "type": "ineq",
-                            "fun": lambda u, k=k, i=i, u_max=u_max: u_max
-                            - u.reshape((self.control_horizon, -1))[k, i],
+                            "fun": lambda u, k=k, i=i, u_max=u_max: u_max - u.reshape((self.control_horizon, -1))[k, i],
                         }
                         constraints.append(constraint)
 
@@ -670,22 +632,16 @@ async def test_model_identification() -> dict[str, Any]:
 
         # Simulate FOPDT response
         true_model = FOPDTModel(gain=2.0, time_constant=5.0, dead_time=2.0)
-        output_data = ModelIdentification._simulate_fopdt(
-            true_model, time_data, input_data
-        )
+        output_data = ModelIdentification._simulate_fopdt(true_model, time_data, input_data)
 
         # Add noise
         output_data += np.random.normal(0, 0.1, len(output_data))
 
         # Identify model
-        identified_model = ModelIdentification.identify_fopdt(
-            time_data, input_data, output_data
-        )
+        identified_model = ModelIdentification.identify_fopdt(time_data, input_data, output_data)
 
         # Validate model
-        validation = ModelIdentification.validate_model(
-            identified_model, time_data, input_data, output_data
-        )
+        validation = ModelIdentification.validate_model(identified_model, time_data, input_data, output_data)
 
         return {
             "test": "model_identification",
@@ -708,9 +664,7 @@ async def test_mpc_controller() -> dict[str, Any]:
         test_model = FOPDTModel(gain=1.5, time_constant=3.0, dead_time=1.0)
 
         # Create MPC controller
-        controller = HybridMPCController(
-            prediction_horizon=10, control_horizon=3, sample_time=1.0, model=test_model
-        )
+        controller = HybridMPCController(prediction_horizon=10, control_horizon=3, sample_time=1.0, model=test_model)
 
         # Initialize controller
         init_result = await controller.initialize()
@@ -722,9 +676,7 @@ async def test_mpc_controller() -> dict[str, Any]:
             }
 
         # Test control calculation
-        control_result = await controller.predict_and_control(
-            current_output=0.0, setpoint=10.0
-        )
+        control_result = await controller.predict_and_control(current_output=0.0, setpoint=10.0)
 
         return {
             "test": "mpc_controller",

@@ -121,14 +121,10 @@ class GatewayResourceExporter:
                 export_options = self._create_default_project_options()
 
             # Gather project resources
-            project_resources = self._gather_project_resources(
-                project_name, export_options
-            )
+            project_resources = self._gather_project_resources(project_name, export_options)
 
             # Analyze project dependencies
-            dependencies = self._analyze_project_dependencies(
-                project_name, project_resources
-            )
+            dependencies = self._analyze_project_dependencies(project_name, project_resources)
 
             # Create project package
             project_data = {
@@ -153,9 +149,7 @@ class GatewayResourceExporter:
 
             # Track export in graph database
             if self.graph_client:
-                self._track_project_export_in_graph(
-                    project_name, export_options, result
-                )
+                self._track_project_export_in_graph(project_name, export_options, result)
 
             logger.info("Project export completed successfully")
             return result
@@ -189,9 +183,7 @@ class GatewayResourceExporter:
 
             for resource_type, resource_names in resource_selection.items():
                 logger.debug(f"Gathering {resource_type} resources: {resource_names}")
-                type_resources = self._gather_resources_by_type(
-                    resource_type, resource_names
-                )
+                type_resources = self._gather_resources_by_type(resource_type, resource_names)
                 resources[resource_type] = type_resources
                 total_size += self._calculate_resources_size(type_resources)
 
@@ -231,9 +223,7 @@ class GatewayResourceExporter:
             logger.error(f"Selective resource export failed: {e}")
             raise
 
-    def create_deployment_package(
-        self: Self, package_config: dict[str, Any], output_path: Path
-    ) -> dict[str, Any]:
+    def create_deployment_package(self: Self, package_config: dict[str, Any], output_path: Path) -> dict[str, Any]:
         """Create a deployment package with scripts and configurations.
 
         Args:
@@ -305,9 +295,7 @@ class GatewayResourceExporter:
             "compression": True,
         }
 
-    def _gather_gateway_resources(
-        self: Self, profile: dict[str, Any]
-    ) -> dict[str, Any]:
+    def _gather_gateway_resources(self: Self, profile: dict[str, Any]) -> dict[str, Any]:
         """Gather all gateway resources based on export profile."""
         resources = {}
 
@@ -354,25 +342,19 @@ class GatewayResourceExporter:
 
         return dependencies
 
-    def _save_gwbk_format(
-        self: Self, data: dict[str, Any], output_path: Path
-    ) -> dict[str, Any]:
+    def _save_gwbk_format(self: Self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
         """Save data in .gwbk compatible format."""
         # In a real implementation, this would create an actual .gwbk file
         # For now, we'll save as compressed JSON
         return self._save_compressed_json(data, output_path)
 
-    def _save_proj_format(
-        self: Self, data: dict[str, Any], output_path: Path
-    ) -> dict[str, Any]:
+    def _save_proj_format(self: Self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
         """Save data in .proj compatible format."""
         # In a real implementation, this would create an actual .proj file
         # For now, we'll save as compressed JSON
         return self._save_compressed_json(data, output_path)
 
-    def _save_json_format(
-        self: Self, data: dict[str, Any], output_path: Path
-    ) -> dict[str, Any]:
+    def _save_json_format(self: Self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
         """Save data in JSON format."""
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -390,17 +372,13 @@ class GatewayResourceExporter:
             "export_time": datetime.now().isoformat(),
         }
 
-    def _save_zip_format(
-        self: Self, data: dict[str, Any], output_path: Path
-    ) -> dict[str, Any]:
+    def _save_zip_format(self: Self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
         """Save data in ZIP format with structured files."""
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
         with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED) as zipf:
             # Add metadata
-            zipf.writestr(
-                "metadata.json", json.dumps(data["metadata"], indent=2, default=str)
-            )
+            zipf.writestr("metadata.json", json.dumps(data["metadata"], indent=2, default=str))
 
             # Add main data
             zipf.writestr("export_data.json", json.dumps(data, indent=2, default=str))
@@ -409,15 +387,11 @@ class GatewayResourceExporter:
             if "resources" in data:
                 for resource_type, resource_data in data["resources"].items():
                     filename = f"resources/{resource_type}.json"
-                    zipf.writestr(
-                        filename, json.dumps(resource_data, indent=2, default=str)
-                    )
+                    zipf.writestr(filename, json.dumps(resource_data, indent=2, default=str))
 
         file_size = output_path.stat().st_size
         uncompressed_size = len(json.dumps(data, default=str).encode("utf-8"))
-        compression_ratio = (
-            file_size / uncompressed_size if uncompressed_size > 0 else 1.0
-        )
+        compression_ratio = file_size / uncompressed_size if uncompressed_size > 0 else 1.0
 
         return {
             "success": True,
@@ -428,9 +402,7 @@ class GatewayResourceExporter:
             "export_time": datetime.now().isoformat(),
         }
 
-    def _save_compressed_json(
-        self: Self, data: dict[str, Any], output_path: Path
-    ) -> dict[str, Any]:
+    def _save_compressed_json(self: Self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
         """Save data as compressed JSON."""
         import gzip
 
@@ -453,9 +425,7 @@ class GatewayResourceExporter:
             "export_time": datetime.now().isoformat(),
         }
 
-    def _track_export_in_graph(
-        self: Self, profile: dict[str, Any], result: dict[str, Any]
-    ) -> None:
+    def _track_export_in_graph(self: Self, profile: dict[str, Any], result: dict[str, Any]) -> None:
         """Track export operation in the graph database."""
         if not self.graph_client or not self.graph_client.is_connected:
             return
@@ -480,9 +450,7 @@ class GatewayResourceExporter:
             )
 
             self.graph_client.create_node(export_node)
-            logger.debug(
-                f"Tracked export operation in graph database: {self.export_id}"
-            )
+            logger.debug(f"Tracked export operation in graph database: {self.export_id}")
 
         except Exception as e:
             logger.warning(f"Failed to track export in graph database: {e}")
@@ -569,9 +537,7 @@ class GatewayResourceExporter:
         # Mock implementation
         return {"strong": [], "weak": []}
 
-    def _gather_project_resources(
-        self: Self, project_name: str, options: dict[str, Any]
-    ) -> dict[str, Any]:
+    def _gather_project_resources(self: Self, project_name: str, options: dict[str, Any]) -> dict[str, Any]:
         """Gather resources for a specific project."""
         # Mock implementation
         return {
@@ -582,16 +548,12 @@ class GatewayResourceExporter:
             "tags": [],
         }
 
-    def _analyze_project_dependencies(
-        self: Self, project_name: str, resources: dict[str, Any]
-    ) -> dict[str, Any]:
+    def _analyze_project_dependencies(self: Self, project_name: str, resources: dict[str, Any]) -> dict[str, Any]:
         """Analyze dependencies for a project."""
         # Mock implementation
         return {"dependencies": [], "conflicts": []}
 
-    def _gather_resources_by_type(
-        self: Self, resource_type: str, resource_names: list[str]
-    ) -> list[dict[str, Any]]:
+    def _gather_resources_by_type(self: Self, resource_type: str, resource_names: list[str]) -> list[dict[str, Any]]:
         """Gather specific resources by type and names."""
         # Mock implementation
         return [{"name": name, "type": resource_type} for name in resource_names]
@@ -601,30 +563,22 @@ class GatewayResourceExporter:
         # Mock implementation
         return len(resources) * 1000
 
-    def _analyze_selective_dependencies(
-        self: Self, resources: dict[str, Any]
-    ) -> dict[str, Any]:
+    def _analyze_selective_dependencies(self: Self, resources: dict[str, Any]) -> dict[str, Any]:
         """Analyze dependencies for selective export."""
         # Mock implementation
         return {"dependencies": [], "conflicts": []}
 
-    def _save_xml_format(
-        self: Self, data: dict[str, Any], output_path: Path
-    ) -> dict[str, Any]:
+    def _save_xml_format(self: Self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
         """Save data in XML format."""
         # Mock implementation - would use xml.etree.ElementTree or lxml
         return self._save_json_format(data, output_path.with_suffix(".json"))
 
-    def _gather_package_components(
-        self: Self, config: dict[str, Any]
-    ) -> dict[str, Any]:
+    def _gather_package_components(self: Self, config: dict[str, Any]) -> dict[str, Any]:
         """Gather components for deployment package."""
         # Mock implementation
         return {"components": []}
 
-    def _generate_deployment_scripts(
-        self: Self, config: dict[str, Any]
-    ) -> dict[str, Any]:
+    def _generate_deployment_scripts(self: Self, config: dict[str, Any]) -> dict[str, Any]:
         """Generate deployment scripts for package."""
         # Mock implementation
         return {
@@ -633,9 +587,7 @@ class GatewayResourceExporter:
             "validate.py": "# Validation script",
         }
 
-    def _save_deployment_package(
-        self: Self, data: dict[str, Any], output_path: Path
-    ) -> dict[str, Any]:
+    def _save_deployment_package(self: Self, data: dict[str, Any], output_path: Path) -> dict[str, Any]:
         """Save deployment package."""
         return self._save_zip_format(data, output_path)
 
@@ -646,16 +598,12 @@ class GatewayResourceExporter:
         # Similar to _track_export_in_graph but for projects
         pass
 
-    def _track_selective_export_in_graph(
-        self: Self, selection: dict[str, list[str]], result: dict[str, Any]
-    ) -> None:
+    def _track_selective_export_in_graph(self: Self, selection: dict[str, list[str]], result: dict[str, Any]) -> None:
         """Track selective export in graph database."""
         # Similar to _track_export_in_graph but for selective exports
         pass
 
-    def _track_package_creation_in_graph(
-        self: Self, config: dict[str, Any], result: dict[str, Any]
-    ) -> None:
+    def _track_package_creation_in_graph(self: Self, config: dict[str, Any], result: dict[str, Any]) -> None:
         """Track package creation in graph database."""
         # Similar to _track_export_in_graph but for packages
         pass

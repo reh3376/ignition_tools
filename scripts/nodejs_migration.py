@@ -88,7 +88,7 @@ class NodeJSMigrator:
             "success": False,
             "files_migrated": [],
             "errors": [],
-            "migration_time": 0.0
+            "migration_time": 0.0,
         }
 
         start_time = datetime.now()
@@ -107,7 +107,7 @@ class NodeJSMigrator:
                 # Files to migrate
                 files_to_migrate = [
                     ("package.json", self.source_path / "package.json"),
-                    ("node_modules", self.source_path / "node_modules")
+                    ("node_modules", self.source_path / "node_modules"),
                 ]
 
                 # Migrate each file/directory
@@ -173,7 +173,7 @@ class NodeJSMigrator:
         cleanup_result = {
             "files_removed": [],
             "files_failed": [],
-            "backup_created": False
+            "backup_created": False,
         }
 
         if self.config.dry_run:
@@ -237,14 +237,8 @@ class NodeJSMigrator:
 
             # Step 3: Cleanup (only if migration successful)
             cleanup_result = None
-            if (
-                migration_result["success"]
-                and migration_result["files_migrated"]
-                and not self.config.dry_run
-            ):
-                cleanup_result = self.cleanup_source_files(
-                    migration_result["files_migrated"]
-                )
+            if migration_result["success"] and migration_result["files_migrated"] and not self.config.dry_run:
+                cleanup_result = self.cleanup_source_files(migration_result["files_migrated"])
 
             # Generate report
             report = {
@@ -264,10 +258,7 @@ class NodeJSMigrator:
             }
 
             # Save report
-            report_file = (
-                self.source_path
-                / f"nodejs_migration_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-            )
+            report_file = self.source_path / f"nodejs_migration_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
             with open(report_file, "w") as f:
                 json.dump(report, f, indent=2)
 
@@ -306,12 +297,8 @@ def main():
         default="https://github.com/reh3376/ignition_tools_front.git",
         help="Frontend repository URL",
     )
-    parser.add_argument(
-        "--dry-run", action="store_true", help="Perform dry run without actual changes"
-    )
-    parser.add_argument(
-        "--no-backup", action="store_true", help="Skip creating backup of files"
-    )
+    parser.add_argument("--dry-run", action="store_true", help="Perform dry run without actual changes")
+    parser.add_argument("--no-backup", action="store_true", help="Skip creating backup of files")
 
     args = parser.parse_args()
 

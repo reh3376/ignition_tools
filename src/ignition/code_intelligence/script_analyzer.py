@@ -35,15 +35,9 @@ class AnalysisRequest(BaseModel):
         default="comprehensive",
         description="Type of analysis: pattern, context, structure, comprehensive",
     )
-    model_preference: str = Field(
-        default="qwen", description="Preferred model: qwen, codellama, auto"
-    )
-    include_suggestions: bool = Field(
-        default=True, description="Whether to include improvement suggestions"
-    )
-    confidence_threshold: float = Field(
-        default=0.6, ge=0.0, le=1.0, description="Confidence threshold for insights"
-    )
+    model_preference: str = Field(default="qwen", description="Preferred model: qwen, codellama, auto")
+    include_suggestions: bool = Field(default=True, description="Whether to include improvement suggestions")
+    confidence_threshold: float = Field(default=0.6, ge=0.0, le=1.0, description="Confidence threshold for insights")
 
 
 class CodePattern(BaseModel):
@@ -71,36 +65,20 @@ class AnalysisResult(BaseModel):
     complexity_score: float = Field(default=0.0, description="Code complexity score")
 
     # Pattern Detection Results
-    patterns_detected: list[CodePattern] = Field(
-        default_factory=list, description="Detected code patterns"
-    )
-    antipatterns_detected: list[CodePattern] = Field(
-        default_factory=list, description="Detected antipatterns"
-    )
+    patterns_detected: list[CodePattern] = Field(default_factory=list, description="Detected code patterns")
+    antipatterns_detected: list[CodePattern] = Field(default_factory=list, description="Detected antipatterns")
 
     # AI Analysis Results
-    context_understanding: dict[str, Any] = Field(
-        default_factory=dict, description="AI understanding of code context"
-    )
-    code_quality_score: float = Field(
-        default=0.0, description="Overall code quality score"
-    )
-    maintainability_score: float = Field(
-        default=0.0, description="Code maintainability score"
-    )
+    context_understanding: dict[str, Any] = Field(default_factory=dict, description="AI understanding of code context")
+    code_quality_score: float = Field(default=0.0, description="Overall code quality score")
+    maintainability_score: float = Field(default=0.0, description="Code maintainability score")
 
     # Processing Information
-    processing_time: float = Field(
-        default=0.0, description="Total processing time in seconds"
-    )
-    models_used: list[str] = Field(
-        default_factory=list, description="Models used for analysis"
-    )
+    processing_time: float = Field(default=0.0, description="Total processing time in seconds")
+    models_used: list[str] = Field(default_factory=list, description="Models used for analysis")
 
     # Improvement Suggestions
-    suggestions: list[dict[str, str]] = Field(
-        default_factory=list, description="Code improvement suggestions"
-    )
+    suggestions: list[dict[str, str]] = Field(default_factory=list, description="Code improvement suggestions")
 
     # Confidence Metrics
     confidence_scores: dict[str, float] = Field(
@@ -110,7 +88,7 @@ class AnalysisResult(BaseModel):
 
 def validate_analyzer_environment() -> dict[str, Any]:
     """Validate environment for script analysis following crawl_mcp.py patterns."""
-    validation_result = {
+    validation_result: dict[str, Any] = {
         "valid": True,
         "errors": [],
         "warnings": [],
@@ -131,9 +109,7 @@ def validate_analyzer_environment() -> dict[str, Any]:
                 if response.status_code == 200:
                     validation_result["available_components"]["ollama_available"] = True
                     tags_data = response.json()
-                    available_models = [
-                        model["name"] for model in tags_data.get("models", [])
-                    ]
+                    available_models = [model["name"] for model in tags_data.get("models", [])]
                     validation_result["available_models"] = available_models
 
                     # Check for preferred models
@@ -143,33 +119,21 @@ def validate_analyzer_environment() -> dict[str, Any]:
                         "codellama:13b-instruct",
                     ]
                     validation_result["preferred_models_available"] = [
-                        model
-                        for model in preferred_models
-                        if any(model in available for available in available_models)
+                        model for model in preferred_models if any(model in available for available in available_models)
                     ]
                 else:
-                    validation_result["warnings"].append(
-                        f"Ollama not responding at {ollama_host}"
-                    )
+                    validation_result["warnings"].append(f"Ollama not responding at {ollama_host}")
             except Exception:
-                validation_result["warnings"].append(
-                    f"Cannot connect to Ollama at {ollama_host}"
-                )
+                validation_result["warnings"].append(f"Cannot connect to Ollama at {ollama_host}")
         else:
-            validation_result["warnings"].append(
-                "Requests library not available for Ollama communication"
-            )
+            validation_result["warnings"].append("Requests library not available for Ollama communication")
 
         # Check local models configuration
         use_local_models = os.getenv("USE_LOCAL_MODELS", "false").lower() == "true"
-        validation_result["available_components"][
-            "local_models_enabled"
-        ] = use_local_models
+        validation_result["available_components"]["local_models_enabled"] = use_local_models
 
         if not use_local_models:
-            validation_result["warnings"].append(
-                "Local models disabled. AI analysis will be limited."
-            )
+            validation_result["warnings"].append("Local models disabled. AI analysis will be limited.")
 
     except Exception as e:
         validation_result["valid"] = False
@@ -220,9 +184,7 @@ class AIScriptAnalyzer:
             if env_validation["available_components"]["ollama_available"]:
                 print("✓ Ollama models available for analysis")
             else:
-                print(
-                    "⚠️  Ollama not available - analysis will be limited to AST-based patterns"
-                )
+                print("⚠️  Ollama not available - analysis will be limited to AST-based patterns")
 
             self.initialized = True
             return True
@@ -247,7 +209,7 @@ class AIScriptAnalyzer:
 
         # Step 1: Input validation and sanitization
         try:
-            request = AnalysisRequest(
+            AnalysisRequest(
                 script_path=script_path,
                 analysis_type=analysis_type,
                 model_preference=model_preference,
@@ -260,9 +222,7 @@ class AIScriptAnalyzer:
                 script_path=script_path,
                 analysis_type=analysis_type,
                 processing_time=time.time() - start_time,
-                suggestions=[
-                    {"type": "error", "suggestion": f"Input validation failed: {e}"}
-                ],
+                suggestions=[{"type": "error", "suggestion": f"Input validation failed: {e}"}],
             )
 
         # Step 2: Environment validation
@@ -270,9 +230,7 @@ class AIScriptAnalyzer:
             await self.initialize()
 
         # Step 3: Create result object
-        result = AnalysisResult(
-            success=True, script_path=script_path, analysis_type=analysis_type
-        )
+        result = AnalysisResult(success=True, script_path=script_path, analysis_type=analysis_type)
 
         try:
             # Step 4: Basic AST Analysis
@@ -284,28 +242,20 @@ class AIScriptAnalyzer:
 
             # Step 6: AI Context Understanding
             if analysis_type in ["context", "comprehensive"]:
-                result = await self._analyze_code_context(
-                    result, script_path, model_preference, confidence_threshold
-                )
+                result = await self._analyze_code_context(result, script_path, model_preference, confidence_threshold)
 
             # Step 7: Generate Suggestions
             if include_suggestions:
-                result = await self._generate_improvement_suggestions(
-                    result, script_path, model_preference
-                )
+                result = await self._generate_improvement_suggestions(result, script_path, model_preference)
 
         except Exception as e:
             result.success = False
-            result.suggestions.append(
-                {"type": "error", "suggestion": format_analyzer_error(e)}
-            )
+            result.suggestions.append({"type": "error", "suggestion": format_analyzer_error(e)})
 
         result.processing_time = time.time() - start_time
         return result
 
-    async def _analyze_ast_structure(
-        self, result: AnalysisResult, script_path: str
-    ) -> AnalysisResult:
+    async def _analyze_ast_structure(self, result: AnalysisResult, script_path: str) -> AnalysisResult:
         """Analyze basic script structure using AST."""
         try:
             with open(script_path, encoding="utf-8") as f:
@@ -335,16 +285,12 @@ class AIScriptAnalyzer:
             result.confidence_scores["structure_analysis"] = 0.0
         except Exception as e:
             result.success = False
-            result.suggestions.append(
-                {"type": "structure_error", "suggestion": format_analyzer_error(e)}
-            )
+            result.suggestions.append({"type": "structure_error", "suggestion": format_analyzer_error(e)})
             result.confidence_scores["structure_analysis"] = 0.0
 
         return result
 
-    async def _detect_code_patterns(
-        self, result: AnalysisResult, script_path: str
-    ) -> AnalysisResult:
+    async def _detect_code_patterns(self, result: AnalysisResult, script_path: str) -> AnalysisResult:
         """Detect code patterns and antipatterns using AST analysis."""
         try:
             with open(script_path, encoding="utf-8") as f:
@@ -394,6 +340,9 @@ class AIScriptAnalyzer:
     ) -> AnalysisResult:
         """Analyze code context using local AI models."""
         try:
+            pass  # TODO: Add try block content
+        except Exception:
+            pass  # TODO: Handle exception
             if not REQUESTS_AVAILABLE:
                 result.suggestions.append(
                     {
@@ -428,20 +377,12 @@ class AIScriptAnalyzer:
                 source_code = f.read()
 
             # Select model based on preference
-            model_name = (
-                "qwen2.5-coder:7b"
-                if model_preference == "qwen"
-                else "codellama:7b-instruct"
-            )
+            model_name = "qwen2.5-coder:7b" if model_preference == "qwen" else "codellama:7b-instruct"
 
             # Check if preferred model is available
             if not any(model_name in available for available in self.available_models):
                 # Fallback to any available code model
-                code_models = [
-                    m
-                    for m in self.available_models
-                    if "code" in m.lower() or "llama" in m.lower()
-                ]
+                code_models = [m for m in self.available_models if "code" in m.lower() or "llama" in m.lower()]
                 if code_models:
                     model_name = code_models[0]
                 else:
@@ -476,9 +417,7 @@ Respond with JSON format:
 
             payload = {"model": model_name, "prompt": prompt, "stream": False}
 
-            response = requests.post(
-                f"{self.ollama_host}/api/generate", json=payload, timeout=120
-            )
+            response = requests.post(f"{self.ollama_host}/api/generate", json=payload, timeout=120)
 
             if response.status_code == 200:
                 ollama_response = response.json()
@@ -489,12 +428,8 @@ Respond with JSON format:
                     analysis = json.loads(response_text)
 
                     result.context_understanding = analysis
-                    result.code_quality_score = float(
-                        analysis.get("quality_score", 0.0)
-                    )
-                    result.maintainability_score = float(
-                        analysis.get("maintainability_score", 0.0)
-                    )
+                    result.code_quality_score = float(analysis.get("quality_score", 0.0))
+                    result.maintainability_score = float(analysis.get("maintainability_score", 0.0))
 
                     result.confidence_scores["context_analysis"] = 0.8
                     result.models_used.append(model_name)
@@ -517,9 +452,7 @@ Respond with JSON format:
                 result.confidence_scores["context_analysis"] = 0.0
 
         except Exception as e:
-            result.suggestions.append(
-                {"type": "context_error", "suggestion": format_analyzer_error(e)}
-            )
+            result.suggestions.append({"type": "context_error", "suggestion": format_analyzer_error(e)})
             result.confidence_scores["context_analysis"] = 0.0
 
         return result
@@ -562,7 +495,7 @@ Respond with JSON format:
                 suggestions.append(
                     {
                         "type": "quality",
-                        "suggestion": f"Low quality score ({result.code_quality_score:.1f}) - improve code structure and documentation",
+                        "suggestion": f"Low quality score ({result.code_quality_score:.1f}) - improve code structure and documentation",  # noqa: E501
                     }
                 )
 
@@ -570,7 +503,7 @@ Respond with JSON format:
                 suggestions.append(
                     {
                         "type": "maintainability",
-                        "suggestion": f"Low maintainability score ({result.maintainability_score:.1f}) - add comments and simplify logic",
+                        "suggestion": f"Low maintainability score ({result.maintainability_score:.1f}) - add comments and simplify logic",  # noqa: E501
                     }
                 )
 
@@ -594,9 +527,7 @@ class StructureAnalyzer(ast.NodeVisitor):
 
     def visit_FunctionDef(self, node) -> Any:
         """Visit function definitions."""
-        self.functions.append(
-            {"name": node.name, "line": node.lineno, "args_count": len(node.args.args)}
-        )
+        self.functions.append({"name": node.name, "line": node.lineno, "args_count": len(node.args.args)})
 
         # Calculate complexity for this function
         old_complexity = self.current_function_complexity
@@ -673,10 +604,7 @@ class CodePatternDetector(ast.NodeVisitor):
                 )
 
         # Check for Ignition-specific patterns
-        if any(
-            ignition_keyword in node.name.lower()
-            for ignition_keyword in ["system", "tag", "opc", "plc"]
-        ):
+        if any(ignition_keyword in node.name.lower() for ignition_keyword in ["system", "tag", "opc", "plc"]):
             self.patterns.append(
                 {
                     "type": "ignition",
@@ -694,10 +622,7 @@ class CodePatternDetector(ast.NodeVisitor):
     def visit_Import(self, node) -> None:
         """Visit import statements to detect Ignition imports."""
         for alias in node.names:
-            if any(
-                ignition_module in alias.name
-                for ignition_module in ["system", "shared"]
-            ):
+            if any(ignition_module in alias.name for ignition_module in ["system", "shared"]):
                 self.patterns.append(
                     {
                         "type": "import",

@@ -89,9 +89,7 @@ class AIAssistantModule(AbstractIgnitionModule):
                 await self.knowledge_validator.initialize()
                 logger.info("Knowledge graph validator initialized")
             else:
-                logger.warning(
-                    "Neo4j not available - knowledge graph validation disabled"
-                )
+                logger.warning("Neo4j not available - knowledge graph validation disabled")
 
             self._set_initialized(True)
             logger.info("AI Assistant Module initialized successfully")
@@ -131,39 +129,25 @@ class AIAssistantModule(AbstractIgnitionModule):
                     request.code, request.file_path or "<string>"
                 )
             elif request.file_path:
-                response.analysis_result = self.code_analyzer.analyze_script(
-                    request.file_path
-                )
+                response.analysis_result = self.code_analyzer.analyze_script(request.file_path)
             else:
                 response.errors.append("Either code or file_path must be provided")
                 return response
 
             # Step 2: Validate against knowledge graph if requested and available
             if request.validate_against_knowledge_graph and self.knowledge_validator:
-                response.validation_result = (
-                    await self.knowledge_validator.validate_script(
-                        response.analysis_result
-                    )
-                )
-                response.confidence_score = (
-                    response.validation_result.overall_confidence
-                )
-                response.hallucinations_detected = (
-                    response.validation_result.hallucinations_detected
-                )
+                response.validation_result = await self.knowledge_validator.validate_script(response.analysis_result)
+                response.confidence_score = response.validation_result.overall_confidence
+                response.hallucinations_detected = response.validation_result.hallucinations_detected
 
                 # Generate suggestions based on validation results
-                response.suggestions = self._generate_suggestions(
-                    response.validation_result
-                )
+                response.suggestions = self._generate_suggestions(response.validation_result)
 
             # Step 3: Add analysis errors to response
             if response.analysis_result and response.analysis_result.errors:
                 response.errors.extend(response.analysis_result.errors)
 
-            logger.info(
-                f"Code analysis completed with confidence: {response.confidence_score:.2%}"
-            )
+            logger.info(f"Code analysis completed with confidence: {response.confidence_score:.2%}")
 
         except Exception as e:
             error_msg = f"Code analysis failed: {e!s}"
@@ -181,9 +165,7 @@ class AIAssistantModule(AbstractIgnitionModule):
         )
         return await self.analyze_code(request)
 
-    async def analyze_code_string(
-        self, code: str, file_path: str = "<string>"
-    ) -> CodeAnalysisResponse:
+    async def analyze_code_string(self, code: str, file_path: str = "<string>") -> CodeAnalysisResponse:
         """Convenience method to analyze code from string."""
         request = CodeAnalysisRequest(
             code=code,
@@ -278,9 +260,7 @@ class AIAssistantModule(AbstractIgnitionModule):
                 analysis_request = CodeAnalysisRequest(
                     code=request.get("code"),
                     file_path=request.get("file_path"),
-                    validate_against_knowledge_graph=request.get(
-                        "validate_against_knowledge_graph", True
-                    ),
+                    validate_against_knowledge_graph=request.get("validate_against_knowledge_graph", True),
                     detect_hallucinations=request.get("detect_hallucinations", True),
                 )
 
@@ -289,16 +269,8 @@ class AIAssistantModule(AbstractIgnitionModule):
                 # Convert response to dict
                 return {
                     "success": True,
-                    "analysis_result": (
-                        response.analysis_result.__dict__
-                        if response.analysis_result
-                        else None
-                    ),
-                    "validation_result": (
-                        response.validation_result.__dict__
-                        if response.validation_result
-                        else None
-                    ),
+                    "analysis_result": (response.analysis_result.__dict__ if response.analysis_result else None),
+                    "validation_result": (response.validation_result.__dict__ if response.validation_result else None),
                     "confidence_score": response.confidence_score,
                     "suggestions": response.suggestions,
                     "hallucinations_detected": response.hallucinations_detected,
@@ -325,9 +297,7 @@ class AIAssistantModule(AbstractIgnitionModule):
         # Load from environment variables
         self.ai_config.neo4j_uri = os.getenv("NEO4J_URI", self.ai_config.neo4j_uri)
         self.ai_config.neo4j_user = os.getenv("NEO4J_USER", self.ai_config.neo4j_user)
-        self.ai_config.neo4j_password = os.getenv(
-            "NEO4J_PASSWORD", self.ai_config.neo4j_password
-        )
+        self.ai_config.neo4j_password = os.getenv("NEO4J_PASSWORD", self.ai_config.neo4j_password)
 
         # Load from module configuration if available
         ai_config_data = self.config.get("ai_assistant", {})
@@ -335,9 +305,7 @@ class AIAssistantModule(AbstractIgnitionModule):
             self.ai_config.confidence_threshold = ai_config_data.get(
                 "confidence_threshold", self.ai_config.confidence_threshold
             )
-            self.ai_config.max_suggestions = ai_config_data.get(
-                "max_suggestions", self.ai_config.max_suggestions
-            )
+            self.ai_config.max_suggestions = ai_config_data.get("max_suggestions", self.ai_config.max_suggestions)
             self.ai_config.enable_web_crawling = ai_config_data.get(
                 "enable_web_crawling", self.ai_config.enable_web_crawling
             )
@@ -346,9 +314,7 @@ class AIAssistantModule(AbstractIgnitionModule):
                 self.ai_config.enable_hallucination_detection,
             )
 
-        logger.info(
-            f"AI Assistant configuration loaded: confidence_threshold={self.ai_config.confidence_threshold}"
-        )
+        logger.info(f"AI Assistant configuration loaded: confidence_threshold={self.ai_config.confidence_threshold}")
 
     def _is_neo4j_available(self) -> bool:
         """Check if Neo4j is available."""
@@ -372,9 +338,7 @@ class AIAssistantModule(AbstractIgnitionModule):
             logger.debug(f"Neo4j not available: {e}")
             return False
 
-    def _generate_suggestions(
-        self, validation_result: ScriptValidationResult
-    ) -> list[str]:
+    def _generate_suggestions(self, validation_result: ScriptValidationResult) -> list[str]:
         """Generate intelligent suggestions based on validation results."""
         suggestions = []
 

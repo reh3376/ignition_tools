@@ -340,7 +340,7 @@ class DeploymentPatternLearner:
 
         if gateway_host:
             conditions.append(
-                "EXISTS { MATCH (de:DeploymentExecution)-[:FOLLOWS_DEPLOYMENT_PATTERN]->(dp) WHERE de.gateway_host = $gateway_host }"
+                "EXISTS { MATCH (de:DeploymentExecution)-[:FOLLOWS_DEPLOYMENT_PATTERN]->(dp) WHERE de.gateway_host = $gateway_host }"  # noqa: E501
             )
             params["gateway_host"] = gateway_host
 

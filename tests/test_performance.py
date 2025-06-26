@@ -33,15 +33,11 @@ class TestPerformance:
         assert isinstance(templates, list)
 
     @pytest.mark.performance
-    def test_single_script_generation_speed(
-        self: Self, script_generator, sample_button_config, benchmark
-    ):
+    def test_single_script_generation_speed(self: Self, script_generator, sample_button_config, benchmark):
         """Benchmark single script generation."""
 
         def generate_script():
-            return script_generator.generate_script(
-                sample_button_config["template"], sample_button_config
-            )
+            return script_generator.generate_script(sample_button_config["template"], sample_button_config)
 
         result = benchmark(generate_script)
         assert result is not None
@@ -82,9 +78,7 @@ class TestPerformance:
         print(f"Memory usage: {memory_usage / 1024 / 1024:.2f} MB")
 
     @pytest.mark.performance
-    def test_concurrent_script_generation(
-        self: Self, script_generator, performance_monitor
-    ):
+    def test_concurrent_script_generation(self: Self, script_generator, performance_monitor):
         """Test concurrent script generation performance."""
         configs = []
         for i in range(20):
@@ -103,9 +97,7 @@ class TestPerformance:
         performance_monitor.start()
 
         with ThreadPoolExecutor(max_workers=4) as executor:
-            futures = [
-                executor.submit(generate_single_script, config) for config in configs
-            ]
+            futures = [executor.submit(generate_single_script, config) for config in configs]
             results = [future.result() for future in as_completed(futures)]
 
         performance_monitor.stop()
@@ -149,19 +141,13 @@ class TestPerformance:
             "window_params": {f"param_{i}": f"value_{i}" for i in range(1000)},
             "metadata": {
                 "large_data": list(range(10000)),
-                "nested": {
-                    "deep": {
-                        "structure": {f"key_{i}": f"value_{i}" for i in range(100)}
-                    }
-                },
+                "nested": {"deep": {"structure": {f"key_{i}": f"value_{i}" for i in range(100)}}},
             },
         }
 
         performance_monitor.start()
 
-        result = script_generator.generate_script(
-            large_context["template"], large_context
-        )
+        result = script_generator.generate_script(large_context["template"], large_context)
 
         performance_monitor.stop()
 
@@ -212,9 +198,7 @@ class TestPerformance:
             growth_rate = (avg_recent - avg_early) / avg_early
             assert growth_rate < 0.1  # Less than 10% growth
 
-        print(
-            f"Memory growth after 100 generations: {memory_growth / 1024 / 1024:.2f} MB"
-        )
+        print(f"Memory growth after 100 generations: {memory_growth / 1024 / 1024:.2f} MB")
 
     @pytest.mark.performance
     def test_jinja2_filter_performance(self: Self, script_generator, benchmark):
@@ -238,9 +222,7 @@ class TestPerformance:
         assert "True" in result  # Python True -> Jython True
 
     @pytest.mark.performance
-    def test_template_caching_effectiveness(
-        self: Self, script_generator, performance_monitor
-    ):
+    def test_template_caching_effectiveness(self: Self, script_generator, performance_monitor):
         """Test effectiveness of template caching."""
         template_name = "vision/button_click_handler.jinja2"
         base_config = {
@@ -273,9 +255,7 @@ class TestPerformance:
         # (Note: This may not always be true with Jinja2's built-in caching)
         print(f"Cold cache duration: {cold_duration:.4f}s")
         print(f"Average warm cache duration: {avg_warm_duration:.4f}s")
-        print(
-            f"Cache effectiveness: {((cold_duration - avg_warm_duration) / cold_duration * 100):.1f}%"
-        )
+        print(f"Cache effectiveness: {((cold_duration - avg_warm_duration) / cold_duration * 100):.1f}%")
 
     @pytest.mark.performance
     def test_cli_performance(self: Self, performance_monitor, temp_dir):

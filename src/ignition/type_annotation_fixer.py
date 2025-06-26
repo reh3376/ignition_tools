@@ -125,7 +125,7 @@ class TypeAnnotationFixer:
                 if not path.exists():
                     logger.warning(f"File not found: {path}")
                     continue
-                if not path.suffix == ".py":
+                if path.suffix != ".py":
                     logger.warning(f"Not a Python file: {path}")
                     continue
                 validated_paths.append(str(path))
@@ -191,10 +191,9 @@ class TypeAnnotationFixer:
 
         try:
             for error in errors:
-                if error.rule_code == "no-untyped-def":
-                    if self._fix_function_annotation(error):
-                        fixes_applied += 1
-                        files_processed.add(error.file_path)
+                if error.rule_code == "no-untyped-def" and self._fix_function_annotation(error):
+                    fixes_applied += 1
+                    files_processed.add(error.file_path)
 
             return FixResult(
                 success=True,
@@ -237,9 +236,7 @@ class TypeAnnotationFixer:
                     # Insert return type annotation
                     colon_pos = line.rfind(":")
                     if colon_pos != -1:
-                        new_line = (
-                            line[:colon_pos] + f" -> {return_type}" + line[colon_pos:]
-                        )
+                        new_line = line[:colon_pos] + f" -> {return_type}" + line[colon_pos:]
                         lines[error.line_number - 1] = new_line
 
                         # Write back to file
@@ -250,9 +247,7 @@ class TypeAnnotationFixer:
             return False
 
         except Exception as e:
-            logger.warning(
-                f"Failed to fix function annotation in {error.file_path}:{error.line_number}: {e}"
-            )
+            logger.warning(f"Failed to fix function annotation in {error.file_path}:{error.line_number}: {e}")
             return False
 
     def _infer_return_type(self, lines: list[str], func_line: int) -> str:
@@ -297,10 +292,9 @@ class TypeAnnotationFixer:
 
         try:
             for error in errors:
-                if error.rule_code == "var-annotated":
-                    if self._fix_variable_annotation(error):
-                        fixes_applied += 1
-                        files_processed.add(error.file_path)
+                if error.rule_code == "var-annotated" and self._fix_variable_annotation(error):
+                    fixes_applied += 1
+                    files_processed.add(error.file_path)
 
             return FixResult(
                 success=True,
@@ -361,9 +355,7 @@ class TypeAnnotationFixer:
             return False
 
         except Exception as e:
-            logger.warning(
-                f"Failed to fix variable annotation in {error.file_path}:{error.line_number}: {e}"
-            )
+            logger.warning(f"Failed to fix variable annotation in {error.file_path}:{error.line_number}: {e}")
             return False
 
     def _infer_variable_type(self, line: str, var_name: str) -> str:
@@ -396,9 +388,7 @@ class TypeAnnotationFixer:
 
         return "Any"
 
-    def fix_all_errors(
-        self, error_types: list[str] | None = None
-    ) -> dict[str, FixResult]:
+    def fix_all_errors(self, error_types: list[str] | None = None) -> dict[str, FixResult]:
         """Fix all mypy errors systematically."""
         logger.info("🚀 Starting comprehensive mypy error fixing")
 
@@ -422,18 +412,12 @@ class TypeAnnotationFixer:
             # Fix each error type
             for error_type in error_types:
                 if error_type in errors_by_type:
-                    logger.info(
-                        f"🔧 Processing {error_type} errors ({len(errors_by_type[error_type])} found)"
-                    )
+                    logger.info(f"🔧 Processing {error_type} errors ({len(errors_by_type[error_type])} found)")
 
                     if error_type == "no-untyped-def":
-                        result = self.fix_no_untyped_def_errors(
-                            errors_by_type[error_type]
-                        )
+                        result = self.fix_no_untyped_def_errors(errors_by_type[error_type])
                     elif error_type == "var-annotated":
-                        result = self.fix_var_annotated_errors(
-                            errors_by_type[error_type]
-                        )
+                        result = self.fix_var_annotated_errors(errors_by_type[error_type])
                     else:
                         result = FixResult(
                             success=False,

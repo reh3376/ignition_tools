@@ -159,7 +159,7 @@ def validate_knowledge_graph_environment() -> dict[str, Any]:
     Returns:
         dict containing validation results and component availability.
     """
-    validation_result = {
+        validation_result: dict[str, Any] = {
         "validation_score": 0,
         "total_checks": 10,
         "components": {},
@@ -275,7 +275,7 @@ class KnowledgeGraphPipeline:
         self.config = config or KnowledgeGraphConfig()
         self.driver = None
         self.embedding_model = None
-        self.validation_result = None
+self.validation_result: dict[str, Any] = None
 
         # Extraction state
         self.extracted_records = []
@@ -297,7 +297,7 @@ class KnowledgeGraphPipeline:
         Step 3: Resource management setup
         """
         # Step 1: Environment validation first
-        self.validation_result = validate_knowledge_graph_environment()
+self.validation_result: dict[str, Any] = validate_knowledge_graph_environment()
 
         if self.validation_result["validation_percentage"] < 70:
             raise SMEAgentValidationError(

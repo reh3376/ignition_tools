@@ -32,22 +32,14 @@ class SigningConfig:
     """Configuration for module signing operations."""
 
     # Certificate and key paths
-    certificate_path: str = field(
-        default_factory=lambda: os.getenv("MODULE_SIGNING_CERT_PATH", "")
-    )
-    private_key_path: str = field(
-        default_factory=lambda: os.getenv("MODULE_SIGNING_KEY_PATH", "")
-    )
-    ca_certificate_path: str = field(
-        default_factory=lambda: os.getenv("MODULE_CA_CERT_PATH", "")
-    )
+    certificate_path: str = field(default_factory=lambda: os.getenv("MODULE_SIGNING_CERT_PATH", ""))
+    private_key_path: str = field(default_factory=lambda: os.getenv("MODULE_SIGNING_KEY_PATH", ""))
+    ca_certificate_path: str = field(default_factory=lambda: os.getenv("MODULE_CA_CERT_PATH", ""))
 
     # Signing configuration
     hash_algorithm: str = "SHA256"
     signature_format: str = "PKCS7"
-    timestamp_server: str = field(
-        default_factory=lambda: os.getenv("TIMESTAMP_SERVER_URL", "")
-    )
+    timestamp_server: str = field(default_factory=lambda: os.getenv("TIMESTAMP_SERVER_URL", ""))
 
     # Validation settings
     verify_certificate_chain: bool = True
@@ -56,9 +48,7 @@ class SigningConfig:
 
     # Output settings
     output_directory: Path = field(default_factory=lambda: Path("signed"))
-    temp_directory: Path = field(
-        default_factory=lambda: Path(tempfile.gettempdir()) / "ignition-signing"
-    )
+    temp_directory: Path = field(default_factory=lambda: Path(tempfile.gettempdir()) / "ignition-signing")
 
     def __post_init__(self) -> None:
         """Validate configuration after initialization."""
@@ -141,9 +131,7 @@ def validate_private_key_path(key_path: str) -> dict[str, Any]:
         except ValueError:
             # Try DER format
             try:
-                private_key = serialization.load_der_private_key(
-                    key_data, password=None
-                )
+                private_key = serialization.load_der_private_key(key_data, password=None)
             except ValueError:
                 return {
                     "valid": False,
@@ -168,22 +156,12 @@ class ModuleSigner:
     def validate_environment(self) -> dict[str, bool]:
         """Validate signing environment and dependencies."""
         validation_results = {
-            "certificate_exists": bool(
-                self.config.certificate_path
-                and Path(self.config.certificate_path).exists()
-            ),
-            "private_key_exists": bool(
-                self.config.private_key_path
-                and Path(self.config.private_key_path).exists()
-            ),
+            "certificate_exists": bool(self.config.certificate_path and Path(self.config.certificate_path).exists()),
+            "private_key_exists": bool(self.config.private_key_path and Path(self.config.private_key_path).exists()),
             "certificate_valid": False,
             "private_key_valid": False,
-            "output_directory_writable": self._check_directory_writable(
-                self.config.output_directory
-            ),
-            "temp_directory_writable": self._check_directory_writable(
-                self.config.temp_directory
-            ),
+            "output_directory_writable": self._check_directory_writable(self.config.output_directory),
+            "temp_directory_writable": self._check_directory_writable(self.config.temp_directory),
         }
 
         # Validate certificate if it exists
@@ -222,20 +200,14 @@ class ModuleSigner:
         env_validation = self.validate_environment()
         missing_requirements = [k for k, v in env_validation.items() if not v]
         if missing_requirements:
-            result.warnings.extend(
-                [f"Missing requirement: {req}" for req in missing_requirements]
-            )
+            result.warnings.extend([f"Missing requirement: {req}" for req in missing_requirements])
 
             # Check for critical missing requirements
             critical_missing = [
-                req
-                for req in missing_requirements
-                if req in ["certificate_valid", "private_key_valid"]
+                req for req in missing_requirements if req in ["certificate_valid", "private_key_valid"]
             ]
             if critical_missing:
-                result.errors.extend(
-                    [f"Critical requirement missing: {req}" for req in critical_missing]
-                )
+                result.errors.extend([f"Critical requirement missing: {req}" for req in critical_missing])
                 return result
 
         try:
@@ -246,15 +218,11 @@ class ModuleSigner:
             key_validation = validate_private_key_path(self.config.private_key_path)
 
             if not cert_validation["valid"]:
-                result.errors.append(
-                    f"Certificate validation failed: {cert_validation['error']}"
-                )
+                result.errors.append(f"Certificate validation failed: {cert_validation['error']}")
                 return result
 
             if not key_validation["valid"]:
-                result.errors.append(
-                    f"Private key validation failed: {key_validation['error']}"
-                )
+                result.errors.append(f"Private key validation failed: {key_validation['error']}")
                 return result
 
             certificate = cert_validation["certificate"]
@@ -265,9 +233,7 @@ class ModuleSigner:
             signed_file = self.config.output_directory / signed_filename
 
             # Create module signature
-            signature_result = self._create_module_signature(
-                module_file, certificate, private_key
-            )
+            signature_result = self._create_module_signature(module_file, certificate, private_key)
             if not signature_result["success"]:
                 result.errors.extend(signature_result["errors"])
                 return result
@@ -305,9 +271,7 @@ class ModuleSigner:
 
         return result
 
-    def verify_module_signature(
-        self, signed_file: Path, signature_file: Path
-    ) -> dict[str, Any]:
+    def verify_module_signature(self, signed_file: Path, signature_file: Path) -> dict[str, Any]:
         """Verify a module signature.
 
         Args:
@@ -432,9 +396,7 @@ class ModuleSigner:
                 "errors": [f"Signature creation error: {e!s}"],
             }
 
-    def _extract_certificate_info(
-        self, certificate: x509.Certificate
-    ) -> dict[str, Any]:
+    def _extract_certificate_info(self, certificate: x509.Certificate) -> dict[str, Any]:
         """Extract information from certificate."""
         try:
             subject = certificate.subject

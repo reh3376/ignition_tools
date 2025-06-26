@@ -18,9 +18,7 @@ def backup() -> None:
 
 
 @backup.command()
-@click.option(
-    "--reason", "-r", default="Manual backup", help="Reason for creating backup"
-)
+@click.option("--reason", "-r", default="Manual backup", help="Reason for creating backup")
 @click.option(
     "--auto",
     "-a",
@@ -33,25 +31,17 @@ def create(reason: str, auto: bool) -> None:
         manager = Neo4jBackupManager()
 
         if auto:
-            console.print(
-                "[bold blue]🔍 Checking for significant changes...[/bold blue]"
-            )
+            console.print("[bold blue]🔍 Checking for significant changes...[/bold blue]")
             if manager.auto_backup_on_significant_changes():
-                console.print(
-                    "[green]✅ Auto-backup created due to significant changes[/green]"
-                )
+                console.print("[green]✅ Auto-backup created due to significant changes[/green]")
             else:
-                console.print(
-                    "[yellow]ℹ️ No backup needed - no significant changes detected[/yellow]"
-                )
+                console.print("[yellow]ℹ️ No backup needed - no significant changes detected[/yellow]")
         else:
             with console.status("[bold blue]Creating backup..."):
                 success, result = manager.create_full_backup(reason)
 
             if success:
-                console.print(
-                    f"[green]✅ Backup created successfully:[/green] {result}"
-                )
+                console.print(f"[green]✅ Backup created successfully:[/green] {result}")
             else:
                 console.print(f"[red]❌ Backup failed:[/red] {result}")
 
@@ -99,9 +89,7 @@ def restore(file: str, confirm: bool) -> None:
         console.print(info_panel)
 
         # Confirmation
-        if not confirm and not click.confirm(
-            "⚠️  This will DELETE all current data and restore from backup. Continue?"
-        ):
+        if not confirm and not click.confirm("⚠️  This will DELETE all current data and restore from backup. Continue?"):
             console.print("[yellow]❌ Restore cancelled[/yellow]")
             return
 
@@ -149,11 +137,7 @@ def list(detailed: bool) -> None:
         for backup in backups:
             row = [
                 backup.get("filename", "Unknown"),
-                (
-                    backup.get("datetime", "Unknown")[:19]
-                    if backup.get("datetime")
-                    else "Unknown"
-                ),
+                (backup.get("datetime", "Unknown")[:19] if backup.get("datetime") else "Unknown"),
                 (
                     backup.get("reason", "No reason")[:30] + "..."
                     if len(backup.get("reason", "")) > 30
@@ -223,12 +207,8 @@ def info(filename: str) -> None:
 
 
 @backup.command()
-@click.option(
-    "--threshold-nodes", default=50, help="Node count threshold for auto-backup"
-)
-@click.option(
-    "--threshold-rels", default=100, help="Relationship count threshold for auto-backup"
-)
+@click.option("--threshold-nodes", default=50, help="Node count threshold for auto-backup")
+@click.option("--threshold-rels", default=100, help="Relationship count threshold for auto-backup")
 @click.option(
     "--threshold-percent",
     default=0.1,
@@ -237,6 +217,9 @@ def info(filename: str) -> None:
 def status(threshold_nodes: int, threshold_rels: int, threshold_percent: float) -> None:
     """📊 Show database backup status and recommendations."""
     try:
+        pass  # TODO: Add try block content
+    except Exception:
+        pass  # TODO: Handle exception
         manager = Neo4jBackupManager()
 
         # Get current database stats
@@ -270,9 +253,7 @@ def status(threshold_nodes: int, threshold_rels: int, threshold_percent: float) 
         else:
             status_text += "[green]✅ No backup needed[/green]"
 
-        status_panel = Panel(
-            status_text, title="📊 Database Backup Status", border_style="blue"
-        )
+        status_panel = Panel(status_text, title="📊 Database Backup Status", border_style="blue")
         console.print(status_panel)
 
         # Show thresholds
@@ -281,9 +262,7 @@ def status(threshold_nodes: int, threshold_rels: int, threshold_percent: float) 
 • Relationships: {threshold_rels:,} new relationships
 • Percentage: {threshold_percent:.1%} increase"""
 
-        threshold_panel = Panel(
-            threshold_text, title="⚙️ Configuration", border_style="dim"
-        )
+        threshold_panel = Panel(threshold_text, title="⚙️ Configuration", border_style="dim")
         console.print(threshold_panel)
 
     except Exception as e:
@@ -294,22 +273,16 @@ def status(threshold_nodes: int, threshold_rels: int, threshold_percent: float) 
 def init() -> None:
     """🚀 Create initial backup for application distribution."""
     try:
-        console.print(
-            "[bold blue]🚀 Creating initial backup for application distribution...[/bold blue]"
-        )
+        console.print("[bold blue]🚀 Creating initial backup for application distribution...[/bold blue]")
 
         manager = Neo4jBackupManager()
 
         with console.status("[bold blue]Creating initial backup..."):
-            success, result = manager.create_full_backup(
-                "Initial backup for application distribution"
-            )
+            success, result = manager.create_full_backup("Initial backup for application distribution")
 
         if success:
             console.print(f"[green]✅ Initial backup created:[/green] {result}")
-            console.print(
-                "[green]This backup will be included with the application for new installations.[/green]"
-            )
+            console.print("[green]This backup will be included with the application for new installations.[/green]")
         else:
             console.print(f"[red]❌ Failed to create initial backup:[/red] {result}")
 

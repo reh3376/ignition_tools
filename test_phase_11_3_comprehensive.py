@@ -130,16 +130,12 @@ class Phase11_3TestSuite:
             # Test health endpoint
             response = client.get("/health")
             health_ok = response.status_code == 200
-            self.log_test(
-                "FastAPI Health Endpoint", health_ok, f"Status: {response.status_code}"
-            )
+            self.log_test("FastAPI Health Endpoint", health_ok, f"Status: {response.status_code}")
 
             # Test status endpoint
             response = client.get("/status")
             status_ok = response.status_code == 200
-            self.log_test(
-                "FastAPI Status Endpoint", status_ok, f"Status: {response.status_code}"
-            )
+            self.log_test("FastAPI Status Endpoint", status_ok, f"Status: {response.status_code}")
 
             # Test docs endpoint
             response = client.get("/docs")
@@ -181,14 +177,10 @@ class Phase11_3TestSuite:
             async def test_integrator():
                 integrator = DevelopmentWorkflowIntegrator()
                 # Test basic initialization without full setup
-                return hasattr(integrator, "config") and hasattr(
-                    integrator, "project_root"
-                )
+                return hasattr(integrator, "config") and hasattr(integrator, "project_root")
 
             integrator_ok = asyncio.run(test_integrator())
-            self.log_test(
-                "Development Workflow Integrator Initialization", integrator_ok
-            )
+            self.log_test("Development Workflow Integrator Initialization", integrator_ok)
 
         except Exception as e:
             self.log_test("Development Workflow Integration Test", False, str(e))
@@ -237,16 +229,11 @@ class Phase11_3TestSuite:
             )
 
             # Test workflow group
-            workflow_ok = (
-                hasattr(workflow_group, "commands") and len(workflow_group.commands) > 0
-            )
+            workflow_ok = hasattr(workflow_group, "commands") and len(workflow_group.commands) > 0
             self.log_test("Workflow CLI Group", workflow_ok)
 
             # Test knowledge group
-            knowledge_ok = (
-                hasattr(knowledge_group, "commands")
-                and len(knowledge_group.commands) > 0
-            )
+            knowledge_ok = hasattr(knowledge_group, "commands") and len(knowledge_group.commands) > 0
             self.log_test("Knowledge CLI Group", knowledge_ok)
 
             # Test command registration function
@@ -280,10 +267,7 @@ class Phase11_3TestSuite:
         """Test 7: Validate documentation completeness."""
         try:
             # Test Phase 11.3 documentation
-            phase_doc = (
-                self.project_root
-                / "docs/phase_summary/PHASE_11_3_SME_AGENT_INTEGRATION_INTERFACES.md"
-            )
+            phase_doc = self.project_root / "docs/phase_summary/PHASE_11_3_SME_AGENT_INTEGRATION_INTERFACES.md"
             if phase_doc.exists():
                 content = phase_doc.read_text()
                 has_implementation = "Implementation Summary" in content
@@ -293,9 +277,7 @@ class Phase11_3TestSuite:
                 doc_complete = has_implementation and has_architecture and has_examples
                 self.log_test("Phase 11.3 Documentation Completeness", doc_complete)
             else:
-                self.log_test(
-                    "Phase 11.3 Documentation Exists", False, "File not found"
-                )
+                self.log_test("Phase 11.3 Documentation Exists", False, "File not found")
 
             # Test uvicorn documentation
             uvicorn_doc = self.project_root / "docs/uvicorn_api_guide.md"
@@ -344,9 +326,7 @@ class Phase11_3TestSuite:
                 __import__(package)
                 self.log_test(f"Dependency: {package}", True)
             except ImportError:
-                self.log_test(
-                    f"Dependency: {package}", False, f"Missing: {description}"
-                )
+                self.log_test(f"Dependency: {package}", False, f"Missing: {description}")
 
     def test_configuration_validation(self):
         """Test 10: Validate configuration and settings."""

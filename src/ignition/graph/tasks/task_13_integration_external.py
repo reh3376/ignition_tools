@@ -32,7 +32,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.callRestAPI",
                 "description": "Call REST APIs with comprehensive error handling and authentication",
-                "parameters": "url:str:required, method:str:optional:GET, headers:dict:optional, body:str:optional, timeout:int:optional:30, authentication:dict:optional, retryPolicy:dict:optional",
+                "parameters": "url:str:required, method:str:optional:GET, headers:dict:optional, body:str:optional, timeout:int:optional:30, authentication:dict:optional, retryPolicy:dict:optional",  # noqa: E501
                 "returns": "dict - REST API response with status, data, and metadata",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "REST API",
@@ -46,7 +46,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.createWebService",
                 "description": "Create and expose web service endpoints from Ignition",
-                "parameters": "serviceName:str:required, endpoint:str:required, methods:list:required, authentication:bool:optional:true, corsEnabled:bool:optional:false, rateLimiting:dict:optional",
+                "parameters": "serviceName:str:required, endpoint:str:required, methods:list:required, authentication:bool:optional:true, corsEnabled:bool:optional:false, rateLimiting:dict:optional",  # noqa: E501
                 "returns": "dict - Web service configuration with endpoint URL and status",
                 "scope": ["Gateway"],
                 "category": "Web Service",
@@ -60,7 +60,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.configureOAuth",
                 "description": "Configure OAuth authentication for external API integrations",
-                "parameters": "providerName:str:required, clientId:str:required, clientSecret:str:required, scopes:list:optional, authUrl:str:required, tokenUrl:str:required, refreshEnabled:bool:optional:true",
+                "parameters": "providerName:str:required, clientId:str:required, clientSecret:str:required, scopes:list:optional, authUrl:str:required, tokenUrl:str:required, refreshEnabled:bool:optional:true",  # noqa: E501
                 "returns": "dict - OAuth configuration with authentication status",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "OAuth Authentication",
@@ -74,7 +74,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.manageAPIKeys",
                 "description": "Manage API keys for external service integrations",
-                "parameters": "keyName:str:required, apiKey:str:required, provider:str:required, permissions:list:optional, expirationDate:str:optional, rotationPolicy:dict:optional",
+                "parameters": "keyName:str:required, apiKey:str:required, provider:str:required, permissions:list:optional, expirationDate:str:optional, rotationPolicy:dict:optional",  # noqa: E501
                 "returns": "dict - API key management status with security metrics",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "API Management",
@@ -88,7 +88,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.validateAPIResponse",
                 "description": "Validate and parse API responses with schema validation",
-                "parameters": "response:dict:required, schema:dict:optional, validationRules:list:optional, errorHandling:str:optional:strict, parseFormat:str:optional:json",
+                "parameters": "response:dict:required, schema:dict:optional, validationRules:list:optional, errorHandling:str:optional:strict, parseFormat:str:optional:json",  # noqa: E501
                 "returns": "dict - Validated response data with parsing results",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "API Validation",
@@ -102,7 +102,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.cacheAPIResponses",
                 "description": "Cache API responses for improved performance and reduced external calls",
-                "parameters": "cacheKey:str:required, response:dict:required, ttl:int:optional:3600, cacheStrategy:str:optional:lru, invalidationRules:list:optional",
+                "parameters": "cacheKey:str:required, response:dict:required, ttl:int:optional:3600, cacheStrategy:str:optional:lru, invalidationRules:list:optional",  # noqa: E501
                 "returns": "dict - Cache status with hit/miss statistics",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "API Caching",
@@ -116,7 +116,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.monitorAPIHealth",
                 "description": "Monitor health and performance of external API integrations",
-                "parameters": "apiEndpoints:list:required, healthCheckInterval:int:optional:300, performanceThresholds:dict:optional, alerting:bool:optional:true, metrics:list:optional",
+                "parameters": "apiEndpoints:list:required, healthCheckInterval:int:optional:300, performanceThresholds:dict:optional, alerting:bool:optional:true, metrics:list:optional",  # noqa: E501
                 "returns": "dict - API health status with performance metrics and alerts",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "API Monitoring",
@@ -130,7 +130,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.handleWebhooks",
                 "description": "Handle incoming webhooks from external systems",
-                "parameters": "webhookUrl:str:required, eventTypes:list:required, authentication:dict:optional, processingLogic:str:required, responseFormat:str:optional:json",
+                "parameters": "webhookUrl:str:required, eventTypes:list:required, authentication:dict:optional, processingLogic:str:required, responseFormat:str:optional:json",  # noqa: E501
                 "returns": "dict - Webhook processing status with event handling results",
                 "scope": ["Gateway"],
                 "category": "Webhook Handling",
@@ -144,7 +144,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.synchronizeData",
                 "description": "Synchronize data between Ignition and external systems",
-                "parameters": "sourceSystem:str:required, targetSystem:str:required, dataMapping:dict:required, syncStrategy:str:optional:bidirectional, conflictResolution:str:optional:timestamp",
+                "parameters": "sourceSystem:str:required, targetSystem:str:required, dataMapping:dict:required, syncStrategy:str:optional:bidirectional, conflictResolution:str:optional:timestamp",  # noqa: E501
                 "returns": "dict - Data synchronization results with conflict resolution details",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Data Synchronization",
@@ -158,7 +158,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.transformData",
                 "description": "Transform data between different formats for external system integration",
-                "parameters": "inputData:dict:required, sourceFormat:str:required, targetFormat:str:required, transformationRules:dict:required, validationEnabled:bool:optional:true",
+                "parameters": "inputData:dict:required, sourceFormat:str:required, targetFormat:str:required, transformationRules:dict:required, validationEnabled:bool:optional:true",  # noqa: E501
                 "returns": "dict - Transformed data with validation results",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Data Transformation",
@@ -181,7 +181,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.configureTCP",
                 "description": "Configure TCP communication for external system connectivity",
-                "parameters": "host:str:required, port:int:required, connectionTimeout:int:optional:5000, keepAlive:bool:optional:true, bufferSize:int:optional:8192, encryption:bool:optional:false",
+                "parameters": "host:str:required, port:int:required, connectionTimeout:int:optional:5000, keepAlive:bool:optional:true, bufferSize:int:optional:8192, encryption:bool:optional:false",  # noqa: E501
                 "returns": "dict - TCP connection status with performance metrics",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "TCP Communication",
@@ -195,7 +195,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.configureUDP",
                 "description": "Configure UDP communication for real-time data exchange",
-                "parameters": "host:str:required, port:int:required, broadcastEnabled:bool:optional:false, multicastGroup:str:optional, packetSize:int:optional:1024, errorHandling:str:optional:ignore",
+                "parameters": "host:str:required, port:int:required, broadcastEnabled:bool:optional:false, multicastGroup:str:optional, packetSize:int:optional:1024, errorHandling:str:optional:ignore",  # noqa: E501
                 "returns": "dict - UDP configuration status with network parameters",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "UDP Communication",
@@ -209,7 +209,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.manageFTP",
                 "description": "Manage FTP file transfers with external systems",
-                "parameters": "ftpServer:str:required, username:str:required, password:str:required, transferMode:str:optional:binary, encryption:str:optional:none, passiveMode:bool:optional:true",
+                "parameters": "ftpServer:str:required, username:str:required, password:str:required, transferMode:str:optional:binary, encryption:str:optional:none, passiveMode:bool:optional:true",  # noqa: E501
                 "returns": "dict - FTP operation results with transfer statistics",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "FTP Management",
@@ -223,7 +223,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.configureSFTP",
                 "description": "Configure secure SFTP connections for file transfers",
-                "parameters": "sftpServer:str:required, username:str:required, privateKey:str:optional, password:str:optional, hostKeyVerification:bool:optional:true, compressionEnabled:bool:optional:false",
+                "parameters": "sftpServer:str:required, username:str:required, privateKey:str:optional, password:str:optional, hostKeyVerification:bool:optional:true, compressionEnabled:bool:optional:false",  # noqa: E501
                 "returns": "dict - SFTP connection status with security parameters",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "SFTP Management",
@@ -237,7 +237,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.handleSMTP",
                 "description": "Handle SMTP email communication for system notifications",
-                "parameters": "smtpServer:str:required, port:int:optional:587, authentication:dict:required, encryption:str:optional:tls, connectionPooling:bool:optional:true, rateLimiting:dict:optional",
+                "parameters": "smtpServer:str:required, port:int:optional:587, authentication:dict:required, encryption:str:optional:tls, connectionPooling:bool:optional:true, rateLimiting:dict:optional",  # noqa: E501
                 "returns": "dict - SMTP configuration with email delivery status",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "SMTP Communication",
@@ -251,7 +251,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.configureSNMP",
                 "description": "Configure SNMP for network device monitoring and management",
-                "parameters": "snmpHost:str:required, community:str:required, version:str:optional:v2c, port:int:optional:161, timeout:int:optional:5000, retries:int:optional:3",
+                "parameters": "snmpHost:str:required, community:str:required, version:str:optional:v2c, port:int:optional:161, timeout:int:optional:5000, retries:int:optional:3",  # noqa: E501
                 "returns": "dict - SNMP configuration with device monitoring status",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "SNMP Management",
@@ -265,7 +265,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.manageLDAP",
                 "description": "Manage LDAP directory services for user authentication and authorization",
-                "parameters": "ldapServer:str:required, bindDN:str:required, bindPassword:str:required, baseDN:str:required, encryption:str:optional:none, connectionPooling:bool:optional:true",
+                "parameters": "ldapServer:str:required, bindDN:str:required, bindPassword:str:required, baseDN:str:required, encryption:str:optional:none, connectionPooling:bool:optional:true",  # noqa: E501
                 "returns": "dict - LDAP connection status with directory service configuration",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "LDAP Management",
@@ -279,7 +279,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.configureSSL",
                 "description": "Configure SSL/TLS encryption for secure external communications",
-                "parameters": "protocol:str:optional:TLSv1.2, certificatePath:str:optional, privateKeyPath:str:optional, caCertificatePath:str:optional, verifyMode:str:optional:required, cipherSuites:list:optional",
+                "parameters": "protocol:str:optional:TLSv1.2, certificatePath:str:optional, privateKeyPath:str:optional, caCertificatePath:str:optional, verifyMode:str:optional:required, cipherSuites:list:optional",  # noqa: E501
                 "returns": "dict - SSL configuration status with encryption parameters",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "SSL Configuration",
@@ -293,7 +293,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.monitorNetworkPerformance",
                 "description": "Monitor network performance for external system integrations",
-                "parameters": "endpoints:list:required, metrics:list:optional, alertThresholds:dict:optional, reportingInterval:int:optional:60, historicalData:bool:optional:true",
+                "parameters": "endpoints:list:required, metrics:list:optional, alertThresholds:dict:optional, reportingInterval:int:optional:60, historicalData:bool:optional:true",  # noqa: E501
                 "returns": "dict - Network performance metrics with trend analysis",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Network Monitoring",
@@ -307,7 +307,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.handleVPN",
                 "description": "Handle VPN connections for secure external system access",
-                "parameters": "vpnServer:str:required, vpnType:str:required, credentials:dict:required, autoConnect:bool:optional:true, connectionTimeout:int:optional:30000, healthCheck:bool:optional:true",
+                "parameters": "vpnServer:str:required, vpnType:str:required, credentials:dict:required, autoConnect:bool:optional:true, connectionTimeout:int:optional:30000, healthCheck:bool:optional:true",  # noqa: E501
                 "returns": "dict - VPN connection status with security metrics",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "VPN Management",
@@ -330,7 +330,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.configureMQTT",
                 "description": "Configure MQTT messaging for IoT and real-time data exchange",
-                "parameters": "brokerUrl:str:required, clientId:str:required, credentials:dict:optional, qos:int:optional:1, keepAlive:int:optional:60, cleanSession:bool:optional:true",
+                "parameters": "brokerUrl:str:required, clientId:str:required, credentials:dict:optional, qos:int:optional:1, keepAlive:int:optional:60, cleanSession:bool:optional:true",  # noqa: E501
                 "returns": "dict - MQTT connection status with messaging configuration",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "MQTT Messaging",
@@ -344,7 +344,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.manageJMS",
                 "description": "Manage Java Message Service (JMS) for enterprise messaging",
-                "parameters": "connectionFactory:str:required, destination:str:required, messageType:str:optional:queue, persistence:bool:optional:true, transacted:bool:optional:false, acknowledgeMode:str:optional:auto",
+                "parameters": "connectionFactory:str:required, destination:str:required, messageType:str:optional:queue, persistence:bool:optional:true, transacted:bool:optional:false, acknowledgeMode:str:optional:auto",  # noqa: E501
                 "returns": "dict - JMS configuration with message handling status",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "JMS Messaging",
@@ -358,7 +358,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.configureKafka",
                 "description": "Configure Apache Kafka for high-throughput data streaming",
-                "parameters": "bootstrapServers:str:required, topic:str:required, groupId:str:optional, keySerializer:str:optional, valueSerializer:str:optional, batchSize:int:optional:16384",
+                "parameters": "bootstrapServers:str:required, topic:str:required, groupId:str:optional, keySerializer:str:optional, valueSerializer:str:optional, batchSize:int:optional:16384",  # noqa: E501
                 "returns": "dict - Kafka configuration with streaming status",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Kafka Streaming",
@@ -372,7 +372,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.handleRabbitMQ",
                 "description": "Handle RabbitMQ message brokering for reliable messaging",
-                "parameters": "host:str:required, virtualHost:str:optional:/, exchange:str:required, routingKey:str:required, credentials:dict:required, durable:bool:optional:true",
+                "parameters": "host:str:required, virtualHost:str:optional:/, exchange:str:required, routingKey:str:required, credentials:dict:required, durable:bool:optional:true",  # noqa: E501
                 "returns": "dict - RabbitMQ configuration with message broker status",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "RabbitMQ Messaging",
@@ -386,7 +386,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.configureWebSockets",
                 "description": "Configure WebSocket connections for real-time bidirectional communication",
-                "parameters": "websocketUrl:str:required, protocols:list:optional, headers:dict:optional, heartbeatInterval:int:optional:30, reconnectEnabled:bool:optional:true, maxReconnectAttempts:int:optional:5",
+                "parameters": "websocketUrl:str:required, protocols:list:optional, headers:dict:optional, heartbeatInterval:int:optional:30, reconnectEnabled:bool:optional:true, maxReconnectAttempts:int:optional:5",  # noqa: E501
                 "returns": "dict - WebSocket connection status with real-time capabilities",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "WebSocket Communication",
@@ -400,7 +400,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.manageESB",
                 "description": "Manage Enterprise Service Bus (ESB) integration patterns",
-                "parameters": "esbEndpoint:str:required, serviceConfig:dict:required, routingRules:list:required, transformationPipeline:list:optional, errorHandling:dict:optional, monitoring:bool:optional:true",
+                "parameters": "esbEndpoint:str:required, serviceConfig:dict:required, routingRules:list:required, transformationPipeline:list:optional, errorHandling:dict:optional, monitoring:bool:optional:true",  # noqa: E501
                 "returns": "dict - ESB integration status with service orchestration results",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "ESB Management",
@@ -414,7 +414,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.handleFileWatcher",
                 "description": "Handle file system watching for external data integration",
-                "parameters": "watchDirectory:str:required, filePattern:str:optional:*, events:list:optional, processingScript:str:required, bufferTime:int:optional:1000, recursiveWatch:bool:optional:false",
+                "parameters": "watchDirectory:str:required, filePattern:str:optional:*, events:list:optional, processingScript:str:required, bufferTime:int:optional:1000, recursiveWatch:bool:optional:false",  # noqa: E501
                 "returns": "dict - File watcher status with processing results",
                 "scope": ["Gateway"],
                 "category": "File Watching",
@@ -428,7 +428,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.configureCron",
                 "description": "Configure cron-style scheduling for external system integrations",
-                "parameters": "cronExpression:str:required, taskName:str:required, integrationScript:str:required, timezone:str:optional:UTC, enabled:bool:optional:true, errorNotification:bool:optional:true",
+                "parameters": "cronExpression:str:required, taskName:str:required, integrationScript:str:required, timezone:str:optional:UTC, enabled:bool:optional:true, errorNotification:bool:optional:true",  # noqa: E501
                 "returns": "dict - Cron configuration with scheduling status",
                 "scope": ["Gateway"],
                 "category": "Task Scheduling",
@@ -442,7 +442,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.manageCache",
                 "description": "Manage distributed cache for external system integration performance",
-                "parameters": "cacheProvider:str:required, configuration:dict:required, expiration:dict:optional, evictionPolicy:str:optional:lru, clustering:bool:optional:false, persistence:bool:optional:false",
+                "parameters": "cacheProvider:str:required, configuration:dict:required, expiration:dict:optional, evictionPolicy:str:optional:lru, clustering:bool:optional:false, persistence:bool:optional:false",  # noqa: E501
                 "returns": "dict - Cache configuration with performance metrics",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Cache Management",
@@ -456,7 +456,7 @@ def get_integration_external_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.integration.orchestrateWorkflow",
                 "description": "Orchestrate complex workflows across multiple external systems",
-                "parameters": "workflowDefinition:dict:required, participants:list:required, executionStrategy:str:optional:sequential, errorHandling:dict:optional, compensation:dict:optional, monitoring:bool:optional:true",
+                "parameters": "workflowDefinition:dict:required, participants:list:required, executionStrategy:str:optional:sequential, errorHandling:dict:optional, compensation:dict:optional, monitoring:bool:optional:true",  # noqa: E501
                 "returns": "dict - Workflow orchestration status with execution results",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Workflow Orchestration",
@@ -478,7 +478,7 @@ def get_task_13_metadata() -> dict[str, Any]:
     return {
         "task_number": 13,
         "task_name": "Integration & External Systems Functions",
-        "description": "Comprehensive external system integration functions for REST APIs, network protocols, messaging, and enterprise connectivity",
+        "description": "Comprehensive external system integration functions for REST APIs, network protocols, messaging, and enterprise connectivity",  # noqa: E501
         "total_functions": 30,
         "categories": ["REST API", "Network Communication", "Message Queuing"],
         "contexts": ["Gateway", "Vision Client", "Perspective Session"],

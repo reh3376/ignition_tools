@@ -227,9 +227,7 @@ class TemplateSharingManager:
 
                 for i, template_path in enumerate(template_paths):
                     template_bundle = templates_dir / f"template_{i}.zip"
-                    if self.export_template(
-                        template_path, template_bundle, include_metadata=True
-                    ):
+                    if self.export_template(template_path, template_bundle, include_metadata=True):
                         package_info["templates"].append(
                             {
                                 "index": i,
@@ -285,9 +283,7 @@ class TemplateSharingManager:
 
         return shared_templates
 
-    def _save_metadata_to_file(
-        self, file_path: Path, metadata: TemplateMetadata
-    ) -> None:
+    def _save_metadata_to_file(self, file_path: Path, metadata: TemplateMetadata) -> None:
         """Save metadata to a JSON file.
 
         Args:

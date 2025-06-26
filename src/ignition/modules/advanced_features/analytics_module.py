@@ -1,4 +1,4 @@
-"""Phase 9.8: Real-time Analytics Module
+"""Phase 9.8: Real-time Analytics Module.
 ====================================
 
 Following crawl_mcp.py methodology for systematic development:
@@ -66,9 +66,7 @@ class AnalyticsConfig:
     def __post_init__(self: Self) -> None:
         """Validate configuration following crawl_mcp.py methodology."""
         if not self.analytics_temp_dir:
-            self.analytics_temp_dir = os.getenv(
-                "ANALYTICS_TEMP_DIR", str(Path.home() / "tmp" / "ign_analytics")
-            )
+            self.analytics_temp_dir = os.getenv("ANALYTICS_TEMP_DIR", str(Path.home() / "tmp" / "ign_analytics"))
         if not self.model_cache_dir:
             self.model_cache_dir = os.getenv(
                 "ANALYTICS_MODEL_CACHE_DIR",
@@ -103,7 +101,7 @@ class AnalyticsData:
 
 
 class RealTimeAnalyticsModule:
-    """Real-time Analytics Module for Ignition
+    """Real-time Analytics Module for Ignition.
 
     Following crawl_mcp.py methodology:
     - Step 1: Environment Variable Validation First
@@ -139,11 +137,9 @@ class RealTimeAnalyticsModule:
 
     def validate_environment(self: Self) -> dict[str, ValidationResult]:
         """Step 1: Environment Variable Validation First
-        Following crawl_mcp.py methodology
+        Following crawl_mcp.py methodology.
         """
-        self.console.print(
-            "🔍 Step 1: Analytics Environment Validation", style="bold blue"
-        )
+        self.console.print("🔍 Step 1: Analytics Environment Validation", style="bold blue")
 
         results = {}
 
@@ -161,18 +157,14 @@ class RealTimeAnalyticsModule:
         # Validate dependencies
         results["analytics_dependencies"] = self._validate_analytics_dependencies()
         results["ml_dependencies"] = self._validate_ml_dependencies()
-        results["visualization_dependencies"] = (
-            self._validate_visualization_dependencies()
-        )
+        results["visualization_dependencies"] = self._validate_visualization_dependencies()
 
         # Display validation results
         self._display_validation_results(results)
 
         return results
 
-    def _validate_directory(
-        self, path: str, description: str, create_if_missing: bool = False
-    ) -> ValidationResult:
+    def _validate_directory(self, path: str, description: str, create_if_missing: bool = False) -> ValidationResult:
         """Validate directory with user-friendly error handling."""
         try:
             path_obj = Path(path)
@@ -180,9 +172,7 @@ class RealTimeAnalyticsModule:
             if not path_obj.exists():
                 if create_if_missing:
                     path_obj.mkdir(parents=True, exist_ok=True)
-                    return ValidationResult(
-                        valid=True, warning=f"{description} created at {path}"
-                    )
+                    return ValidationResult(valid=True, warning=f"{description} created at {path}")
                 else:
                     return ValidationResult(
                         valid=False,
@@ -191,9 +181,7 @@ class RealTimeAnalyticsModule:
                     )
 
             if not path_obj.is_dir():
-                return ValidationResult(
-                    valid=False, error=f"{description} is not a directory: {path}"
-                )
+                return ValidationResult(valid=False, error=f"{description} is not a directory: {path}")
 
             # Test write permissions
             test_file = path_obj / ".test_write"
@@ -209,9 +197,7 @@ class RealTimeAnalyticsModule:
                 )
 
         except Exception as e:
-            return ValidationResult(
-                valid=False, error=f"Error validating {description}: {e!s}"
-            )
+            return ValidationResult(valid=False, error=f"Error validating {description}: {e!s}")
 
     def _validate_analytics_dependencies(self: Self) -> ValidationResult:
         """Validate analytics dependencies with detailed feedback."""
@@ -232,9 +218,7 @@ class RealTimeAnalyticsModule:
             return ValidationResult(
                 valid=False,
                 error=f"Missing analytics packages: {', '.join(missing_packages)}",
-                suggestions=[
-                    f"Install packages: pip install {' '.join(missing_packages)}"
-                ],
+                suggestions=[f"Install packages: pip install {' '.join(missing_packages)}"],
             )
 
         return ValidationResult(valid=True)
@@ -260,9 +244,7 @@ class RealTimeAnalyticsModule:
             return ValidationResult(
                 valid=False,
                 error=f"Missing ML packages: {', '.join(missing_packages)}",
-                suggestions=[
-                    f"Install packages: pip install {' '.join(missing_packages)}"
-                ],
+                suggestions=[f"Install packages: pip install {' '.join(missing_packages)}"],
             )
 
         return ValidationResult(valid=True)
@@ -284,16 +266,12 @@ class RealTimeAnalyticsModule:
             return ValidationResult(
                 valid=False,
                 error=f"Missing visualization packages: {', '.join(missing_packages)}",
-                suggestions=[
-                    f"Install packages: pip install {' '.join(missing_packages)}"
-                ],
+                suggestions=[f"Install packages: pip install {' '.join(missing_packages)}"],
             )
 
         return ValidationResult(valid=True)
 
-    def _display_validation_results(
-        self: Self, results: dict[str, ValidationResult]
-    ) -> None:
+    def _display_validation_results(self: Self, results: dict[str, ValidationResult]) -> None:
         """Display validation results with user-friendly formatting."""
         table = Table(title="Analytics Environment Validation")
         table.add_column("Component", style="cyan")
@@ -316,11 +294,9 @@ class RealTimeAnalyticsModule:
 
     def _initialize_components(self: Self) -> None:
         """Step 5: Progressive Complexity
-        Initialize components based on complexity level and validation results
+        Initialize components based on complexity level and validation results.
         """
-        self.console.print(
-            "🔧 Step 5: Progressive Component Initialization", style="bold blue"
-        )
+        self.console.print("🔧 Step 5: Progressive Component Initialization", style="bold blue")
 
         # Check if environment validation passed
         all_valid = all(result.valid for result in self.environment_validation.values())
@@ -354,31 +330,23 @@ class RealTimeAnalyticsModule:
 
     def _initialize_intermediate_components(self: Self) -> None:
         """Initialize intermediate analytics components."""
-        self.console.print(
-            "📊 Initializing Intermediate Analytics Components", style="green"
-        )
+        self.console.print("📊 Initializing Intermediate Analytics Components", style="green")
 
         # Initialize basic components first
         self._initialize_basic_components()
 
         # Add intermediate components
-        if self.environment_validation.get(
-            "ml_dependencies", ValidationResult(False)
-        ).valid:
+        if self.environment_validation.get("ml_dependencies", ValidationResult(False)).valid:
             self.ml_engine = IntermediateMLEngine(self.config)
 
-        if self.environment_validation.get(
-            "visualization_dependencies", ValidationResult(False)
-        ).valid:
+        if self.environment_validation.get("visualization_dependencies", ValidationResult(False)).valid:
             self.dashboard_generator = BasicDashboardGenerator(self.config)
 
         self.console.print("✅ Intermediate components initialized", style="green")
 
     def _initialize_advanced_components(self: Self) -> None:
         """Initialize advanced analytics components."""
-        self.console.print(
-            "📊 Initializing Advanced Analytics Components", style="green"
-        )
+        self.console.print("📊 Initializing Advanced Analytics Components", style="green")
 
         # Initialize intermediate components first
         self._initialize_intermediate_components()
@@ -388,18 +356,14 @@ class RealTimeAnalyticsModule:
             self.prediction_engine = AdvancedPredictionEngine(self.config)
 
         # Advanced dashboard with real-time updates
-        if self.environment_validation.get(
-            "visualization_dependencies", ValidationResult(False)
-        ).valid:
+        if self.environment_validation.get("visualization_dependencies", ValidationResult(False)).valid:
             self.dashboard_generator = AdvancedDashboardGenerator(self.config)
 
         self.console.print("✅ Advanced components initialized", style="green")
 
-    def process_data(
-        self, data: dict[str, Any] | list[dict[str, Any]]
-    ) -> dict[str, Any]:
+    def process_data(self, data: dict[str, Any] | list[dict[str, Any]]) -> dict[str, Any]:
         """Step 2: Comprehensive Input Validation
-        Process incoming data with full validation
+        Process incoming data with full validation.
         """
         try:
             # Validate input data
@@ -436,9 +400,7 @@ class RealTimeAnalyticsModule:
                 "suggestions": ["Check data format and try again"],
             }
 
-    def _validate_input_data(
-        self, data: dict[str, Any] | list[dict[str, Any]]
-    ) -> dict[str, Any]:
+    def _validate_input_data(self, data: dict[str, Any] | list[dict[str, Any]]) -> dict[str, Any]:
         """Comprehensive input validation following crawl_mcp.py patterns."""
         if data is None:
             return {
@@ -512,8 +474,7 @@ class RealTimeAnalyticsModule:
                     "dashboards_enabled": self.config.enable_dashboards,
                 },
                 "environment_validation": {
-                    component: result.valid
-                    for component, result in self.environment_validation.items()
+                    component: result.valid for component, result in self.environment_validation.items()
                 },
                 "data_summary": {
                     "cached_data_points": len(self.data_cache),
@@ -534,7 +495,7 @@ class RealTimeAnalyticsModule:
 
     def cleanup_resources(self: Self) -> None:
         """Step 6: Resource Management
-        Clean up resources and temporary files
+        Clean up resources and temporary files.
         """
         try:
             self.console.print("🧹 Cleaning up analytics resources...", style="yellow")
@@ -614,9 +575,7 @@ class IntermediateMLEngine:
         self.config = config
         self.models = {}
 
-    def train_model(
-        self, data: list[AnalyticsData], model_type: str = "linear"
-    ) -> dict[str, Any]:
+    def train_model(self, data: list[AnalyticsData], model_type: str = "linear") -> dict[str, Any]:
         """Train a basic ML model."""
         return {
             "model_type": model_type,
@@ -661,9 +620,7 @@ class AdvancedDashboardGenerator:
     def __init__(self: Self, config: AnalyticsConfig):
         self.config = config
 
-    def generate_realtime_dashboard(
-        self: Self, data: list[AnalyticsData]
-    ) -> dict[str, Any]:
+    def generate_realtime_dashboard(self: Self, data: list[AnalyticsData]) -> dict[str, Any]:
         """Generate advanced real-time dashboard."""
         return {
             "dashboard_type": "advanced_realtime",
@@ -680,9 +637,7 @@ class AdvancedDashboardGenerator:
 # Main function for testing
 def main() -> None:
     """Test the analytics module following crawl_mcp.py methodology."""
-    console.print(
-        Panel.fit("🚀 Phase 9.8 Real-time Analytics Module Test", style="green bold")
-    )
+    console.print(Panel.fit("🚀 Phase 9.8 Real-time Analytics Module Test", style="green bold"))
 
     # Test with different complexity levels
     for complexity in ["basic", "intermediate", "advanced"]:

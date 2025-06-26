@@ -1,4 +1,4 @@
-"""Phase 12.8: Deployment Package Creation & How-to Guides
+"""Phase 12.8: Deployment Package Creation & How-to Guides.
 
 Following crawl_mcp.py methodology:
 - Step 1: Environment validation first
@@ -56,9 +56,7 @@ def validate_deployment_environment() -> dict[str, Any]:
 
         # Check Python version
         try:
-            result = subprocess.run(
-                ["python3", "--version"], capture_output=True, text=True, check=True
-            )
+            result = subprocess.run(["python3", "--version"], capture_output=True, text=True, check=True)
             version = result.stdout.strip()
             if "3.12" not in version and "3.11" not in version:
                 warnings.append(f"Python version may not be optimal: {version}")
@@ -139,9 +137,7 @@ class DockerPackageConfig(BaseModel):
     tag: str = Field(default="latest", description="Docker image tag")
     expose_ports: list[int] = Field(default=[8000], description="Ports to expose")
     volumes: dict[str, str] = Field(default_factory=dict, description="Volume mappings")
-    environment_vars: dict[str, str] = Field(
-        default_factory=dict, description="Environment variables"
-    )
+    environment_vars: dict[str, str] = Field(default_factory=dict, description="Environment variables")
     health_check_command: str = Field(
         default="curl -f http://localhost:8000/health || exit 1",
         description="Health check command",
@@ -161,13 +157,9 @@ class StandalonePackageConfig(BaseModel):
     """Standalone package configuration."""
 
     include_python: bool = Field(default=False, description="Include Python runtime")
-    create_installer: bool = Field(
-        default=True, description="Create installation script"
-    )
+    create_installer: bool = Field(default=True, description="Create installation script")
     service_name: str = Field(default="ign-scripts", description="Service name")
-    install_path: str = Field(
-        default="/opt/ign-scripts", description="Installation path"
-    )
+    install_path: str = Field(default="/opt/ign-scripts", description="Installation path")
     user_account: str = Field(default="ign-scripts", description="Service user account")
 
     @field_validator("install_path")
@@ -182,20 +174,12 @@ class PackageCreationRequest(BaseModel):
     """Package creation request model."""
 
     package_type: PackageType = Field(..., description="Type of package to create")
-    deployment_target: DeploymentTarget = Field(
-        ..., description="Deployment target environment"
-    )
+    deployment_target: DeploymentTarget = Field(..., description="Deployment target environment")
     version: str = Field(default="1.0.0", description="Package version")
-    output_directory: str = Field(
-        default="./dist", description="Output directory for packages"
-    )
-    include_documentation: bool = Field(
-        default=True, description="Include documentation in package"
-    )
+    output_directory: str = Field(default="./dist", description="Output directory for packages")
+    include_documentation: bool = Field(default=True, description="Include documentation in package")
     include_tests: bool = Field(default=False, description="Include tests in package")
-    docker_config: DockerPackageConfig | None = Field(
-        default=None, description="Docker-specific configuration"
-    )
+    docker_config: DockerPackageConfig | None = Field(default=None, description="Docker-specific configuration")
     standalone_config: StandalonePackageConfig | None = Field(
         default=None, description="Standalone-specific configuration"
     )
@@ -217,11 +201,7 @@ class PackageCreationRequest(BaseModel):
     def validate_output_directory(cls, v: str) -> str:
         # Ensure output directory is safe
         path = Path(v)
-        if (
-            path.is_absolute()
-            and not str(path).startswith("/tmp")
-            and not str(path).startswith(os.getcwd())
-        ):
+        if path.is_absolute() and not str(path).startswith("/tmp") and not str(path).startswith(os.getcwd()):
             raise ValueError("Output directory must be relative or within project")
         return v
 
@@ -244,7 +224,7 @@ class PackageCreationResult:
 class DeploymentPackageCreator:
     """Main deployment package creator following crawl_mcp.py methodology."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._docker_client: docker.DockerClient | None = None
         self._temp_dirs: list[str] = []
         self._is_initialized = False
@@ -288,7 +268,7 @@ class DeploymentPackageCreator:
             }
 
     @asynccontextmanager
-    async def managed_creation(self):
+    async def managed_creation(self) -> None:
         """Context manager for package creation with proper cleanup."""
         try:
             if not self._is_initialized:
@@ -312,18 +292,14 @@ class DeploymentPackageCreator:
                 logger.warning(f"⚠️ Failed to cleanup {temp_dir}: {e}")
         self._temp_dirs.clear()
 
-    async def create_package(
-        self, request: PackageCreationRequest
-    ) -> PackageCreationResult:
+    async def create_package(self, request: PackageCreationRequest) -> PackageCreationResult:
         """Create deployment package based on request."""
         start_time = datetime.now()
 
         try:
             # Step 3: Comprehensive error handling
             if not self._is_initialized:
-                return PackageCreationResult(
-                    success=False, error_message="Package creator not initialized"
-                )
+                return PackageCreationResult(success=False, error_message="Package creator not initialized")
 
             # Create output directory
             output_path = Path(request.output_directory)
@@ -347,9 +323,7 @@ class DeploymentPackageCreator:
             # Add timing information
             if result.success:
                 result.creation_time = start_time
-                result.metadata["creation_duration"] = (
-                    datetime.now() - start_time
-                ).total_seconds()
+                result.metadata["creation_duration"] = (datetime.now() - start_time).total_seconds()
 
             return result
 
@@ -360,15 +334,11 @@ class DeploymentPackageCreator:
                 creation_time=start_time,
             )
 
-    async def _create_docker_package(
-        self, request: PackageCreationRequest
-    ) -> PackageCreationResult:
+    async def _create_docker_package(self, request: PackageCreationRequest) -> PackageCreationResult:
         """Create Docker deployment package."""
         try:
             if not self._docker_client:
-                return PackageCreationResult(
-                    success=False, error_message="Docker client not available"
-                )
+                return PackageCreationResult(success=False, error_message="Docker client not available")
 
             if not request.docker_config:
                 return PackageCreationResult(
@@ -385,23 +355,17 @@ class DeploymentPackageCreator:
             await self._copy_project_files(build_path, request)
 
             # Generate Dockerfile
-            dockerfile_content = self._generate_dockerfile(
-                request.docker_config, request.deployment_target
-            )
+            dockerfile_content = self._generate_dockerfile(request.docker_config, request.deployment_target)
             dockerfile_path = build_path / "Dockerfile"
             dockerfile_path.write_text(dockerfile_content)
 
             # Generate docker-compose.yml
-            compose_content = self._generate_docker_compose(
-                request.docker_config, request.deployment_target
-            )
+            compose_content = self._generate_docker_compose(request.docker_config, request.deployment_target)
             compose_path = build_path / "docker-compose.yml"
             compose_path.write_text(compose_content)
 
             # Build Docker image
-            logger.info(
-                f"🐳 Building Docker image: {request.docker_config.image_name}:{request.docker_config.tag}"
-            )
+            logger.info(f"🐳 Building Docker image: {request.docker_config.image_name}:{request.docker_config.tag}")
 
             try:
                 image, build_logs = self._docker_client.images.build(
@@ -419,22 +383,15 @@ class DeploymentPackageCreator:
                             logger.debug(stream_value.strip())
 
             except Exception as build_error:
-                return PackageCreationResult(
-                    success=False, error_message=f"Docker build failed: {build_error}"
-                )
+                return PackageCreationResult(success=False, error_message=f"Docker build failed: {build_error}")
 
             # Create package directory
-            package_name = (
-                f"{request.docker_config.image_name}-{request.version}-docker"
-            )
+            package_name = f"{request.docker_config.image_name}-{request.version}-docker"
             package_path = Path(request.output_directory) / package_name
             package_path.mkdir(parents=True, exist_ok=True)
 
             # Export Docker image
-            image_tar_path = (
-                package_path
-                / f"{request.docker_config.image_name}-{request.version}.tar"
-            )
+            image_tar_path = package_path / f"{request.docker_config.image_name}-{request.version}.tar"
             with open(image_tar_path, "wb") as f:
                 for chunk in image.save():
                     f.write(chunk)
@@ -453,9 +410,7 @@ class DeploymentPackageCreator:
                 included_files.extend(["README.md", "INSTALLATION.md"])
 
             # Calculate package size
-            package_size = sum(
-                f.stat().st_size for f in package_path.rglob("*") if f.is_file()
-            )
+            package_size = sum(f.stat().st_size for f in package_path.rglob("*") if f.is_file())
 
             logger.info(f"✅ Docker package created: {package_path}")
 
@@ -477,9 +432,7 @@ class DeploymentPackageCreator:
                 error_message=format_deployment_error(e, "Docker package creation"),
             )
 
-    async def _create_standalone_package(
-        self, request: PackageCreationRequest
-    ) -> PackageCreationResult:
+    async def _create_standalone_package(self, request: PackageCreationRequest) -> PackageCreationResult:
         """Create standalone deployment package."""
         try:
             if not request.standalone_config:
@@ -497,24 +450,18 @@ class DeploymentPackageCreator:
             await self._copy_project_files(package_path, request)
 
             # Generate installation script
-            install_script = self._generate_install_script(
-                request.standalone_config, request.deployment_target
-            )
+            install_script = self._generate_install_script(request.standalone_config, request.deployment_target)
             install_path = package_path / "install.sh"
             install_path.write_text(install_script)
             install_path.chmod(0o755)
 
             # Generate systemd service file
             service_content = self._generate_systemd_service(request.standalone_config)
-            service_path = (
-                package_path / f"{request.standalone_config.service_name}.service"
-            )
+            service_path = package_path / f"{request.standalone_config.service_name}.service"
             service_path.write_text(service_content)
 
             # Generate uninstall script
-            uninstall_script = self._generate_uninstall_script(
-                request.standalone_config
-            )
+            uninstall_script = self._generate_uninstall_script(request.standalone_config)
             uninstall_path = package_path / "uninstall.sh"
             uninstall_path.write_text(uninstall_script)
             uninstall_path.chmod(0o755)
@@ -530,9 +477,7 @@ class DeploymentPackageCreator:
                 included_files.extend(["README.md", "INSTALLATION.md"])
 
             # Calculate package size
-            package_size = sum(
-                f.stat().st_size for f in package_path.rglob("*") if f.is_file()
-            )
+            package_size = sum(f.stat().st_size for f in package_path.rglob("*") if f.is_file())
 
             logger.info(f"✅ Standalone package created: {package_path}")
 
@@ -554,9 +499,7 @@ class DeploymentPackageCreator:
                 error_message=format_deployment_error(e, "standalone package creation"),
             )
 
-    async def _create_kubernetes_package(
-        self, request: PackageCreationRequest
-    ) -> PackageCreationResult:
+    async def _create_kubernetes_package(self, request: PackageCreationRequest) -> PackageCreationResult:
         """Create Kubernetes deployment package."""
         # Placeholder for Kubernetes package creation
         return PackageCreationResult(
@@ -564,18 +507,12 @@ class DeploymentPackageCreator:
             error_message="Kubernetes package creation not yet implemented",
         )
 
-    async def _create_systemd_package(
-        self, request: PackageCreationRequest
-    ) -> PackageCreationResult:
+    async def _create_systemd_package(self, request: PackageCreationRequest) -> PackageCreationResult:
         """Create systemd service package."""
         # Placeholder for systemd package creation
-        return PackageCreationResult(
-            success=False, error_message="Systemd package creation not yet implemented"
-        )
+        return PackageCreationResult(success=False, error_message="Systemd package creation not yet implemented")
 
-    async def _copy_project_files(
-        self, target_path: Path, request: PackageCreationRequest
-    ) -> None:
+    async def _copy_project_files(self, target_path: Path, request: PackageCreationRequest) -> None:
         """Copy project files to target directory."""
         try:
             # Essential directories to copy
@@ -601,9 +538,7 @@ class DeploymentPackageCreator:
             config_dir = Path("config")
             if config_dir.exists():
                 dest_config = target_path / "config"
-                shutil.copytree(
-                    config_dir, dest_config, ignore=shutil.ignore_patterns("*.env")
-                )
+                shutil.copytree(config_dir, dest_config, ignore=shutil.ignore_patterns("*.env"))
 
             # Copy documentation if requested
             if request.include_documentation:
@@ -625,9 +560,7 @@ class DeploymentPackageCreator:
             logger.error(f"❌ Failed to copy project files: {e}")
             raise
 
-    def _generate_dockerfile(
-        self, config: DockerPackageConfig, target: DeploymentTarget
-    ) -> str:
+    def _generate_dockerfile(self, config: DockerPackageConfig, target: DeploymentTarget) -> str:
         """Generate Dockerfile content."""
         dockerfile_content = f"""# IGN Scripts Deployment Package
 # Generated for {target.value} environment
@@ -693,9 +626,7 @@ CMD ["python", "-m", "src.main"]
 
         return dockerfile_content
 
-    def _generate_docker_compose(
-        self, config: DockerPackageConfig, target: DeploymentTarget
-    ) -> str:
+    def _generate_docker_compose(self, config: DockerPackageConfig, target: DeploymentTarget) -> str:
         """Generate docker-compose.yml content."""
         compose_content = f"""version: '3.8'
 
@@ -703,7 +634,7 @@ CMD ["python", "-m", "src.main"]
 # Generated for {target.value} environment
 # Following crawl_mcp.py methodology
 
-services:
+        services:
   ign-scripts:
     image: {config.image_name}:{config.tag}
     container_name: ign-scripts-{target.value}
@@ -745,9 +676,7 @@ networks:
 
         return compose_content
 
-    def _generate_install_script(
-        self, config: StandalonePackageConfig, target: DeploymentTarget
-    ) -> str:
+    def _generate_install_script(self, config: StandalonePackageConfig, target: DeploymentTarget) -> str:
         """Generate installation script for standalone package."""
         install_script = f"""#!/bin/bash
 
@@ -1098,11 +1027,12 @@ main "$@"
 
         return uninstall_script
 
-    async def _generate_deployment_scripts(
-        self, package_path: Path, request: PackageCreationRequest
-    ) -> None:
+    async def _generate_deployment_scripts(self, package_path: Path, request: PackageCreationRequest) -> None:
         """Generate deployment helper scripts."""
         try:
+            pass  # TODO: Add try block content
+        except Exception:
+            pass  # TODO: Handle exception
             # Generate start script
             start_script = f"""#!/bin/bash
 
@@ -1132,7 +1062,7 @@ echo "🏥 Checking service health..."
 docker-compose ps
 
 echo "✅ IGN Scripts started successfully!"
-echo "📊 Access the application at: http://localhost:{request.docker_config.expose_ports[0] if request.docker_config.expose_ports else 8000}"
+echo "📊 Access the application at: http://localhost:{request.docker_config.expose_ports[0] if request.docker_config.expose_ports else 8000}"  # noqa: E501
 """
 
             start_path = package_path / "start.sh"
@@ -1187,11 +1117,12 @@ echo "✅ IGN Scripts updated successfully!"
             logger.error(f"❌ Failed to generate deployment scripts: {e}")
             raise
 
-    async def _generate_package_documentation(
-        self, package_path: Path, request: PackageCreationRequest
-    ) -> None:
+    async def _generate_package_documentation(self, package_path: Path, request: PackageCreationRequest) -> None:
         """Generate package documentation."""
         try:
+            pass  # TODO: Add try block content
+        except Exception:
+            pass  # TODO: Handle exception
             # Generate README.md
             readme_content = f"""# IGN Scripts Deployment Package
 
@@ -1302,9 +1233,7 @@ See INSTALLATION.md for detailed troubleshooting information.
             logger.error(f"❌ Failed to generate package documentation: {e}")
             raise
 
-    async def _generate_installation_guide(
-        self, package_path: Path, request: PackageCreationRequest
-    ) -> None:
+    async def _generate_installation_guide(self, package_path: Path, request: PackageCreationRequest) -> None:
         """Generate detailed installation guide."""
         installation_content = f"""# IGN Scripts Installation Guide
 
@@ -1341,7 +1270,7 @@ curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 
 # Install Docker Compose
-sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose  # noqa: E501
 sudo chmod +x /usr/local/bin/docker-compose
 
 # Add user to docker group
@@ -1358,7 +1287,7 @@ sudo systemctl start docker
 sudo systemctl enable docker
 
 # Install Docker Compose
-sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose  # noqa: E501
 sudo chmod +x /usr/local/bin/docker-compose
 ```
 
@@ -1602,7 +1531,7 @@ async def create_standalone_package(
 # Main implementation function for Phase 12.8
 async def run_phase_12_8_implementation() -> dict[str, Any]:
     """Run Phase 12.8 implementation following crawl_mcp.py methodology."""
-    implementation_results = {
+    implementation_results: dict[str, Any] = {
         "success": False,
         "phase": "12.8",
         "title": "Deployment Package Creation & How-to Guides",
@@ -1645,15 +1574,13 @@ async def run_phase_12_8_implementation() -> dict[str, Any]:
         implementation_results["steps"]["creator_initialization"] = init_result
 
         if not init_result["success"]:
-            raise RuntimeError(
-                f"Package creator initialization failed: {init_result['error']}"
-            )
+            raise RuntimeError(f"Package creator initialization failed: {init_result['error']}")
 
         print("✅ Package creator initialized")
 
         # Step 3: Create Docker production package
         print("\n🐳 Step 3: Create Docker Production Package")
-        async with creator.managed_creation() as package_creator:
+        async with creator.managed_creation():
             docker_result = await create_docker_package(
                 image_name="ign-scripts-api",
                 version="1.0.0",
@@ -1678,13 +1605,11 @@ async def run_phase_12_8_implementation() -> dict[str, Any]:
                 )
                 print(f"✅ Docker package created: {docker_result.package_path}")
             else:
-                print(
-                    f"❌ Docker package creation failed: {docker_result.error_message}"
-                )
+                print(f"❌ Docker package creation failed: {docker_result.error_message}")
 
         # Step 4: Create standalone production package
         print("\n📋 Step 4: Create Standalone Production Package")
-        async with creator.managed_creation() as package_creator:
+        async with creator.managed_creation():
             standalone_result = await create_standalone_package(
                 version="1.0.0", deployment_target="production", output_dir="./dist"
             )
@@ -1704,28 +1629,20 @@ async def run_phase_12_8_implementation() -> dict[str, Any]:
                         "size": standalone_result.package_size,
                     }
                 )
-                print(
-                    f"✅ Standalone package created: {standalone_result.package_path}"
-                )
+                print(f"✅ Standalone package created: {standalone_result.package_path}")
             else:
-                print(
-                    f"❌ Standalone package creation failed: {standalone_result.error_message}"
-                )
+                print(f"❌ Standalone package creation failed: {standalone_result.error_message}")
 
         # Step 5: Generate comprehensive how-to guides
         print("\n📚 Step 5: Generate How-to Guides")
         guides_created = await generate_comprehensive_guides()
         implementation_results["steps"]["how_to_guides"] = guides_created
-        implementation_results["documentation_generated"] = guides_created.get(
-            "guides", []
-        )
+        implementation_results["documentation_generated"] = guides_created.get("guides", [])
 
         print(f"✅ Generated {len(guides_created.get('guides', []))} how-to guides")
 
         # Success summary
-        successful_packages = len(
-            [p for p in implementation_results["packages_created"]]
-        )
+        successful_packages = len(list(implementation_results["packages_created"]))
         implementation_results["success"] = successful_packages > 0
         implementation_results["end_time"] = datetime.now().isoformat()
 
@@ -1768,7 +1685,7 @@ async def run_phase_12_8_implementation() -> dict[str, Any]:
                     f"📦 Packages Created: {successful_packages}\n"
                     f"📚 Guides Generated: {len(guides_created.get('guides', []))}\n"
                     f"📁 Output Directory: ./dist/\n"
-                    f"⏱️ Total Time: {(datetime.fromisoformat(implementation_results['end_time']) - datetime.fromisoformat(implementation_results['start_time'])).total_seconds():.2f}s",
+                    f"⏱️ Total Time: {(datetime.fromisoformat(implementation_results['end_time']) - datetime.fromisoformat(implementation_results['start_time'])).total_seconds():.2f}s",  # noqa: E501
                     title="🎉 Success",
                     border_style="green",
                 )
@@ -1817,36 +1734,28 @@ async def generate_comprehensive_guides() -> dict[str, Any]:
         if installation_guide["success"]:
             guides_result["guides"].append("installation-guide.md")
         else:
-            guides_result["errors"].append(
-                f"Installation guide: {installation_guide['error']}"
-            )
+            guides_result["errors"].append(f"Installation guide: {installation_guide['error']}")
 
         # Generate deployment guide
         deployment_guide = await generate_deployment_how_to_guide()
         if deployment_guide["success"]:
             guides_result["guides"].append("deployment-guide.md")
         else:
-            guides_result["errors"].append(
-                f"Deployment guide: {deployment_guide['error']}"
-            )
+            guides_result["errors"].append(f"Deployment guide: {deployment_guide['error']}")
 
         # Generate operations guide
         operations_guide = await generate_operations_how_to_guide()
         if operations_guide["success"]:
             guides_result["guides"].append("operations-guide.md")
         else:
-            guides_result["errors"].append(
-                f"Operations guide: {operations_guide['error']}"
-            )
+            guides_result["errors"].append(f"Operations guide: {operations_guide['error']}")
 
         # Generate troubleshooting guide
         troubleshooting_guide = await generate_troubleshooting_how_to_guide()
         if troubleshooting_guide["success"]:
             guides_result["guides"].append("troubleshooting-guide.md")
         else:
-            guides_result["errors"].append(
-                f"Troubleshooting guide: {troubleshooting_guide['error']}"
-            )
+            guides_result["errors"].append(f"Troubleshooting guide: {troubleshooting_guide['error']}")
 
         # Generate security guide
         security_guide = await generate_security_how_to_guide()
@@ -1868,6 +1777,9 @@ async def generate_comprehensive_guides() -> dict[str, Any]:
 async def generate_installation_how_to_guide() -> dict[str, Any]:
     """Generate installation how-to guide."""
     try:
+        pass  # TODO: Add try block content
+    except Exception:
+        pass  # TODO: Handle exception
         guides_dir = Path("docs/how-to")
         guides_dir.mkdir(parents=True, exist_ok=True)
 
@@ -1907,6 +1819,9 @@ For detailed instructions, see the deployment packages in the `dist/` directory.
 async def generate_deployment_how_to_guide() -> dict[str, Any]:
     """Generate deployment how-to guide."""
     try:
+        pass  # TODO: Add try block content
+    except Exception:
+        pass  # TODO: Handle exception
         guides_dir = Path("docs/how-to")
         guides_dir.mkdir(parents=True, exist_ok=True)
 
@@ -1947,6 +1862,9 @@ For specific deployment packages, see the `dist/` directory.
 async def generate_operations_how_to_guide() -> dict[str, Any]:
     """Generate operations how-to guide."""
     try:
+        pass  # TODO: Add try block content
+    except Exception:
+        pass  # TODO: Handle exception
         guides_dir = Path("docs/how-to")
         guides_dir.mkdir(parents=True, exist_ok=True)
 
@@ -1990,6 +1908,9 @@ This guide covers day-to-day operations for IGN Scripts.
 async def generate_troubleshooting_how_to_guide() -> dict[str, Any]:
     """Generate troubleshooting how-to guide."""
     try:
+        pass  # TODO: Add try block content
+    except Exception:
+        pass  # TODO: Handle exception
         guides_dir = Path("docs/how-to")
         guides_dir.mkdir(parents=True, exist_ok=True)
 
@@ -2041,6 +1962,9 @@ This guide helps diagnose and resolve common issues with IGN Scripts.
 async def generate_security_how_to_guide() -> dict[str, Any]:
     """Generate security how-to guide."""
     try:
+        pass  # TODO: Add try block content
+    except Exception:
+        pass  # TODO: Handle exception
         guides_dir = Path("docs/how-to")
         guides_dir.mkdir(parents=True, exist_ok=True)
 

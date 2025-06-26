@@ -1,4 +1,4 @@
-"""SME Agent Core CLI Commands - Basic Operations
+"""SME Agent Core CLI Commands - Basic Operations.
 
 Following crawl_mcp.py methodology:
 - Step 1: Environment validation first
@@ -19,7 +19,10 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 
-from ..sme_agent_module import SMEAgentModule, SMEAgentValidationError
+from src.ignition.modules.sme_agent.sme_agent_module import (
+    SMEAgentModule,
+    SMEAgentValidationError,
+)
 
 console = Console()
 logger = logging.getLogger(__name__)
@@ -44,21 +47,19 @@ def handle_sme_agent_error(func: Any) -> Any:
 
 @click.group(name="core")
 def core_commands() -> None:
-    """SME Agent Core Commands - Basic Operations"""
+    """SME Agent Core Commands - Basic Operations."""
     pass
 
 
 @core_commands.command("validate-env")
 @handle_sme_agent_error
 def validate_environment() -> None:
-    """Step 1: Environment Validation First
+    """Step 1: Environment Validation First.
 
     Validate SME Agent environment and dependencies.
     """
     console.print("[bold blue]🔍 SME Agent Environment Validation[/bold blue]")
-    console.print(
-        "Following crawl_mcp.py methodology - Step 1: Environment Validation First"
-    )
+    console.print("Following crawl_mcp.py methodology - Step 1: Environment Validation First")
 
     try:
         # Create temporary SME Agent instance for validation
@@ -82,7 +83,7 @@ def validate_environment() -> None:
 @core_commands.command("status")
 @handle_sme_agent_error
 def get_status() -> None:
-    """Step 4: Modular Component Testing
+    """Step 4: Modular Component Testing.
 
     Get current status of SME Agent components.
     """
@@ -107,16 +108,12 @@ def get_status() -> None:
 )
 @handle_sme_agent_error
 def initialize_components(complexity: str) -> None:
-    """Step 5: Progressive Complexity Support
+    """Step 5: Progressive Complexity Support.
 
     Initialize SME Agent components with specified complexity level.
     """
-    console.print(
-        f"[bold blue]🚀 SME Agent Initialization - {complexity.title()} Level[/bold blue]"
-    )
-    console.print(
-        "Following crawl_mcp.py methodology - Step 5: Progressive Complexity Support"
-    )
+    console.print(f"[bold blue]🚀 SME Agent Initialization - {complexity.title()} Level[/bold blue]")
+    console.print("Following crawl_mcp.py methodology - Step 5: Progressive Complexity Support")
 
     try:
         with SMEAgentModule() as agent:
@@ -139,7 +136,7 @@ def initialize_components(complexity: str) -> None:
 @handle_sme_agent_error
 def ask_question(question: str, context: str | None, complexity: str) -> None:
     """Step 2: Comprehensive Input Validation
-    Step 3: Error Handling and User-Friendly Messages
+    Step 3: Error Handling and User-Friendly Messages.
 
     Ask a question to the SME Agent.
     """
@@ -183,7 +180,9 @@ def analyze_file(file_path: str, complexity: str) -> None:
         file_content = Path(file_path).read_text()
 
         # Create analysis question
-        question = "Please analyze this file and provide insights about its structure, purpose, and potential improvements."
+        question = (
+            "Please analyze this file and provide insights about its structure, purpose, and potential improvements."
+        )
         context = f"File: {file_path}\nContent:\n{file_content[:2000]}..."  # Limit context size
 
         with SMEAgentModule() as agent:
@@ -232,9 +231,7 @@ def _display_status(status: dict[str, Any]) -> None:
 def _display_initialization_results(result: dict[str, Any]) -> None:
     """Display initialization results."""
     if result.get("success", False):
-        console.print(
-            "[green]✅ SME Agent initialization completed successfully![/green]"
-        )
+        console.print("[green]✅ SME Agent initialization completed successfully![/green]")
         console.print(f"Initialized components: {result.get('component_count', 0)}")
     else:
         console.print("[red]❌ SME Agent initialization failed![/red]")
@@ -245,14 +242,8 @@ def _display_response(response: Any) -> None:
     """Display SME Agent response."""
     if isinstance(response, dict):
         if "answer" in response:
-            console.print(
-                Panel(
-                    response["answer"], title="SME Agent Response", border_style="green"
-                )
-            )
+            console.print(Panel(response["answer"], title="SME Agent Response", border_style="green"))
         if "confidence" in response:
             console.print(f"Confidence: {response['confidence']:.2%}")
     else:
-        console.print(
-            Panel(str(response), title="SME Agent Response", border_style="green")
-        )
+        console.print(Panel(str(response), title="SME Agent Response", border_style="green"))

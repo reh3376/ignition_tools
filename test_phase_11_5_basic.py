@@ -1,5 +1,5 @@
 #!/usr/bin/env python3.12
-"""Basic Test for Phase 11.5: Industrial Dataset Curation & AI Model Preparation
+"""Basic Test for Phase 11.5: Industrial Dataset Curation & AI Model Preparation.
 
 This test verifies the implementation exists without importing modules.
 """
@@ -9,9 +9,7 @@ from pathlib import Path
 
 def test_phase_11_5_basic():
     """Basic test for Phase 11.5 implementation."""
-    print(
-        "🧪 Basic Test for Phase 11.5: Industrial Dataset Curation & AI Model Preparation"
-    )
+    print("🧪 Basic Test for Phase 11.5: Industrial Dataset Curation & AI Model Preparation")
     print("=" * 80)
 
     test_results = {
@@ -157,9 +155,7 @@ def test_phase_11_5_basic():
 
     # Calculate total implementation size
     total_size = sum(Path(f).stat().st_size for f in required_files if Path(f).exists())
-    print(
-        f"📏 Total Implementation Size: {total_size:,} bytes ({total_size / 1024:.1f} KB)"
-    )
+    print(f"📏 Total Implementation Size: {total_size:,} bytes ({total_size / 1024:.1f} KB)")
 
     if passed_tests >= 3:
         print("🎉 Phase 11.5 implementation is COMPLETE!")

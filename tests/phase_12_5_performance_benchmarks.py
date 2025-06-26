@@ -27,6 +27,8 @@ except ImportError:
     subprocess.run(["pip", "install", "httpx"])
     import httpx
 
+import contextlib
+
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 
@@ -67,19 +69,15 @@ class Phase125PerformanceTester:
         print("🔥 Warming up API...")
         async with httpx.AsyncClient(timeout=30) as client:
             for _ in range(WARMUP_REQUESTS):
-                try:
+                with contextlib.suppress(Exception):
                     await client.get(f"{self.api_base}/health")
-                except Exception:
-                    pass
         print("   ✅ Warmup complete")
 
     async def benchmark_endpoint(
         self, endpoint: str, concurrent_users: int = 10, duration_seconds: int = 30
     ) -> PerformanceResult:
         """Benchmark a single endpoint"""
-        print(
-            f"🚀 Benchmarking {endpoint} with {concurrent_users} concurrent users for {duration_seconds}s"
-        )
+        print(f"🚀 Benchmarking {endpoint} with {concurrent_users} concurrent users for {duration_seconds}s")
 
         response_times = []
         successful_requests = 0
@@ -94,10 +92,7 @@ class Phase125PerformanceTester:
                     response_time = (time.time() - request_start) * 1000
                     response_times.append(response_time)
 
-                    if response.status_code == 200:
-                        return True
-                    else:
-                        return False
+                    return response.status_code == 200
                 except Exception:
                     return False
 
@@ -131,18 +126,12 @@ class Phase125PerformanceTester:
             avg_response_time = statistics.mean(response_times)
             min_response_time = min(response_times)
             max_response_time = max(response_times)
-            p95_response_time = statistics.quantiles(response_times, n=20)[
-                18
-            ]  # 95th percentile
+            p95_response_time = statistics.quantiles(response_times, n=20)[18]  # 95th percentile
         else:
-            avg_response_time = min_response_time = max_response_time = (
-                p95_response_time
-            ) = 0.0
+            avg_response_time = min_response_time = max_response_time = p95_response_time = 0.0
 
         requests_per_second = total_requests / duration if duration > 0 else 0
-        error_rate_percent = (
-            (failed_requests / total_requests * 100) if total_requests > 0 else 0
-        )
+        error_rate_percent = (failed_requests / total_requests * 100) if total_requests > 0 else 0
 
         result = PerformanceResult(
             test_name=f"Load Test - {endpoint}",
@@ -163,9 +152,7 @@ class Phase125PerformanceTester:
         # Print results
         print(f"   📊 Results for {endpoint}:")
         print(f"     • Total Requests: {total_requests}")
-        print(
-            f"     • Success Rate: {(successful_requests / total_requests * 100):.1f}%"
-        )
+        print(f"     • Success Rate: {(successful_requests / total_requests * 100):.1f}%")
         print(f"     • Avg Response Time: {avg_response_time:.1f}ms")
         print(f"     • P95 Response Time: {p95_response_time:.1f}ms")
         print(f"     • Requests/sec: {requests_per_second:.1f}")
@@ -210,9 +197,7 @@ class Phase125PerformanceTester:
                         passed_tests += 1
 
                     status = "✅ PASS" if meets_requirement else "❌ FAIL"
-                    print(
-                        f"   {status} {endpoint}: {avg_response_time:.1f}ms (max: {max_time_ms}ms)"
-                    )
+                    print(f"   {status} {endpoint}: {avg_response_time:.1f}ms (max: {max_time_ms}ms)")
                 else:
                     print(f"   ❌ FAIL {endpoint}: No successful responses")
 
@@ -248,9 +233,7 @@ class Phase125PerformanceTester:
             benchmark_results = []
             for endpoint in critical_endpoints:
                 try:
-                    result = await self.benchmark_endpoint(
-                        endpoint, concurrent_users=5, duration_seconds=15
-                    )
+                    result = await self.benchmark_endpoint(endpoint, concurrent_users=5, duration_seconds=15)
                     benchmark_results.append(result)
                 except Exception as e:
                     print(f"   ❌ Benchmark failed for {endpoint}: {e}")
@@ -276,23 +259,13 @@ class Phase125PerformanceTester:
                 "summary": {
                     "total_endpoints_tested": len(benchmark_results),
                     "avg_requests_per_second": (
-                        statistics.mean(
-                            [r.requests_per_second for r in benchmark_results]
-                        )
-                        if benchmark_results
-                        else 0
+                        statistics.mean([r.requests_per_second for r in benchmark_results]) if benchmark_results else 0
                     ),
                     "avg_response_time_ms": (
-                        statistics.mean(
-                            [r.avg_response_time_ms for r in benchmark_results]
-                        )
-                        if benchmark_results
-                        else 0
+                        statistics.mean([r.avg_response_time_ms for r in benchmark_results]) if benchmark_results else 0
                     ),
                     "max_error_rate_percent": (
-                        max([r.error_rate_percent for r in benchmark_results])
-                        if benchmark_results
-                        else 0
+                        max([r.error_rate_percent for r in benchmark_results]) if benchmark_results else 0
                     ),
                 },
             }
@@ -302,25 +275,15 @@ class Phase125PerformanceTester:
             print("PERFORMANCE BENCHMARKING RESULTS")
             print("=" * 80)
 
-            print(
-                f"Response Time Requirements: {'✅ PASS' if response_time_ok else '❌ FAIL'}"
-            )
+            print(f"Response Time Requirements: {'✅ PASS' if response_time_ok else '❌ FAIL'}")
             print(f"Load Testing: {'✅ PASS' if all_passed else '❌ FAIL'}")
-            print(
-                f"Overall Performance: {'✅ PASS' if report['overall_success'] else '❌ FAIL'}"
-            )
+            print(f"Overall Performance: {'✅ PASS' if report['overall_success'] else '❌ FAIL'}")
 
             if benchmark_results:
                 print("\nSummary Statistics:")
-                print(
-                    f"  • Average RPS: {report['summary']['avg_requests_per_second']:.1f}"
-                )
-                print(
-                    f"  • Average Response Time: {report['summary']['avg_response_time_ms']:.1f}ms"
-                )
-                print(
-                    f"  • Max Error Rate: {report['summary']['max_error_rate_percent']:.1f}%"
-                )
+                print(f"  • Average RPS: {report['summary']['avg_requests_per_second']:.1f}")
+                print(f"  • Average Response Time: {report['summary']['avg_response_time_ms']:.1f}ms")
+                print(f"  • Max Error Rate: {report['summary']['max_error_rate_percent']:.1f}%")
 
             if report["overall_success"]:
                 print("\n🎯 PERFORMANCE REQUIREMENTS MET")

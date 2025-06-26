@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """CLI Commands for Development Workflow Integration and Real-Time Knowledge Updates
-Phase 11.3: SME Agent Integration & Interfaces
+Phase 11.3: SME Agent Integration & Interfaces.
 
 This module provides CLI commands for:
 - Development workflow integration
@@ -14,12 +14,12 @@ from typing import Any
 
 import click
 
-from ..development_workflow_integration import (
+from src.ignition.modules.sme_agent.development_workflow_integration import (
     DevelopmentWorkflowIntegrator,
     get_development_workflow_info,
     validate_development_workflow_environment,
 )
-from ..real_time_knowledge_updates import (
+from src.ignition.modules.sme_agent.real_time_knowledge_updates import (
     RealTimeKnowledgeUpdater,
     get_knowledge_update_info,
     validate_knowledge_update_environment,
@@ -46,11 +46,11 @@ def validate_workflow_environment() -> None:
     """Validate development workflow integration environment."""
     click.echo("🔍 Validating development workflow environment...")
 
-    async def run_validation() -> None:
-        result = await validate_development_workflow_environment()
+    async def run_validation() -> dict[str, Any]:
+        result: dict[str, Any] = await validate_development_workflow_environment()
         return result
 
-    result = asyncio.run(run_validation())
+    result: dict[str, Any] = asyncio.run(run_validation())
 
     click.echo(f"✅ Validation: {result['validation_percentage']:.1f}%")
 
@@ -100,7 +100,7 @@ def assess_project_health(detailed: Any) -> None:
     """Assess project health with SME Agent insights."""
     click.echo("🏥 Assessing project health...")
 
-    async def run_assessment() -> None:
+    async def run_assessment() -> dict[str, Any]:
         integrator = DevelopmentWorkflowIntegrator()
         await integrator.initialize()
 
@@ -125,7 +125,7 @@ def assess_project_health(detailed: Any) -> None:
             ],
         }
 
-    result = asyncio.run(run_assessment())
+    result: dict[str, Any] = asyncio.run(run_assessment())
 
     click.echo(f"📊 Overall Health Score: {result['overall_score']:.1f}/100")
     click.echo("\n📈 Component Scores:")
@@ -178,9 +178,9 @@ def generate_documentation(target, force) -> None:
     """Generate automated documentation with SME Agent enhancement."""
     click.echo("📚 Generating documentation...")
 
-    target_paths = list(target) if target else None
+    list(target) if target else None
 
-    async def run_generation() -> None:
+    async def run_generation() -> dict[str, Any]:
         integrator = DevelopmentWorkflowIntegrator()
         await integrator.initialize()
 
@@ -200,7 +200,7 @@ def generate_documentation(target, force) -> None:
             ],
         }
 
-    result = asyncio.run(run_generation())
+    result: dict[str, Any] = asyncio.run(run_generation())
 
     click.echo("✅ Documentation generation complete")
     click.echo(f"   • Generated: {len(result['generated_files'])} files")
@@ -223,11 +223,11 @@ def validate_knowledge_environment() -> None:
     """Validate real-time knowledge updates environment."""
     click.echo("🔍 Validating knowledge update environment...")
 
-    async def run_validation() -> None:
-        result = await validate_knowledge_update_environment()
+    async def run_validation() -> dict[str, Any]:
+        result: dict[str, Any] = await validate_knowledge_update_environment()
         return result
 
-    result = asyncio.run(run_validation())
+    result: dict[str, Any] = asyncio.run(run_validation())
 
     click.echo(f"✅ Validation: {result['validation_percentage']:.1f}%")
 
@@ -311,9 +311,7 @@ def knowledge_status() -> None:
         "cache_size": "2.3 MB",
     }
 
-    click.echo(
-        f"🔄 Monitoring: {'Active' if status['monitoring_active'] else 'Inactive'}"
-    )
+    click.echo(f"🔄 Monitoring: {'Active' if status['monitoring_active'] else 'Inactive'}")
     click.echo(f"🕒 Last Update: {status['last_update']}")
     click.echo(f"📦 Cache Size: {status['cache_size']}")
 
@@ -347,7 +345,7 @@ def force_knowledge_update(type: Any) -> None:
             "errors": [],
         }
 
-    result = asyncio.run(run_update())
+    result: dict[str, Any] = asyncio.run(run_update())
 
     if result["errors"]:
         click.echo("❌ Update failed:")

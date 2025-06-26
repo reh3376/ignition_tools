@@ -1,4 +1,4 @@
-"""SME Agent Module - Core Implementation
+"""SME Agent Module - Core Implementation.
 
 Phase 11.1: SME Agent Infrastructure & LLM Setup
 Following crawl_mcp.py methodology for systematic development.
@@ -65,11 +65,7 @@ class SMEDecisionLog:
             "processing_time": self.processing_time,
             "model_used": self.model_used,
             "human_evaluation": self.human_evaluation,
-            "evaluation_timestamp": (
-                self.evaluation_timestamp.isoformat()
-                if self.evaluation_timestamp
-                else None
-            ),
+            "evaluation_timestamp": (self.evaluation_timestamp.isoformat() if self.evaluation_timestamp else None),
             "human_sme_id": self.human_sme_id,
             "correct_response": self.correct_response,
             "improvement_suggestions": self.improvement_suggestions,
@@ -82,11 +78,7 @@ class SMEDecisionLog:
         """Create decision log from dictionary."""
         log = cls()
         log.decision_id = data.get("decision_id", str(uuid.uuid4()))
-        log.timestamp = (
-            datetime.fromisoformat(data["timestamp"])
-            if data.get("timestamp")
-            else datetime.now()
-        )
+        log.timestamp = datetime.fromisoformat(data["timestamp"]) if data.get("timestamp") else datetime.now()
         log.question = data.get("question", "")
         log.context = data.get("context")
         log.agent_response = data.get("agent_response", "")
@@ -97,9 +89,7 @@ class SMEDecisionLog:
         log.model_used = data.get("model_used", "")
         log.human_evaluation = data.get("human_evaluation")
         log.evaluation_timestamp = (
-            datetime.fromisoformat(data["evaluation_timestamp"])
-            if data.get("evaluation_timestamp")
-            else None
+            datetime.fromisoformat(data["evaluation_timestamp"]) if data.get("evaluation_timestamp") else None
         )
         log.human_sme_id = data.get("human_sme_id")
         log.correct_response = data.get("correct_response")
@@ -178,35 +168,21 @@ class SMEAgentConfig:
         if isinstance(self.use_vector_embeddings, str):
             self.use_vector_embeddings = self.use_vector_embeddings.lower() == "true"
         if isinstance(self.enable_human_evaluation, str):
-            self.enable_human_evaluation = (
-                self.enable_human_evaluation.lower() == "true"
-            )
+            self.enable_human_evaluation = self.enable_human_evaluation.lower() == "true"
 
         # Validate numeric ranges
         if not 0.0 <= self.temperature <= 2.0:
-            raise SMEAgentValidationError(
-                f"Temperature {self.temperature} must be between 0.0 and 2.0"
-            )
+            raise SMEAgentValidationError(f"Temperature {self.temperature} must be between 0.0 and 2.0")
         if not 0.0 <= self.top_p <= 1.0:
-            raise SMEAgentValidationError(
-                f"Top-p {self.top_p} must be between 0.0 and 1.0"
-            )
+            raise SMEAgentValidationError(f"Top-p {self.top_p} must be between 0.0 and 1.0")
         if self.max_context <= 0:
-            raise SMEAgentValidationError(
-                f"Max context {self.max_context} must be positive"
-            )
+            raise SMEAgentValidationError(f"Max context {self.max_context} must be positive")
         if self.max_tokens <= 0:
-            raise SMEAgentValidationError(
-                f"Max tokens {self.max_tokens} must be positive"
-            )
+            raise SMEAgentValidationError(f"Max tokens {self.max_tokens} must be positive")
         if self.evaluation_batch_size <= 0:
-            raise SMEAgentValidationError(
-                f"Evaluation batch size {self.evaluation_batch_size} must be positive"
-            )
+            raise SMEAgentValidationError(f"Evaluation batch size {self.evaluation_batch_size} must be positive")
         if self.evaluation_frequency_hours <= 0:
-            raise SMEAgentValidationError(
-                f"Evaluation frequency {self.evaluation_frequency_hours} must be positive"
-            )
+            raise SMEAgentValidationError(f"Evaluation frequency {self.evaluation_frequency_hours} must be positive")
 
 
 @dataclass
@@ -237,7 +213,7 @@ class SMEAgentResponse:
 
 
 class SMEAgentModule:
-    """SME Agent Module - Phase 11: Process SME Agent & AI Enhancement Platform
+    """SME Agent Module - Phase 11: Process SME Agent & AI Enhancement Platform.
 
     Following crawl_mcp.py methodology:
     - Step 1: Environment validation first
@@ -277,9 +253,7 @@ class SMEAgentModule:
         try:
             self.validation_result = validate_sme_agent_environment()
             if not self.validation_result["valid"]:
-                raise SMEAgentValidationError(
-                    f"Environment validation failed: {self.validation_result['errors']}"
-                )
+                raise SMEAgentValidationError(f"Environment validation failed: {self.validation_result['errors']}")
         except Exception as e:
             self.logger.error(f"Environment validation failed: {e}")
             raise SMEAgentValidationError(f"Environment validation failed: {e}")
@@ -305,39 +279,25 @@ class SMEAgentModule:
         return SMEAgentConfig(
             model_name=env_config.get("SME_AGENT_MODEL", "llama3.1-8b"),
             quantization=env_config.get("SME_AGENT_QUANTIZATION", "int8"),
-            gpu_enabled=env_config.get("SME_AGENT_GPU_ENABLED", "false").lower()
-            == "true",
+            gpu_enabled=env_config.get("SME_AGENT_GPU_ENABLED", "false").lower() == "true",
             max_context=int(env_config.get("SME_AGENT_MAX_CONTEXT", "8192")),
             temperature=float(env_config.get("SME_AGENT_TEMPERATURE", "0.7")),
             top_p=float(env_config.get("SME_AGENT_TOP_P", "0.9")),
             max_tokens=int(env_config.get("SME_AGENT_MAX_TOKENS", "2048")),
-            use_knowledge_graph=env_config.get("USE_KNOWLEDGE_GRAPH", "true").lower()
-            == "true",
-            use_vector_embeddings=env_config.get(
-                "USE_VECTOR_EMBEDDINGS", "true"
-            ).lower()
-            == "true",
+            use_knowledge_graph=env_config.get("USE_KNOWLEDGE_GRAPH", "true").lower() == "true",
+            use_vector_embeddings=env_config.get("USE_VECTOR_EMBEDDINGS", "true").lower() == "true",
             neo4j_uri=env_config.get("NEO4J_URI", ""),
             neo4j_user=env_config.get("NEO4J_USER", ""),
             neo4j_password=env_config.get("NEO4J_PASSWORD", ""),
             log_level=env_config.get("SME_AGENT_LOG_LEVEL", "INFO"),
-            enable_human_evaluation=env_config.get(
-                "SME_AGENT_ENABLE_HUMAN_EVALUATION", "true"
-            ).lower()
-            == "true",
-            evaluation_batch_size=int(
-                env_config.get("SME_AGENT_EVALUATION_BATCH_SIZE", "10")
-            ),
-            evaluation_frequency_hours=int(
-                env_config.get("SME_AGENT_EVALUATION_FREQUENCY_HOURS", "24")
-            ),
-            decision_log_retention_days=int(
-                env_config.get("SME_AGENT_DECISION_LOG_RETENTION_DAYS", "90")
-            ),
+            enable_human_evaluation=env_config.get("SME_AGENT_ENABLE_HUMAN_EVALUATION", "true").lower() == "true",
+            evaluation_batch_size=int(env_config.get("SME_AGENT_EVALUATION_BATCH_SIZE", "10")),
+            evaluation_frequency_hours=int(env_config.get("SME_AGENT_EVALUATION_FREQUENCY_HOURS", "24")),
+            decision_log_retention_days=int(env_config.get("SME_AGENT_DECISION_LOG_RETENTION_DAYS", "90")),
         )
 
     def validate_environment(self: Self) -> dict[str, Any]:
-        """Step 1: Environment Validation First
+        """Step 1: Environment Validation First.
 
         Returns:
             dict containing validation results
@@ -347,10 +307,8 @@ class SMEAgentModule:
 
         return self.validation_result
 
-    def initialize_components(
-        self: Self, complexity_level: str = "basic"
-    ) -> dict[str, Any]:
-        """Step 5: Progressive Complexity Support
+    def initialize_components(self: Self, complexity_level: str = "basic") -> dict[str, Any]:
+        """Step 5: Progressive Complexity Support.
 
         Initialize SME Agent components based on complexity level.
 
@@ -390,16 +348,12 @@ class SMEAgentModule:
             if complexity_level in ["advanced", "enterprise"]:
                 # Initialize LLM model (placeholder for now)
                 self._initialize_llm_placeholder()
-                initialization_result["components_initialized"].append(
-                    "llm_placeholder"
-                )
+                initialization_result["components_initialized"].append("llm_placeholder")
 
             if complexity_level == "enterprise":
                 # Initialize vector embeddings (placeholder for now)
                 self._initialize_vector_store_placeholder()
-                initialization_result["components_initialized"].append(
-                    "vector_store_placeholder"
-                )
+                initialization_result["components_initialized"].append("vector_store_placeholder")
 
             self.initialized = True
 
@@ -474,16 +428,10 @@ class SMEAgentModule:
             # Validate LLM environment
             llm_validation = validate_llm_environment()
             if llm_validation["valid"]:
-                self.logger.info(
-                    f"LLM infrastructure initialized: {self.config.model_name}"
-                )
-                self.logger.info(
-                    f"LLM validation: {len(llm_validation['components_available'])} components available"
-                )
+                self.logger.info(f"LLM infrastructure initialized: {self.config.model_name}")
+                self.logger.info(f"LLM validation: {len(llm_validation['components_available'])} components available")
             else:
-                self.logger.warning(
-                    f"LLM validation issues: {llm_validation['errors']}"
-                )
+                self.logger.warning(f"LLM validation issues: {llm_validation['errors']}")
 
         except Exception as e:
             # Fallback to placeholder if LLM integration fails
@@ -506,11 +454,9 @@ class SMEAgentModule:
         }
         self.logger.info("Vector store placeholder initialized")
 
-    def ask_question(
-        self, question: str, context: str | None = None
-    ) -> SMEAgentResponse:
+    def ask_question(self, question: str, context: str | None = None) -> SMEAgentResponse:
         """Step 2: Comprehensive Input Validation
-        Step 3: Error Handling and User-Friendly Messages
+        Step 3: Error Handling and User-Friendly Messages.
 
         Process a question through the SME Agent.
 
@@ -555,29 +501,18 @@ class SMEAgentModule:
                     if llm_response.get("success"):
                         response_text = llm_response["response"]
                         confidence = 0.9  # High confidence for successful LLM response
-                        sources = (
-                            ["llm_model", "knowledge_graph"]
-                            if self.config.use_knowledge_graph
-                            else ["llm_model"]
-                        )
+                        sources = ["llm_model", "knowledge_graph"] if self.config.use_knowledge_graph else ["llm_model"]
                         knowledge_sources = (
-                            ["LLM Model", "Neo4j Knowledge Graph"]
-                            if self.config.use_knowledge_graph
-                            else ["LLM Model"]
+                            ["LLM Model", "Neo4j Knowledge Graph"] if self.config.use_knowledge_graph else ["LLM Model"]
                         )
                     else:
                         # LLM failed, use fallback
-                        response_text = (
-                            f"[LLM ERROR] {llm_response.get('error', 'Unknown error')}"
-                        )
+                        response_text = f"[LLM ERROR] {llm_response.get('error', 'Unknown error')}"
                         confidence = 0.3
                         sources = ["error_fallback"]
                         knowledge_sources = []
 
-                elif (
-                    isinstance(self.llm_model, dict)
-                    and self.llm_model.get("status") == "placeholder"
-                ):
+                elif isinstance(self.llm_model, dict) and self.llm_model.get("status") == "placeholder":
                     # Placeholder response
                     response_text = f"[PLACEHOLDER] This is a simulated response to: {question[:100]}..."
                     confidence = 0.8
@@ -586,11 +521,7 @@ class SMEAgentModule:
                         if self.config.use_knowledge_graph
                         else ["vector_embeddings"]
                     )
-                    knowledge_sources = (
-                        ["Neo4j Knowledge Graph"]
-                        if self.config.use_knowledge_graph
-                        else []
-                    )
+                    knowledge_sources = ["Neo4j Knowledge Graph"] if self.config.use_knowledge_graph else []
                 else:
                     response_text = "SME Agent not fully initialized"
                     confidence = 0.0
@@ -626,9 +557,7 @@ class SMEAgentModule:
                 processing_time=processing_time,
                 model_used=self.config.model_name,
                 knowledge_sources=knowledge_sources,
-                decision_log=(
-                    decision_log if self.config.enable_human_evaluation else None
-                ),
+                decision_log=(decision_log if self.config.enable_human_evaluation else None),
             )
 
             return response
@@ -651,9 +580,7 @@ class SMEAgentModule:
         logs_for_batch = self.decision_logs[: self.config.evaluation_batch_size]
 
         # Create evaluation batch
-        batch = HumanEvaluationBatch(
-            decision_logs=logs_for_batch.copy(), status="pending"
-        )
+        batch = HumanEvaluationBatch(decision_logs=logs_for_batch.copy(), status="pending")
 
         self.evaluation_batches.append(batch)
 
@@ -663,9 +590,7 @@ class SMEAgentModule:
         # Save batch to file
         self._save_evaluation_batch(batch)
 
-        self.logger.info(
-            f"Created evaluation batch {batch.batch_id} with {len(batch.decision_logs)} decisions"
-        )
+        self.logger.info(f"Created evaluation batch {batch.batch_id} with {len(batch.decision_logs)} decisions")
 
     def _save_evaluation_batch(self: Self, batch: HumanEvaluationBatch) -> Any:
         """Save evaluation batch to file for human review."""
@@ -686,23 +611,15 @@ class SMEAgentModule:
 
     def get_pending_evaluation_batches(self: Self) -> dict[str, Any]:
         """Get all pending evaluation batches for human review."""
-        pending_batches = [
-            batch.to_dict()
-            for batch in self.evaluation_batches
-            if batch.status == "pending"
-        ]
+        pending_batches = [batch.to_dict() for batch in self.evaluation_batches if batch.status == "pending"]
 
         return {
             "pending_batches": pending_batches,
             "count": len(pending_batches),
-            "total_decisions": sum(
-                len(batch["decision_logs"]) for batch in pending_batches
-            ),
+            "total_decisions": sum(len(batch["decision_logs"]) for batch in pending_batches),
         }
 
-    def export_batch_for_review(
-        self, batch_id: str, export_format: str = "json"
-    ) -> dict[str, Any]:
+    def export_batch_for_review(self, batch_id: str, export_format: str = "json") -> dict[str, Any]:
         """Export evaluation batch for human SME review.
 
         Args:
@@ -741,7 +658,7 @@ class SMEAgentModule:
                         "status": batch.status,
                     },
                     "instructions": {
-                        "rating_scale": "Rate each decision from 1-5 (1=Poor, 2=Below Average, 3=Average, 4=Good, 5=Excellent)",
+                        "rating_scale": "Rate each decision from 1-5 (1=Poor, 2=Below Average, 3=Average, 4=Good, 5=Excellent)",  # noqa: E501
                         "evaluation_fields": [
                             "rating: Required integer 1-5",
                             "correct_response: Optional better response if needed",
@@ -822,9 +739,7 @@ class SMEAgentModule:
                         )
 
             else:
-                raise SMEAgentValidationError(
-                    f"Unsupported export format: {export_format}"
-                )
+                raise SMEAgentValidationError(f"Unsupported export format: {export_format}")
 
             # Update batch status
             batch.status = "exported"
@@ -843,9 +758,7 @@ class SMEAgentModule:
             self.logger.error(f"Failed to export batch {batch_id}: {e}")
             return {"success": False, "batch_id": batch_id, "error": str(e)}
 
-    def import_human_evaluation(
-        self, batch_id: str, evaluation_file: str, human_sme_id: str
-    ) -> dict[str, Any]:
+    def import_human_evaluation(self, batch_id: str, evaluation_file: str, human_sme_id: str) -> dict[str, Any]:
         """Import human SME evaluation results and incorporate feedback.
 
         Args:
@@ -870,9 +783,7 @@ class SMEAgentModule:
             # Load evaluation data
             evaluation_path = Path(evaluation_file)
             if not evaluation_path.exists():
-                raise SMEAgentValidationError(
-                    f"Evaluation file not found: {evaluation_file}"
-                )
+                raise SMEAgentValidationError(f"Evaluation file not found: {evaluation_file}")
 
             with open(evaluation_path, encoding="utf-8") as f:
                 evaluation_data = json.load(f)
@@ -900,9 +811,7 @@ class SMEAgentModule:
                     decision_log.human_sme_id = human_sme_id
                     decision_log.rating = human_eval.get("rating")
                     decision_log.correct_response = human_eval.get("correct_response")
-                    decision_log.improvement_suggestions = human_eval.get(
-                        "improvement_suggestions", []
-                    )
+                    decision_log.improvement_suggestions = human_eval.get("improvement_suggestions", [])
                     decision_log.feedback_incorporated = True
 
                     processed_count += 1
@@ -910,9 +819,7 @@ class SMEAgentModule:
                     if human_eval.get("rating"):
                         ratings.append(human_eval["rating"])
 
-                    if human_eval.get("correct_response") or human_eval.get(
-                        "improvement_suggestions"
-                    ):
+                    if human_eval.get("correct_response") or human_eval.get("improvement_suggestions"):
                         improvement_count += 1
 
             # Update batch metadata
@@ -941,9 +848,7 @@ class SMEAgentModule:
             self.logger.error(f"Failed to import evaluation for batch {batch_id}: {e}")
             return {"success": False, "batch_id": batch_id, "error": str(e)}
 
-    def _generate_reinforcement_learning_insights(
-        self, batch: HumanEvaluationBatch
-    ) -> dict[str, Any]:
+    def _generate_reinforcement_learning_insights(self, batch: HumanEvaluationBatch) -> dict[str, Any]:
         """Generate insights for reinforcement learning from human evaluation."""
         insights: Any = {
             "performance_metrics": {},
@@ -952,9 +857,7 @@ class SMEAgentModule:
             "recommendations": [],
         }
 
-        evaluated_logs = [
-            log for log in batch.decision_logs if log.feedback_incorporated
-        ]
+        evaluated_logs = [log for log in batch.decision_logs if log.feedback_incorporated]
 
         if not evaluated_logs:
             return insights
@@ -986,46 +889,31 @@ class SMEAgentModule:
 
         insights["improvement_patterns"] = [
             {"suggestion": suggestion, "frequency": count}
-            for suggestion, count in sorted(
-                suggestion_counts.items(), key=lambda x: x[1], reverse=True
-            )[:5]
+            for suggestion, count in sorted(suggestion_counts.items(), key=lambda x: x[1], reverse=True)[:5]
         ]
 
         # Common issues (low-rated responses)
-        low_rated_logs = [
-            log for log in evaluated_logs if log.rating and log.rating <= 2
-        ]
+        low_rated_logs = [log for log in evaluated_logs if log.rating and log.rating <= 2]
         if low_rated_logs:
             insights["common_issues"] = [
                 {
                     "question_type": "Low confidence responses",
-                    "frequency": len(
-                        [log for log in low_rated_logs if log.confidence < 0.5]
-                    ),
+                    "frequency": len([log for log in low_rated_logs if log.confidence < 0.5]),
                     "description": "Agent responses with low confidence scores",
                 },
                 {
                     "question_type": "Long processing time",
-                    "frequency": len(
-                        [log for log in low_rated_logs if log.processing_time > 5.0]
-                    ),
+                    "frequency": len([log for log in low_rated_logs if log.processing_time > 5.0]),
                     "description": "Responses that took longer than 5 seconds",
                 },
             ]
 
         # Recommendations for model improvement
         if insights["performance_metrics"].get("average_rating", 0) < 3.5:
-            insights["recommendations"].append(
-                "Consider additional training data or fine-tuning"
-            )
+            insights["recommendations"].append("Consider additional training data or fine-tuning")
 
-        if (
-            len([log for log in evaluated_logs if log.correct_response])
-            > len(evaluated_logs) * 0.3
-        ):
-            insights["recommendations"].append(
-                "High correction rate - review training data quality"
-            )
+        if len([log for log in evaluated_logs if log.correct_response]) > len(evaluated_logs) * 0.3:
+            insights["recommendations"].append("High correction rate - review training data quality")
 
         return insights
 
@@ -1035,9 +923,7 @@ class SMEAgentModule:
 
         for batch in self.evaluation_batches:
             if batch.status == "completed":
-                evaluated_logs = [
-                    log for log in batch.decision_logs if log.feedback_incorporated
-                ]
+                evaluated_logs = [log for log in batch.decision_logs if log.feedback_incorporated]
                 all_evaluated_logs.extend(evaluated_logs)
 
         if not all_evaluated_logs:
@@ -1053,47 +939,21 @@ class SMEAgentModule:
 
         summary = {
             "total_evaluations": len(all_evaluated_logs),
-            "total_batches": len(
-                [b for b in self.evaluation_batches if b.status == "completed"]
-            ),
+            "total_batches": len([b for b in self.evaluation_batches if b.status == "completed"]),
             "performance_trends": {
                 "average_human_rating": sum(ratings) / len(ratings) if ratings else 0,
-                "average_agent_confidence": (
-                    sum(confidences) / len(confidences) if confidences else 0
-                ),
-                "average_processing_time": (
-                    sum(processing_times) / len(processing_times)
-                    if processing_times
-                    else 0
-                ),
+                "average_agent_confidence": (sum(confidences) / len(confidences) if confidences else 0),
+                "average_processing_time": (sum(processing_times) / len(processing_times) if processing_times else 0),
                 "improvement_rate": len(
-                    [
-                        log
-                        for log in all_evaluated_logs
-                        if log.correct_response or log.improvement_suggestions
-                    ]
+                    [log for log in all_evaluated_logs if log.correct_response or log.improvement_suggestions]
                 )
                 / len(all_evaluated_logs),
             },
             "learning_opportunities": [],
             "model_performance": {
-                "high_quality_responses": len(
-                    [
-                        log
-                        for log in all_evaluated_logs
-                        if log.rating and log.rating >= 4
-                    ]
-                ),
-                "needs_improvement": len(
-                    [
-                        log
-                        for log in all_evaluated_logs
-                        if log.rating and log.rating <= 2
-                    ]
-                ),
-                "consistency_score": (
-                    1.0 - (max(confidences) - min(confidences)) if confidences else 0
-                ),
+                "high_quality_responses": len([log for log in all_evaluated_logs if log.rating and log.rating >= 4]),
+                "needs_improvement": len([log for log in all_evaluated_logs if log.rating and log.rating <= 2]),
+                "consistency_score": (1.0 - (max(confidences) - min(confidences)) if confidences else 0),
             },
         }
 
@@ -1113,9 +973,7 @@ class SMEAgentModule:
                 "frequency": count,
                 "priority": "high" if count > 3 else "medium",
             }
-            for suggestion, count in sorted(
-                suggestion_counts.items(), key=lambda x: x[1], reverse=True
-            )[:10]
+            for suggestion, count in sorted(suggestion_counts.items(), key=lambda x: x[1], reverse=True)[:10]
         ]
 
         return summary
@@ -1138,7 +996,7 @@ class SMEAgentModule:
         }
 
     def cleanup(self: Self) -> Any:
-        """Step 6: Resource Management and Cleanup
+        """Step 6: Resource Management and Cleanup.
 
         Clean up resources and connections.
         """

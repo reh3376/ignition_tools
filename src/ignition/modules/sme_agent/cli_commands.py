@@ -1,4 +1,4 @@
-"""SME Agent CLI Commands - Modular Architecture
+"""SME Agent CLI Commands - Modular Architecture.
 
 Following crawl_mcp.py methodology:
 - Step 1: Environment validation first
@@ -36,7 +36,7 @@ console = Console()
 @click.group(name="sme")
 @click.pass_context
 def sme_agent_cli(ctx) -> None:
-    """SME Agent CLI - Ignition Subject Matter Expert Assistant
+    """SME Agent CLI - Ignition Subject Matter Expert Assistant.
 
     Phase 11: Process SME Agent & AI Enhancement Platform
     Following crawl_mcp.py methodology for systematic operation.
@@ -54,29 +54,15 @@ def sme_agent_cli(ctx) -> None:
         console.print("[bold blue]🤖 SME Agent CLI - Modular Architecture[/bold blue]")
         console.print("\nAvailable command groups:")
         console.print("  • [cyan]core[/cyan] - Basic operations and validation")
-        console.print(
-            "  • [cyan]control[/cyan] - AI Control Supervisor and optimization"
-        )
+        console.print("  • [cyan]control[/cyan] - AI Control Supervisor and optimization")
         console.print("  • [cyan]pid[/cyan] - PID controller tuning and optimization")
-        console.print(
-            "  • [cyan]mpc[/cyan] - Model Predictive Control and hybrid systems"
-        )
-        console.print(
-            "  • [cyan]deployment[/cyan] - Production deployment and PLC integration"
-        )
+        console.print("  • [cyan]mpc[/cyan] - Model Predictive Control and hybrid systems")
+        console.print("  • [cyan]deployment[/cyan] - Production deployment and PLC integration")
         console.print("  • [cyan]evaluation[/cyan] - Testing and batch management")
-        console.print(
-            "  • [cyan]infrastructure[/cyan] - Deployment and system management"
-        )
-        console.print(
-            "  • [cyan]knowledge[/cyan] - Knowledge extraction and vector enhancement"
-        )
-        console.print(
-            "  • [cyan]dataset-curation[/cyan] - Industrial dataset curation and AI model preparation"
-        )
-        console.print(
-            "\nUse 'ign module sme <group> --help' for group-specific commands"
-        )
+        console.print("  • [cyan]infrastructure[/cyan] - Deployment and system management")
+        console.print("  • [cyan]knowledge[/cyan] - Knowledge extraction and vector enhancement")
+        console.print("  • [cyan]dataset-curation[/cyan] - Industrial dataset curation and AI model preparation")
+        console.print("\nUse 'ign module sme <group> --help' for group-specific commands")
 
 
 # Add all sub-command groups to the main CLI
@@ -95,14 +81,14 @@ sme_agent_cli.add_command(dataset_curation)
 @sme_agent_cli.command("validate-env")
 @click.pass_context
 def validate_env_alias(ctx) -> None:
-    """Alias for core validate-env command"""
+    """Alias for core validate-env command."""
     ctx.invoke(core_commands.commands["validate-env"])
 
 
 @sme_agent_cli.command("status")
 @click.pass_context
 def status_alias(ctx) -> None:
-    """Alias for core status command"""
+    """Alias for core status command."""
     ctx.invoke(core_commands.commands["status"])
 
 
@@ -116,7 +102,7 @@ def status_alias(ctx) -> None:
 )
 @click.pass_context
 def ask_alias(ctx, question: str, context: str | None, complexity: str) -> None:
-    """Alias for core ask command"""
+    """Alias for core ask command."""
     ctx.invoke(
         core_commands.commands["ask"],
         question=question,

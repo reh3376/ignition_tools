@@ -30,7 +30,7 @@ def get_opcua_client_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.opcua.createConnection",
                 "description": "Create and configure OPC-UA client connections with automatic discovery and security",
-                "parameters": "serverUrl:str:required, applicationName:str:optional:IgnitionOPCClient, securityMode:str:optional:SignAndEncrypt, securityPolicy:str:optional:Basic256Sha256, authentication:dict:optional, sessionTimeout:int:optional:300000, connectTimeout:int:optional:30000, autoReconnect:bool:optional:true",
+                "parameters": "serverUrl:str:required, applicationName:str:optional:IgnitionOPCClient, securityMode:str:optional:SignAndEncrypt, securityPolicy:str:optional:Basic256Sha256, authentication:dict:optional, sessionTimeout:int:optional:300000, connectTimeout:int:optional:30000, autoReconnect:bool:optional:true",  # noqa: E501
                 "returns": "dict - OPC-UA connection handle with server info, security status, and session details",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "OPC-UA Connection",
@@ -44,8 +44,8 @@ def get_opcua_client_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.opcua.manageEndpoints",
                 "description": "Discover and manage OPC-UA server endpoints with filtering and selection capabilities",
-                "parameters": "discoveryUrl:str:required, endpointFilters:dict:optional, securityRequirements:dict:optional, applicationFilters:list:optional, timeout:int:optional:10000, maxEndpoints:int:optional:50",
-                "returns": "dict - Available endpoints with security policies, transport profiles, and server capabilities",
+                "parameters": "discoveryUrl:str:required, endpointFilters:dict:optional, securityRequirements:dict:optional, applicationFilters:list:optional, timeout:int:optional:10000, maxEndpoints:int:optional:50",  # noqa: E501
+                "returns": "dict - Available endpoints with security policies, transport profiles, and server capabilities",  # noqa: E501
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Endpoint Discovery",
                 "patterns": [
@@ -57,9 +57,9 @@ def get_opcua_client_functions() -> list[dict[str, Any]]:
             },
             {
                 "name": "system.opcua.handleSecurity",
-                "description": "Configure OPC-UA security including certificates, authentication, and encryption policies",
-                "parameters": "connectionId:str:required, certificateConfig:dict:required, privateKeyConfig:dict:optional, trustedCertificates:list:optional, userIdentity:dict:optional, encryptionEnabled:bool:optional:true, signatureValidation:bool:optional:true",
-                "returns": "dict - Security configuration status with certificate validation and authentication results",
+                "description": "Configure OPC-UA security including certificates, authentication, and encryption policies",  # noqa: E501
+                "parameters": "connectionId:str:required, certificateConfig:dict:required, privateKeyConfig:dict:optional, trustedCertificates:list:optional, userIdentity:dict:optional, encryptionEnabled:bool:optional:true, signatureValidation:bool:optional:true",  # noqa: E501
+                "returns": "dict - Security configuration status with certificate validation and authentication results",  # noqa: E501
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Security Management",
                 "patterns": [
@@ -81,8 +81,8 @@ def get_opcua_client_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.opcua.browseNodes",
                 "description": "Browse OPC-UA server address space with hierarchical navigation and filtering",
-                "parameters": "connectionId:str:required, startingNode:str:optional:Objects, browseDirection:str:optional:Forward, nodeClassMask:int:optional:255, resultMask:int:optional:63, maxResults:int:optional:1000, includeSubtypes:bool:optional:true, filterCriteria:dict:optional",
-                "returns": "dict - Node hierarchy with references, attributes, data types, and browsing continuation points",
+                "parameters": "connectionId:str:required, startingNode:str:optional:Objects, browseDirection:str:optional:Forward, nodeClassMask:int:optional:255, resultMask:int:optional:63, maxResults:int:optional:1000, includeSubtypes:bool:optional:true, filterCriteria:dict:optional",  # noqa: E501
+                "returns": "dict - Node hierarchy with references, attributes, data types, and browsing continuation points",  # noqa: E501
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Address Space Browsing",
                 "patterns": [
@@ -95,8 +95,8 @@ def get_opcua_client_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.opcua.resolveNodeIds",
                 "description": "Resolve and validate OPC-UA node identifiers with reference following",
-                "parameters": "connectionId:str:required, nodeIds:list:required, resolveReferences:bool:optional:true, includeAttributes:bool:optional:true, validateExistence:bool:optional:true, attributeFilter:list:optional",
-                "returns": "dict - Resolved node information with attributes, references, data types, and validation status",
+                "parameters": "connectionId:str:required, nodeIds:list:required, resolveReferences:bool:optional:true, includeAttributes:bool:optional:true, validateExistence:bool:optional:true, attributeFilter:list:optional",  # noqa: E501
+                "returns": "dict - Resolved node information with attributes, references, data types, and validation status",  # noqa: E501
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Node Resolution",
                 "patterns": [
@@ -118,7 +118,7 @@ def get_opcua_client_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.opcua.readNodes",
                 "description": "Read values from OPC-UA nodes with batch operations and quality validation",
-                "parameters": "connectionId:str:required, nodeIds:list:required, attributes:list:optional:Value, maxAge:int:optional:0, timestampsToReturn:str:optional:Both, batchSize:int:optional:100, qualityValidation:bool:optional:true, retryPolicy:dict:optional",
+                "parameters": "connectionId:str:required, nodeIds:list:required, attributes:list:optional:Value, maxAge:int:optional:0, timestampsToReturn:str:optional:Both, batchSize:int:optional:100, qualityValidation:bool:optional:true, retryPolicy:dict:optional",  # noqa: E501
                 "returns": "dict - Node values with quality codes, timestamps, status codes, and data type information",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Data Reading",
@@ -132,7 +132,7 @@ def get_opcua_client_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.opcua.writeNodes",
                 "description": "Write values to OPC-UA nodes with data validation and status reporting",
-                "parameters": "connectionId:str:required, writeRequests:list:required, dataValidation:bool:optional:true, typeConversion:bool:optional:true, batchSize:int:optional:100, writeTimeout:int:optional:30000, confirmationRequired:bool:optional:false",
+                "parameters": "connectionId:str:required, writeRequests:list:required, dataValidation:bool:optional:true, typeConversion:bool:optional:true, batchSize:int:optional:100, writeTimeout:int:optional:30000, confirmationRequired:bool:optional:false",  # noqa: E501
                 "returns": "dict - Write operation results with status codes, error details, and confirmation data",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Data Writing",
@@ -146,8 +146,8 @@ def get_opcua_client_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.opcua.callMethods",
                 "description": "Execute OPC-UA methods on server objects with parameter validation",
-                "parameters": "connectionId:str:required, methodCalls:list:required, parameterValidation:bool:optional:true, outputValidation:bool:optional:true, executionTimeout:int:optional:60000, asyncExecution:bool:optional:false",
-                "returns": "dict - Method execution results with output parameters, status codes, and execution details",
+                "parameters": "connectionId:str:required, methodCalls:list:required, parameterValidation:bool:optional:true, outputValidation:bool:optional:true, executionTimeout:int:optional:60000, asyncExecution:bool:optional:false",  # noqa: E501
+                "returns": "dict - Method execution results with output parameters, status codes, and execution details",  # noqa: E501
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Method Execution",
                 "patterns": [
@@ -169,7 +169,7 @@ def get_opcua_client_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.opcua.createSubscriptions",
                 "description": "Create and manage OPC-UA subscriptions for real-time data monitoring",
-                "parameters": "connectionId:str:required, subscriptionConfig:dict:required, publishingInterval:int:optional:1000, lifetimeCount:int:optional:1200, maxKeepAliveCount:int:optional:10, maxNotificationsPerPublish:int:optional:0, priority:int:optional:0, publishingEnabled:bool:optional:true",
+                "parameters": "connectionId:str:required, subscriptionConfig:dict:required, publishingInterval:int:optional:1000, lifetimeCount:int:optional:1200, maxKeepAliveCount:int:optional:10, maxNotificationsPerPublish:int:optional:0, priority:int:optional:0, publishingEnabled:bool:optional:true",  # noqa: E501
                 "returns": "dict - Subscription handle with configuration details, status, and notification settings",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Subscription Management",
@@ -183,8 +183,8 @@ def get_opcua_client_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.opcua.monitorItems",
                 "description": "Monitor specific OPC-UA items for value and status changes with filtering",
-                "parameters": "subscriptionId:str:required, monitoredItems:list:required, samplingInterval:int:optional:1000, deadbandType:str:optional:Absolute, deadbandValue:float:optional:0.0, discardOldest:bool:optional:true, queueSize:int:optional:10",
-                "returns": "dict - Monitoring configuration with item handles, filter settings, and notification status",
+                "parameters": "subscriptionId:str:required, monitoredItems:list:required, samplingInterval:int:optional:1000, deadbandType:str:optional:Absolute, deadbandValue:float:optional:0.0, discardOldest:bool:optional:true, queueSize:int:optional:10",  # noqa: E501
+                "returns": "dict - Monitoring configuration with item handles, filter settings, and notification status",  # noqa: E501
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Item Monitoring",
                 "patterns": [
@@ -197,8 +197,8 @@ def get_opcua_client_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.opcua.handleNotifications",
                 "description": "Process OPC-UA subscription notifications and data change events",
-                "parameters": "subscriptionId:str:required, notificationHandler:str:required, eventFiltering:dict:optional, dataProcessing:dict:optional, batchProcessing:bool:optional:false, errorHandling:str:optional:log, queueManagement:dict:optional",
-                "returns": "dict - Notification processing status with event counts, error details, and queue statistics",
+                "parameters": "subscriptionId:str:required, notificationHandler:str:required, eventFiltering:dict:optional, dataProcessing:dict:optional, batchProcessing:bool:optional:false, errorHandling:str:optional:log, queueManagement:dict:optional",  # noqa: E501
+                "returns": "dict - Notification processing status with event counts, error details, and queue statistics",  # noqa: E501
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Notification Handling",
                 "patterns": [
@@ -211,8 +211,8 @@ def get_opcua_client_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.opcua.manageSubscriptionLifecycle",
                 "description": "Manage OPC-UA subscription lifecycle including creation, modification, and cleanup",
-                "parameters": "connectionId:str:required, operation:str:required, subscriptionId:str:optional, modificationParams:dict:optional, cleanupPolicy:str:optional:graceful, transferPolicy:dict:optional",
-                "returns": "dict - Subscription lifecycle status with operation results and resource management details",
+                "parameters": "connectionId:str:required, operation:str:required, subscriptionId:str:optional, modificationParams:dict:optional, cleanupPolicy:str:optional:graceful, transferPolicy:dict:optional",  # noqa: E501
+                "returns": "dict - Subscription lifecycle status with operation results and resource management details",  # noqa: E501
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Subscription Lifecycle",
                 "patterns": [
@@ -234,8 +234,8 @@ def get_opcua_client_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.opcua.manageAlarms",
                 "description": "Handle OPC-UA alarms and conditions with acknowledgment and filtering",
-                "parameters": "connectionId:str:required, alarmConfig:dict:required, conditionTypes:list:optional, acknowledgmentHandling:bool:optional:true, alarmFiltering:dict:optional, historicalAlarms:bool:optional:false, escalationRules:dict:optional",
-                "returns": "dict - Alarm management status with active conditions, acknowledgment results, and alarm history",
+                "parameters": "connectionId:str:required, alarmConfig:dict:required, conditionTypes:list:optional, acknowledgmentHandling:bool:optional:true, alarmFiltering:dict:optional, historicalAlarms:bool:optional:false, escalationRules:dict:optional",  # noqa: E501
+                "returns": "dict - Alarm management status with active conditions, acknowledgment results, and alarm history",  # noqa: E501
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Alarm Management",
                 "patterns": [
@@ -248,7 +248,7 @@ def get_opcua_client_functions() -> list[dict[str, Any]]:
             {
                 "name": "system.opcua.performHistoricalRead",
                 "description": "Read historical data from OPC-UA servers with time-based queries and aggregation",
-                "parameters": "connectionId:str:required, nodeIds:list:required, startTime:str:required, endTime:str:required, aggregateType:str:optional:Raw, processingInterval:int:optional:0, maxValues:int:optional:1000, returnBounds:bool:optional:false, qualityFilter:dict:optional",
+                "parameters": "connectionId:str:required, nodeIds:list:required, startTime:str:required, endTime:str:required, aggregateType:str:optional:Raw, processingInterval:int:optional:0, maxValues:int:optional:1000, returnBounds:bool:optional:false, qualityFilter:dict:optional",  # noqa: E501
                 "returns": "dict - Historical data with timestamps, values, quality codes, and aggregation results",
                 "scope": ["Gateway", "Vision Client", "Perspective Session"],
                 "category": "Historical Data Access",
@@ -270,7 +270,7 @@ def get_task_14_metadata() -> dict[str, Any]:
     return {
         "task_number": 14,
         "task_name": "OPC-UA Client Integration Functions",
-        "description": "Comprehensive OPC-UA client capabilities for industrial automation, device connectivity, and real-time data exchange",
+        "description": "Comprehensive OPC-UA client capabilities for industrial automation, device connectivity, and real-time data exchange",  # noqa: E501
         "total_functions": 12,
         "categories": [
             "Connection Management",

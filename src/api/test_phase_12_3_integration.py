@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Phase 12.3: Neo4j Context Sharing - Integration Tests
-Following crawl_mcp.py methodology with comprehensive validation
+Following crawl_mcp.py methodology with comprehensive validation.
 """
 
 import json
@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field
 
 
 class TestResult(BaseModel):
-    """Test result model following crawl_mcp.py patterns"""
+    """Test result model following crawl_mcp.py patterns."""
 
     test_name: str
     success: bool
@@ -28,7 +28,7 @@ class TestResult(BaseModel):
 class Phase123TestSuite:
     """Phase 12.3: Neo4j Context Sharing Integration Test Suite
     Following crawl_mcp.py methodology: Environment validation, input validation,
-    error handling, modular testing, progressive complexity
+    error handling, modular testing, progressive complexity.
     """
 
     def __init__(self, base_url: str = "http://localhost:8000"):
@@ -43,7 +43,7 @@ class Phase123TestSuite:
         details: dict[str, Any] | None = None,
         execution_time: float = 0.0,
     ):
-        """Log test result following crawl_mcp.py patterns"""
+        """Log test result following crawl_mcp.py patterns."""
         result = TestResult(
             test_name=test_name,
             success=success,
@@ -59,7 +59,7 @@ class Phase123TestSuite:
 
     # === STEP 1: ENVIRONMENT VALIDATION ===
     def test_environment_validation(self) -> bool:
-        """Test environment setup following crawl_mcp.py methodology"""
+        """Test environment setup following crawl_mcp.py methodology."""
         start_time = time.time()
 
         try:
@@ -89,9 +89,7 @@ class Phase123TestSuite:
                 return False
 
             # Test Neo4j knowledge graph status endpoint
-            response = requests.get(
-                f"{self.base_url}/api/v1/knowledge/status", timeout=30
-            )
+            response = requests.get(f"{self.base_url}/api/v1/knowledge/status", timeout=30)
             if response.status_code != 200:
                 self.log_test_result(
                     "Environment Validation",
@@ -137,7 +135,7 @@ class Phase123TestSuite:
 
     # === STEP 2: INPUT VALIDATION ===
     def test_input_validation(self) -> bool:
-        """Test Pydantic input validation following crawl_mcp.py patterns"""
+        """Test Pydantic input validation following crawl_mcp.py patterns."""
         start_time = time.time()
 
         try:
@@ -213,9 +211,7 @@ class Phase123TestSuite:
                         passed_tests += 1
                         print(f"   ✓ {test['name']}")
                     else:
-                        print(
-                            f"   ✗ {test['name']}: Expected {test['should_succeed']}, got {response.status_code}"
-                        )
+                        print(f"   ✗ {test['name']}: Expected {test['should_succeed']}, got {response.status_code}")
 
                 except Exception as e:
                     print(f"   ✗ {test['name']}: Exception {e!s}")
@@ -248,7 +244,7 @@ class Phase123TestSuite:
 
     # === STEP 3: ERROR HANDLING ===
     def test_error_handling(self) -> bool:
-        """Test comprehensive error handling following crawl_mcp.py patterns"""
+        """Test comprehensive error handling following crawl_mcp.py patterns."""
         start_time = time.time()
 
         try:
@@ -288,9 +284,7 @@ class Phase123TestSuite:
             for test in error_tests:
                 try:
                     if test.get("method") == "GET":
-                        response = requests.get(
-                            f"{self.base_url}{test['endpoint']}", timeout=30
-                        )
+                        response = requests.get(f"{self.base_url}{test['endpoint']}", timeout=30)
                     else:
                         response = requests.post(
                             f"{self.base_url}{test['endpoint']}",
@@ -303,9 +297,7 @@ class Phase123TestSuite:
                         passed_tests += 1
                         print(f"   ✓ {test['name']}: Correct error handling")
                     else:
-                        print(
-                            f"   ✗ {test['name']}: Expected {expected_status}, got {response.status_code}"
-                        )
+                        print(f"   ✗ {test['name']}: Expected {expected_status}, got {response.status_code}")
 
                 except Exception as e:
                     print(f"   ✗ {test['name']}: Exception {e!s}")
@@ -338,7 +330,7 @@ class Phase123TestSuite:
 
     # === STEP 4: KNOWLEDGE GRAPH FUNCTIONALITY ===
     def test_knowledge_graph_functionality(self) -> bool:
-        """Test Neo4j context sharing functionality"""
+        """Test Neo4j context sharing functionality."""
         start_time = time.time()
 
         try:
@@ -380,9 +372,7 @@ class Phase123TestSuite:
             for test in functionality_tests:
                 try:
                     if test["method"] == "GET":
-                        response = requests.get(
-                            f"{self.base_url}{test['endpoint']}", timeout=30
-                        )
+                        response = requests.get(f"{self.base_url}{test['endpoint']}", timeout=30)
                     else:
                         response = requests.post(
                             f"{self.base_url}{test['endpoint']}",
@@ -392,9 +382,7 @@ class Phase123TestSuite:
 
                     if response.status_code == 200:
                         data = response.json()
-                        if data.get(
-                            "success", True
-                        ):  # Some endpoints don't have success field
+                        if data.get("success", True):  # Some endpoints don't have success field
                             passed_tests += 1
                             print(f"   ✓ {test['name']}: Working correctly")
                         else:
@@ -433,7 +421,7 @@ class Phase123TestSuite:
 
     # === STEP 5: PROGRESSIVE COMPLEXITY ===
     def test_progressive_complexity(self) -> bool:
-        """Test progressive complexity implementation following crawl_mcp.py"""
+        """Test progressive complexity implementation following crawl_mcp.py."""
         start_time = time.time()
 
         try:
@@ -472,23 +460,17 @@ class Phase123TestSuite:
                             timeout=10,
                         )
                     else:
-                        response = requests.get(
-                            f"{self.base_url}{endpoint['path']}", timeout=10
-                        )
+                        response = requests.get(f"{self.base_url}{endpoint['path']}", timeout=10)
 
                     # Accept 200, 404 (for test repo), or 500 (if Neo4j issue) as "available"
                     if response.status_code in [200, 404, 500]:
                         available_endpoints += 1
                         print(f"   ✓ {endpoint['level'].title()}: {endpoint['path']}")
                     else:
-                        print(
-                            f"   ✗ {endpoint['level'].title()}: {endpoint['path']} - {response.status_code}"
-                        )
+                        print(f"   ✗ {endpoint['level'].title()}: {endpoint['path']} - {response.status_code}")
 
                 except Exception:
-                    print(
-                        f"   ✗ {endpoint['level'].title()}: {endpoint['path']} - Exception"
-                    )
+                    print(f"   ✗ {endpoint['level'].title()}: {endpoint['path']} - Exception")
 
             success_rate = available_endpoints / total_endpoints
             success = success_rate >= 0.85  # 85% endpoint availability required
@@ -523,7 +505,7 @@ class Phase123TestSuite:
             return False
 
     def run_comprehensive_test_suite(self) -> dict[str, Any]:
-        """Run complete test suite following crawl_mcp.py methodology"""
+        """Run complete test suite following crawl_mcp.py methodology."""
         print("=" * 80)
         print("PHASE 12.3: NEO4J CONTEXT SHARING - INTEGRATION TESTS")
         print("Following crawl_mcp.py methodology")
@@ -556,9 +538,7 @@ class Phase123TestSuite:
             status = "✅ PASS" if result else "❌ FAIL"
             print(f"{status} {test_name.replace('_', ' ').title()}")
 
-        print(
-            f"\nOverall: {passed_tests}/{total_tests} tests passed ({success_rate:.1%})"
-        )
+        print(f"\nOverall: {passed_tests}/{total_tests} tests passed ({success_rate:.1%})")
         print(f"Total execution time: {total_time:.2f} seconds")
 
         if overall_success:
@@ -579,12 +559,9 @@ class Phase123TestSuite:
         }
 
 
-def main():
-    """Main test execution following crawl_mcp.py patterns"""
-    if len(sys.argv) > 1:
-        base_url = sys.argv[1]
-    else:
-        base_url = "http://localhost:8000"
+def main() -> None:
+    """Main test execution following crawl_mcp.py patterns."""
+    base_url = sys.argv[1] if len(sys.argv) > 1 else "http://localhost:8000"
 
     print(f"Testing Phase 12.3 API at: {base_url}")
 

@@ -309,7 +309,7 @@ class EnhancedCodeIntelligence:
                 }
 
             # Assess quality
-            quality_assessment = await self._assess_code_quality(
+quality_assessment: dict[str, Any] = await self._assess_code_quality(
                 file_paths, quality_metrics or [], complexity
             )
 

@@ -1,4 +1,4 @@
-"""Variable Type Classification & Metadata System
+"""Variable Type Classification & Metadata System.
 
 Following the crawl_mcp.py methodology for structured development:
 - Comprehensive validation and error handling
@@ -55,38 +55,69 @@ class VariableTypeClassifier:
         """Load default variable classification rules."""
         self.classification_rules = {
             "primary_pv_patterns": [
-                r".*temp.*", r".*temperature.*", r".*press.*", r".*pressure.*",
-                r".*flow.*", r".*level.*", r".*ph.*", r".*density.*",
-                r".*concentration.*", r".*conductivity.*", r".*viscosity.*"
+                r".*temp.*",
+                r".*temperature.*",
+                r".*press.*",
+                r".*pressure.*",
+                r".*flow.*",
+                r".*level.*",
+                r".*ph.*",
+                r".*density.*",
+                r".*concentration.*",
+                r".*conductivity.*",
+                r".*viscosity.*",
             ],
             "secondary_pv_patterns": [
-                r".*spc.*", r".*secondary.*", r".*aux.*", r".*auxiliary.*",
-                r".*calc.*", r".*calculated.*", r".*derived.*"
+                r".*spc.*",
+                r".*secondary.*",
+                r".*aux.*",
+                r".*auxiliary.*",
+                r".*calc.*",
+                r".*calculated.*",
+                r".*derived.*",
             ],
             "control_variable_patterns": [
-                r".*valve.*", r".*output.*", r".*cv.*", r".*actuator.*",
-                r".*speed.*", r".*position.*", r".*signal.*", r".*command.*",
-                r".*demand.*", r".*drive.*"
+                r".*valve.*",
+                r".*output.*",
+                r".*cv.*",
+                r".*actuator.*",
+                r".*speed.*",
+                r".*position.*",
+                r".*signal.*",
+                r".*command.*",
+                r".*demand.*",
+                r".*drive.*",
             ],
             "setpoint_patterns": [
-                r".*sp.*", r".*setpoint.*", r".*target.*", r".*set.*",
-                r".*reference.*", r".*desired.*"
+                r".*sp.*",
+                r".*setpoint.*",
+                r".*target.*",
+                r".*set.*",
+                r".*reference.*",
+                r".*desired.*",
             ],
             "disturbance_patterns": [
-                r".*ambient.*", r".*feed.*", r".*load.*", r".*disturbance.*",
-                r".*external.*", r".*weather.*", r".*inlet.*", r".*supply.*"
+                r".*ambient.*",
+                r".*feed.*",
+                r".*load.*",
+                r".*disturbance.*",
+                r".*external.*",
+                r".*weather.*",
+                r".*inlet.*",
+                r".*supply.*",
             ],
             "process_state_patterns": [
-                r".*state.*", r".*mode.*", r".*status.*", r".*phase.*",
-                r".*operation.*", r".*running.*", r".*stopped.*"
-            ]
+                r".*state.*",
+                r".*mode.*",
+                r".*status.*",
+                r".*phase.*",
+                r".*operation.*",
+                r".*running.*",
+                r".*stopped.*",
+            ],
         }
 
-    def classify_variables_from_dataset(
-        self,
-        dataset_name: str,
-        confidence_threshold: float = 0.7
-    ) -> dict[str, Any]:
+    def classify_variables_from_dataset(self, dataset_name: str, confidence_threshold: float = 0.7) -> dict[str, Any]:
         """Automatically classify variables from a dataset.
 
         Args:
@@ -102,7 +133,7 @@ class VariableTypeClassifier:
                 return {
                     "success": False,
                     "error": f"Dataset '{dataset_name}' not found",
-                    "classified_variables": 0
+                    "classified_variables": 0,
                 }
 
             df = self.curator.datasets[dataset_name]
@@ -110,9 +141,7 @@ class VariableTypeClassifier:
 
             # Classify each column
             for column in df.columns:
-                classification = self._classify_single_variable(
-                    column, df[column], confidence_threshold
-                )
+                classification = self._classify_single_variable(column, df[column], confidence_threshold)
                 classification_results[column] = classification
 
                 # Auto-add high-confidence classifications
@@ -125,7 +154,7 @@ class VariableTypeClassifier:
                         data_source=DataSourceType.CSV_XLS,
                         high_limit=classification.get("suggested_high_limit"),
                         low_limit=classification.get("suggested_low_limit"),
-                        normalization_factor=classification.get("normalization_factor")
+                        normalization_factor=classification.get("normalization_factor"),
                     )
 
                     self.curator.add_variable(metadata)
@@ -133,21 +162,17 @@ class VariableTypeClassifier:
             # Update classification statistics
             self.classification_stats[dataset_name] = {
                 "total_variables": len(df.columns),
-                "classified_variables": len([
-                    c for c in classification_results.values()
-                    if c["confidence"] >= confidence_threshold
-                ]),
+                "classified_variables": len(
+                    [c for c in classification_results.values() if c["confidence"] >= confidence_threshold]
+                ),
                 "classification_results": classification_results,
                 "confidence_threshold": confidence_threshold,
-                "timestamp": pd.Timestamp.now().isoformat()
+                "timestamp": pd.Timestamp.now().isoformat(),
             }
 
             classified_count = self.classification_stats[dataset_name]["classified_variables"]
 
-            logger.info(
-                f"Classified {classified_count}/{len(df.columns)} variables "
-                f"from dataset '{dataset_name}'"
-            )
+            logger.info(f"Classified {classified_count}/{len(df.columns)} variables from dataset '{dataset_name}'")
 
             return {
                 "success": True,
@@ -155,23 +180,16 @@ class VariableTypeClassifier:
                 "total_variables": len(df.columns),
                 "classified_variables": classified_count,
                 "classification_results": classification_results,
-                "confidence_threshold": confidence_threshold
+                "confidence_threshold": confidence_threshold,
             }
 
         except Exception as e:
             error_msg = format_validation_error(e, "Variable classification")
             logger.error(error_msg)
-            return {
-                "success": False,
-                "error": error_msg,
-                "classified_variables": 0
-            }
+            return {"success": False, "error": error_msg, "classified_variables": 0}
 
     def _classify_single_variable(
-        self,
-        variable_name: str,
-        data_series: pd.Series,
-        confidence_threshold: float
+        self, variable_name: str, data_series: pd.Series, confidence_threshold: float
     ) -> dict[str, Any]:
         """Classify a single variable using pattern matching and data analysis.
 
@@ -190,7 +208,7 @@ class VariableTypeClassifier:
                 "variable_type": VariableType.PRIMARY_PV,  # Default
                 "confidence": 0.0,
                 "classification_reasons": [],
-                "data_analysis": {}
+                "data_analysis": {},
             }
 
             # Pattern-based classification
@@ -201,17 +219,13 @@ class VariableTypeClassifier:
             result["data_analysis"] = data_analysis
 
             # Combine pattern and data analysis for final classification
-            final_classification = self._combine_classification_methods(
-                pattern_scores, data_analysis, variable_name
-            )
+            final_classification = self._combine_classification_methods(pattern_scores, data_analysis, variable_name)
 
             result.update(final_classification)
 
             # Add engineering unit suggestions
             if result["confidence"] >= confidence_threshold:
-                result.update(self._suggest_engineering_metadata(
-                    result["variable_type"], data_analysis
-                ))
+                result.update(self._suggest_engineering_metadata(result["variable_type"], data_analysis))
 
             return result
 
@@ -223,7 +237,7 @@ class VariableTypeClassifier:
                 "confidence": 0.0,
                 "error": str(e),
                 "classification_reasons": ["Classification failed"],
-                "data_analysis": {}
+                "data_analysis": {},
             }
 
     def _calculate_pattern_scores(self, variable_name: str) -> dict[str, float]:
@@ -253,24 +267,26 @@ class VariableTypeClassifier:
                 "data_type": str(data_series.dtype),
                 "total_points": len(data_series),
                 "missing_points": data_series.isnull().sum(),
-                "missing_percentage": (data_series.isnull().sum() / len(data_series) * 100)
+                "missing_percentage": (data_series.isnull().sum() / len(data_series) * 100),
             }
 
             # Numeric data analysis
             if pd.api.types.is_numeric_dtype(data_series):
                 numeric_data = data_series.dropna()
                 if len(numeric_data) > 0:
-                    analysis.update({
-                        "is_numeric": True,
-                        "min_value": float(numeric_data.min()),
-                        "max_value": float(numeric_data.max()),
-                        "mean_value": float(numeric_data.mean()),
-                        "std_value": float(numeric_data.std()),
-                        "range": float(numeric_data.max() - numeric_data.min()),
-                        "unique_values": len(numeric_data.unique()),
-                        "zero_values": (numeric_data == 0).sum(),
-                        "negative_values": (numeric_data < 0).sum()
-                    })
+                    analysis.update(
+                        {
+                            "is_numeric": True,
+                            "min_value": float(numeric_data.min()),
+                            "max_value": float(numeric_data.max()),
+                            "mean_value": float(numeric_data.mean()),
+                            "std_value": float(numeric_data.std()),
+                            "range": float(numeric_data.max() - numeric_data.min()),
+                            "unique_values": len(numeric_data.unique()),
+                            "zero_values": (numeric_data == 0).sum(),
+                            "negative_values": (numeric_data < 0).sum(),
+                        }
+                    )
 
                     # Detect if likely boolean/state variable
                     unique_vals = numeric_data.unique()
@@ -290,10 +306,12 @@ class VariableTypeClassifier:
             else:
                 analysis["is_numeric"] = False
                 # Categorical data analysis
-                analysis.update({
-                    "unique_values": len(data_series.dropna().unique()),
-                    "most_common": data_series.value_counts().head(5).to_dict()
-                })
+                analysis.update(
+                    {
+                        "unique_values": len(data_series.dropna().unique()),
+                        "most_common": data_series.value_counts().head(5).to_dict(),
+                    }
+                )
 
             return analysis
 
@@ -305,7 +323,7 @@ class VariableTypeClassifier:
         self,
         pattern_scores: dict[str, float],
         data_analysis: dict[str, Any],
-        variable_name: str
+        variable_name: str,
     ) -> dict[str, Any]:
         """Combine pattern matching and data analysis for final classification."""
         # Find highest pattern score
@@ -318,9 +336,11 @@ class VariableTypeClassifier:
 
         if data_analysis.get("is_numeric", False):
             # Boost control variable score if range suggests actuator output
-            if (data_analysis.get("min_value", 0) >= 0 and
-                data_analysis.get("max_value", 100) <= 100 and
-                not data_analysis.get("likely_state_variable", False)):
+            if (
+                data_analysis.get("min_value", 0) >= 0
+                and data_analysis.get("max_value", 100) <= 100
+                and not data_analysis.get("likely_state_variable", False)
+            ):
                 adjusted_scores["control_variable_patterns"] += 0.2
                 reasons.append("Numeric range suggests control output")
 
@@ -350,7 +370,7 @@ class VariableTypeClassifier:
             "control_variable_patterns": VariableType.CONTROL_VARIABLE,
             "setpoint_patterns": VariableType.SETPOINT,
             "disturbance_patterns": VariableType.DISTURBANCE_VARIABLE,
-            "process_state_patterns": VariableType.PROCESS_STATE
+            "process_state_patterns": VariableType.PROCESS_STATE,
         }
 
         variable_type = type_mapping.get(final_type, VariableType.PRIMARY_PV)
@@ -364,13 +384,11 @@ class VariableTypeClassifier:
             "confidence": min(final_score, 1.0),
             "classification_reasons": reasons,
             "pattern_scores": pattern_scores,
-            "adjusted_scores": adjusted_scores
+            "adjusted_scores": adjusted_scores,
         }
 
     def _suggest_engineering_metadata(
-        self,
-        variable_type: VariableType,
-        data_analysis: dict[str, Any]
+        self, variable_type: VariableType, data_analysis: dict[str, Any]
     ) -> dict[str, Any]:
         """Suggest engineering units and limits based on variable type and data."""
         suggestions = {}
@@ -380,7 +398,7 @@ class VariableTypeClassifier:
 
         min_val = data_analysis.get("min_value", 0)
         max_val = data_analysis.get("max_value", 100)
-        mean_val = data_analysis.get("mean_value", 50)
+        data_analysis.get("mean_value", 50)
 
         # Suggest engineering units based on variable type and data range
         if variable_type == VariableType.PRIMARY_PV:
@@ -420,11 +438,7 @@ class VariableTypeClassifier:
 
         return suggestions
 
-    def validate_variable_classification(
-        self,
-        variable_name: str,
-        proposed_type: VariableType
-    ) -> dict[str, Any]:
+    def validate_variable_classification(self, variable_name: str, proposed_type: VariableType) -> dict[str, Any]:
         """Validate a proposed variable classification.
 
         Args:
@@ -439,7 +453,7 @@ class VariableTypeClassifier:
             variable_found = False
             data_series = None
 
-            for dataset_name, df in self.curator.datasets.items():
+            for _dataset_name, df in self.curator.datasets.items():
                 if variable_name in df.columns:
                     variable_found = True
                     data_series = df[variable_name]
@@ -449,25 +463,25 @@ class VariableTypeClassifier:
                 return {
                     "valid": False,
                     "error": f"Variable '{variable_name}' not found in any dataset",
-                    "confidence": 0.0
+                    "confidence": 0.0,
                 }
 
             # Perform classification analysis
             if data_series is not None:
                 current_classification = self._classify_single_variable(
-                    variable_name, data_series, 0.0  # No threshold for validation
+                    variable_name,
+                    data_series,
+                    0.0,  # No threshold for validation
                 )
             else:
                 return {
                     "valid": False,
                     "error": f"Data series for variable '{variable_name}' is None",
-                    "confidence": 0.0
+                    "confidence": 0.0,
                 }
 
             # Compare with proposed type
-            matches_auto_classification = (
-                current_classification["variable_type"] == proposed_type
-            )
+            matches_auto_classification = current_classification["variable_type"] == proposed_type
 
             validation_result = {
                 "valid": True,
@@ -477,14 +491,12 @@ class VariableTypeClassifier:
                 "matches_auto_classification": matches_auto_classification,
                 "auto_classification_confidence": current_classification["confidence"],
                 "validation_reasons": [],
-                "data_analysis": current_classification["data_analysis"]
+                "data_analysis": current_classification["data_analysis"],
             }
 
             # Add validation reasons
             if matches_auto_classification:
-                validation_result["validation_reasons"].append(
-                    "Matches automatic classification"
-                )
+                validation_result["validation_reasons"].append("Matches automatic classification")
             else:
                 validation_result["validation_reasons"].append(
                     f"Differs from automatic classification ({current_classification['variable_type'].value})"
@@ -493,41 +505,27 @@ class VariableTypeClassifier:
             # Additional validation based on data characteristics
             if data_analysis := current_classification.get("data_analysis", {}):
                 if proposed_type == VariableType.PROCESS_STATE and not data_analysis.get("is_numeric", True):
-                    validation_result["validation_reasons"].append(
-                        "Non-numeric data appropriate for state variable"
-                    )
+                    validation_result["validation_reasons"].append("Non-numeric data appropriate for state variable")
                 elif proposed_type == VariableType.CONTROL_VARIABLE and data_analysis.get("likely_percentage", False):
-                    validation_result["validation_reasons"].append(
-                        "Percentage range appropriate for control variable"
-                    )
+                    validation_result["validation_reasons"].append("Percentage range appropriate for control variable")
 
             return validation_result
 
         except Exception as e:
             error_msg = format_validation_error(e, "Variable validation")
             logger.error(error_msg)
-            return {
-                "valid": False,
-                "error": error_msg,
-                "confidence": 0.0
-            }
+            return {"valid": False, "error": error_msg, "confidence": 0.0}
 
     def get_classification_summary(self) -> dict[str, Any]:
         """Get summary of all classification activities."""
         try:
             total_datasets = len(self.classification_stats)
-            total_variables = sum(
-                stats["total_variables"]
-                for stats in self.classification_stats.values()
-            )
-            total_classified = sum(
-                stats["classified_variables"]
-                for stats in self.classification_stats.values()
-            )
+            total_variables = sum(stats["total_variables"] for stats in self.classification_stats.values())
+            total_classified = sum(stats["classified_variables"] for stats in self.classification_stats.values())
 
             # Variable type distribution
             type_distribution = {}
-            for variable_name, metadata in self.curator.variables.items():
+            for _variable_name, metadata in self.curator.variables.items():
                 var_type = metadata.variable_type.value
                 type_distribution[var_type] = type_distribution.get(var_type, 0) + 1
 
@@ -535,19 +533,16 @@ class VariableTypeClassifier:
                 "total_datasets_processed": total_datasets,
                 "total_variables_analyzed": total_variables,
                 "total_variables_classified": total_classified,
-                "classification_rate": (total_classified / total_variables * 100) if total_variables > 0 else 0,
+                "classification_rate": ((total_classified / total_variables * 100) if total_variables > 0 else 0),
                 "variable_type_distribution": type_distribution,
                 "dataset_statistics": self.classification_stats,
                 "configured_variables": len(self.curator.variables),
-                "timestamp": pd.Timestamp.now().isoformat()
+                "timestamp": pd.Timestamp.now().isoformat(),
             }
 
         except Exception as e:
             logger.error(f"Error generating classification summary: {e}")
-            return {
-                "error": str(e),
-                "timestamp": pd.Timestamp.now().isoformat()
-            }
+            return {"error": str(e), "timestamp": pd.Timestamp.now().isoformat()}
 
 
 # Initialize module logger

@@ -28,9 +28,7 @@ logger = logging.getLogger(__name__)
 class RepositoryAnalyzer:
     """Analyzes repositories and creates graph representations."""
 
-    def __init__(
-        self, graph_client, embedder: SentenceTransformer | None = None
-    ) -> bool:
+    def __init__(self, graph_client, embedder: SentenceTransformer | None = None) -> bool:
         """Initialize the repository analyzer."""
         self.client = graph_client
         self.embedder = embedder or SentenceTransformer("all-MiniLM-L6-v2")
@@ -114,11 +112,7 @@ class RepositoryAnalyzer:
         """Extract repository metadata."""
         # Parse GitHub URL for API call
         if "github.com" in repo_url:
-            parts = (
-                repo_url.replace("https://github.com/", "")
-                .replace(".git", "")
-                .split("/")
-            )
+            parts = repo_url.replace("https://github.com/", "").replace(".git", "").split("/")
             if len(parts) >= 2:
                 owner, repo = parts[0], parts[1]
 
@@ -137,17 +131,9 @@ class RepositoryAnalyzer:
                             "stars": data.get("stargazers_count", 0),
                             "forks": data.get("forks_count", 0),
                             "size_kb": data.get("size", 0),
-                            "created_at": datetime.fromisoformat(
-                                data["created_at"].replace("Z", "+00:00")
-                            ),
-                            "updated_at": datetime.fromisoformat(
-                                data["updated_at"].replace("Z", "+00:00")
-                            ),
-                            "license": (
-                                data.get("license", {}).get("name")
-                                if data.get("license")
-                                else None
-                            ),
+                            "created_at": datetime.fromisoformat(data["created_at"].replace("Z", "+00:00")),
+                            "updated_at": datetime.fromisoformat(data["updated_at"].replace("Z", "+00:00")),
+                            "license": (data.get("license", {}).get("name") if data.get("license") else None),
                             "topics": data.get("topics", []),
                         }
                 except Exception as e:
@@ -178,9 +164,7 @@ class RepositoryAnalyzer:
             readme_path = repo_info.get("local_path", Path()) / readme_file
             if readme_path.exists():
                 try:
-                    readme_content = readme_path.read_text(encoding="utf-8")[
-                        :5000
-                    ]  # Limit size
+                    readme_content = readme_path.read_text(encoding="utf-8")[:5000]  # Limit size
                     break
                 except Exception:
                     continue
@@ -235,10 +219,7 @@ class RepositoryAnalyzer:
             # Skip hidden directories and common ignore patterns
             if any(part.startswith(".") for part in relative_path.parts):
                 continue
-            if any(
-                ignore in str(relative_path)
-                for ignore in ["__pycache__", ".git", "node_modules"]
-            ):
+            if any(ignore in str(relative_path) for ignore in ["__pycache__", ".git", "node_modules"]):
                 continue
 
             # Count files and subdirectories
@@ -337,11 +318,7 @@ class RepositoryAnalyzer:
         """Analyze Python files and extract code structure."""
         for root, dirs, files in os.walk(repo_path):
             # Skip hidden and ignored directories
-            dirs[:] = [
-                d
-                for d in dirs
-                if not d.startswith(".") and d not in ["__pycache__", ".git"]
-            ]
+            dirs[:] = [d for d in dirs if not d.startswith(".") and d not in ["__pycache__", ".git"]]
 
             for file in files:
                 if file.endswith(".py"):
@@ -353,9 +330,7 @@ class RepositoryAnalyzer:
                     except Exception as e:
                         logger.warning(f"Failed to analyze {relative_path}: {e}")
 
-    def _analyze_python_file(
-        self, file_path: Path, relative_path: Path, repo_name: str
-    ) -> None:
+    def _analyze_python_file(self, file_path: Path, relative_path: Path, repo_name: str) -> None:
         """Analyze a single Python file."""
         try:
             with open(file_path, encoding="utf-8") as f:
@@ -432,11 +407,7 @@ class RepositoryAnalyzer:
         """Create file node in Neo4j."""
         # Create embedding from docstring or first few lines
         text_for_embedding = docstring or content[:1000]
-        embedding = (
-            self.embedder.encode(text_for_embedding).tolist()
-            if text_for_embedding
-            else None
-        )
+        embedding = self.embedder.encode(text_for_embedding).tolist() if text_for_embedding else None
 
         cypher = """
         MERGE (f:File {path: $path, repository: $repository})
@@ -479,25 +450,15 @@ class RepositoryAnalyzer:
             elif isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef):
                 self._create_function_node(node, file_path, repo_name)
 
-    def _create_class_node(
-        self, node: ast.ClassDef, file_path: str, repo_name: str
-    ) -> None:
+    def _create_class_node(self, node: ast.ClassDef, file_path: str, repo_name: str) -> None:
         """Create class node from AST."""
         docstring = ast.get_docstring(node)
         base_classes = [self._get_node_name(base) for base in node.bases]
 
         # Count methods and properties
-        methods = [
-            n
-            for n in node.body
-            if isinstance(n, ast.FunctionDef | ast.AsyncFunctionDef)
-        ]
+        methods = [n for n in node.body if isinstance(n, ast.FunctionDef | ast.AsyncFunctionDef)]
         properties = [
-            n
-            for n in methods
-            if any(
-                d.id == "property" for d in n.decorator_list if isinstance(d, ast.Name)
-            )
+            n for n in methods if any(d.id == "property" for d in n.decorator_list if isinstance(d, ast.Name))
         ]
 
         # Check for decorators
@@ -623,9 +584,7 @@ class RepositoryAnalyzer:
         for req_file in repo_path.glob("*requirements*.txt"):
             self._parse_requirements_file(req_file, repo_name)
 
-    def _parse_pyproject_dependencies(
-        self, pyproject_path: Path, repo_name: str
-    ) -> None:
+    def _parse_pyproject_dependencies(self, pyproject_path: Path, repo_name: str) -> None:
         """Parse dependencies from pyproject.toml."""
         try:
             import tomli
@@ -640,16 +599,12 @@ class RepositoryAnalyzer:
 
             # Process main dependencies
             for dep in dependencies:
-                self._create_dependency_node(
-                    dep, repo_name, "runtime", "pyproject.toml"
-                )
+                self._create_dependency_node(dep, repo_name, "runtime", "pyproject.toml")
 
             # Process optional dependencies
             for group, deps in optional_deps.items():
                 for dep in deps:
-                    self._create_dependency_node(
-                        dep, repo_name, f"optional-{group}", "pyproject.toml"
-                    )
+                    self._create_dependency_node(dep, repo_name, f"optional-{group}", "pyproject.toml")
 
         except Exception as e:
             logger.warning(f"Failed to parse pyproject.toml: {e}")
@@ -665,26 +620,16 @@ class RepositoryAnalyzer:
             for line in lines:
                 line = line.strip()
                 if line and not line.startswith("#"):
-                    self._create_dependency_node(
-                        line, repo_name, dep_type, req_file.name
-                    )
+                    self._create_dependency_node(line, repo_name, dep_type, req_file.name)
 
         except Exception as e:
             logger.warning(f"Failed to parse {req_file}: {e}")
 
-    def _create_dependency_node(
-        self, dep_spec: str, repo_name: str, dep_type: str, source: str
-    ) -> None:
+    def _create_dependency_node(self, dep_spec: str, repo_name: str, dep_type: str, source: str) -> None:
         """Create dependency node from dependency specification."""
         # Parse dependency specification
         dep_name = (
-            dep_spec.split("==")[0]
-            .split(">=")[0]
-            .split("<=")[0]
-            .split(">")[0]
-            .split("<")[0]
-            .split("~=")[0]
-            .strip()
+            dep_spec.split("==")[0].split(">=")[0].split("<=")[0].split(">")[0].split("<")[0].split("~=")[0].strip()
         )
         version = None
 
@@ -724,29 +669,19 @@ class RepositoryAnalyzer:
                 for node in ast.walk(tree):
                     if isinstance(node, ast.ClassDef):
                         # Check if it's an Agent class
-                        if "Agent" in node.name or any(
-                            "Agent" in self._get_node_name(base) for base in node.bases
-                        ):
-                            self._create_agent_node(
-                                node, str(relative_path), repo_name, content
-                            )
+                        if "Agent" in node.name or any("Agent" in self._get_node_name(base) for base in node.bases):
+                            self._create_agent_node(node, str(relative_path), repo_name, content)
 
                     elif isinstance(node, ast.FunctionDef):
                         # Check if it's a tool function (decorated with @tool or similar)
-                        decorators = [
-                            self._get_node_name(d) for d in node.decorator_list
-                        ]
+                        decorators = [self._get_node_name(d) for d in node.decorator_list]
                         if any("tool" in dec.lower() for dec in decorators):
                             self._create_tool_node(node, str(relative_path), repo_name)
 
             except Exception as e:
-                logger.warning(
-                    f"Failed to analyze Pydantic AI components in {py_file}: {e}"
-                )
+                logger.warning(f"Failed to analyze Pydantic AI components in {py_file}: {e}")
 
-    def _create_agent_node(
-        self, node: ast.ClassDef, file_path: str, repo_name: str, content: str
-    ) -> None:
+    def _create_agent_node(self, node: ast.ClassDef, file_path: str, repo_name: str, content: str) -> None:
         """Create agent node for Pydantic AI agents."""
         docstring = ast.get_docstring(node)
 
@@ -794,9 +729,7 @@ class RepositoryAnalyzer:
             },
         )
 
-    def _create_tool_node(
-        self, node: ast.FunctionDef, file_path: str, repo_name: str
-    ) -> None:
+    def _create_tool_node(self, node: ast.FunctionDef, file_path: str, repo_name: str) -> None:
         """Create tool node for Pydantic AI tools."""
         docstring = ast.get_docstring(node)
         parameters = [arg.arg for arg in node.args.args]

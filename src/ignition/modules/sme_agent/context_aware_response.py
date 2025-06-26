@@ -58,9 +58,7 @@ class ResponseContext:
     domain: str | None = None
     topic: str | None = None
     project_context: ProjectContext | None = None
-    user_experience_level: str = (
-        "intermediate"  # beginner, intermediate, advanced, expert
-    )
+    user_experience_level: str = "intermediate"  # beginner, intermediate, advanced, expert
     preferred_response_style: str = "detailed"  # brief, detailed, comprehensive
     include_examples: bool = True
     include_best_practices: bool = True
@@ -156,9 +154,7 @@ class ProjectAnalyzer:
                 raise ContextAwareError(f"Project path does not exist: {project_path}")
 
             if not path.is_dir():
-                raise ContextAwareError(
-                    f"Project path is not a directory: {project_path}"
-                )
+                raise ContextAwareError(f"Project path is not a directory: {project_path}")
 
             # Analyze project structure
             context = ProjectContext(
@@ -180,9 +176,7 @@ class ProjectAnalyzer:
             # Calculate complexity score
             context.complexity_score = self._calculate_complexity_score(context)
 
-            self.logger.info(
-                f"Analyzed project: {context.project_type} with {context.file_count} files"
-            )
+            self.logger.info(f"Analyzed project: {context.project_type} with {context.file_count} files")
 
             return context
 
@@ -225,10 +219,7 @@ class ProjectAnalyzer:
         config_extensions = {".properties", ".conf", ".xml", ".json", ".yaml", ".yml"}
         config_names = {"settings.json", "project.json", "config.json"}
 
-        return (
-            file_path.suffix.lower() in config_extensions
-            or file_path.name.lower() in config_names
-        )
+        return file_path.suffix.lower() in config_extensions or file_path.name.lower() in config_names
 
     def _is_resource_file(self, file_path: Path) -> bool:
         """Check if file is a resource file."""
@@ -250,49 +241,32 @@ class ProjectAnalyzer:
         type_scores = {"gateway": 0, "vision": 0, "perspective": 0}
 
         # Check file patterns
-        for file_path in (
-            context.code_files + context.config_files + context.resource_files
-        ):
+        for file_path in context.code_files + context.config_files + context.resource_files:
             file_lower = file_path.lower()
 
             # Gateway indicators
-            if any(
-                pattern in file_lower
-                for pattern in ["script", "gateway", "tag", "device"]
-            ):
+            if any(pattern in file_lower for pattern in ["script", "gateway", "tag", "device"]):
                 type_scores["gateway"] += 1
 
             # Vision indicators
-            if any(
-                pattern in file_lower
-                for pattern in ["vision", "window", "template", ".vwin"]
-            ):
+            if any(pattern in file_lower for pattern in ["vision", "window", "template", ".vwin"]):
                 type_scores["vision"] += 1
 
             # Perspective indicators
-            if any(
-                pattern in file_lower
-                for pattern in ["perspective", "view", "session", ".view"]
-            ):
+            if any(pattern in file_lower for pattern in ["perspective", "view", "session", ".view"]):
                 type_scores["perspective"] += 1
 
         # Check directory names
         for dir_path in context.directories:
             dir_lower = dir_path.lower()
 
-            if any(
-                pattern in dir_lower for pattern in ["gateway", "scripts", "devices"]
-            ):
+            if any(pattern in dir_lower for pattern in ["gateway", "scripts", "devices"]):
                 type_scores["gateway"] += 2
 
-            if any(
-                pattern in dir_lower for pattern in ["vision", "windows", "templates"]
-            ):
+            if any(pattern in dir_lower for pattern in ["vision", "windows", "templates"]):
                 type_scores["vision"] += 2
 
-            if any(
-                pattern in dir_lower for pattern in ["perspective", "views", "sessions"]
-            ):
+            if any(pattern in dir_lower for pattern in ["perspective", "views", "sessions"]):
                 type_scores["perspective"] += 2
 
         # Determine project type
@@ -301,9 +275,7 @@ class ProjectAnalyzer:
             return "unknown"
 
         # Check for mixed projects
-        high_scores = [
-            ptype for ptype, score in type_scores.items() if score >= max_score * 0.7
-        ]
+        high_scores = [ptype for ptype, score in type_scores.items() if score >= max_score * 0.7]
         if len(high_scores) > 1:
             return "mixed"
 
@@ -359,9 +331,7 @@ class ContextAwareResponseGenerator:
     Following crawl_mcp.py methodology for systematic response generation.
     """
 
-    def __init__(
-        self, domain_managers=None, learning_engine=None, llm_manager=None
-    ) -> None:
+    def __init__(self, domain_managers=None, learning_engine=None, llm_manager=None) -> None:
         """Initialize the context-aware response generator.
 
         Args:
@@ -409,18 +379,12 @@ class ContextAwareResponseGenerator:
     def _validate_environment(self) -> None:
         """Step 1: Environment Validation First."""
         if not self.domain_managers:
-            self.logger.warning(
-                "No domain managers provided - responses may be limited"
-            )
+            self.logger.warning("No domain managers provided - responses may be limited")
 
         if not self.learning_engine:
-            self.logger.warning(
-                "No learning engine provided - adaptive learning disabled"
-            )
+            self.logger.warning("No learning engine provided - adaptive learning disabled")
 
-    def generate_response(
-        self, query: str, context: ResponseContext
-    ) -> ContextAwareResponse:
+    def generate_response(self, query: str, context: ResponseContext) -> ContextAwareResponse:
         """Generate context-aware response with confidence scoring.
 
         Args:
@@ -453,32 +417,22 @@ class ContextAwareResponseGenerator:
                 response.topic = context.topic or topic
 
             # Gather knowledge from domain managers
-            knowledge_results = self._gather_domain_knowledge(
-                query, response.domain or "General", context
-            )
+            knowledge_results = self._gather_domain_knowledge(query, response.domain or "General", context)
 
             # Generate base response
-            response.response = self._generate_base_response(
-                query, knowledge_results, context
-            )
+            response.response = self._generate_base_response(query, knowledge_results, context)
 
             # Add context-aware enhancements
             self._add_context_enhancements(response, context, knowledge_results)
 
             # Calculate confidence score
-            response.confidence = self._calculate_response_confidence(
-                knowledge_results, context
-            )
+            response.confidence = self._calculate_response_confidence(knowledge_results, context)
 
             # Generate recommendations
-            response.recommendations = self._generate_recommendations(
-                query, response, context
-            )
+            response.recommendations = self._generate_recommendations(query, response, context)
 
             # Generate follow-up questions
-            response.follow_up_questions = self._generate_follow_up_questions(
-                query, response, context
-            )
+            response.follow_up_questions = self._generate_follow_up_questions(query, response, context)
 
             # Record response time
             response.response_time = time.time() - start_time
@@ -487,9 +441,7 @@ class ContextAwareResponseGenerator:
             if self.learning_engine:
                 self._record_interaction(query, response, context)
 
-            self.logger.info(
-                f"Generated response for query: {query[:50]}... (confidence: {response.confidence:.2f})"
-            )
+            self.logger.info(f"Generated response for query: {query[:50]}... (confidence: {response.confidence:.2f})")
 
             return response
 
@@ -557,9 +509,7 @@ class ContextAwareResponseGenerator:
 
         return domain, topic
 
-    def _gather_domain_knowledge(
-        self, query: str, domain: str, context: ResponseContext
-    ) -> list[Any]:
+    def _gather_domain_knowledge(self, query: str, domain: str, context: ResponseContext) -> list[Any]:
         """Gather knowledge from relevant domain managers."""
         knowledge_results = []
 
@@ -583,18 +533,14 @@ class ContextAwareResponseGenerator:
                         result = manager.query_knowledge(domain_query)
                         knowledge_results.append(result)
                     except Exception as e:
-                        self.logger.warning(
-                            f"Domain query failed for {domain_name}: {e}"
-                        )
+                        self.logger.warning(f"Domain query failed for {domain_name}: {e}")
 
         except ImportError:
             self.logger.warning("Knowledge domains not available")
 
         return knowledge_results
 
-    def _generate_base_response(
-        self, _query: str, knowledge_results: list[Any], context: ResponseContext
-    ) -> str:
+    def _generate_base_response(self, _query: str, knowledge_results: list[Any], context: ResponseContext) -> str:
         """Generate base response from knowledge results."""
         if not knowledge_results:
             return (
@@ -603,9 +549,7 @@ class ContextAwareResponseGenerator:
             )
 
         # Get templates for user experience level
-        templates = self.response_templates.get(
-            context.user_experience_level, self.response_templates["intermediate"]
-        )
+        templates = self.response_templates.get(context.user_experience_level, self.response_templates["intermediate"])
 
         # Start response
         response_parts = [templates["intro"]]
@@ -661,42 +605,28 @@ class ContextAwareResponseGenerator:
         if context.project_context:
             self._add_project_context(response, context.project_context)
 
-    def _add_project_context(
-        self, response: ContextAwareResponse, project_context: ProjectContext
-    ) -> None:
+    def _add_project_context(self, response: ContextAwareResponse, project_context: ProjectContext) -> None:
         """Add project-specific context to the response."""
         # Add project-specific recommendations
         if project_context.project_type == "gateway":
-            response.recommendations.append(
-                "Consider gateway scripting best practices for your project"
-            )
+            response.recommendations.append("Consider gateway scripting best practices for your project")
         elif project_context.project_type == "perspective":
-            response.recommendations.append(
-                "Review Perspective component design patterns"
-            )
+            response.recommendations.append("Review Perspective component design patterns")
         elif project_context.project_type == "vision":
-            response.recommendations.append(
-                "Consider Vision component optimization techniques"
-            )
+            response.recommendations.append("Consider Vision component optimization techniques")
 
         # Add technology-specific advice
         if "database" in project_context.technologies_detected:
-            response.recommendations.append(
-                "Ensure proper database connection management"
-            )
+            response.recommendations.append("Ensure proper database connection management")
 
         if "opc_ua" in project_context.technologies_detected:
             response.recommendations.append("Review OPC-UA subscription optimization")
 
         # Add complexity-based advice
         if project_context.complexity_score > 0.7:
-            response.warnings.append(
-                "High project complexity detected - consider modular design patterns"
-            )
+            response.warnings.append("High project complexity detected - consider modular design patterns")
 
-    def _calculate_response_confidence(
-        self, knowledge_results: list[Any], context: ResponseContext
-    ) -> float:
+    def _calculate_response_confidence(self, knowledge_results: list[Any], context: ResponseContext) -> float:
         """Calculate confidence score for the response."""
         if not knowledge_results:
             return 0.1
@@ -729,40 +659,24 @@ class ContextAwareResponseGenerator:
 
         # Add domain-specific recommendations
         if response.domain == "Gateway Scripting":
-            recommendations.append(
-                "Test scripts in development environment before production deployment"
-            )
-            recommendations.append(
-                "Use proper error handling and logging in all scripts"
-            )
+            recommendations.append("Test scripts in development environment before production deployment")
+            recommendations.append("Use proper error handling and logging in all scripts")
 
         elif response.domain == "System Functions":
-            recommendations.append(
-                "Review function documentation for latest parameters and usage"
-            )
-            recommendations.append(
-                "Consider performance implications for frequently called functions"
-            )
+            recommendations.append("Review function documentation for latest parameters and usage")
+            recommendations.append("Consider performance implications for frequently called functions")
 
         elif response.domain == "Designer Development":
             recommendations.append("Follow UI/UX best practices for component design")
-            recommendations.append(
-                "Test components across different screen resolutions"
-            )
+            recommendations.append("Test components across different screen resolutions")
 
         # Add experience-level specific recommendations
         if context.user_experience_level == "beginner":
-            recommendations.append(
-                "Start with simple implementations and gradually add complexity"
-            )
-            recommendations.append(
-                "Review Ignition documentation and training materials"
-            )
+            recommendations.append("Start with simple implementations and gradually add complexity")
+            recommendations.append("Review Ignition documentation and training materials")
 
         elif context.user_experience_level == "expert":
-            recommendations.append(
-                "Consider advanced optimization techniques and patterns"
-            )
+            recommendations.append("Consider advanced optimization techniques and patterns")
             recommendations.append("Review latest Ignition features and capabilities")
 
         return recommendations[:5]  # Limit recommendations
@@ -803,15 +717,11 @@ class ContextAwareResponseGenerator:
 
         # Project context follow-ups
         if context.project_context and context.project_context.complexity_score > 0.5:
-            follow_ups.append(
-                "Would you like architecture recommendations for your project?"
-            )
+            follow_ups.append("Would you like architecture recommendations for your project?")
 
         return follow_ups[:3]  # Limit follow-up questions
 
-    def _record_interaction(
-        self, query: str, response: ContextAwareResponse, context: ResponseContext
-    ) -> None:
+    def _record_interaction(self, query: str, response: ContextAwareResponse, context: ResponseContext) -> None:
         """Record interaction for learning purposes."""
         try:
             from .adaptive_learning import ConversationData
@@ -853,9 +763,7 @@ class ContextAwareResponseGenerator:
 
         # For simplicity, analyze the directory containing the first file
         first_file_path = Path(project_files[0])
-        project_path = (
-            first_file_path.parent if first_file_path.is_file() else first_file_path
-        )
+        project_path = first_file_path.parent if first_file_path.is_file() else first_file_path
 
         return self.project_analyzer.analyze_project(str(project_path))
 

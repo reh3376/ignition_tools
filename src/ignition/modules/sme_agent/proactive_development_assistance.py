@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Proactive Development Assistance for SME Agent
-Phase 11.4: Advanced SME Agent Features
+Phase 11.4: Advanced SME Agent Features.
 
 This module provides intelligent recommendations following crawl_mcp.py methodology:
 1. Environment validation first
@@ -152,9 +152,7 @@ class ProactiveDevelopmentAssistance:
             }
 
         except Exception as e:
-            self.logger.error(
-                f"Proactive development assistance initialization failed: {e}"
-            )
+            self.logger.error(f"Proactive development assistance initialization failed: {e}")
             return {
                 "status": "error",
                 "message": f"Initialization failed: {e!s}",
@@ -170,9 +168,7 @@ class ProactiveDevelopmentAssistance:
         """Suggest architecture patterns based on project requirements."""
         try:
             # Step 2: Comprehensive input validation
-            validation_result = self._validate_architecture_query(
-                project_requirements, complexity
-            )
+            validation_result = self._validate_architecture_query(project_requirements, complexity)
             if not validation_result["valid"]:
                 return {
                     "status": "error",
@@ -181,9 +177,7 @@ class ProactiveDevelopmentAssistance:
                 }
 
             # Find relevant patterns
-            relevant_patterns = await self._find_relevant_architecture_patterns(
-                project_requirements, constraints or {}
-            )
+            relevant_patterns = await self._find_relevant_architecture_patterns(project_requirements, constraints or {})
 
             # Generate suggestions
             suggestions = await self._generate_architecture_suggestions(
@@ -216,9 +210,7 @@ class ProactiveDevelopmentAssistance:
         """Optimize component selection and configuration."""
         try:
             # Step 2: Comprehensive input validation
-            validation_result = self._validate_component_query(
-                system_components, complexity
-            )
+            validation_result = self._validate_component_query(system_components, complexity)
             if not validation_result["valid"]:
                 return {
                     "status": "error",
@@ -230,8 +222,7 @@ class ProactiveDevelopmentAssistance:
             relevant_recommendations = [
                 rec
                 for rec in self.component_recommendations
-                if rec.component_type.lower()
-                in [comp.lower() for comp in system_components]
+                if rec.component_type.lower() in [comp.lower() for comp in system_components]
             ]
 
             # Generate optimizations
@@ -265,9 +256,7 @@ class ProactiveDevelopmentAssistance:
         """Identify and resolve performance bottlenecks."""
         try:
             # Step 2: Comprehensive input validation
-            validation_result = self._validate_performance_query(
-                performance_metrics, complexity
-            )
+            validation_result = self._validate_performance_query(performance_metrics, complexity)
             if not validation_result["valid"]:
                 return {
                     "status": "error",
@@ -283,8 +272,7 @@ class ProactiveDevelopmentAssistance:
                         1
                         for symptom in system_symptoms
                         if any(
-                            symptom.lower() in bottleneck_symptom.lower()
-                            for bottleneck_symptom in bottleneck.symptoms
+                            symptom.lower() in bottleneck_symptom.lower() for bottleneck_symptom in bottleneck.symptoms
                         )
                     )
                     if symptom_matches > 0:
@@ -328,9 +316,7 @@ class ProactiveDevelopmentAssistance:
         """Develop maintenance and monitoring strategy."""
         try:
             # Step 2: Comprehensive input validation
-            validation_result = self._validate_maintenance_query(
-                system_components, complexity
-            )
+            validation_result = self._validate_maintenance_query(system_components, complexity)
             if not validation_result["valid"]:
                 return {
                     "status": "error",
@@ -341,9 +327,7 @@ class ProactiveDevelopmentAssistance:
             # Find relevant strategies
             relevant_strategies = []
             for strategy in self.maintenance_strategies:
-                component_match = any(
-                    comp in strategy.monitoring_components for comp in system_components
-                )
+                component_match = any(comp in strategy.monitoring_components for comp in system_components)
                 if component_match:
                     relevant_strategies.append(strategy)
 
@@ -533,9 +517,7 @@ class ProactiveDevelopmentAssistance:
         ]
 
         self.architecture_patterns.extend(patterns)
-        self.assistance_stats["architecture_patterns_loaded"] = len(
-            self.architecture_patterns
-        )
+        self.assistance_stats["architecture_patterns_loaded"] = len(self.architecture_patterns)
 
     async def _load_component_recommendations(self) -> None:
         """Load component recommendations."""
@@ -641,9 +623,7 @@ class ProactiveDevelopmentAssistance:
         ]
 
         self.component_recommendations.extend(recommendations)
-        self.assistance_stats["component_recommendations_loaded"] = len(
-            self.component_recommendations
-        )
+        self.assistance_stats["component_recommendations_loaded"] = len(self.component_recommendations)
 
     async def _load_performance_bottlenecks(self) -> None:
         """Load performance bottlenecks."""
@@ -753,9 +733,7 @@ class ProactiveDevelopmentAssistance:
         ]
 
         self.performance_bottlenecks.extend(bottlenecks)
-        self.assistance_stats["performance_bottlenecks_loaded"] = len(
-            self.performance_bottlenecks
-        )
+        self.assistance_stats["performance_bottlenecks_loaded"] = len(self.performance_bottlenecks)
 
     async def _load_maintenance_strategies(self) -> None:
         """Load maintenance strategies."""
@@ -818,13 +796,9 @@ class ProactiveDevelopmentAssistance:
         ]
 
         self.maintenance_strategies.extend(strategies)
-        self.assistance_stats["maintenance_strategies_loaded"] = len(
-            self.maintenance_strategies
-        )
+        self.assistance_stats["maintenance_strategies_loaded"] = len(self.maintenance_strategies)
 
-    def _validate_architecture_query(
-        self, project_requirements: dict[str, Any], complexity: str
-    ) -> dict[str, Any]:
+    def _validate_architecture_query(self, project_requirements: dict[str, Any], complexity: str) -> dict[str, Any]:
         """Validate architecture pattern query parameters."""
         if not project_requirements or not isinstance(project_requirements, dict):
             return {
@@ -841,9 +815,7 @@ class ProactiveDevelopmentAssistance:
 
         return {"valid": True}
 
-    def _validate_component_query(
-        self, system_components: list[str], complexity: str
-    ) -> dict[str, Any]:
+    def _validate_component_query(self, system_components: list[str], complexity: str) -> dict[str, Any]:
         """Validate component optimization query parameters."""
         if not system_components or not isinstance(system_components, list):
             return {
@@ -866,9 +838,7 @@ class ProactiveDevelopmentAssistance:
 
         return {"valid": True}
 
-    def _validate_performance_query(
-        self, performance_metrics: dict[str, Any], complexity: str
-    ) -> dict[str, Any]:
+    def _validate_performance_query(self, performance_metrics: dict[str, Any], complexity: str) -> dict[str, Any]:
         """Validate performance analysis query parameters."""
         if not performance_metrics or not isinstance(performance_metrics, dict):
             return {
@@ -885,9 +855,7 @@ class ProactiveDevelopmentAssistance:
 
         return {"valid": True}
 
-    def _validate_maintenance_query(
-        self, system_components: list[str], complexity: str
-    ) -> dict[str, Any]:
+    def _validate_maintenance_query(self, system_components: list[str], complexity: str) -> dict[str, Any]:
         """Validate maintenance strategy query parameters."""
         if not system_components or not isinstance(system_components, list):
             return {
@@ -919,14 +887,12 @@ class ProactiveDevelopmentAssistance:
         for pattern in self.architecture_patterns:
             # Check if pattern matches requirements
             requirement_match = False
-            for req_key, req_value in project_requirements.items():
-                if isinstance(req_value, str):
-                    if any(
-                        req_value.lower() in use_case.lower()
-                        for use_case in pattern.use_cases
-                    ):
-                        requirement_match = True
-                        break
+            for _req_key, req_value in project_requirements.items():
+                if isinstance(req_value, str) and any(
+                    req_value.lower() in use_case.lower() for use_case in pattern.use_cases
+                ):
+                    requirement_match = True
+                    break
 
             if requirement_match:
                 relevant_patterns.append(pattern)
@@ -957,15 +923,11 @@ class ProactiveDevelopmentAssistance:
                 "disadvantages": pattern.disadvantages,
                 "implementation_steps": pattern.implementation_steps,
                 "ignition_considerations": pattern.ignition_specific_considerations,
-                "fit_score": self._calculate_pattern_fit_score(
-                    pattern, project_requirements
-                ),
+                "fit_score": self._calculate_pattern_fit_score(pattern, project_requirements),
             }
             suggestions["recommended_patterns"].append(pattern_suggestion)
 
-        suggestions["implementation_guidance"] = self._get_implementation_guidance(
-            complexity
-        )
+        suggestions["implementation_guidance"] = self._get_implementation_guidance(complexity)
         suggestions["next_steps"] = [
             "Review recommended patterns and select the best fit",
             "Create detailed implementation plan",
@@ -1110,21 +1072,17 @@ class ProactiveDevelopmentAssistance:
 
         return strategy
 
-    def _calculate_pattern_fit_score(
-        self, pattern: ArchitecturePattern, project_requirements: dict[str, Any]
-    ) -> float:
+    def _calculate_pattern_fit_score(self, pattern: ArchitecturePattern, project_requirements: dict[str, Any]) -> float:
         """Calculate how well a pattern fits the project requirements."""
         # Simple scoring based on use case matches
         matches = 0
         total_requirements = len(project_requirements)
 
-        for req_key, req_value in project_requirements.items():
-            if isinstance(req_value, str):
-                if any(
-                    req_value.lower() in use_case.lower()
-                    for use_case in pattern.use_cases
-                ):
-                    matches += 1
+        for _req_key, req_value in project_requirements.items():
+            if isinstance(req_value, str) and any(
+                req_value.lower() in use_case.lower() for use_case in pattern.use_cases
+            ):
+                matches += 1
 
         return (matches / max(total_requirements, 1)) * 100
 

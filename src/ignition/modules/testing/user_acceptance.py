@@ -232,15 +232,11 @@ class UserAcceptanceTestManager:
         self.gateway_url = os.getenv("UAT_GATEWAY_URL", "http://localhost:8088")
         self.max_testers = int(os.getenv("UAT_TESTER_COUNT", "5"))
         self.timeout = int(os.getenv("UAT_TIMEOUT", "3600"))
-        self.screenshot_path = Path(
-            os.getenv("UAT_SCREENSHOT_PATH", "./uat_screenshots")
-        )
+        self.screenshot_path = Path(os.getenv("UAT_SCREENSHOT_PATH", "./uat_screenshots"))
         self.log_level = os.getenv("UAT_LOG_LEVEL", "INFO")
 
     @asynccontextmanager
-    async def uat_context(
-        self, module_path: str
-    ) -> AsyncIterator["UserAcceptanceTestManager"]:
+    async def uat_context(self, module_path: str) -> AsyncIterator["UserAcceptanceTestManager"]:
         """Create UAT context with resource management.
 
         Following patterns from crawl_mcp.py for context management.
@@ -465,9 +461,7 @@ class UserAcceptanceTestManager:
             self.results.append(result)
             raise RuntimeError(format_uat_error(e)) from e
 
-    async def run_all_scenarios(
-        self, tester_assignments: dict[str, str] | None = None
-    ) -> UATReport:
+    async def run_all_scenarios(self, tester_assignments: dict[str, str] | None = None) -> UATReport:
         """Run all test scenarios.
 
         Args:
@@ -483,8 +477,7 @@ class UserAcceptanceTestManager:
 
         # Default tester assignments
         assignments = tester_assignments or {
-            scenario.id: f"tester_{i % self.max_testers + 1}"
-            for i, scenario in enumerate(self.scenarios)
+            scenario.id: f"tester_{i % self.max_testers + 1}" for i, scenario in enumerate(self.scenarios)
         }
 
         # Execute scenarios with concurrency control
@@ -493,9 +486,7 @@ class UserAcceptanceTestManager:
 
         for scenario in self.scenarios:
             tester_id = assignments.get(scenario.id, "default_tester")
-            task = asyncio.create_task(
-                self._execute_with_semaphore(scenario.id, tester_id, semaphore)
-            )
+            task = asyncio.create_task(self._execute_with_semaphore(scenario.id, tester_id, semaphore))
             tasks.append(task)
 
         try:
@@ -510,9 +501,7 @@ class UserAcceptanceTestManager:
         self.report = self._generate_report(duration)
         return self.report
 
-    async def _execute_with_semaphore(
-        self, scenario_id: str, tester_id: str, semaphore: asyncio.Semaphore
-    ) -> None:
+    async def _execute_with_semaphore(self, scenario_id: str, tester_id: str, semaphore: asyncio.Semaphore) -> None:
         """Execute scenario with semaphore control.
 
         Args:
@@ -559,18 +548,10 @@ class UserAcceptanceTestManager:
             UATReport with results
         """
         executed_scenarios = len(self.results)
-        passed_scenarios = sum(
-            1 for r in self.results if r.status == TestScenarioStatus.PASSED
-        )
-        failed_scenarios = sum(
-            1 for r in self.results if r.status == TestScenarioStatus.FAILED
-        )
-        blocked_scenarios = sum(
-            1 for s in self.scenarios if s.status == TestScenarioStatus.BLOCKED
-        )
-        skipped_scenarios = sum(
-            1 for s in self.scenarios if s.status == TestScenarioStatus.SKIPPED
-        )
+        passed_scenarios = sum(1 for r in self.results if r.status == TestScenarioStatus.PASSED)
+        failed_scenarios = sum(1 for r in self.results if r.status == TestScenarioStatus.FAILED)
+        blocked_scenarios = sum(1 for s in self.scenarios if s.status == TestScenarioStatus.BLOCKED)
+        skipped_scenarios = sum(1 for s in self.scenarios if s.status == TestScenarioStatus.SKIPPED)
 
         # Determine overall status
         if failed_scenarios > 0:
@@ -583,16 +564,8 @@ class UserAcceptanceTestManager:
             overall_status = "in_progress"
 
         # Calculate metrics
-        pass_rate = (
-            (passed_scenarios / executed_scenarios * 100)
-            if executed_scenarios > 0
-            else 0
-        )
-        avg_execution_time = (
-            sum(r.execution_time for r in self.results) / len(self.results)
-            if self.results
-            else 0
-        )
+        pass_rate = (passed_scenarios / executed_scenarios * 100) if executed_scenarios > 0 else 0
+        avg_execution_time = sum(r.execution_time for r in self.results) / len(self.results) if self.results else 0
 
         return UATReport(
             module_path="",  # Will be set by caller
@@ -629,32 +602,21 @@ class UserAcceptanceTestManager:
         """
         recommendations = []
 
-        failed_results = [
-            r for r in self.results if r.status == TestScenarioStatus.FAILED
-        ]
-        blocked_scenarios = [
-            s for s in self.scenarios if s.status == TestScenarioStatus.BLOCKED
-        ]
+        failed_results = [r for r in self.results if r.status == TestScenarioStatus.FAILED]
+        blocked_scenarios = [s for s in self.scenarios if s.status == TestScenarioStatus.BLOCKED]
 
         if failed_results:
-            recommendations.append(
-                "Review and fix failed test scenarios before release"
-            )
+            recommendations.append("Review and fix failed test scenarios before release")
 
             # Specific recommendations based on scenario types
             failed_types = {
-                next(s for s in self.scenarios if s.id == r.scenario_id).scenario_type
-                for r in failed_results
+                next(s for s in self.scenarios if s.id == r.scenario_id).scenario_type for r in failed_results
             }
 
             if TestScenarioType.FUNCTIONAL in failed_types:
-                recommendations.append(
-                    "Address functional issues - core features not working correctly"
-                )
+                recommendations.append("Address functional issues - core features not working correctly")
             if TestScenarioType.PERFORMANCE in failed_types:
-                recommendations.append(
-                    "Optimize performance - module not meeting performance requirements"
-                )
+                recommendations.append("Optimize performance - module not meeting performance requirements")
             if TestScenarioType.USABILITY in failed_types:
                 recommendations.append("Improve user interface and user experience")
 
@@ -666,16 +628,12 @@ class UserAcceptanceTestManager:
         if critical_feedback:
             recommendations.append("Address critical user feedback before release")
 
-        bug_reports = [
-            f for f in self.feedback if f.feedback_type == FeedbackType.BUG_REPORT
-        ]
+        bug_reports = [f for f in self.feedback if f.feedback_type == FeedbackType.BUG_REPORT]
         if len(bug_reports) > 3:
             recommendations.append("Review and fix multiple bug reports from testers")
 
         if not recommendations:
-            recommendations.append(
-                "All UAT scenarios passed - module ready for release"
-            )
+            recommendations.append("All UAT scenarios passed - module ready for release")
 
         return recommendations
 

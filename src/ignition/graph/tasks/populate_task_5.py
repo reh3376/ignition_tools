@@ -177,9 +177,7 @@ def populate_task_5_functions() -> Any:
                 param_count = len(func_data.get("parameters", []))
                 pattern_count = len(func_data.get("patterns", []))
                 scope_count = len(func_data.get("scope", []))
-                func_relationships = (
-                    param_count + pattern_count + scope_count + 1
-                )  # +1 for category
+                func_relationships = param_count + pattern_count + scope_count + 1  # +1 for category
                 relationships_created += func_relationships
 
                 print(f"   📊 Created {func_relationships} relationships")
@@ -203,9 +201,7 @@ def populate_task_5_functions() -> Any:
         RETURN t.name as task_name
         """
 
-        task_result = client.execute_query(
-            task_query, {"function_count": len(functions)}
-        )
+        task_result = client.execute_query(task_query, {"function_count": len(functions)})
         if task_result:
             print("   ✅ Created Task 5 master node")
             relationships_created += 1
@@ -220,14 +216,10 @@ def populate_task_5_functions() -> Any:
     print("\n" + "=" * 60)
     print("📊 TASK 5 POPULATION SUMMARY")
     print("=" * 60)
-    print(
-        f"✅ Functions Added: {success_count}/{total_count} ({success_count / total_count * 100:.1f}%)"
-    )
+    print(f"✅ Functions Added: {success_count}/{total_count} ({success_count / total_count * 100:.1f}%)")
     print(f"🔗 Relationships Created: {relationships_created}")
     print(f"📁 Categories: {len(categories)}")
-    print(
-        f"🎯 Task Status: {'COMPLETED' if success_count == total_count else 'PARTIAL'}"
-    )
+    print(f"🎯 Task Status: {'COMPLETED' if success_count == total_count else 'PARTIAL'}")
 
     if success_count < total_count:
         print(f"⚠️  {total_count - success_count} functions failed to populate")
@@ -270,9 +262,7 @@ def verify_task_5_population() -> bool:
         task_result = client.execute_query(task_query)
         if task_result:
             task_info = task_result[0]
-            print(
-                f"   📋 Task 5 Node: {task_info['name']} (Priority: {task_info['priority']})"
-            )
+            print(f"   📋 Task 5 Node: {task_info['name']} (Priority: {task_info['priority']})")
 
         client.disconnect()
         return True

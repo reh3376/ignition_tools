@@ -53,37 +53,21 @@ class StallMonitorConfig(BaseModel):
     """Configuration for stall monitoring."""
 
     # Detection settings
-    check_interval: float = Field(
-        default=2.0, ge=0.5, le=10.0, description="Check interval in seconds"
-    )
-    stall_threshold: int = Field(
-        default=15, ge=5, le=300, description="Seconds before considering stalled"
-    )
-    cpu_threshold: float = Field(
-        default=1.0, ge=0.0, le=50.0, description="CPU % threshold for stall detection"
-    )
+    check_interval: float = Field(default=2.0, ge=0.5, le=10.0, description="Check interval in seconds")
+    stall_threshold: int = Field(default=15, ge=5, le=300, description="Seconds before considering stalled")
+    cpu_threshold: float = Field(default=1.0, ge=0.0, le=50.0, description="CPU % threshold for stall detection")
 
     # Recovery settings
-    max_recovery_attempts: int = Field(
-        default=3, ge=1, le=10, description="Maximum recovery attempts"
-    )
-    recovery_delay: float = Field(
-        default=2.0, ge=0.5, le=10.0, description="Delay between recovery attempts"
-    )
-    timeout_extension_factor: float = Field(
-        default=2.0, ge=1.0, le=5.0, description="Factor to extend timeout"
-    )
+    max_recovery_attempts: int = Field(default=3, ge=1, le=10, description="Maximum recovery attempts")
+    recovery_delay: float = Field(default=2.0, ge=0.5, le=10.0, description="Delay between recovery attempts")
+    timeout_extension_factor: float = Field(default=2.0, ge=1.0, le=5.0, description="Factor to extend timeout")
 
     # Monitoring settings
-    max_monitored_commands: int = Field(
-        default=10, ge=1, le=50, description="Maximum commands to monitor"
-    )
-    cleanup_interval: int = Field(
-        default=60, ge=30, le=300, description="Cleanup interval in seconds"
-    )
+    max_monitored_commands: int = Field(default=10, ge=1, le=50, description="Maximum commands to monitor")
+    cleanup_interval: int = Field(default=60, ge=30, le=300, description="Cleanup interval in seconds")
 
     @validator("check_interval")
-    def validate_check_interval(cls, v):
+    def validate_check_interval(cls, v) -> Any:
         if v <= 0:
             raise ValueError("Check interval must be positive")
         return v
@@ -93,13 +77,9 @@ class CommandMonitorRequest(BaseModel):
     """Request to monitor a command."""
 
     command: str | list[str] = Field(..., description="Command to monitor")
-    timeout: int | None = Field(
-        default=None, ge=1, le=3600, description="Command timeout in seconds"
-    )
+    timeout: int | None = Field(default=None, ge=1, le=3600, description="Command timeout in seconds")
     cwd: str | None = Field(default=None, description="Working directory")
-    env: dict[str, str] | None = Field(
-        default=None, description="Environment variables"
-    )
+    env: dict[str, str] | None = Field(default=None, description="Environment variables")
 
     # Recovery settings
     recovery_strategies: list[RecoveryStrategy] = Field(
@@ -114,13 +94,12 @@ class CommandMonitorRequest(BaseModel):
     auto_recover: bool = Field(default=True, description="Enable auto-recovery")
 
     @validator("command")
-    def validate_command(cls, v):
+    def validate_command(cls, v) -> Any:
         if isinstance(v, str):
             if not v.strip():
                 raise ValueError("Command cannot be empty")
-        elif isinstance(v, list):
-            if not v or not v[0].strip():
-                raise ValueError("Command list cannot be empty")
+        elif isinstance(v, list) and (not v or not v[0].strip()):
+            raise ValueError("Command list cannot be empty")
         return v
 
 
@@ -135,9 +114,7 @@ class CommandMetrics:
     io_read_bytes: int = 0
     io_write_bytes: int = 0
 
-    def add_sample(
-        self, cpu_percent: float, memory_mb: float, io_read: int = 0, io_write: int = 0
-    ):
+    def add_sample(self, cpu_percent: float, memory_mb: float, io_read: int = 0, io_write: int = 0):
         """Add a monitoring sample."""
         self.cpu_samples.append(cpu_percent)
         self.memory_samples.append(memory_mb)
@@ -159,9 +136,7 @@ class CommandMetrics:
             return False
 
         # Check recent CPU activity
-        recent_samples = (
-            self.cpu_samples[-5:] if len(self.cpu_samples) >= 5 else self.cpu_samples
-        )
+        recent_samples = self.cpu_samples[-5:] if len(self.cpu_samples) >= 5 else self.cpu_samples
         avg_cpu = sum(recent_samples) / len(recent_samples) if recent_samples else 0
 
         return avg_cpu < cpu_threshold
@@ -278,9 +253,7 @@ class TerminalStallMonitor:
             # Permissions check
             try:
                 # Test process creation
-                test_proc = subprocess.Popen(
-                    ["echo", "test"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-                )
+                test_proc = subprocess.Popen(["echo", "test"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 test_proc.wait(timeout=5)
                 validation_results["permissions_ok"] = True
             except Exception:
@@ -310,11 +283,7 @@ class TerminalStallMonitor:
                 "permissions_ok",
             ]
 
-            missing_components = [
-                comp
-                for comp in required_components
-                if not env_validation.get(comp, False)
-            ]
+            missing_components = [comp for comp in required_components if not env_validation.get(comp, False)]
 
             if missing_components:
                 raise RuntimeError(f"Missing required components: {missing_components}")
@@ -325,15 +294,11 @@ class TerminalStallMonitor:
             self.monitoring_active = True
 
             # Start monitoring thread
-            self.monitor_thread = threading.Thread(
-                target=self._monitoring_loop, daemon=True, name="StallMonitor"
-            )
+            self.monitor_thread = threading.Thread(target=self._monitoring_loop, daemon=True, name="StallMonitor")
             self.monitor_thread.start()
 
             # Start cleanup thread
-            self.cleanup_thread = threading.Thread(
-                target=self._cleanup_loop, daemon=True, name="StallCleanup"
-            )
+            self.cleanup_thread = threading.Thread(target=self._cleanup_loop, daemon=True, name="StallCleanup")
             self.cleanup_thread.start()
 
             return True
@@ -342,7 +307,7 @@ class TerminalStallMonitor:
             self.monitoring_active = False
             raise RuntimeError(f"Failed to start monitoring: {e}")
 
-    def stop_monitoring(self):
+    def stop_monitoring(self) -> Any:
         """Stop the monitoring system."""
         self.monitoring_active = False
 
@@ -371,9 +336,7 @@ class TerminalStallMonitor:
 
         # Check monitoring limit
         if len(self.monitored_commands) >= self.config.max_monitored_commands:
-            raise RuntimeError(
-                f"Maximum monitored commands limit reached ({self.config.max_monitored_commands})"
-            )
+            raise RuntimeError(f"Maximum monitored commands limit reached ({self.config.max_monitored_commands})")
 
         # Start the command
         try:
@@ -403,9 +366,7 @@ class TerminalStallMonitor:
 
             # Create monitored command
             command_id = f"cmd_{int(time.time() * 1000)}_{process.pid}"
-            monitored_cmd = MonitoredCommand(
-                id=command_id, request=request, process=process
-            )
+            monitored_cmd = MonitoredCommand(id=command_id, request=request, process=process)
 
             self.monitored_commands[command_id] = monitored_cmd
             self.stats["total_monitored"] += 1
@@ -438,22 +399,18 @@ class TerminalStallMonitor:
             "warnings": cmd.warnings,
             "metrics": {
                 "avg_cpu": (
-                    sum(cmd.metrics.cpu_samples) / len(cmd.metrics.cpu_samples)
-                    if cmd.metrics.cpu_samples
-                    else 0
+                    sum(cmd.metrics.cpu_samples) / len(cmd.metrics.cpu_samples) if cmd.metrics.cpu_samples else 0
                 ),
-                "peak_memory": (
-                    max(cmd.metrics.memory_samples) if cmd.metrics.memory_samples else 0
-                ),
+                "peak_memory": (max(cmd.metrics.memory_samples) if cmd.metrics.memory_samples else 0),
                 "samples_count": len(cmd.metrics.cpu_samples),
             },
         }
 
-    def _monitoring_loop(self):
+    def _monitoring_loop(self) -> None:
         """Main monitoring loop."""
         while self.monitoring_active:
             try:
-                for cmd_id, cmd in list(self.monitored_commands.items()):
+                for _cmd_id, cmd in list(self.monitored_commands.items()):
                     self._check_command_status(cmd)
 
                 time.sleep(self.config.check_interval)
@@ -462,7 +419,7 @@ class TerminalStallMonitor:
                 print(f"Monitoring loop error: {e}")
                 time.sleep(self.config.check_interval)
 
-    def _check_command_status(self, cmd: MonitoredCommand):
+    def _check_command_status(self, cmd: MonitoredCommand) -> None:
         """Check status of a single command."""
         try:
             # Check if process is still running
@@ -500,25 +457,20 @@ class TerminalStallMonitor:
                 )
 
                 # Check for stall
-                if cmd.metrics.is_stalled(
-                    self.config.stall_threshold, self.config.cpu_threshold
+                if (
+                    cmd.metrics.is_stalled(self.config.stall_threshold, self.config.cpu_threshold)
+                    and cmd.state != StallState.STALLED
                 ):
-                    if cmd.state != StallState.STALLED:
-                        cmd.state = StallState.STALLED
-                        self.stats["stalled_detected"] += 1
-                        cmd.warnings.append(
-                            f"Command stalled after {cmd.metrics.get_duration():.1f}s"
-                        )
+                    cmd.state = StallState.STALLED
+                    self.stats["stalled_detected"] += 1
+                    cmd.warnings.append(f"Command stalled after {cmd.metrics.get_duration():.1f}s")
 
-                        # Attempt recovery if enabled
-                        if cmd.request.auto_recover:
-                            self._attempt_recovery(cmd)
+                    # Attempt recovery if enabled
+                    if cmd.request.auto_recover:
+                        self._attempt_recovery(cmd)
 
                 # Check for timeout
-                if (
-                    cmd.request.timeout
-                    and cmd.metrics.get_duration() > cmd.request.timeout
-                ):
+                if cmd.request.timeout and cmd.metrics.get_duration() > cmd.request.timeout:
                     cmd.state = StallState.TIMEOUT
                     self.stats["timeouts"] += 1
                     cmd.errors.append(f"Command timed out after {cmd.request.timeout}s")
@@ -535,12 +487,10 @@ class TerminalStallMonitor:
         except Exception as e:
             cmd.errors.append(f"Status check error: {e}")
 
-    def _attempt_recovery(self, cmd: MonitoredCommand):
+    def _attempt_recovery(self, cmd: MonitoredCommand) -> None:
         """Attempt to recover a stalled/timed-out command."""
         if cmd.recovery_attempts >= self.config.max_recovery_attempts:
-            cmd.errors.append(
-                f"Maximum recovery attempts reached ({self.config.max_recovery_attempts})"
-            )
+            cmd.errors.append(f"Maximum recovery attempts reached ({self.config.max_recovery_attempts})")
             return
 
         cmd.recovery_attempts += 1
@@ -550,9 +500,7 @@ class TerminalStallMonitor:
         for strategy in cmd.request.recovery_strategies:
             try:
                 success = self._execute_recovery_strategy(cmd, strategy)
-                cmd.recovery_history.append(
-                    f"{strategy.value}:{'success' if success else 'failed'}"
-                )
+                cmd.recovery_history.append(f"{strategy.value}:{'success' if success else 'failed'}")
 
                 if success:
                     cmd.state = StallState.RECOVERED
@@ -567,9 +515,7 @@ class TerminalStallMonitor:
         self.stats["failed_recoveries"] += 1
         cmd.errors.append("All recovery strategies failed")
 
-    def _execute_recovery_strategy(
-        self, cmd: MonitoredCommand, strategy: RecoveryStrategy
-    ) -> bool:
+    def _execute_recovery_strategy(self, cmd: MonitoredCommand, strategy: RecoveryStrategy) -> bool:
         """Execute a specific recovery strategy.
 
         Args:
@@ -638,9 +584,7 @@ class TerminalStallMonitor:
             elif strategy == RecoveryStrategy.TIMEOUT_EXTEND:
                 # Extend timeout
                 if cmd.request.timeout:
-                    cmd.request.timeout = int(
-                        cmd.request.timeout * self.config.timeout_extension_factor
-                    )
+                    cmd.request.timeout = int(cmd.request.timeout * self.config.timeout_extension_factor)
                     cmd.warnings.append(f"Extended timeout to {cmd.request.timeout}s")
                     return True
                 return False
@@ -660,7 +604,7 @@ class TerminalStallMonitor:
 
         return False
 
-    def _cleanup_loop(self):
+    def _cleanup_loop(self) -> Any:
         """Cleanup completed commands."""
         while self.monitoring_active:
             try:
@@ -688,13 +632,7 @@ class TerminalStallMonitor:
     def get_statistics(self) -> dict[str, Any]:
         """Get monitoring statistics."""
         uptime = time.time() - self.stats["start_time"]
-        active_commands = len(
-            [
-                cmd
-                for cmd in self.monitored_commands.values()
-                if cmd.state == StallState.RUNNING
-            ]
-        )
+        active_commands = len([cmd for cmd in self.monitored_commands.values() if cmd.state == StallState.RUNNING])
 
         return {
             **self.stats,
@@ -705,8 +643,7 @@ class TerminalStallMonitor:
                 self.stats["successful_recoveries"]
                 / max(
                     1,
-                    self.stats["successful_recoveries"]
-                    + self.stats["failed_recoveries"],
+                    self.stats["successful_recoveries"] + self.stats["failed_recoveries"],
                 )
             )
             * 100,
@@ -740,9 +677,7 @@ def format_stall_error(error: Exception) -> str:
     elif "permission" in error_str or "access denied" in error_str:
         return "Permission denied while monitoring process. Check process permissions."
     elif "no such process" in error_str:
-        return (
-            "Process disappeared during monitoring. It may have been killed externally."
-        )
+        return "Process disappeared during monitoring. It may have been killed externally."
     elif "resource" in error_str or "memory" in error_str:
         return "Insufficient system resources for monitoring. Close other applications."
     else:
@@ -753,7 +688,7 @@ if __name__ == "__main__":
     """Test the stall monitoring system."""
     import asyncio
 
-    async def test_stall_monitoring():
+    async def test_stall_monitoring() -> None:
         """Test stall monitoring functionality."""
         print("🧪 Testing Terminal Stall Monitoring System")
 
@@ -770,9 +705,7 @@ if __name__ == "__main__":
 
         # Test normal command
         try:
-            cmd_id = monitor.monitor_command(
-                CommandMonitorRequest(command=["echo", "Hello, World!"])
-            )
+            cmd_id = monitor.monitor_command(CommandMonitorRequest(command=["echo", "Hello, World!"]))
             print(f"✅ Started monitoring command: {cmd_id}")
 
             # Wait for completion
@@ -805,9 +738,7 @@ if __name__ == "__main__":
             for i in range(15):
                 status = stall_monitor.get_command_status(cmd_id)
                 if status:
-                    print(
-                        f"Status {i}: {status['state']} (duration: {status['duration']:.1f}s)"
-                    )
+                    print(f"Status {i}: {status['state']} (duration: {status['duration']:.1f}s)")
                     if status["state"] in ["timeout", "recovered", "failed"]:
                         break
                 await asyncio.sleep(1)
