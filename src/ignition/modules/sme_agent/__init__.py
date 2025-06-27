@@ -20,9 +20,6 @@ from typing import Any
 
 from dotenv import load_dotenv
 
-# Phase 11 SME Agent Module Components
-from .sme_agent_module import SMEAgentModule
-
 # Load environment variables
 load_dotenv()
 
@@ -176,7 +173,6 @@ def _check_fastapi_availability() -> bool:
 
 
 __all__ = [
-    "SMEAgentModule",
     "SMEAgentValidationError",
     "validate_sme_agent_environment",
 ]
