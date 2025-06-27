@@ -73,14 +73,9 @@ python -m src.main module mpc-framework validate-env
 
 Validating MPC Controller Environment...
 ✅ MPC Environment: VALID
-⚠️  MPC Warnings:
-  • MPC environment variable MPC_SOLVER_TIMEOUT not set
-  • MPC environment variable MPC_MAX_ITERATIONS not set
 
 Validating Safety System Environment...
 ✅ Safety Environment: VALID
-⚠️  Safety Warnings:
-  • Safety environment variable SAFETY_EMERGENCY_TIMEOUT not set
 
 Overall Environment Status:
 ✅ READY FOR PRODUCTION
@@ -88,40 +83,136 @@ Overall Environment Status:
 
 ### Step 2: Configure Environment Variables
 
-Create or update your `.env` file with MPC-specific configurations:
+**IMPORTANT**: Copy the complete environment template to create your .env file:
+
+```bash
+# Copy the comprehensive environment template
+cp config/env.example .env
+```
+
+The template includes all required MPC Framework and Safety System configurations:
 
 ```env
-# MPC Framework Configuration
+# ================================
+# MPC Framework Configuration - Phase 14.1
+# ================================
+# MPC Controller Settings
 MPC_SOLVER_TIMEOUT=30.0
 MPC_MAX_ITERATIONS=100
 MPC_CONVERGENCE_TOLERANCE=1e-6
 MPC_TEMP_DIR=/tmp/mpc_framework
 
-# Safety System Configuration
+# MPC Optimization Settings
+MPC_PREDICTION_HORIZON=20
+MPC_CONTROL_HORIZON=5
+MPC_SAMPLE_TIME=1.0
+MPC_OPTIMIZATION_METHOD=SLSQP
+
+# ================================
+# Safety System Configuration - CRITICAL
+# ================================
+# Emergency Response Settings
 SAFETY_EMERGENCY_TIMEOUT=5.0
 SAFETY_WATCHDOG_INTERVAL=1.0
-SAFETY_BACKUP_SYSTEMS=plc,safety_relay
-SAFETY_NOTIFICATION_ENDPOINTS=safety@company.com,operator@company.com
+SAFETY_BACKUP_SYSTEMS=plc,safety_relay,manual_override
+SAFETY_NOTIFICATION_ENDPOINTS=safety@company.com,operator@company.com,emergency@company.com
 
-# Alarm Management
+# Safety Hardware Configuration
+EMERGENCY_STOP_GPIO_PIN=18
+SAFETY_DATABASE_URL=postgresql://user:pass@localhost/safety_db
+SAFETY_BACKUP_CHANNELS=ethernet,serial,radio
+
+# Safety Integrity Levels
+SAFETY_DEFAULT_SIL_LEVEL=SIL_2
+SAFETY_CRITICAL_TIMEOUT=2.0
+SAFETY_FAIL_SAFE_MODE=true
+
+# ================================
+# Alarm Management System
+# ================================
 ALARM_DATABASE_URL=postgresql://user:pass@localhost/alarms
-ALARM_NOTIFICATION_ENDPOINTS=alarm@company.com,sms:+1234567890
+ALARM_NOTIFICATION_ENDPOINTS=alarm@company.com,sms:+1234567890,teams:webhook_url
 ALARM_ESCALATION_TIMEOUT=300
 ALARM_MAX_ACTIVE_ALARMS=1000
+ALARM_PRIORITY_LEVELS=LOW,MEDIUM,HIGH,CRITICAL,EMERGENCY
 
+# ================================
 # Performance Monitoring
+# ================================
 PERFORMANCE_DATA_RETENTION_DAYS=30
 PERFORMANCE_ANALYTICS_INTERVAL=60
 PERFORMANCE_KPI_CALCULATION_WINDOW=3600
+PERFORMANCE_ALERT_THRESHOLDS=efficiency:0.8,availability:0.95
+
+# ================================
+# Production Scheduler
+# ================================
+SCHEDULER_UPDATE_INTERVAL=300
+SCHEDULER_MAX_CONCURRENT_TASKS=10
+SCHEDULER_TASK_TIMEOUT=3600
+SCHEDULER_BACKUP_INTERVAL=1800
 ```
 
-### Step 3: Verify System Status
+### Step 3: Install Required Dependencies
+
+Ensure all safety system dependencies are installed:
+
+```bash
+# Install watchdog for safety system monitoring
+pip install watchdog>=6.0.0
+
+# Or install all requirements
+pip install -r requirements.txt
+```
+
+### Step 4: Verify System Status
 
 Check the overall system status:
 
 ```bash
 # Show comprehensive system status
-python -m src.main module mpc-framework status --show-config --show-performance --show-alarms
+python -m src.main module mpc-framework status --show-config
+```
+
+**Expected Output:**
+```
+📊 MPC Framework System Status
+
+Environment Status:
+┏━━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━┓
+┃ Component      ┃ Status   ┃ Issues ┃
+┡━━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━┩
+│ MPC Controller │ ✅ VALID │ 0      │
+│ Safety System  │ ✅ VALID │ 0      │
+└────────────────┴──────────┴────────┘
+```
+
+### Step 5: Run Comprehensive Test Suite
+
+Validate all components are working correctly:
+
+```bash
+# Run complete MPC Framework test suite
+python -m src.main module mpc-framework run-test-suite --verbose
+```
+
+**Expected Output:**
+```
+🧪 Running MPC Framework Test Suite
+
+Test 1: Environment Validation
+✅ Environment validation passed
+
+Test 2: MPC Controller
+✅ MPC Controller test passed (0.00s)
+
+Test 3: Safety System
+✅ Safety System test passed (0.00s)
+
+Test Suite Summary:
+Tests Passed: 3/3
+Total Time: 0.01s
+✅ ALL TESTS PASSED
 ```
 
 ---
@@ -217,7 +308,7 @@ Performance Metrics:
 The safety system provides:
 - **Safety Integrity Levels (SIL)**: SIL-1 through SIL-4 compliance
 - **Emergency Procedures**: Automated shutdown and recovery
-- **Watchdog Monitoring**: Continuous system health checks
+- **Watchdog Monitoring**: Continuous system health checks using the `watchdog` package
 - **Fail-safe Behavior**: Default to safe state on failures
 
 ### Step 1: Create Safety Configuration
@@ -238,6 +329,21 @@ python -m src.main module mpc-framework safety create-config \
 python -m src.main module mpc-framework safety test \
   --config-file safety_config.json \
   --verbose
+```
+
+**Expected Output:**
+```
+🧪 Testing Safety System
+✅ Safety system test passed in 0.00s
+
+Tests Passed:
+┏━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━┓
+┃ Test                 ┃ Status    ┃
+┡━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━┩
+│ parameter_update     │ ✅ PASSED │
+│ alarm_creation       │ ✅ PASSED │
+│ alarm_acknowledgment │ ✅ PASSED │
+└──────────────────────┴───────────┘
 ```
 
 ---
@@ -412,87 +518,71 @@ python -m src.main module mpc-framework predict \
 
 ## 🔧 Troubleshooting
 
-### Common Issues and Solutions
+### Common Safety System Issues
 
-#### 1. Controller Not Responding
-
-**Symptoms:**
-- Control outputs not updating
-- Optimization time increasing
-- Constraint violations
-
-**Diagnosis:**
+#### Issue: "Watchdog timer not available"
+**Solution:**
 ```bash
-# Check controller status
-python -m src.main module mpc-framework controller status
-
-# Review logs
-tail -f /var/log/mpc_framework/controller.log
+pip install watchdog>=6.0.0
 ```
 
-**Solutions:**
-- Verify process model accuracy
-- Check constraint feasibility
-- Reduce prediction horizon
-- Increase solver timeout
+#### Issue: "Safety environment variable not set"
+**Solution:**
+1. Copy the complete environment template:
+   ```bash
+   cp config/env.example .env
+   ```
+2. Update the .env file with your specific values
+3. Verify with: `python -m src.main module mpc-framework validate-env`
 
-#### 2. Safety System Alarms
-
-**Symptoms:**
-- Frequent safety alarms
-- Emergency shutdowns
-- False alarms
-
-**Diagnosis:**
-```bash
-# Check safety system status
-python -m src.main module mpc-framework safety status
-
-# Review alarm history
-python -m src.main module mpc-framework safety alarm-history --days 1
+#### Issue: "Safety database URL not configured"
+**Solution:**
+Add to your .env file:
+```env
+SAFETY_DATABASE_URL=postgresql://user:pass@localhost/safety_db
 ```
 
-**Solutions:**
-- Adjust alarm limits and hysteresis
-- Review emergency procedures
-- Check sensor calibration
-- Verify safety logic
-
-#### 3. Performance Issues
-
-**Symptoms:**
-- High optimization time
-- Memory usage increasing
-- CPU overload
-
-**Diagnosis:**
-```bash
-# Performance diagnostics
-python -m src.main module mpc-framework diagnostics \
-  --include-memory --include-cpu --include-timing
+#### Issue: "Emergency stop GPIO pin not configured"
+**Solution:**
+Add to your .env file:
+```env
+EMERGENCY_STOP_GPIO_PIN=18
 ```
 
-**Solutions:**
-- Reduce model complexity
-- Optimize constraints
-- Increase hardware resources
-- Implement model reduction techniques
+#### Issue: "Insufficient backup communication channels"
+**Solution:**
+Add to your .env file:
+```env
+SAFETY_BACKUP_CHANNELS=ethernet,serial,radio
+```
 
-### Diagnostic Commands
+### Environment Variable Reference
+
+| Variable | Purpose | Example |
+|----------|---------|---------|
+| `SAFETY_EMERGENCY_TIMEOUT` | Emergency response timeout (seconds) | `5.0` |
+| `SAFETY_WATCHDOG_INTERVAL` | Watchdog check interval (seconds) | `1.0` |
+| `SAFETY_BACKUP_SYSTEMS` | Backup safety systems | `plc,safety_relay,manual_override` |
+| `SAFETY_NOTIFICATION_ENDPOINTS` | Emergency notification endpoints | `safety@company.com,operator@company.com` |
+| `EMERGENCY_STOP_GPIO_PIN` | Emergency stop GPIO pin number | `18` |
+| `SAFETY_DATABASE_URL` | Safety database connection | `postgresql://user:pass@localhost/safety_db` |
+| `SAFETY_BACKUP_CHANNELS` | Communication backup channels | `ethernet,serial,radio` |
+
+### Validation Commands
 
 ```bash
-# System health check
-python -m src.main module mpc-framework health-check
+# Basic environment validation
+python -m src.main module mpc-framework validate-env
 
-# Performance benchmark
-python -m src.main module mpc-framework benchmark \
-  --duration 300 --report benchmark_results.json
+# Comprehensive system status
+python -m src.main module mpc-framework status --show-config
 
-# Memory usage analysis
-python -m src.main module mpc-framework memory-profile
+# Test specific components
+python -m src.main module mpc-framework safety test --verbose
+python -m src.main module mpc-framework controller test --verbose
 
-# Network connectivity test
-python -m src.main module mpc-framework test-connectivity
+# Run complete test suite
+python -m src.main module mpc-framework run-test-suite --verbose
 ```
 
 ---

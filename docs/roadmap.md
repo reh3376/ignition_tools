@@ -2246,7 +2246,7 @@ Phase 14 implements a comprehensive Model Predictive Control (MPC) framework as 
 
 ---
 
-## Phase 15: Advanced Process Control Suite 🏭 **FUTURE**
+## **Phase 15: Advanced Process Control Suite 🏭 in-progess**
 
 ### **Overview**
 Phase 15 delivers a comprehensive Advanced Process Control (APC) suite with automated tuning, real-time analytics, and multi-loop coordination. This phase integrates with existing MPC framework to provide enterprise-grade process optimization capabilities.
@@ -2255,6 +2255,8 @@ Phase 15 delivers a comprehensive Advanced Process Control (APC) suite with auto
 
 #### **Auto-tuning Algorithms**
 - [ ] **Controller Tuning**
+  - [ ] Integrate with existing functionality - via CLI to setup connections (PLC, OPC-UA, Ignition) to facilitate dynamic tuning and PID variable modifications based on process conditions.
+  - [ ] Advanced Process monitoring with triggers to initiate dynamic adjustments
   - [ ] PID auto-tuning with relay feedback
   - [ ] Model identification from step tests
   - [ ] Frequency domain analysis
