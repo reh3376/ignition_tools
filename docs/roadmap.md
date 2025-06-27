@@ -2255,6 +2255,11 @@ Phase 15 delivers a comprehensive Advanced Process Control (APC) suite with auto
 - **✅ [CLI Commands Reference](src/ignition/modules/advanced_process_control/cli_commands.py)** - Complete command-line interface documentation
 - **✅ [Environment Configuration](config/env.example)** - Phase 15 environment variables and setup
 
+**🎯 How-To Guides - Phase 15** ✅ **ALL COMPLETED**:
+- **✅ [Advanced Process Control Guide](docs/how-to/advanced-process-control-guide.md)** - Comprehensive usage guide with step-by-step instructions
+- **✅ [APC Troubleshooting Guide](docs/how-to/apc-troubleshooting-guide.md)** - Complete troubleshooting procedures and solutions
+- **✅ [APC Quick Reference](docs/how-to/apc-quick-reference.md)** - Essential commands and quick reference guide
+
 ### **Phase 15.1: Automated Tuning System** 🎯 ✅ **COMPLETED**
 
 #### **Auto-tuning Algorithms** ✅
