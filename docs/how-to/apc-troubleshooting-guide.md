@@ -9,409 +9,724 @@
 
 ## Table of Contents
 
-1. [Common Issues](#common-issues)
-2. [Environment Problems](#environment-problems)
-3. [Tuning Failures](#tuning-failures)
-4. [Integration Issues](#integration-issues)
-5. [Performance Problems](#performance-problems)
-6. [Debug Procedures](#debug-procedures)
-7. [Recovery Steps](#recovery-steps)
+1. [Quick Diagnosis](#quick-diagnosis)
+2. [Common Issues](#common-issues)
+3. [Environment Problems](#environment-problems)
+4. [Tuning Failures](#tuning-failures)
+5. [Integration Problems](#integration-problems)
+6. [Performance Issues](#performance-issues)
+7. [Debug Procedures](#debug-procedures)
+8. [Recovery Procedures](#recovery-procedures)
+
+---
+
+## Quick Diagnosis
+
+### System Health Check
+```bash
+# Step 1: Quick status check
+ign advanced-process-control status
+
+# Step 2: Environment validation
+ign advanced-process-control validate-env --verbose
+
+# Step 3: Comprehensive testing
+ign advanced-process-control test --verbose
+```
+
+### Expected vs. Actual Outputs
+
+#### ✅ Healthy System
+```
+📊 Advanced Process Control System Status
+✅ System Status: ACTIVE
+✅ Environment: VALID
+```
+
+#### ❌ Problem Indicators
+```
+❌ Advanced Process Control Environment: INVALID
+❌ System Error: Missing dependency: numpy
+❌ PID Tuning Failed: Insufficient process data
+```
 
 ---
 
 ## Common Issues
 
-### Issue: Command Not Found
-**Symptoms**: `ign: command not found` or `advanced-process-control: command not found`
-**Root Cause**: CLI not properly installed or registered
-**Solution**:
-```bash
-# Check if IGN Scripts is properly installed
-which ign
+### 1. Command Not Found
 
-# If not found, activate virtual environment
-source .venv312/bin/activate
+#### Problem
+```bash
+$ ign advanced-process-control status
+Error: No such command 'advanced-process-control'
+```
+
+#### Root Cause
+- Phase 15 module not properly installed
+- CLI registration failed
+- Import errors in module initialization
+
+#### Solution
+```bash
+# Check module availability
+python -c "from src.ignition.modules.advanced_process_control import apc_cli; print('✅ Module available')"
+
+# Reinstall IGN Scripts
+pip install -e .
 
 # Verify CLI registration
 ign --help | grep advanced-process-control
-
-# If missing, reinstall
-pip install -e .
 ```
 
-### Issue: Module Import Errors
-**Symptoms**: `ModuleNotFoundError: No module named 'src.ignition.modules.advanced_process_control'`
-**Root Cause**: Python path or module structure issues
-**Solution**:
+#### Prevention
+- Always run `pip install -e .` after code updates
+- Check for import errors in module files
+- Verify environment activation
+
+### 2. Module Import Errors
+
+#### Problem
 ```bash
-# Check Python path
-python -c "import sys; print(sys.path)"
+ImportError: No module named 'numpy'
+ModuleNotFoundError: No module named 'scipy'
+```
 
-# Verify module structure
-ls -la src/ignition/modules/advanced_process_control/
+#### Root Cause
+- Missing scientific computing dependencies
+- Virtual environment not activated
+- Incorrect Python environment
 
-# Reinstall in development mode
-pip install -e .
+#### Solution
+```bash
+# Install all required dependencies
+pip install numpy>=1.21.0 scipy>=1.7.0 pandas>=1.3.0 scikit-learn>=1.0.0 asyncua>=1.0.0
+
+# Verify installation
+python -c "import numpy, scipy, pandas, sklearn; print('✅ All dependencies available')"
+
+# Check Python environment
+which python
+pip list | grep -E "numpy|scipy|pandas|scikit-learn|asyncua"
+```
+
+#### Prevention
+- Use `requirements.txt` for dependency management
+- Always activate virtual environment
+- Document dependency versions
+
+### 3. Environment Validation Failures
+
+#### Problem
+```bash
+❌ Advanced Process Control Environment: INVALID
+Error: Environment validation failed: ['Missing dependency: numpy']
+```
+
+#### Root Cause Analysis
+Following crawl_mcp.py Step 1 (Environment Validation First):
+
+1. **Dependency Issues**: Missing or incompatible versions
+2. **Configuration Problems**: Invalid environment variables
+3. **Resource Constraints**: Insufficient memory or disk space
+4. **Permission Issues**: File access restrictions
+
+#### Systematic Solution
+```bash
+# Step 1: Check dependencies
+ign advanced-process-control validate-env --verbose
+
+# Step 2: Install missing dependencies
+pip install -r requirements.txt
+
+# Step 3: Verify environment variables
+cat .env | grep -E "MPC|APC"
+
+# Step 4: Check system resources
+df -h  # Disk space
+free -h  # Memory
 ```
 
 ---
 
 ## Environment Problems
 
-### Issue: Environment Validation Fails
-**Symptoms**: `❌ Environment validation failed`
-**Diagnostic Steps**:
-```bash
-# Run detailed validation
-ign advanced-process-control validate-env --verbose
+### 1. Missing Dependencies
 
+#### Diagnosis
+```bash
 # Check specific dependencies
-python -c "import numpy; print('numpy OK')"
-python -c "import scipy; print('scipy OK')"
-python -c "import pandas; print('pandas OK')"
-python -c "import sklearn; print('sklearn OK')"
+python -c "import numpy; print(f'NumPy: {numpy.__version__}')"
+python -c "import scipy; print(f'SciPy: {scipy.__version__}')"
+python -c "import pandas; print(f'Pandas: {pandas.__version__}')"
+python -c "import sklearn; print(f'Scikit-learn: {sklearn.__version__}')"
 ```
 
-**Solutions**:
+#### Resolution
 ```bash
-# Install missing dependencies
-pip install numpy>=1.21.0 scipy>=1.7.0 pandas>=1.3.0 scikit-learn>=1.0.0
-
-# For asyncua issues
+# Install with specific versions
+pip install numpy>=1.21.0
+pip install scipy>=1.7.0
+pip install pandas>=1.3.0
+pip install scikit-learn>=1.0.0
 pip install asyncua>=1.0.0
 
-# Update all dependencies
-pip install --upgrade -r requirements.txt
+# Verify installation
+ign advanced-process-control validate-env
 ```
 
-### Issue: MPC Framework Integration Missing
-**Symptoms**: `❌ MPC Framework missing`
-**Root Cause**: Phase 14 not properly installed
-**Solution**:
+### 2. MPC Framework Integration Issues
+
+#### Problem
 ```bash
-# Check Phase 14 status
+⚠️ MPC Framework integration unavailable: No module named 'mpc_framework'
+```
+
+#### Root Cause
+- Phase 14 (MPC Framework) not installed
+- Import path issues
+- Module initialization failures
+
+#### Solution
+```bash
+# Check Phase 14 availability
 ign mpc-framework status
 
-# If not available, install Phase 14 first
-# See MPC Framework documentation
+# Verify MPC Framework installation
+python -c "from src.ignition.modules.mpc_framework import mpc_controller; print('✅ MPC Framework available')"
 
-# Verify integration
-python -c "from src.ignition.modules.mpc_framework import mpc_controller; print('MPC OK')"
+# Check environment variables
+grep MPC .env
 ```
 
-### Issue: Environment Variables Not Set
-**Symptoms**: Configuration warnings during validation
-**Solution**:
+#### Workaround
+Phase 15 can operate in PID-only mode without MPC Framework:
 ```bash
-# Check .env file exists
-ls -la .env
+# Disable MPC integration
+export MPC_CONTROLLER_ENABLED=false
 
-# Copy from example if missing
+# Test PID-only functionality
+ign advanced-process-control tune-pid --method ai_enhanced
+```
+
+### 3. Environment Variables
+
+#### Problem
+```bash
+⚠️ Not set (using defaults)
+```
+
+#### Required Variables
+```bash
+# Core configuration
+MPC_CONTROLLER_ENABLED=true
+APC_AUTO_TUNING_ENABLED=true
+APC_MULTI_LOOP_COORDINATION=true
+APC_ANALYTICS_ENABLED=true
+
+# Optional features
+APC_AI_ENHANCEMENT=true
+APC_REAL_TIME_OPTIMIZATION=true
+APC_PERFORMANCE_MONITORING=true
+```
+
+#### Setup
+```bash
+# Copy example configuration
 cp config/env.example .env
 
-# Edit with required values
-vim .env
+# Edit configuration
+nano .env
 
-# Verify loading
-python -c "import os; from dotenv import load_dotenv; load_dotenv(); print(os.getenv('MPC_CONTROLLER_ENABLED'))"
+# Verify configuration
+ign advanced-process-control validate-env --verbose
 ```
 
 ---
 
 ## Tuning Failures
 
-### Issue: Insufficient Process Data
-**Symptoms**: `Insufficient process data for tuning (minimum 10 points required)`
-**Root Cause**: Data collection problems
-**Diagnostic Steps**:
+### 1. Insufficient Process Data
+
+#### Problem
 ```bash
-# Check if process is responsive
-# Verify OPC-UA connections if using real data
-# Check simulation parameters
+❌ PID Tuning Failed: Insufficient process data for tuning (minimum 10 points required)
 ```
 
-**Solutions**:
+#### Root Cause
+- Data collection timeout
+- Process communication failures
+- Simulation errors
+
+#### Solution
 ```bash
-# Use longer data collection period
-# Ensure process is running and stable
-# Check for communication issues
-# Verify step input is properly applied
+# Try with different method
+ign advanced-process-control tune-pid --method imc --verbose
+
+# Check with smaller setpoint
+ign advanced-process-control tune-pid --setpoint 25.0
+
+# Verify system initialization
+ign advanced-process-control validate-env
 ```
 
-### Issue: Invalid PID Parameters
-**Symptoms**: `Invalid PID parameters (negative values)`
-**Root Cause**: Poor process data or inappropriate method
-**Solutions**:
+#### Debug
 ```bash
-# Try different tuning method
+# Enable debug logging
+export LOG_LEVEL=DEBUG
+export APC_DEBUG_MODE=true
+
+# Run with verbose output
+ign advanced-process-control tune-pid --verbose
+```
+
+### 2. Invalid Parameters
+
+#### Problem
+```bash
+❌ Invalid parameter: Setpoint must be between 0 and 1000
+❌ Invalid PID parameters (negative values)
+```
+
+#### Root Cause Analysis
+Following crawl_mcp.py Step 2 (Input Validation):
+
+1. **Input Validation**: Setpoint outside valid range
+2. **Algorithm Failure**: Tuning method produced invalid results
+3. **Process Characteristics**: Unusual process behavior
+
+#### Solution
+```bash
+# Use valid setpoint range
+ign advanced-process-control tune-pid --setpoint 50.0
+
+# Try conservative method
 ign advanced-process-control tune-pid --method imc
 
-# Check process stability
-# Verify setpoint is reasonable
-# Use conservative method first
-
-# For unstable processes, try IMC
-ign advanced-process-control tune-pid --method imc --setpoint 50.0
+# Check process simulation
+ign advanced-process-control test --verbose
 ```
 
-### Issue: Tuning Takes Too Long
-**Symptoms**: Tuning process hangs or takes excessive time
-**Root Cause**: Data collection or algorithm issues
-**Solutions**:
+### 3. Tuning Method Failures
+
+#### Problem
 ```bash
-# Cancel with Ctrl+C
-# Check system resources
-top
+❌ Method ziegler_nichols_open not implemented, using AI-enhanced
+```
 
-# Try simpler method
-ign advanced-process-control tune-pid --method ziegler_nichols_open
+#### Available Methods
+```bash
+# Verified working methods
+ign advanced-process-control tune-pid --method ai_enhanced     # Recommended
+ign advanced-process-control tune-pid --method imc            # Conservative
+ign advanced-process-control tune-pid --method cohen_coon     # Dead-time processes
+ign advanced-process-control tune-pid --method ziegler_nichols_open  # Simple processes
+```
 
-# Check for deadlocks in logs
-tail -f logs/advanced_process_control.log
+#### Fallback Strategy
+```bash
+# Start with most robust method
+ign advanced-process-control tune-pid --method imc
+
+# Progress to AI-enhanced for production
+ign advanced-process-control tune-pid --method ai_enhanced
 ```
 
 ---
 
-## Integration Issues
+## Integration Problems
 
-### Issue: CLI Commands Not Registered
-**Symptoms**: `No such command 'advanced-process-control'`
-**Root Cause**: Module not properly registered in enhanced_cli.py
-**Solution**:
+### 1. CLI Registration Failures
+
+#### Problem
 ```bash
-# Check enhanced_cli.py registration
-grep -n "advanced_process_control" src/core/enhanced_cli.py
+Error: No such command 'advanced-process-control'
+```
 
-# Verify import path
-python -c "from src.ignition.modules.advanced_process_control.cli_commands import apc_cli; print('Import OK')"
+#### Diagnosis
+```bash
+# Check CLI registration
+python -c "
+from src.ignition.modules.advanced_process_control.cli_commands import apc_cli
+print('✅ CLI module imports successfully')
+"
 
-# Reinstall if needed
+# Verify main CLI integration
+grep -r "apc_cli" src/main.py
+```
+
+#### Solution
+```bash
+# Reinstall with CLI registration
 pip install -e .
+
+# Check enhanced CLI
+python -c "
+from src.ignition.enhanced_cli import main
+print('✅ Enhanced CLI available')
+"
 ```
 
-### Issue: Rich Console Formatting Issues
-**Symptoms**: Broken console output or formatting errors
-**Solution**:
+### 2. Console Formatting Issues
+
+#### Problem
 ```bash
-# Check rich installation
-pip show rich
+# Broken formatting or missing colors
+Advanced Process Control Suite
+Phase 15: Automated Tuning & Multi-Loop Coordination
+```
 
-# Update if needed
-pip install --upgrade rich
+#### Root Cause
+- Missing Rich library
+- Terminal compatibility issues
+- Console encoding problems
 
-# Test console
-python -c "from rich.console import Console; Console().print('Test', style='bold green')"
+#### Solution
+```bash
+# Install Rich for console formatting
+pip install rich
+
+# Test console output
+python -c "from rich.console import Console; Console().print('✅ Rich working')"
+
+# Check terminal compatibility
+echo $TERM
+```
+
+### 3. Resource Conflicts
+
+#### Problem
+```bash
+❌ Resource allocation failed
+❌ Async context manager error
+```
+
+#### Root Cause Analysis
+Following crawl_mcp.py Step 6 (Resource Management):
+
+1. **Memory Constraints**: Insufficient system memory
+2. **Async Issues**: Event loop conflicts
+3. **Resource Leaks**: Improper cleanup
+
+#### Solution
+```bash
+# Check system resources
+free -h
+ps aux | grep python
+
+# Restart with clean environment
+pkill -f advanced-process-control
+ign advanced-process-control status
 ```
 
 ---
 
-## Performance Problems
+## Performance Issues
 
-### Issue: Slow Tuning Performance
-**Symptoms**: Tuning takes much longer than expected
-**Diagnostic Steps**:
+### 1. Slow Tuning Performance
+
+#### Problem
+Tuning takes longer than expected (>2 minutes)
+
+#### Diagnosis
 ```bash
-# Check system resources
+# Time the tuning process
+time ign advanced-process-control tune-pid --method ai_enhanced
+
+# Check system load
 top
-free -h
-
-# Monitor during tuning
-ign advanced-process-control tune-pid --verbose &
-top -p $!
+htop
 ```
 
-**Solutions**:
+#### Optimization
 ```bash
-# Close unnecessary applications
-# Use faster tuning method
-ign advanced-process-control tune-pid --method ziegler_nichols_open
+# Use faster method for testing
+ign advanced-process-control tune-pid --method imc
 
-# Check for memory issues
-# Restart Python environment if needed
+# Reduce data collection time (if configurable)
+export APC_DATA_COLLECTION_TIME=30
+
+# Check for resource conflicts
+lsof | grep python
 ```
 
-### Issue: High Memory Usage
-**Symptoms**: System becomes slow during tuning
-**Solutions**:
+### 2. High Memory Usage
+
+#### Problem
+```bash
+# Memory usage continuously increasing
+# System becomes unresponsive
+```
+
+#### Diagnosis
 ```bash
 # Monitor memory usage
-watch -n 1 'free -h'
+watch -n 1 'ps aux | grep advanced-process-control'
 
-# Use smaller data collection periods
-# Check for memory leaks in logs
-# Restart if necessary
+# Check for memory leaks
+valgrind python -m src.main advanced-process-control status
+```
+
+#### Solution
+```bash
+# Restart system components
+ign advanced-process-control test
+
+# Check for proper cleanup
+python -c "
+import gc
+gc.collect()
+print('✅ Garbage collection completed')
+"
+```
+
+### 3. System Constraints
+
+#### Problem
+```bash
+❌ System resource constraints detected
+```
+
+#### Requirements
+- **Memory**: Minimum 2GB RAM
+- **CPU**: 2+ cores recommended
+- **Disk**: 1GB free space
+- **Python**: 3.12+ with scientific libraries
+
+#### Solution
+```bash
+# Check system specifications
+free -h
+nproc
+df -h
+python --version
 ```
 
 ---
 
 ## Debug Procedures
 
-### Enable Debug Logging
+### 1. Enable Debug Logging
+
+#### Configuration
 ```bash
-# Set debug level
-export LOG_LEVEL=DEBUG
+# Add to .env file
+LOG_LEVEL=DEBUG
+APC_DEBUG_MODE=true
+APC_VERBOSE_LOGGING=true
 
-# Run with verbose output
-ign advanced-process-control tune-pid --verbose
-
-# Check logs
-tail -f logs/advanced_process_control.log
-```
-
-### Systematic Debugging Steps
-
-#### Step 1: Environment Validation
-```bash
-# Always start here
+# Verify logging configuration
 ign advanced-process-control validate-env --verbose
 ```
 
-#### Step 2: Component Testing
+#### Log Analysis
 ```bash
-# Test each component
+# Check log files
+tail -f logs/ign_scripts.log
+
+# Filter for APC messages
+grep -i "advanced.*process.*control" logs/*.log
+
+# Monitor real-time logging
+ign advanced-process-control tune-pid --verbose 2>&1 | tee debug.log
+```
+
+### 2. Step-by-Step Diagnosis
+
+#### Following crawl_mcp.py Methodology
+
+**Step 1: Environment Validation**
+```bash
+ign advanced-process-control validate-env --verbose
+```
+
+**Step 2: Input Validation**
+```bash
+# Test with known good parameters
+ign advanced-process-control tune-pid --method imc --setpoint 50.0
+```
+
+**Step 3: Error Handling**
+```bash
+# Test error conditions
+ign advanced-process-control tune-pid --setpoint -10  # Should fail gracefully
+```
+
+**Step 4: Modular Testing**
+```bash
+# Test individual components
 ign advanced-process-control test --verbose
 ```
 
-#### Step 3: Isolation Testing
+**Step 5: Progressive Complexity**
 ```bash
-# Test individual methods
-ign advanced-process-control tune-pid --method imc --verbose
-ign advanced-process-control tune-pid --method ai_enhanced --verbose
+# Start simple, add complexity
+ign advanced-process-control status
+ign advanced-process-control tune-pid --method imc
+ign advanced-process-control tune-pid --method ai_enhanced
 ```
 
-#### Step 4: Integration Testing
+**Step 6: Resource Management**
 ```bash
-# Test with MPC Framework
-ign mpc-framework status
+# Verify proper cleanup
+ps aux | grep advanced-process-control  # Should be minimal
+```
+
+### 3. Component Isolation
+
+#### Test Individual Components
+```bash
+# Test environment validation only
+python -c "
+from src.ignition.modules.advanced_process_control import validate_environment
+result = validate_environment()
+print(f'Environment: {result}')
+"
+
+# Test tuning system initialization
+python -c "
+import asyncio
+from src.ignition.modules.advanced_process_control.automated_tuning_system import AutomatedTuningSystem
+
+async def test():
+    system = AutomatedTuningSystem()
+    result = await system.initialize()
+    print(f'Initialization: {result}')
+
+asyncio.run(test())
+"
+```
+
+---
+
+## Recovery Procedures
+
+### 1. Soft Reset
+
+#### Procedure
+```bash
+# Clear temporary files
+rm -rf /tmp/ign_scripts_*
+
+# Reset environment
+source .venv/bin/activate
+
+# Validate configuration
+ign advanced-process-control validate-env --verbose
+```
+
+### 2. Hard Reset
+
+#### Complete System Reset
+```bash
+# Stop all processes
+pkill -f advanced-process-control
+
+# Clear cache and logs
+rm -rf cache/ logs/
+
+# Reinstall dependencies
+pip install -r requirements.txt --force-reinstall
+
+# Rebuild installation
+pip install -e . --force-reinstall
+
+# Verify functionality
+ign advanced-process-control test --verbose
+```
+
+### 3. Emergency Procedures
+
+#### System Unresponsive
+```bash
+# Force kill processes
+sudo pkill -9 -f advanced-process-control
+
+# Check system resources
+free -h
+df -h
+
+# Restart with minimal configuration
+export MPC_CONTROLLER_ENABLED=false
+export APC_AI_ENHANCEMENT=false
 ign advanced-process-control status
 ```
 
-### Log Analysis
-
-#### Common Log Patterns
+#### Data Recovery
 ```bash
-# Error patterns
-grep "ERROR" logs/advanced_process_control.log
-
-# Warning patterns
-grep "WARNING" logs/advanced_process_control.log
-
-# Performance issues
-grep "slow\|timeout\|hang" logs/advanced_process_control.log
-```
-
-#### Log Locations
-- **Main logs**: `logs/advanced_process_control.log`
-- **System logs**: `/var/log/ignition/` (if applicable)
-- **Python logs**: Check console output
-
----
-
-## Recovery Steps
-
-### Complete System Reset
-```bash
-# Stop all processes
-pkill -f "advanced-process-control"
-
-# Clear temporary files
-rm -rf /tmp/apc_*
-
-# Reset environment
-source .venv312/bin/activate
-
-# Reinstall
-pip install -e .
-
-# Validate
-ign advanced-process-control validate-env
-```
-
-### Dependency Recovery
-```bash
-# Backup current environment
-pip freeze > requirements_backup.txt
-
-# Reinstall clean
-pip uninstall -y numpy scipy pandas scikit-learn
-pip install numpy>=1.21.0 scipy>=1.7.0 pandas>=1.3.0 scikit-learn>=1.0.0
-
-# Test
-ign advanced-process-control validate-env
-```
-
-### Configuration Recovery
-```bash
-# Backup current config
+# Backup current configuration
 cp .env .env.backup
+cp -r logs/ logs.backup/
 
-# Reset to defaults
+# Restore from known good state
 cp config/env.example .env
-
-# Edit required values
-vim .env
-
-# Test
 ign advanced-process-control validate-env
 ```
 
 ---
 
-## Emergency Procedures
+## Prevention Strategies
 
-### System Unresponsive
+### 1. Regular Health Checks
 ```bash
-# Force kill processes
-sudo pkill -9 -f "advanced-process-control"
-
-# Check system resources
-df -h
-free -h
-
-# Restart if necessary
-sudo reboot
+# Daily health check script
+#!/bin/bash
+echo "🔍 APC Health Check - $(date)"
+ign advanced-process-control status
+ign advanced-process-control validate-env
+echo "✅ Health check completed"
 ```
 
-### Data Corruption
+### 2. Monitoring Setup
 ```bash
-# Check file integrity
-ls -la src/ignition/modules/advanced_process_control/
+# Monitor system resources
+watch -n 60 'ign advanced-process-control status'
 
-# Restore from git if needed
-git status
-git checkout -- src/ignition/modules/advanced_process_control/
+# Log rotation
+logrotate /etc/logrotate.d/ign_scripts
+```
 
-# Reinstall
-pip install -e .
+### 3. Backup Procedures
+```bash
+# Configuration backup
+tar -czf apc_config_$(date +%Y%m%d).tar.gz .env config/ logs/
+
+# System state backup
+ign advanced-process-control test --verbose > system_state_$(date +%Y%m%d).log
 ```
 
 ---
 
-## Getting Help
+## Contact and Support
 
-### Self-Diagnosis Checklist
-- [ ] Environment validation passes
-- [ ] All dependencies installed
-- [ ] MPC Framework integration working
-- [ ] Configuration files present
-- [ ] No error messages in logs
-- [ ] System resources adequate
+### Debug Information Collection
+When reporting issues, include:
 
-### Support Resources
-- **Documentation**: See [Advanced Process Control Guide](advanced-process-control-guide.md)
-- **Logs**: Check `logs/advanced_process_control.log`
-- **GitHub Issues**: Report bugs and get community help
-- **CLI Help**: `ign advanced-process-control --help`
+```bash
+# System information
+uname -a
+python --version
+pip list | grep -E "numpy|scipy|pandas|scikit-learn|asyncua|rich"
 
-### Information to Provide When Seeking Help
-1. **Environment details**: OS, Python version, dependency versions
-2. **Error messages**: Complete error output
-3. **Steps to reproduce**: Exact commands and sequence
-4. **Log files**: Relevant log excerpts
-5. **Configuration**: Environment variables and settings (redact sensitive info)
+# IGN Scripts version
+ign --version
+
+# Environment validation
+ign advanced-process-control validate-env --verbose
+
+# Test results
+ign advanced-process-control test --verbose
+```
+
+### Common Resolution Times
+- **Environment Issues**: 5-15 minutes
+- **Dependency Problems**: 10-30 minutes
+- **Integration Issues**: 15-45 minutes
+- **Performance Problems**: 30-60 minutes
 
 ---
 
 **Last Updated**: December 27, 2024
 **Version**: 15.0.0
 **Status**: ✅ Production Ready
+**Methodology**: crawl_mcp.py systematic approach
