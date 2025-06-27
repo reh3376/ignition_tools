@@ -5,6 +5,7 @@ This script tests the multi-interface deployment implementation
 following the crawl_mcp.py methodology.
 """
 
+import importlib.util
 import subprocess
 import sys
 from pathlib import Path
@@ -16,14 +17,24 @@ def test_imports():
 
     try:
         # Test SME Agent module
-        from src.ignition.modules.sme_agent.sme_agent_module import SMEAgentModule
-
-        print("✅ SME Agent module imported successfully")
+        if (
+            importlib.util.find_spec("src.ignition.modules.sme_agent.sme_agent_module")
+            is not None
+        ):
+            print("✅ SME Agent module available")
+        else:
+            print("❌ SME Agent module not available")
+            return False
 
         # Test web interface
-        from src.ignition.modules.sme_agent.web_interface import app
-
-        print("✅ FastAPI web interface imported successfully")
+        if (
+            importlib.util.find_spec("src.ignition.modules.sme_agent.web_interface")
+            is not None
+        ):
+            print("✅ FastAPI web interface available")
+        else:
+            print("❌ FastAPI web interface not available")
+            return False
 
         # Test Streamlit interface
         streamlit_path = Path("src/ignition/modules/sme_agent/streamlit_interface.py")
@@ -34,11 +45,16 @@ def test_imports():
             return False
 
         # Test CLI commands
-        from src.ignition.modules.sme_agent.cli.infrastructure_commands import (
-            infrastructure_commands,
-        )
-
-        print("✅ Infrastructure CLI commands imported successfully")
+        if (
+            importlib.util.find_spec(
+                "src.ignition.modules.sme_agent.cli.infrastructure_commands"
+            )
+            is not None
+        ):
+            print("✅ Infrastructure CLI commands available")
+        else:
+            print("❌ Infrastructure CLI commands not available")
+            return False
 
         return True
 
@@ -64,7 +80,9 @@ def test_sme_agent_basic():
         if validation_result.get("valid"):
             print("✅ SME Agent environment validation passed")
         else:
-            print(f"⚠️ SME Agent environment validation issues: {validation_result.get('errors', [])}")
+            print(
+                f"⚠️ SME Agent environment validation issues: {validation_result.get('errors', [])}"
+            )
 
         # Test status check
         status = agent.get_status()

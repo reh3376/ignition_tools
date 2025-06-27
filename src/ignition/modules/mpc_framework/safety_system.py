@@ -19,7 +19,7 @@ import asyncio
 import logging
 import os
 from collections.abc import AsyncIterator, Callable
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
@@ -707,10 +707,8 @@ class ProductionSafetySystem:
             # Stop watchdog
             if self._watchdog_task:
                 self._watchdog_task.cancel()
-                try:
+                with suppress(asyncio.CancelledError):
                     await self._watchdog_task
-                except asyncio.CancelledError:
-                    pass
 
             # Clear alarms and handlers
             self._active_alarms.clear()
@@ -785,7 +783,7 @@ async def test_safety_system() -> dict[str, Any]:
 
             # Test alarm acknowledgment
             if safety_system._active_alarms:
-                alarm_id = list(safety_system._active_alarms.keys())[0]
+                alarm_id = next(iter(safety_system._active_alarms.keys()))
                 ack_result = await safety_system.acknowledge_alarm(
                     alarm_id, "test_user"
                 )

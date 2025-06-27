@@ -619,7 +619,7 @@ class FineTuningManager:
     def _create_instruction_variations(self, item: dict) -> list[dict]:
         """Create variations of training instructions."""
         variations = []
-        base_instruction = item["instruction"]
+        item["instruction"]
 
         # Create different question formats
         question_formats = [

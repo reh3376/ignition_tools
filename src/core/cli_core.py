@@ -14,9 +14,6 @@ from rich.text import Text
 # Optional prompt_toolkit imports for TUI features
 try:
     from prompt_toolkit import Application
-    from prompt_toolkit.shortcuts import (
-        radiolist_dialog,
-    )
 
     PROMPT_TOOLKIT_AVAILABLE = True
 except ImportError:
@@ -71,9 +68,13 @@ class LearningSystemCLI:
                 self.tracker = UsageTracker(self.client)
                 self.analyzer = PatternAnalyzer(self.client)
                 self.manager = PatternManager(self.client)
-                self.generator = IgnitionScriptGenerator() if IgnitionScriptGenerator else None
+                self.generator = (
+                    IgnitionScriptGenerator() if IgnitionScriptGenerator else None
+                )
             except Exception as e:
-                self.console.print(f"[yellow]Warning: Learning system not available: {e}[/yellow]")
+                self.console.print(
+                    f"[yellow]Warning: Learning system not available: {e}[/yellow]"
+                )
 
     def connect_learning_system(self) -> bool:
         """Connect to the learning system database."""
@@ -104,9 +105,10 @@ class LearningSystemCLI:
 
         try:
             # Create a session if none exists
-            if (hasattr(self.tracker, "current_session_id") and not self.tracker.current_session_id) and hasattr(
-                self.tracker, "start_session"
-            ):
+            if (
+                hasattr(self.tracker, "current_session_id")
+                and not self.tracker.current_session_id
+            ) and hasattr(self.tracker, "start_session"):
                 self.tracker.start_session(user_id="cli_user", session_type="cli_usage")
 
             # Track the command usage
@@ -132,7 +134,9 @@ class LearningSystemCLI:
 
         try:
             function_name = f"cli.{current_command}"
-            recommendations = self.analyzer.get_recommendations_for_function(function_name)
+            recommendations = self.analyzer.get_recommendations_for_function(
+                function_name
+            )
 
             # Convert to CLI commands
             cli_recommendations = []
@@ -159,7 +163,11 @@ class LearningSystemCLI:
         title.append(__version__, style="bold green")
 
         # Check learning system status
-        ls_status = "🧠 Connected" if self.client and self.client.is_connected else "⚠️ Disconnected"
+        ls_status = (
+            "🧠 Connected"
+            if self.client and self.client.is_connected
+            else "⚠️ Disconnected"
+        )
 
         welcome_panel = Panel.fit(
             f"{title}\n"
@@ -210,38 +218,42 @@ def main(ctx: click.Context) -> None:
 
 @main.command()
 @click.pass_context
-def setup(ctx: click.Context) -> None:
+def setup(_ctx: click.Context) -> None:
     """🔧 Interactive setup wizard for IGN Scripts configuration."""
     enhanced_cli.track_cli_usage("setup")
 
-    console.print("[bold blue]🔧 IGN Scripts Setup Wizard[/bold blue]\n")
+    console.print(
+        Panel.fit(
+            "[bold blue]IGN Scripts Setup Wizard[/bold blue]\n\n"
+            "This wizard will help you configure IGN Scripts for your environment.\n"
+            "You can run this setup again anytime with: [bold green]ign setup[/bold green]",
+            title="🔧 Setup",
+            border_style="blue",
+        )
+    )
 
-    # Configuration steps
-    steps = [
-        "Neo4j Database Configuration",
-        "Ignition Gateway Connection",
-        "Learning System Setup",
-        "Template Directory Setup",
-        "Export/Import Configuration",
-    ]
+    # Show current configuration status
+    console.print("\n[bold]Current Configuration Status:[/bold]")
 
-    for i, step in enumerate(steps, 1):
-        console.print(f"[bold cyan]Step {i}:[/bold cyan] {step}")
-        # TODO: Implement actual configuration logic
-        console.print(f"   [green]✓[/green] {step} configured")
+    # Check if learning system is available
+    if enhanced_cli.client and enhanced_cli.client.is_connected:
+        console.print("✅ Learning System: [green]Connected[/green]")
+    else:
+        console.print("❌ Learning System: [red]Not Connected[/red]")
 
-    console.print("\n[green]🎉 Setup completed successfully![/green]")
-    console.print("[dim]Run 'ign --help' to see available commands.[/dim]")
+    console.print(
+        "\n[dim]Setup completed! Use 'ign --help' to see available commands.[/dim]"
+    )
 
 
 @main.result_callback()
 @click.pass_context
-def cleanup(ctx: click.Context, result, **kwargs) -> None:
+def cleanup(_ctx: click.Context, _result, **_kwargs) -> None:
     """Clean up resources after command execution."""
     try:
-        cli = ctx.obj.get("cli")
-        if cli and cli.client and hasattr(cli.client, "close"):
-            cli.client.close()
+        # Clean up any open connections
+        if enhanced_cli.client and hasattr(enhanced_cli.client, "close"):
+            enhanced_cli.client.close()  # type: ignore[attr-defined]
     except Exception:
-        # Silently fail cleanup
+        # Silently handle cleanup errors
         pass

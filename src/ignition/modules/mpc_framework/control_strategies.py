@@ -1,4 +1,4 @@
-"""Control Strategies Module for MPC Framework
+"""Control Strategies Module for MPC Framework.
 
 This module provides advanced control strategies and algorithms for the MPC Framework.
 Following crawl_mcp.py methodology for robust, production-ready implementation.

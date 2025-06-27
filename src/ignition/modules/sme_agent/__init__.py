@@ -12,12 +12,16 @@ Following crawl_mcp.py methodology:
 - Step 6: Resource management and cleanup
 """
 
+import importlib.util
 import logging
 import os
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from dotenv import load_dotenv
+
+# Phase 11 SME Agent Module Components
+from .sme_agent_module import SMEAgentModule
 
 # Load environment variables
 load_dotenv()
@@ -73,7 +77,9 @@ def validate_sme_agent_environment() -> dict[str, Any]:
         value = os.getenv(env_var)
         if not value:
             validation_result["valid"] = False
-            validation_result["errors"].append(f"Missing required environment variable: {env_var} ({description})")
+            validation_result["errors"].append(
+                f"Missing required environment variable: {env_var} ({description})"
+            )
         else:
             validation_result["config"][env_var] = value
 
@@ -87,21 +93,31 @@ def validate_sme_agent_environment() -> dict[str, Any]:
             try:
                 int(value)
             except ValueError:
-                validation_result["warnings"].append(f"Invalid {env_var}: {value}, using default 8192")
+                validation_result["warnings"].append(
+                    f"Invalid {env_var}: {value}, using default 8192"
+                )
                 validation_result["config"][env_var] = "8192"
 
         elif env_var == "SME_AGENT_TEMPERATURE":
             try:
                 temp_val = float(value)
                 if not 0.0 <= temp_val <= 2.0:
-                    validation_result["warnings"].append(f"Temperature {value} outside recommended range [0.0, 2.0]")
+                    validation_result["warnings"].append(
+                        f"Temperature {value} outside recommended range [0.0, 2.0]"
+                    )
             except ValueError:
-                validation_result["warnings"].append(f"Invalid temperature: {value}, using default 0.7")
+                validation_result["warnings"].append(
+                    f"Invalid temperature: {value}, using default 0.7"
+                )
                 validation_result["config"][env_var] = "0.7"
 
     # Step 1.3: Check component availability
-    validation_result["components_available"]["neo4j"] = _check_neo4j_availability(validation_result["config"])
-    validation_result["components_available"]["transformers"] = _check_transformers_availability()
+    validation_result["components_available"]["neo4j"] = _check_neo4j_availability(
+        validation_result["config"]
+    )
+    validation_result["components_available"][
+        "transformers"
+    ] = _check_transformers_availability()
     validation_result["components_available"]["torch"] = _check_torch_availability()
     validation_result["components_available"]["fastapi"] = _check_fastapi_availability()
 
@@ -112,7 +128,9 @@ def validate_sme_agent_environment() -> dict[str, Any]:
     for dir_path in required_dirs:
         full_path = project_root / dir_path
         if not full_path.exists():
-            validation_result["warnings"].append(f"Directory {dir_path} does not exist, will be created")
+            validation_result["warnings"].append(
+                f"Directory {dir_path} does not exist, will be created"
+            )
 
     return validation_result
 
@@ -144,36 +162,18 @@ def _check_neo4j_availability(config: dict[str, str]) -> bool:
 
 def _check_transformers_availability() -> bool:
     """Check if transformers library is available."""
-    try:
-        import transformers
-
-        return True
-    except ImportError:
-        return False
+    return importlib.util.find_spec("transformers") is not None
 
 
 def _check_torch_availability() -> bool:
     """Check if PyTorch is available."""
-    try:
-        import torch
-
-        return True
-    except ImportError:
-        return False
+    return importlib.util.find_spec("torch") is not None
 
 
 def _check_fastapi_availability() -> bool:
     """Check if FastAPI is available."""
-    try:
-        import fastapi
+    return importlib.util.find_spec("fastapi") is not None
 
-        return True
-    except ImportError:
-        return False
-
-
-# Phase 11 SME Agent Module Components
-from .sme_agent_module import SMEAgentModule
 
 __all__ = [
     "SMEAgentModule",

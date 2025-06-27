@@ -319,7 +319,7 @@ class ProductionMPCController:
             # First Order Plus Dead Time model
             gain = model.parameters["gain"]
             tau = model.parameters["time_constant"]
-            delay = model.parameters.get("dead_time", 0.0)
+            model.parameters.get("dead_time", 0.0)
 
             # Direct discrete-time approximation for FOPDT
             # G(z) = K * (1-a) * z^(-d) / (z - a)
@@ -461,8 +461,8 @@ class ProductionMPCController:
         x_current = self._state_estimator["current_state"]
 
         # Prediction matrices (simplified for 1D case)
-        n_states = A.shape[0]
-        n_inputs = B.shape[1]
+        A.shape[0]
+        B.shape[1]
 
         # Simple optimization: minimize tracking error + control effort
         def objective(u_sequence):
@@ -497,10 +497,9 @@ class ProductionMPCController:
         u_init = np.zeros(self.config.control_horizon)
 
         # Constraints
-        constraints = []
         bounds = []
 
-        for k in range(self.config.control_horizon):
+        for _k in range(self.config.control_horizon):
             # Control bounds
             bounds.append(
                 (

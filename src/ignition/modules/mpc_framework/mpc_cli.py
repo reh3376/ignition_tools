@@ -42,7 +42,7 @@ console = Console()
 # Step 1: Environment Validation Commands (crawl_mpc.py methodology)
 @click.group(name="mpc-framework")
 def mpc_framework_cli() -> None:
-    """Phase 14: MPC Framework & Production Control 🎛️
+    """Phase 14: MPC Framework & Production Control 🎛️.
 
     Comprehensive Model Predictive Control framework with production control capabilities.
 

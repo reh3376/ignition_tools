@@ -102,14 +102,14 @@ def test_input_validation() -> bool:
         print("  🧪 Testing invalid configurations...")
 
         try:
-            invalid_config = FeedbackCollectionConfig(quality_threshold=1.5)
+            FeedbackCollectionConfig(quality_threshold=1.5)
             print("    ❌ Should have failed for invalid threshold")
             return False
         except Exception:
             print("    ✅ Invalid threshold properly rejected")
 
         try:
-            invalid_learning = OnlineLearningConfig(performance_threshold=0.5)
+            OnlineLearningConfig(performance_threshold=0.5)
             print("    ❌ Should have failed for invalid performance threshold")
             return False
         except Exception:
@@ -511,7 +511,7 @@ def test_integration_with_existing_infrastructure() -> bool:
             print("    ✅ LLM Infrastructure module accessible")
 
             # Test model manager initialization
-            model_manager = LLMModelManager()
+            LLMModelManager()
             print("    ✅ LLM Model Manager initialized")
 
         except ImportError as e:

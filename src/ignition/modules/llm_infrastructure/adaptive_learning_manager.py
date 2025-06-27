@@ -247,7 +247,7 @@ class AdaptiveLearningManager:
 
             # Validate rating
             rating = feedback_data.get("rating")
-            if not isinstance(rating, (int, float)) or not 0.0 <= rating <= 1.0:
+            if not isinstance(rating, int | float) or not 0.0 <= rating <= 1.0:
                 raise AdaptiveLearningValidationError(
                     "Rating must be a number between 0.0 and 1.0"
                 )
@@ -277,7 +277,7 @@ class AdaptiveLearningManager:
                 feedback_record["user_id"] = f"anon_{hash(user_id) % 10000}"
 
             # Save feedback
-            result = await self._save_feedback_record(feedback_record)
+            await self._save_feedback_record(feedback_record)
 
             # Update user profile
             if self.personalization_config.user_profiles:
@@ -397,7 +397,7 @@ class AdaptiveLearningManager:
             logger.warning(f"⚠️ Failed to queue for learning: {e}")
 
     async def execute_incremental_learning(
-        self, model_name: str, feedback_batch_size: int = None
+        self, model_name: str, feedback_batch_size: int | None = None
     ) -> dict[str, Any]:
         """Step 4: Execute incremental learning process (crawl_mcp.py methodology)."""
         try:

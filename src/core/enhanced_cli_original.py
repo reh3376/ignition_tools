@@ -8,20 +8,7 @@ This module provides a rich, interactive command-line interface with:
 - Real-time analytics and insights
 """
 
-# Import the main CLI group and enhanced_cli instance from core
-from .cli_core import enhanced_cli, main
-
-# Import all command modules to register them with the main group
-from .cli_script_commands import script
-from .cli_template_commands import template
-
-# Register command groups with main CLI
-main.add_command(script)
-main.add_command(template)
-
-# Import all remaining commands that haven't been split yet
-# These will be moved to separate modules in subsequent iterations
-
+import builtins
 import logging
 from typing import Any
 
@@ -33,12 +20,6 @@ from rich.table import Table
 # Optional prompt_toolkit imports for TUI features
 try:
     from prompt_toolkit import Application
-    from prompt_toolkit.shortcuts import (
-        input_dialog,
-        message_dialog,
-        radiolist_dialog,
-    )
-    from prompt_toolkit.styles import Style
 
     PROMPT_TOOLKIT_AVAILABLE = True
 except ImportError:
@@ -53,7 +34,16 @@ except ImportError:
     Application = DummyApp
     PROMPT_TOOLKIT_AVAILABLE = False
 
-import builtins
+# Import the main CLI group and enhanced_cli instance from core
+from .cli_core import enhanced_cli, main
+
+# Import all command modules to register them with the main group
+from .cli_script_commands import script
+from .cli_template_commands import template
+
+# Register command groups with main CLI
+main.add_command(script)
+main.add_command(template)
 
 console = Console()
 logger = logging.getLogger(__name__)
@@ -72,18 +62,22 @@ def learning() -> None:
 @click.option("--days", "-d", default=30, help="Days of data to analyze")
 @click.option("--pattern-type", "-t", help="Specific pattern type to show")
 @click.pass_context
-def patterns(ctx: click.Context, days: int, pattern_type: str) -> None:
+def patterns(_ctx: click.Context, days: int, pattern_type: str) -> None:
     """📊 Explore usage patterns and insights."""
     if not enhanced_cli.manager:
         console.print("[yellow]Learning system not available[/yellow]")
         return
 
-    enhanced_cli.track_cli_usage("learning", "patterns", {"days": days, "pattern_type": pattern_type})
+    enhanced_cli.track_cli_usage(
+        "learning", "patterns", {"days": days, "pattern_type": pattern_type}
+    )
 
     try:
         with console.status("[bold blue]Analyzing patterns..."):
             if pattern_type:
-                patterns = enhanced_cli.manager.get_patterns_by_type(pattern_type, limit=10)
+                patterns = enhanced_cli.manager.get_patterns_by_type(
+                    pattern_type, limit=10
+                )
                 display_specific_patterns(pattern_type, patterns)
             else:
                 stats = enhanced_cli.manager.get_pattern_statistics()
@@ -119,7 +113,9 @@ def display_pattern_overview(stats: dict[str, Any]) -> None:
                 console.print(f"  {level.replace('_', ' ').title()}: {count} {bar}")
 
 
-def display_specific_patterns(pattern_type: str, patterns: builtins.list[dict[str, Any]]) -> None:
+def display_specific_patterns(
+    pattern_type: str, patterns: builtins.list[dict[str, Any]]
+) -> None:
     """Display specific pattern type details."""
     title = f"📊 {pattern_type.replace('_', ' ').title()} Patterns"
     console.print(f"[bold cyan]{title}[/bold cyan]\n")
@@ -151,7 +147,9 @@ def create_pattern_display(pattern: dict[str, Any]) -> str:
         usage = pattern.get("usage_count", 0)
         success = pattern.get("success_rate", 0)
 
-        return f"Template: {template}\nUsage Count: {usage}\nSuccess Rate: {success:.1%}"
+        return (
+            f"Template: {template}\nUsage Count: {usage}\nSuccess Rate: {success:.1%}"
+        )
 
     elif pattern_type == "parameter_combination":
         entity = pattern.get("entity_name", "")

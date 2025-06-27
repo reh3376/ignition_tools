@@ -1,4 +1,4 @@
-"""Production Scheduler Module for MPC Framework
+"""Production Scheduler Module for MPC Framework.
 
 This module provides production scheduling and optimization capabilities.
 Following crawl_mcp.py methodology for robust, production-ready implementation.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Specialized Expertise Modules for Phase 16.2 Multi-Domain Architecture
+"""Specialized Expertise Modules for Phase 16.2 Multi-Domain Architecture.
 
 Following crawl_mcp.py methodology for systematic development:
 - Step 1: Environment validation first
@@ -22,9 +22,9 @@ from .power_generation_agent import PowerGenerationAgent
 
 __all__ = [
     "BaseSpecializedAgent",
-    "DistillationWhiskeyAgent", 
+    "DistillationWhiskeyAgent",
     "PharmaceuticalAgent",
     "PowerGenerationAgent",
 ]
 
-__version__ = "16.2.0" 
+__version__ = "16.2.0"

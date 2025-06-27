@@ -11,6 +11,7 @@ following the crawl_mcp.py methodology with:
 """
 
 import asyncio
+import importlib.util
 import os
 import subprocess
 import sys
@@ -58,22 +59,34 @@ class MonitoringConfig(BaseModel):
     """Configuration for terminal monitoring."""
 
     # Basic monitoring settings
-    check_interval: float = Field(default=1.0, ge=0.1, le=10.0, description="Monitoring check interval in seconds")
-    default_timeout: int = Field(default=30, ge=1, le=3600, description="Default command timeout in seconds")
-    max_retries: int = Field(default=3, ge=0, le=10, description="Maximum retry attempts")
+    check_interval: float = Field(
+        default=1.0, ge=0.1, le=10.0, description="Monitoring check interval in seconds"
+    )
+    default_timeout: int = Field(
+        default=30, ge=1, le=3600, description="Default command timeout in seconds"
+    )
+    max_retries: int = Field(
+        default=3, ge=0, le=10, description="Maximum retry attempts"
+    )
 
     # Stall detection settings
-    stall_detection_window: int = Field(default=10, ge=5, le=60, description="Window for stall detection in seconds")
+    stall_detection_window: int = Field(
+        default=10, ge=5, le=60, description="Window for stall detection in seconds"
+    )
     cpu_threshold: float = Field(
         default=5.0,
         ge=0.0,
         le=100.0,
         description="CPU usage threshold for stall detection",
     )
-    memory_threshold: float = Field(default=90.0, ge=50.0, le=100.0, description="Memory usage threshold")
+    memory_threshold: float = Field(
+        default=90.0, ge=50.0, le=100.0, description="Memory usage threshold"
+    )
 
     # Recovery settings
-    enable_auto_recovery: bool = Field(default=True, description="Enable automatic recovery mechanisms")
+    enable_auto_recovery: bool = Field(
+        default=True, description="Enable automatic recovery mechanisms"
+    )
     escalation_timeout: int = Field(
         default=120,
         ge=30,
@@ -88,8 +101,12 @@ class MonitoringConfig(BaseModel):
     )
 
     # Resource management
-    max_concurrent_commands: int = Field(default=5, ge=1, le=20, description="Maximum concurrent commands")
-    cleanup_interval: int = Field(default=300, ge=60, le=3600, description="Cleanup interval in seconds")
+    max_concurrent_commands: int = Field(
+        default=5, ge=1, le=20, description="Maximum concurrent commands"
+    )
+    cleanup_interval: int = Field(
+        default=300, ge=60, le=3600, description="Cleanup interval in seconds"
+    )
 
     @validator("check_interval")
     def validate_check_interval(cls, v) -> Any:
@@ -104,15 +121,23 @@ class CommandRequest(BaseModel):
     command: str | list[str] = Field(..., description="Command to execute")
     args: list[str] | None = Field(default=None, description="Command arguments")
     cwd: str | None = Field(default=None, description="Working directory")
-    env: dict[str, str] | None = Field(default=None, description="Environment variables")
-    timeout: int | None = Field(default=None, ge=1, le=3600, description="Command timeout in seconds")
+    env: dict[str, str] | None = Field(
+        default=None, description="Environment variables"
+    )
+    timeout: int | None = Field(
+        default=None, ge=1, le=3600, description="Command timeout in seconds"
+    )
     shell: bool = Field(default=False, description="Execute in shell")
     capture_output: bool = Field(default=True, description="Capture stdout/stderr")
 
     # Recovery settings
-    max_retries: int | None = Field(default=None, ge=0, le=10, description="Override max retries")
+    max_retries: int | None = Field(
+        default=None, ge=0, le=10, description="Override max retries"
+    )
     critical: bool = Field(default=False, description="Mark as critical command")
-    recovery_actions: list[RecoveryAction] | None = Field(default=None, description="Custom recovery actions")
+    recovery_actions: list[RecoveryAction] | None = Field(
+        default=None, description="Custom recovery actions"
+    )
 
     @validator("command")
     def validate_command(cls, v) -> Any:
@@ -137,7 +162,9 @@ class CommandMetrics:
     peak_memory: float = 0.0
     average_cpu: float = 0.0
 
-    def add_sample(self, cpu: float, memory: float, io_read: int = 0, io_write: int = 0):
+    def add_sample(
+        self, cpu: float, memory: float, io_read: int = 0, io_write: int = 0
+    ):
         """Add a monitoring sample."""
         self.cpu_usage.append(cpu)
         self.memory_usage.append(memory)
@@ -249,38 +276,40 @@ class TerminalMonitor:
 
             # Core modules availability
             try:
-                import subprocess
-
-                validation_results["subprocess_available"] = True
+                validation_results["subprocess_available"] = (
+                    importlib.util.find_spec("subprocess") is not None
+                )
             except ImportError:
-                pass
+                validation_results["subprocess_available"] = False
 
             try:
                 import psutil
 
                 validation_results["psutil_available"] = True
             except ImportError:
-                pass
+                validation_results["psutil_available"] = False
 
             try:
-                import threading
-
-                validation_results["threading_available"] = True
+                validation_results["threading_available"] = (
+                    importlib.util.find_spec("threading") is not None
+                )
             except ImportError:
-                pass
+                validation_results["threading_available"] = False
 
             try:
-                import signal
-
-                validation_results["signal_handling_available"] = True
+                validation_results["signal_handling_available"] = (
+                    importlib.util.find_spec("signal") is not None
+                )
             except ImportError:
-                pass
+                validation_results["signal_handling_available"] = False
 
             # System resources check
             try:
                 # Memory check (at least 1GB available)
                 memory = psutil.virtual_memory()
-                validation_results["memory_sufficient"] = memory.available > 1024 * 1024 * 1024
+                validation_results["memory_sufficient"] = (
+                    memory.available > 1024 * 1024 * 1024
+                )
             except:
                 pass
 
@@ -322,7 +351,11 @@ class TerminalMonitor:
                 "memory_sufficient",
             ]
 
-            missing_components = [comp for comp in required_components if not env_validation.get(comp, False)]
+            missing_components = [
+                comp
+                for comp in required_components
+                if not env_validation.get(comp, False)
+            ]
 
             if missing_components:
                 raise RuntimeError(f"Missing required components: {missing_components}")
@@ -333,11 +366,15 @@ class TerminalMonitor:
             self.monitoring_active = True
 
             # Start monitoring thread
-            self.monitor_thread = threading.Thread(target=self._monitoring_loop, daemon=True, name="TerminalMonitor")
+            self.monitor_thread = threading.Thread(
+                target=self._monitoring_loop, daemon=True, name="TerminalMonitor"
+            )
             self.monitor_thread.start()
 
             # Start cleanup thread
-            self.cleanup_thread = threading.Thread(target=self._cleanup_loop, daemon=True, name="TerminalCleanup")
+            self.cleanup_thread = threading.Thread(
+                target=self._cleanup_loop, daemon=True, name="TerminalCleanup"
+            )
             self.cleanup_thread.start()
 
             return True
@@ -378,15 +415,23 @@ class TerminalMonitor:
         """
         # Input validation (crawl_mcp.py principle)
         try:
-            request = CommandRequest.parse_obj(request.dict()) if not isinstance(request, CommandRequest) else request
+            request = (
+                CommandRequest.parse_obj(request.dict())
+                if not isinstance(request, CommandRequest)
+                else request
+            )
         except Exception as e:
             raise ValueError(f"Invalid command request: {e}")
 
         # Check concurrent command limit
-        active_commands = sum(1 for exec in self.executions.values() if exec.state == CommandState.RUNNING)
+        active_commands = sum(
+            1 for exec in self.executions.values() if exec.state == CommandState.RUNNING
+        )
 
         if active_commands >= self.config.max_concurrent_commands:
-            raise RuntimeError(f"Maximum concurrent commands limit reached ({self.config.max_concurrent_commands})")
+            raise RuntimeError(
+                f"Maximum concurrent commands limit reached ({self.config.max_concurrent_commands})"
+            )
 
         # Create execution instance
         execution_id = f"cmd_{int(time.time() * 1000)}_{len(self.executions)}"
@@ -543,7 +588,9 @@ class TerminalMonitor:
         max_retries = execution.request.max_retries or self.config.max_retries
         if execution.retry_count >= max_retries:
             execution.state = CommandState.FAILED
-            execution.errors.append(f"Maximum recovery attempts reached ({max_retries})")
+            execution.errors.append(
+                f"Maximum recovery attempts reached ({max_retries})"
+            )
             return
 
         # Determine recovery actions
@@ -569,7 +616,9 @@ class TerminalMonitor:
         execution.last_recovery_time = time.time()
         execution.recovery_attempts.append(f"{reason}:{action}")
 
-    async def _handle_retry_recovery(self, execution: CommandExecution, reason: str) -> bool:
+    async def _handle_retry_recovery(
+        self, execution: CommandExecution, reason: str
+    ) -> bool:
         """Handle retry recovery action."""
         try:
             # Kill current process if running
@@ -594,7 +643,9 @@ class TerminalMonitor:
         except Exception:
             return False
 
-    async def _handle_kill_restart_recovery(self, execution: CommandExecution, reason: str) -> bool:
+    async def _handle_kill_restart_recovery(
+        self, execution: CommandExecution, reason: str
+    ) -> bool:
         """Handle kill and restart recovery action."""
         try:
             # Force kill process and all children
@@ -623,7 +674,9 @@ class TerminalMonitor:
         except Exception:
             return False
 
-    async def _handle_adaptive_timeout_recovery(self, execution: CommandExecution, reason: str) -> bool:
+    async def _handle_adaptive_timeout_recovery(
+        self, execution: CommandExecution, reason: str
+    ) -> bool:
         """Handle adaptive timeout recovery action."""
         try:
             # Increase timeout by factor
@@ -640,7 +693,9 @@ class TerminalMonitor:
         except Exception:
             return False
 
-    async def _handle_escalation_recovery(self, execution: CommandExecution, reason: str) -> bool:
+    async def _handle_escalation_recovery(
+        self, execution: CommandExecution, reason: str
+    ) -> bool:
         """Handle escalation recovery action."""
         execution.errors.append(f"Command escalated for manual intervention: {reason}")
         execution.state = CommandState.FAILED
@@ -653,7 +708,9 @@ class TerminalMonitor:
 
         return False
 
-    async def _handle_skip_recovery(self, execution: CommandExecution, reason: str) -> bool:
+    async def _handle_skip_recovery(
+        self, execution: CommandExecution, reason: str
+    ) -> bool:
         """Handle skip recovery action."""
         execution.warnings.append(f"Command skipped due to {reason}")
         execution.state = CommandState.COMPLETED
@@ -745,8 +802,12 @@ class TerminalMonitor:
         # Update average execution time
         if execution.metrics.end_time:
             duration = execution.metrics.get_duration()
-            total_time = self.stats["average_execution_time"] * (self.stats["total_commands"] - 1)
-            self.stats["average_execution_time"] = (total_time + duration) / self.stats["total_commands"]
+            total_time = self.stats["average_execution_time"] * (
+                self.stats["total_commands"] - 1
+            )
+            self.stats["average_execution_time"] = (total_time + duration) / self.stats[
+                "total_commands"
+            ]
 
     def get_statistics(self) -> dict[str, Any]:
         """Get monitoring statistics."""
@@ -755,9 +816,14 @@ class TerminalMonitor:
         return {
             **self.stats,
             "uptime_seconds": uptime,
-            "active_executions": len([e for e in self.executions.values() if e.state == CommandState.RUNNING]),
+            "active_executions": len(
+                [e for e in self.executions.values() if e.state == CommandState.RUNNING]
+            ),
             "total_executions": len(self.executions),
-            "success_rate": (self.stats["successful_commands"] / max(1, self.stats["total_commands"])) * 100,
+            "success_rate": (
+                self.stats["successful_commands"] / max(1, self.stats["total_commands"])
+            )
+            * 100,
             "recovery_rate": (
                 self.stats["recovered_commands"]
                 / max(1, self.stats["failed_commands"] + self.stats["timeout_commands"])
@@ -858,7 +924,9 @@ if __name__ == "__main__":
         # Test simple command
         try:
             result = await execute_monitored_command(["echo", "Hello, World!"])
-            print(f"✅ Simple command result: {result.state}, output: {result.stdout.strip()}")
+            print(
+                f"✅ Simple command result: {result.state}, output: {result.stdout.strip()}"
+            )
         except Exception as e:
             print(f"❌ Simple command failed: {e}")
 

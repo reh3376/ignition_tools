@@ -366,7 +366,7 @@ try:
     agent = DistillationWhiskeyAgent()
 except Exception as e:
     print(f"Agent creation failed: {e}")
-    
+
     # Check environment
     import os
     required_vars = ['SPECIALIZED_AGENTS_ENABLED', 'WHISKEY_DISTILLATION_ENABLED']
@@ -542,4 +542,4 @@ print(f"Process Template Validation: {audit_report['process_validation']}")
 - Specialized Agent Development Course
 - Industry-Specific Implementation Training
 - Regulatory Compliance Certification
-- Advanced Integration Workshops 
+- Advanced Integration Workshops

@@ -531,7 +531,7 @@ async def _analyze_interaction_patterns(
         # Analyze patterns
         patterns = {
             "total_interactions": len(all_interactions),
-            "unique_users": len(set(i.get("user_id") for i in all_interactions)),
+            "unique_users": len({i.get("user_id") for i in all_interactions}),
             "average_rating": 0.0,
             "most_active_domain": "General",
             "top_topics": [],

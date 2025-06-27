@@ -1,4 +1,4 @@
-"""Phase 14: MPC Framework & Production Control 🎛️
+"""Phase 14: MPC Framework & Production Control 🎛️.
 
 This module implements a comprehensive Model Predictive Control (MPC) framework
 with advanced production control capabilities for Ignition systems.

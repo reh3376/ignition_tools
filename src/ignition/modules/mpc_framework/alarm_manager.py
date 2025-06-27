@@ -19,7 +19,7 @@ import asyncio
 import logging
 import os
 from collections.abc import AsyncIterator, Callable
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
@@ -609,12 +609,11 @@ class ProductionAlarmManager:
         # Find matching notification rules
         matching_rules = []
         for rule in self.config.notification_rules:
-            if alarm.priority in rule.alarm_priorities:
-                if (
-                    not rule.alarm_categories
-                    or alarm.definition.category in rule.alarm_categories
-                ):
-                    matching_rules.append(rule)
+            if alarm.priority in rule.alarm_priorities and (
+                not rule.alarm_categories
+                or alarm.definition.category in rule.alarm_categories
+            ):
+                matching_rules.append(rule)
 
         # Schedule notifications for matching rules
         for rule in matching_rules:
@@ -705,9 +704,7 @@ class ProductionAlarmManager:
             for rule in self.config.notification_rules:
                 if alarm.priority in rule.alarm_priorities and rule.escalation_levels:
                     if alarm.escalation_level <= len(rule.escalation_levels):
-                        escalation_config = rule.escalation_levels[
-                            alarm.escalation_level - 1
-                        ]
+                        rule.escalation_levels[alarm.escalation_level - 1]
                         # Process escalation configuration
                         logger.warning(
                             f"⬆️ Alarm escalated: {alarm.definition.name} (Level {alarm.escalation_level})"
@@ -835,10 +832,8 @@ class ProductionAlarmManager:
             if self._processing_task:
                 self._processing_active = False
                 self._processing_task.cancel()
-                try:
+                with suppress(asyncio.CancelledError):
                     await self._processing_task
-                except asyncio.CancelledError:
-                    pass
 
             # Clear data structures
             self._active_alarms.clear()

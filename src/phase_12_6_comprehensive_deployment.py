@@ -692,7 +692,7 @@ class Phase126ComprehensiveTester:
             )
 
             # Validate configuration
-config_valid: list[Any] | str =  (
+            config_valid = (
                 isinstance(health_config.endpoint, str) and health_config.interval > 0
             )
 

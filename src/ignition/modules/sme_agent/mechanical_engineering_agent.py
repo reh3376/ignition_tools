@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Mechanical Engineering Domain Agent for Phase 16 Multi-Domain Architecture
+"""Mechanical Engineering Domain Agent for Phase 16 Multi-Domain Architecture.
 
 Following crawl_mcp.py methodology for systematic development:
 - Step 1: Environment validation first
@@ -21,17 +21,15 @@ Mechanical Engineering Expertise:
 """
 
 import asyncio
-import json
 import logging
 import os
 import time
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Self
+from typing import Any, Self
 
 from dotenv import load_dotenv
 
 from .multi_domain_architecture import (
-    AgentStatus,
     AgentTask,
     BaseDomainAgent,
     DomainType,
@@ -45,7 +43,7 @@ logger = logging.getLogger(__name__)
 
 class MechanicalEngineeringAgent(BaseDomainAgent):
     """Mechanical Engineering Domain Agent.
-    
+
     Specialized SME agent for mechanical engineering tasks including:
     - Fluid dynamics and heat transfer
     - Mechanical design and materials
@@ -54,127 +52,129 @@ class MechanicalEngineeringAgent(BaseDomainAgent):
     - Vibration analysis
     - Maintenance and reliability
     """
-    
+
     def __init__(self: Self, agent_id: str = "mechanical_engineering_agent"):
         """Initialize Mechanical Engineering Agent.
-        
+
         Args:
             agent_id: Unique identifier for the agent
         """
         super().__init__(
-            agent_id=agent_id,
-            domain=DomainType.MECHANICAL,
-            max_concurrent_tasks=5
+            agent_id=agent_id, domain=DomainType.MECHANICAL, max_concurrent_tasks=5
         )
-        
+
         # Mechanical engineering specific configuration
         self.expertise_areas = {
             "fluid_dynamics": {
                 "description": "Fluid flow, heat transfer, and thermal systems",
                 "keywords": ["fluid", "flow", "heat", "thermal", "pressure"],
-                "complexity_level": "advanced"
+                "complexity_level": "advanced",
             },
             "mechanical_design": {
                 "description": "Mechanical design, materials, and stress analysis",
                 "keywords": ["design", "material", "stress", "mechanical"],
-                "complexity_level": "standard"
-            }
+                "complexity_level": "standard",
+            },
         }
-        
+
         # Knowledge base paths
-        self.knowledge_base_path = os.getenv("MECHANICAL_KNOWLEDGE_BASE_PATH", "data/mechanical_engineering")
-        
+        self.knowledge_base_path = os.getenv(
+            "MECHANICAL_KNOWLEDGE_BASE_PATH", "data/mechanical_engineering"
+        )
+
         self.logger.info(f"Initialized Mechanical Engineering Agent: {agent_id}")
-    
-    def validate_environment(self: Self) -> Dict[str, Any]:
+
+    def validate_environment(self: Self) -> dict[str, Any]:
         """Step 1: Environment Validation First."""
         validation_result = super().validate_environment()
-        
+
         mechanical_vars = ["MECHANICAL_KNOWLEDGE_BASE_PATH"]
         for var in mechanical_vars:
             value = os.getenv(var)
             if value is None:
-                validation_result["warnings"].append(f"Optional environment variable {var} not set")
+                validation_result["warnings"].append(
+                    f"Optional environment variable {var} not set"
+                )
             else:
                 validation_result["config"][var] = value
-        
+
         return validation_result
-    
-    async def process_mechanical_task(self: Self, task: AgentTask) -> Dict[str, Any]:
+
+    async def process_mechanical_task(self: Self, task: AgentTask) -> dict[str, Any]:
         """Process mechanical engineering specific task."""
         start_time = time.time()
-        
+
         try:
             analysis = {
                 "task_type": "mechanical_engineering",
                 "analysis": {
                     "domain": "Mechanical Engineering",
-                    "approach": "Systematic mechanical engineering analysis"
+                    "approach": "Systematic mechanical engineering analysis",
                 },
                 "recommendations": [
                     "Apply fundamental mechanical engineering principles",
-                    "Consider operating conditions and environment"
-                ]
+                    "Consider operating conditions and environment",
+                ],
             }
-            
+
             return {
                 "success": True,
                 "analysis": analysis,
                 "expertise_applied": "mechanical_engineering",
-                "processing_time": time.time() - start_time
+                "processing_time": time.time() - start_time,
             }
-            
+
         except Exception as e:
             self.logger.error(f"Error processing mechanical task: {e}")
             return {
                 "success": False,
-                "error": f"Processing failed: {str(e)}",
-                "processing_time": time.time() - start_time
+                "error": f"Processing failed: {e!s}",
+                "processing_time": time.time() - start_time,
             }
-    
+
     async def assign_task(self: Self, task: AgentTask) -> bool:
         """Assign task to mechanical engineering agent."""
         try:
             if len(self.active_tasks) >= self.max_concurrent_tasks:
                 return False
-            
+
             self.active_tasks[task.task_id] = task
             task.assigned_agent = self.agent_id
             task.status = "assigned"
-            
+
             asyncio.create_task(self._execute_mechanical_task(task))
             return True
-            
+
         except Exception as e:
             self.logger.error(f"Error assigning task {task.task_id}: {e}")
             return False
-    
+
     async def _execute_mechanical_task(self: Self, task: AgentTask) -> None:
         """Execute mechanical engineering task."""
         try:
             task.status = "processing"
-            
+
             result = await self.process_mechanical_task(task)
-            
+
             task.result = result
             task.status = "completed" if result.get("success", False) else "failed"
             task.completed_at = datetime.now()
-            
+
             if task.task_id in self.active_tasks:
                 del self.active_tasks[task.task_id]
-            
+
         except Exception as e:
             task.status = "failed"
             task.result = {"success": False, "error": str(e)}
             task.completed_at = datetime.now()
-            
+
             if task.task_id in self.active_tasks:
                 del self.active_tasks[task.task_id]
-    
-    def get_agent_status(self: Self) -> Dict[str, Any]:
+
+    def get_agent_status(self: Self) -> dict[str, Any]:
         """Get comprehensive agent status information."""
         base_status = super().get_agent_status()
-        
+
         # Add mechanical engineering specific status
         mechanical_status = {
             "expertise_areas": list(self.expertise_areas.keys()),
@@ -188,9 +188,9 @@ class MechanicalEngineeringAgent(BaseDomainAgent):
                 "Vibration analysis and condition monitoring",
                 "Maintenance and reliability engineering",
                 "Thermodynamic cycle analysis",
-                "Manufacturing process optimization"
-            ]
+                "Manufacturing process optimization",
+            ],
         }
-        
+
         base_status.update(mechanical_status)
-        return base_status 
+        return base_status

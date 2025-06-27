@@ -66,6 +66,35 @@ ign-scripts-ui = "src.ui.app:main"
 target-version = "py311"
 line-length = 120
 
+# Force exclusion to ensure documentation files are never checked
+force-exclude = true
+
+# ===================================================================
+# DOCUMENTATION FILE EXCLUSIONS - Following crawl_mcp.py Methodology
+# ===================================================================
+# Comprehensive exclusion of markdown and documentation files from
+# all linting operations. This prevents wasting time on documentation
+# files that don't need Python code quality checks.
+#
+# Exclusion Strategy:
+# 1. Direct file pattern exclusions (*.md, *.txt, etc.)
+# 2. Directory-based exclusions (docs/, documentation/)
+# 3. Per-file ignore rules with "ALL" to catch any edge cases
+# ===================================================================
+exclude = [
+    "*.md",
+    "**/*.md",
+    "docs/**/*.md",
+    "README.md",
+    "CHANGELOG.md",
+    "*.markdown",
+    "**/*.markdown",
+    "docs/",
+    "documentation/",
+    "*.txt",
+    "**/*.txt"
+]
+
 [tool.ruff.lint]
 select = [
     "E",  # pycodestyle errors
@@ -107,6 +136,16 @@ convention = "google"
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*" = ["D", "S101", "ARG", "FBT"]
 "scripts/**/*" = ["D", "T201"]
+# Comprehensive exclusion of all documentation files from all linting rules
+"*.md" = ["ALL"]
+"**/*.md" = ["ALL"]
+"*.markdown" = ["ALL"]
+"**/*.markdown" = ["ALL"]
+"*.txt" = ["ALL"]
+"**/*.txt" = ["ALL"]
+"docs/**/*" = ["ALL"]
+"README.*" = ["ALL"]
+"CHANGELOG.*" = ["ALL"]
 
 [tool.mypy]
 python_version = "3.11"

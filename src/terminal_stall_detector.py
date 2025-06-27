@@ -54,18 +54,34 @@ class StallDetectorConfig(BaseModel):
     """Configuration for stall detection."""
 
     # Detection settings
-    check_interval: float = Field(default=2.0, ge=0.5, le=10.0, description="Check interval in seconds")
-    stall_timeout: int = Field(default=30, ge=5, le=300, description="Seconds before considering stalled")
-    output_timeout: int = Field(default=15, ge=5, le=120, description="Seconds without output before stall")
+    check_interval: float = Field(
+        default=2.0, ge=0.5, le=10.0, description="Check interval in seconds"
+    )
+    stall_timeout: int = Field(
+        default=30, ge=5, le=300, description="Seconds before considering stalled"
+    )
+    output_timeout: int = Field(
+        default=15, ge=5, le=120, description="Seconds without output before stall"
+    )
 
     # Recovery settings
-    max_recovery_attempts: int = Field(default=3, ge=1, le=10, description="Maximum recovery attempts")
-    recovery_delay: float = Field(default=1.0, ge=0.1, le=5.0, description="Delay between recovery attempts")
-    timeout_multiplier: float = Field(default=1.5, ge=1.0, le=3.0, description="Timeout extension multiplier")
+    max_recovery_attempts: int = Field(
+        default=3, ge=1, le=10, description="Maximum recovery attempts"
+    )
+    recovery_delay: float = Field(
+        default=1.0, ge=0.1, le=5.0, description="Delay between recovery attempts"
+    )
+    timeout_multiplier: float = Field(
+        default=1.5, ge=1.0, le=3.0, description="Timeout extension multiplier"
+    )
 
     # System settings
-    max_concurrent: int = Field(default=5, ge=1, le=20, description="Maximum concurrent monitored commands")
-    enable_auto_recovery: bool = Field(default=True, description="Enable automatic recovery")
+    max_concurrent: int = Field(
+        default=5, ge=1, le=20, description="Maximum concurrent monitored commands"
+    )
+    enable_auto_recovery: bool = Field(
+        default=True, description="Enable automatic recovery"
+    )
 
     @validator("check_interval")
     def validate_check_interval(cls, v) -> Any:
@@ -78,9 +94,13 @@ class MonitoredCommandRequest(BaseModel):
     """Request to monitor a command for stalls."""
 
     command: str | list[str] = Field(..., description="Command to execute and monitor")
-    timeout: int | None = Field(default=None, ge=1, le=3600, description="Command timeout in seconds")
+    timeout: int | None = Field(
+        default=None, ge=1, le=3600, description="Command timeout in seconds"
+    )
     cwd: str | None = Field(default=None, description="Working directory")
-    env: dict[str, str] | None = Field(default=None, description="Environment variables")
+    env: dict[str, str] | None = Field(
+        default=None, description="Environment variables"
+    )
     shell: bool = Field(default=False, description="Execute in shell")
 
     # Recovery settings
@@ -93,7 +113,9 @@ class MonitoredCommandRequest(BaseModel):
         description="Recovery actions to try in order",
     )
     critical: bool = Field(default=False, description="Mark as critical command")
-    auto_recover: bool = Field(default=True, description="Enable auto-recovery for this command")
+    auto_recover: bool = Field(
+        default=True, description="Enable auto-recovery for this command"
+    )
 
     @validator("command")
     def validate_command(cls, v) -> Any:
@@ -206,32 +228,40 @@ class TerminalStallDetector:
                 pass
 
             try:
-                import threading
+                import importlib.util
 
-                validation_results["threading_available"] = True
+                validation_results["threading_available"] = (
+                    importlib.util.find_spec("threading") is not None
+                )
             except ImportError:
-                pass
+                validation_results["threading_available"] = False
 
             try:
-                import signal
+                import importlib.util
 
-                validation_results["signal_handling_available"] = True
+                validation_results["signal_handling_available"] = (
+                    importlib.util.find_spec("signal") is not None
+                )
             except ImportError:
-                pass
+                validation_results["signal_handling_available"] = False
 
             # System resources check
             try:
                 import psutil
 
                 memory = psutil.virtual_memory()
-                validation_results["system_resources_ok"] = memory.available > 128 * 1024 * 1024  # 128MB
+                validation_results["system_resources_ok"] = (
+                    memory.available > 128 * 1024 * 1024
+                )  # 128MB
             except ImportError:
                 # Fallback without psutil
                 validation_results["system_resources_ok"] = True
 
             # Test basic command execution
             try:
-                result = subprocess.run(["echo", "test"], capture_output=True, text=True, timeout=5)
+                result = subprocess.run(
+                    ["echo", "test"], capture_output=True, text=True, timeout=5
+                )
                 validation_results["basic_commands_work"] = result.returncode == 0
             except Exception:
                 pass
@@ -259,7 +289,11 @@ class TerminalStallDetector:
                 "basic_commands_work",
             ]
 
-            missing_components = [comp for comp in required_components if not env_validation.get(comp, False)]
+            missing_components = [
+                comp
+                for comp in required_components
+                if not env_validation.get(comp, False)
+            ]
 
             if missing_components:
                 raise RuntimeError(f"Missing required components: {missing_components}")
@@ -270,7 +304,9 @@ class TerminalStallDetector:
             self.monitoring_active = True
 
             # Start monitoring thread
-            self.monitor_thread = threading.Thread(target=self._monitoring_loop, daemon=True, name="StallDetector")
+            self.monitor_thread = threading.Thread(
+                target=self._monitoring_loop, daemon=True, name="StallDetector"
+            )
             self.monitor_thread.start()
 
             return True
@@ -297,7 +333,9 @@ class TerminalStallDetector:
                     with contextlib.suppress(Exception):
                         execution.process.kill()
 
-    async def execute_monitored_command(self, request: MonitoredCommandRequest) -> CommandExecution:
+    async def execute_monitored_command(
+        self, request: MonitoredCommandRequest
+    ) -> CommandExecution:
         """Execute a command with stall monitoring.
 
         Args:
@@ -315,11 +353,15 @@ class TerminalStallDetector:
 
         # Check concurrent limit
         active_count = sum(
-            1 for e in self.executions.values() if e.state in [CommandState.RUNNING, CommandState.PENDING]
+            1
+            for e in self.executions.values()
+            if e.state in [CommandState.RUNNING, CommandState.PENDING]
         )
 
         if active_count >= self.config.max_concurrent:
-            raise RuntimeError(f"Maximum concurrent commands limit reached ({self.config.max_concurrent})")
+            raise RuntimeError(
+                f"Maximum concurrent commands limit reached ({self.config.max_concurrent})"
+            )
 
         # Create execution
         execution_id = f"cmd_{int(time.time() * 1000)}_{len(self.executions)}"
@@ -412,20 +454,30 @@ class TerminalStallDetector:
             if execution.time_since_output() > self.config.output_timeout:
                 if execution.state != CommandState.STALLED:
                     execution.state = CommandState.STALLED
-                    execution.warnings.append(f"Command stalled - no output for {self.config.output_timeout}s")
+                    execution.warnings.append(
+                        f"Command stalled - no output for {self.config.output_timeout}s"
+                    )
                     self.stats["stalled_commands"] += 1
 
-                    if execution.request.auto_recover and self.config.enable_auto_recovery:
+                    if (
+                        execution.request.auto_recover
+                        and self.config.enable_auto_recovery
+                    ):
                         await self._attempt_recovery(execution, "stall")
 
             # Check for overall stall (total time)
             if execution.get_duration() > self.config.stall_timeout:
                 if execution.state == CommandState.RUNNING:
                     execution.state = CommandState.STALLED
-                    execution.warnings.append(f"Command stalled - running for {self.config.stall_timeout}s")
+                    execution.warnings.append(
+                        f"Command stalled - running for {self.config.stall_timeout}s"
+                    )
                     self.stats["stalled_commands"] += 1
 
-                    if execution.request.auto_recover and self.config.enable_auto_recovery:
+                    if (
+                        execution.request.auto_recover
+                        and self.config.enable_auto_recovery
+                    ):
                         await self._attempt_recovery(execution, "long_running")
 
             await asyncio.sleep(self.config.check_interval)
@@ -458,7 +510,9 @@ class TerminalStallDetector:
     async def _attempt_recovery(self, execution: CommandExecution, reason: str) -> None:
         """Attempt to recover a stalled command."""
         if execution.recovery_attempts >= self.config.max_recovery_attempts:
-            execution.errors.append(f"Maximum recovery attempts reached ({self.config.max_recovery_attempts})")
+            execution.errors.append(
+                f"Maximum recovery attempts reached ({self.config.max_recovery_attempts})"
+            )
             return
 
         execution.recovery_attempts += 1
@@ -467,12 +521,16 @@ class TerminalStallDetector:
         for action in execution.request.recovery_actions:
             try:
                 success = await self._execute_recovery_action(execution, action, reason)
-                execution.recovery_history.append(f"{action.value}:{reason}:{'success' if success else 'failed'}")
+                execution.recovery_history.append(
+                    f"{action.value}:{reason}:{'success' if success else 'failed'}"
+                )
 
                 if success:
                     execution.state = CommandState.RECOVERED
                     self.stats["recovered_commands"] += 1
-                    execution.warnings.append(f"Recovered using {action.value} for {reason}")
+                    execution.warnings.append(
+                        f"Recovered using {action.value} for {reason}"
+                    )
                     return
 
                 # Wait between recovery attempts
@@ -484,7 +542,9 @@ class TerminalStallDetector:
         # All recovery attempts failed
         execution.errors.append(f"All recovery attempts failed for {reason}")
 
-    async def _execute_recovery_action(self, execution: CommandExecution, action: RecoveryAction, reason: str) -> bool:
+    async def _execute_recovery_action(
+        self, execution: CommandExecution, action: RecoveryAction, reason: str
+    ) -> bool:
         """Execute a specific recovery action.
 
         Args:
@@ -538,14 +598,20 @@ class TerminalStallDetector:
                 # Extend timeout
                 if execution.request.timeout:
                     old_timeout = execution.request.timeout
-                    execution.request.timeout = int(old_timeout * self.config.timeout_multiplier)
-                    execution.warnings.append(f"Extended timeout from {old_timeout}s to {execution.request.timeout}s")
+                    execution.request.timeout = int(
+                        old_timeout * self.config.timeout_multiplier
+                    )
+                    execution.warnings.append(
+                        f"Extended timeout from {old_timeout}s to {execution.request.timeout}s"
+                    )
                     return True
                 return False
 
             elif action == RecoveryAction.ESCALATE:
                 # Escalate for manual intervention
-                execution.errors.append(f"Command escalated for manual intervention: {reason}")
+                execution.errors.append(
+                    f"Command escalated for manual intervention: {reason}"
+                )
                 print(f"🚨 ESCALATION REQUIRED: Command {execution.id}")
                 print(f"   Command: {execution.request.command}")
                 print(f"   Reason: {reason}")
@@ -634,7 +700,11 @@ class TerminalStallDetector:
         """Get monitoring statistics."""
         uptime = time.time() - self.stats["start_time"]
         active_executions = len(
-            [e for e in self.executions.values() if e.state in [CommandState.RUNNING, CommandState.STALLED]]
+            [
+                e
+                for e in self.executions.values()
+                if e.state in [CommandState.RUNNING, CommandState.STALLED]
+            ]
         )
 
         return {
@@ -642,8 +712,15 @@ class TerminalStallDetector:
             "uptime_seconds": uptime,
             "active_executions": active_executions,
             "total_executions": len(self.executions),
-            "success_rate": (self.stats["completed_commands"] / max(1, self.stats["total_commands"])) * 100,
-            "recovery_rate": (self.stats["recovered_commands"] / max(1, self.stats["stalled_commands"])) * 100,
+            "success_rate": (
+                self.stats["completed_commands"] / max(1, self.stats["total_commands"])
+            )
+            * 100,
+            "recovery_rate": (
+                self.stats["recovered_commands"]
+                / max(1, self.stats["stalled_commands"])
+            )
+            * 100,
         }
 
 
@@ -738,14 +815,18 @@ if __name__ == "__main__":
         # Test normal command
         try:
             result = await execute_with_stall_detection(["echo", "Hello, World!"])
-            print(f"✅ Normal command: {result.state} - {' '.join(result.stdout_lines)}")
+            print(
+                f"✅ Normal command: {result.state} - {' '.join(result.stdout_lines)}"
+            )
         except Exception as e:
             print(f"❌ Normal command failed: {e}")
 
         # Test timeout command
         try:
             result = await execute_with_stall_detection(["sleep", "5"], timeout=2)
-            print(f"⏰ Timeout command: {result.state} - Recovery attempts: {result.recovery_attempts}")
+            print(
+                f"⏰ Timeout command: {result.state} - Recovery attempts: {result.recovery_attempts}"
+            )
         except Exception as e:
             print(f"❌ Timeout command failed: {e}")
 
