@@ -102,6 +102,16 @@ except ImportError as e:
     print(f"MPC Framework commands not available: {e}")
     pass
 
+# Import Phase 15 Advanced Process Control commands
+try:
+    from src.ignition.modules.advanced_process_control.cli_commands import apc_cli
+
+    main.add_command(apc_cli)
+except ImportError as e:
+    # Advanced Process Control commands not available
+    print(f"Advanced Process Control commands not available: {e}")
+    pass
+
 # Register command groups with main CLI
 main.add_command(script)
 main.add_command(template)
