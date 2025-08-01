@@ -12,7 +12,7 @@
 #   python3 scripts/run_tests.py --all
 #   python3 scripts/monitor_logs.py --live
 #
-FROM python:3.11-slim
+FROM python:3.14.0rc1-slim
 
 # Set working directory
 WORKDIR /app
